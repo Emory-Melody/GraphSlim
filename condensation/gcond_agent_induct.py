@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.nn import Parameter
 import torch.nn.functional as F
-from utils import match_loss, regularization, row_normalize_tensor
+from .utils import match_loss, regularization
 import deeprobust.graph.utils as utils
 from copy import deepcopy
 import numpy as np
@@ -13,11 +13,10 @@ from models.gcn import GCN
 from models.sgc import SGC
 from models.sgc_multi import SGC as SGC1
 from models.parametrized_adj import PGE
-import scipy.sparse as sp
 from torch_sparse import SparseTensor
 
 
-class GCond:
+class GCondInd:
 
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
@@ -101,25 +100,25 @@ class GCond:
                   "accuracy= {:.4f}".format(acc_test.item()))
         print(adj_syn.sum(), adj_syn.sum()/(adj_syn.shape[0]**2))
 
-        if False:
-            if self.args.dataset == 'ogbn-arxiv':
-                thresh = 0.6
-            elif self.args.dataset == 'reddit':
-                thresh = 0.91
-            else:
-                thresh = 0.7
-
-            labels_train = torch.LongTensor(data.labels_train).cuda()
-            output = model.predict(data.feat_train, data.adj_train)
-            # loss_train = F.nll_loss(output, labels_train)
-            # acc_train = utils.accuracy(output, labels_train)
-            loss_train = torch.tensor(0)
-            acc_train = torch.tensor(0)
-            if verbose:
-                print("Train set results:",
-                      "loss= {:.4f}".format(loss_train.item()),
-                      "accuracy= {:.4f}".format(acc_train.item()))
-            res.append(acc_train.item())
+        # if False:
+        #     if self.args.dataset == 'ogbn-arxiv':
+        #         thresh = 0.6
+        #     elif self.args.dataset == 'reddit':
+        #         thresh = 0.91
+        #     else:
+        #         thresh = 0.7
+        #
+        #     labels_train = torch.LongTensor(data.labels_train).cuda()
+        #     output = model.predict(data.feat_train, data.adj_train)
+        #     # loss_train = F.nll_loss(output, labels_train)
+        #     # acc_train = utils.accuracy(output, labels_train)
+        #     loss_train = torch.tensor(0)
+        #     acc_train = torch.tensor(0)
+        #     if verbose:
+        #         print("Train set results:",
+        #               "loss= {:.4f}".format(loss_train.item()),
+        #               "accuracy= {:.4f}".format(acc_train.item()))
+        #     res.append(acc_train.item())
         return res
 
     def train(self, verbose=True):

@@ -15,7 +15,7 @@ from torch_geometric.nn import APPNP as ModuleAPPNP
 # from torch_geometric.nn import GATConv
 from .mygatconv import GATConv
 import numpy as np
-import scipy.sparse as sp
+import scipy as sp
 
 from torch.nn import Linear
 from itertools import repeat
@@ -222,7 +222,6 @@ class GraphData:
 
 
 from torch_geometric.data import InMemoryDataset, Data
-import scipy.sparse as sp
 
 class Dpr2Pyg(InMemoryDataset):
 
@@ -264,7 +263,7 @@ class Dpr2Pyg(InMemoryDataset):
             edge_index = edge_index_selfloop
             edge_weight = adj_selfloop[edge_index_selfloop[0], edge_index_selfloop[1]]
         else:
-            adj_selfloop = dpr_data.adj + sp.eye(dpr_data.adj.shape[0])
+            adj_selfloop = dpr_data.adj + sp.sparse.eye(dpr_data.adj.shape[0])
             edge_index = torch.LongTensor(adj_selfloop.nonzero()).cuda()
             edge_weight = torch.FloatTensor(adj_selfloop[adj_selfloop.nonzero()]).cuda()
 

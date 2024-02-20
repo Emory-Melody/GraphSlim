@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch.nn.functional as F
 import math
 import torch
 import torch.optim as optim
@@ -7,14 +6,12 @@ from torch.nn.parameter import Parameter
 from torch.nn.modules.module import Module
 from deeprobust.graph import utils
 from copy import deepcopy
-from sklearn.metrics import f1_score
-from torch.nn import init
+from utils import *
 import torch_sparse
+from torch_sparse import SparseTensor
 
 
 class GraphConvolution(Module):
-    """Simple GCN layer, similar to https://github.com/tkipf/pygcn
-    """
 
     def __init__(self, in_features, out_features, with_bias=True):
         super(GraphConvolution, self).__init__()
@@ -37,7 +34,7 @@ class GraphConvolution(Module):
             support = torch.spmm(input, self.weight)
         else:
             support = torch.mm(input, self.weight)
-        if isinstance(adj, torch_sparse.SparseTensor):
+        if isinstance(adj, SparseTensor):
             output = torch_sparse.matmul(adj, support)
         else:
             output = torch.spmm(adj, support)
@@ -96,6 +93,7 @@ class GCN(nn.Module):
         self.multi_label = None
 
     def forward(self, x, adj):
+
         for ix, layer in enumerate(self.layers):
             x = layer(x, adj)
             if ix != len(self.layers) - 1:
@@ -138,7 +136,7 @@ class GCN(nn.Module):
         else:
             return F.log_softmax(x, dim=1)
 
-    def initialize(self):
+    def reset_parameters(self):
         """Initialize parameters of GCN.
         """
         for layer in self.layers:
@@ -149,15 +147,13 @@ class GCN(nn.Module):
 
     def fit_with_val(self, features, adj, data, train_iters=200, initialize=True, verbose=False, normalize=True,
                      patience=None, noval=False, **kwargs):
-        '''data: full data class'''
         if initialize:
-            self.initialize()
+            self.reset_parameters()
 
         if type(adj) is not torch.Tensor:
-            features, adj = utils.to_tensor(features, adj, device=self.device)
-        else:
-            features = features.to(self.device)
-            adj = adj.to(self.device)
+            adj = my_to_tensor(adj, device=self.device)
+        if type(features) is not torch.Tensor:
+            features = my_to_tensor(features, device=self.device)
 
         if normalize:
             if utils.is_sparse_tensor(adj):
@@ -227,10 +223,10 @@ class GCN(nn.Module):
                 output = self.forward(feat_full, adj_full_norm)
 
                 if adj_val:
-                    loss_val = F.nll_loss(output, labels_val)
+                    # loss_val = F.nll_loss(output, labels_val)
                     acc_val = utils.accuracy(output, labels_val)
                 else:
-                    loss_val = F.nll_loss(output[data.idx_val], labels_val)
+                    # loss_val = F.nll_loss(output[data.idx_val], labels_val)
                     acc_val = utils.accuracy(output[data.idx_val], labels_val)
 
                 if acc_val > best_acc_val:
@@ -242,7 +238,7 @@ class GCN(nn.Module):
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
 
-    def test(self, idx_test, data=None, verbose=False):
+    def test(self, data=None, verbose=False):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
@@ -250,7 +246,8 @@ class GCN(nn.Module):
             node testing indices
         """
         self.eval()
-        # whether condensed, use the raw graph to test
+        idx_test = data.idx_test
+        # whether condensed or not, use the raw graph to test
         output = self.predict(data.feat_full, data.adj_full)
         # output = self.output
         labels_test = torch.LongTensor(data.labels_test).to(self.device)

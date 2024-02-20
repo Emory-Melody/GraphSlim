@@ -1,23 +1,19 @@
-import numpy as np
-import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.nn import Parameter
-import torch.nn.functional as F
-from utils import match_loss, regularization, row_normalize_tensor
+from collections import Counter
+from .utils import match_loss, regularization
 import deeprobust.graph.utils as utils
-from copy import deepcopy
 import numpy as np
 from tqdm import tqdm
+import torch.nn.functional as F
+import torch
 from models.gcn import GCN
 from models.sgc import SGC
 from models.sgc_multi import SGC as SGC1
 from models.parametrized_adj import PGE
-import scipy.sparse as sp
 from torch_sparse import SparseTensor
 
 
-class GCond:
+class GCondTrans:
 
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
@@ -47,7 +43,8 @@ class GCond:
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     def generate_labels_syn(self, data):
-        from collections import Counter
+        if not hasattr(data, 'labels_train'):
+            data.labels_train = data.labels[data.idx_train]
         counter = Counter(data.labels_train)
         num_class_dict = {}
         # n = len(data.labels_train)
@@ -85,8 +82,8 @@ class GCond:
         args = self.args
 
         if self.args.save:
-            torch.save(adj_syn, f'saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            torch.save(adj_syn, f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            torch.save(feat_syn, f'dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         if self.args.lr_adj == 0:
             n = len(data.labels_syn)
@@ -98,9 +95,9 @@ class GCond:
         labels_test = torch.LongTensor(data.labels_test).cuda()
 
         labels_train = torch.LongTensor(data.labels_train).cuda()
-        output = model.predict(data.feat_train, data.adj_train)
-        loss_train = F.nll_loss(output, labels_train)
-        acc_train = utils.accuracy(output, labels_train)
+        output = model.predict(data.feat_full, data.adj_full)
+        loss_train = F.nll_loss(output[data.idx_train], labels_train)
+        acc_train = utils.accuracy(output[data.idx_train], labels_train)
         if verbose:
             print("Train set results:",
                   "loss= {:.4f}".format(loss_train.item()),

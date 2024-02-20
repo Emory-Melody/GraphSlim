@@ -1,4 +1,4 @@
-import scipy.sparse as sp
+import scipy as sp
 import numpy as np
 import sys
 import json
@@ -15,7 +15,7 @@ class DataGraphSAINT:
 
     def __init__(self, dataset, **kwargs):
         dataset_str = '../data/' + dataset + '/'
-        adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
+        adj_full = sp.sparse.load_npz(dataset_str + 'adj_full.npz')
         self.nnodes = adj_full.shape[0]
         if dataset == 'ogbn-arxiv':
             adj_full = adj_full + adj_full.T
@@ -108,7 +108,7 @@ class DataGraphSAINT:
                 sizes = [10, 5]
 
         if self.class_dict2 is None:
-            print(f'sampling sizes{sizes}')
+            print(f'sampling size per hop{sizes}')
             self.class_dict2 = {}
             for i in range(self.nclass):
                 if transductive:
@@ -181,7 +181,7 @@ class Dpr2Pyg(InMemoryDataset):
         dpr_data = self.dpr_data
         edge_index = torch.LongTensor(dpr_data.adj.nonzero())
         # by default, the features in pyg data is dense
-        if sp.issparse(dpr_data.features):
+        if sp.sparse.issparse(dpr_data.features):
             x = torch.FloatTensor(dpr_data.features.todense()).float()
         else:
             x = torch.FloatTensor(dpr_data.features).float()

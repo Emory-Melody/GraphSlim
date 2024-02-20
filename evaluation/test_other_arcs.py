@@ -1,14 +1,7 @@
-import sys
-from deeprobust.graph.data import Dataset
-import numpy as np
-import random
-import time
 import argparse
-import torch
 from utils import *
-import torch.nn.functional as F
 from tester_other_arcs import Evaluator
-from utils_graphsaint import DataGraphSAINT
+from dataset.utils_graphsaint import DataGraphSAINT
 
 
 parser = argparse.ArgumentParser()

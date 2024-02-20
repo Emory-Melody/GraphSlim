@@ -11,7 +11,7 @@ from sklearn.metrics import f1_score
 from torch.nn import init
 import torch_sparse
 from torch_geometric.nn.inits import zeros
-import scipy.sparse as sp
+import scipy as sp
 import numpy as np
 
 

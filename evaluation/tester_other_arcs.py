@@ -18,7 +18,7 @@ from models.myappnp1 import APPNP1
 from models.mycheby import Cheby
 from models.mygraphsage import GraphSage
 from models.gat import GAT
-import scipy.sparse as sp
+import scipy as sp
 
 
 class Evaluator:
@@ -94,6 +94,7 @@ class Evaluator:
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
 
+        # inductive
         if args.dataset in ['reddit', 'flickr']:
             output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
@@ -105,7 +106,7 @@ class Evaluator:
                       "accuracy= {:.4f}".format(acc_test.item()))
 
         else:
-            # Full graph
+            # Full graph transduction
             output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
             acc_test = utils.accuracy(output[data.idx_test], labels_test)
@@ -115,15 +116,15 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-        labels_train = torch.LongTensor(data.labels_train).cuda()
-        output = model.predict(data.feat_train, data.adj_train)
-        loss_train = F.nll_loss(output, labels_train)
-        acc_train = utils.accuracy(output, labels_train)
-        if verbose:
-            print("Train set results:",
-                  "loss= {:.4f}".format(loss_train.item()),
-                  "accuracy= {:.4f}".format(acc_train.item()))
-        res.append(acc_train.item())
+        # labels_train = torch.LongTensor(data.labels_train).cuda()
+        # output = model.predict(data.feat_train, data.adj_train)
+        # loss_train = F.nll_loss(output, labels_train)
+        # acc_train = utils.accuracy(output, labels_train)
+        # if verbose:
+        #     print("Train set results:",
+        #           "loss= {:.4f}".format(loss_train.item()),
+        #           "accuracy= {:.4f}".format(acc_train.item()))
+        # res.append(acc_train.item())
         return res
 
     def get_syn_data(self, model_type=None):
@@ -189,7 +190,7 @@ class Evaluator:
         labels_test = torch.LongTensor(data.labels_test).cuda()
 
         if model_type == 'MLP':
-            output = model.predict_unnorm(data.feat_test, sp.eye(len(data.feat_test)))
+            output = model.predict_unnorm(data.feat_test, sp.sparse.eye(len(data.feat_test)))
         else:
             output = model.predict(data.feat_test, data.adj_test)
 
@@ -215,14 +216,14 @@ class Evaluator:
                       "accuracy= {:.4f}".format(acc_test.item()))
 
             labels_train = torch.LongTensor(data.labels_train).cuda()
-            output = model.predict(data.feat_train, data.adj_train)
-            loss_train = F.nll_loss(output, labels_train)
-            acc_train = utils.accuracy(output, labels_train)
-            if verbose:
-                print("Train set results:",
-                      "loss= {:.4f}".format(loss_train.item()),
-                      "accuracy= {:.4f}".format(acc_train.item()))
-            res.append(acc_train.item())
+            # output = model.predict(data.feat_train, data.adj_train)
+            # loss_train = F.nll_loss(output, labels_train)
+            # acc_train = utils.accuracy(output, labels_train)
+            # if verbose:
+            #     print("Train set results:",
+            #           "loss= {:.4f}".format(loss_train.item()),
+            #           "accuracy= {:.4f}".format(acc_train.item()))
+            # res.append(acc_train.item())
         return res
 
     def train(self, verbose=True):

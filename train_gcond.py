@@ -1,16 +1,11 @@
-from deeprobust.graph.data import Dataset
-import numpy as np
-import random
-import time
 import argparse
-import torch
 from utils import *
-import torch.nn.functional as F
-from gcond_agent_transduct import GCond
-from utils_graphsaint import DataGraphSAINT
+from dataset import *
+from condensation import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
+parser.add_argument('--setting', '-S', type=str, default='trans', help='trans/ind')
 parser.add_argument('--dataset', type=str, default='cora')
 parser.add_argument('--dis_metric', type=str, default='ours')
 parser.add_argument('--epochs', type=int, default=1000)
@@ -23,7 +18,7 @@ parser.add_argument('--weight_decay', type=float, default=0.0)
 parser.add_argument('--dropout', type=float, default=0.0)
 parser.add_argument('--normalize_features', type=bool, default=True)
 parser.add_argument('--keep_ratio', type=float, default=1.0)
-parser.add_argument('--reduction_rate', type=float, default=1)
+parser.add_argument('--reduction_rate', type=float, default=0.5)
 parser.add_argument('--seed', type=int, default=15, help='Random seed.')
 parser.add_argument('--alpha', type=float, default=0, help='regularization term.')
 parser.add_argument('--debug', type=int, default=0)
@@ -43,12 +38,18 @@ print(args)
 data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
 if args.dataset in data_graphsaint:
     data = DataGraphSAINT(args.dataset)
-    data_full = data.data_full
+    # arxiv: transductive
+    # flickr, reddict: inductive
 else:
-    data_full = get_dataset(args.dataset, args.normalize_features)
-    # TODO: trans not to ind
-    data = Transd2Ind(data_full, keep_ratio=args.keep_ratio)
+    data = get_dataset(args.dataset, args.normalize_features)
+    # trans or ind is optional for cora, citeseer, pubmed
+    data = TransAndInd(data, keep_ratio=args.keep_ratio)
 
-agent = GCond(data_full, args, device='cuda')
+if args.setting == 'trans':
+    agent = GCondTrans(data, args, device='cuda')
+elif args.setting == 'ind':
+    agent = GCondInd(data, args, device='cuda')
+else:
+    raise Exception('Unknown setting')
 
 agent.train()

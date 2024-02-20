@@ -1,21 +1,14 @@
-from deeprobust.graph.data import Dataset
-import numpy as np
-import random
-import time
 import argparse
-import torch
-import sys
-from deeprobust.graph.utils import *
-import torch.nn.functional as F
 from configs import load_config
 from utils import *
-from utils_graphsaint import DataGraphSAINT
+from dataset import *
 from models.gcn import GCN
-from coreset import KCenter, Herding, Random
+from sparsification.coreset import KCenter, Herding, Random
 from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
+parser.add_argument('--setting', '-S', type=str, default='trans', help='trans/ind')
 parser.add_argument('--dataset', type=str, default='cora')
 parser.add_argument('--hidden', type=int, default=256)
 parser.add_argument('--normalize_features', type=bool, default=True)
@@ -40,56 +33,107 @@ seed_everything(args.seed)
 data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
 if args.dataset in data_graphsaint:
     data = DataGraphSAINT(args.dataset)
-    data_full = data.data_full
-    # data = Transd2Ind(data_full, keep_ratio=args.keep_ratio)
+    # arxiv: transductive
+    # flickr, reddict: inductive
 else:
-    data_full = get_dataset(args.dataset, args.normalize_features)
-    data = Transd2Ind(data_full, keep_ratio=args.keep_ratio)
+    data = get_dataset(args.dataset, args.normalize_features)
+    # trans or ind is optional for cora, citeseer, pubmed
+    data = TransAndInd(data, keep_ratio=args.keep_ratio)
 
-features = data_full.features
-adj = data_full.adj
-labels = data_full.labels
-idx_train = data_full.idx_train
-idx_val = data_full.idx_val
-idx_test = data_full.idx_test
-
-# Setup GCN Model
 device = 'cuda'
-model = GCN(nfeat=features.shape[1], nhid=256, nclass=labels.max() + 1, device=device, weight_decay=args.weight_decay)
-
-model = model.to(device)
-model.fit_with_val(features, adj, data, train_iters=600, verbose=True)
-model.test(idx_test, data, verbose=True)
-
-embeds = model.predict().detach()
-
+num_classes = data.labels_full.max() + 1
 if args.method == 'kcenter':
     agent = KCenter(data, args, device='cuda')
 if args.method == 'herding':
     agent = Herding(data, args, device='cuda')
 if args.method == 'random':
     agent = Random(data, args, device='cuda')
+model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=num_classes, device=device,
+            weight_decay=args.weight_decay).to(device)
 
-idx_selected = agent.select(embeds)
+# ============start==================#
+if args.setting == 'trans':
+    features = data.feat_full
+    adj = data.adj_full
+    labels = data.labels_full
+    idx_train = data.idx_train
+    idx_val = data.idx_val
+    idx_test = data.idx_test
 
-feat_train = features[idx_selected]
-adj_train = adj[np.ix_(idx_selected, idx_selected)]
+    # Setup GCN Model
 
-data.labels_syn = labels[idx_selected]
+    model.fit_with_val(features, adj, data, train_iters=600, verbose=True)
+    model.test(data, verbose=True)
+    embeds = model.predict().detach()
 
-if args.save:
-    np.save(f'saved/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy', idx_selected)
+    idx_selected = agent.select(embeds)
 
-res = []
-runs = 10
-for _ in tqdm(range(runs)):
-    model.initialize()
-    model.fit_with_val(feat_train, adj_train, data,
-                       train_iters=600, normalize=True, verbose=False, condensed=True)
+    # induce a graph with selected nodes
+    feat_train = features[idx_selected]
+    adj_train = adj[np.ix_(idx_selected, idx_selected)]
 
-    # Full graph
-    acc_test = model.test(idx_test, data)
-    res.append(acc_test)
+    data.labels_syn = labels[idx_selected]
 
-res = np.array(res)
-print('Mean accuracy:', repr([res.mean(), res.std()]))
+    if args.save:
+        np.save(f'dataset/output/coreset/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
+                idx_selected)
+
+    res = []
+    runs = 10
+    for _ in tqdm(range(runs)):
+        model.fit_with_val(feat_train, adj_train, data,
+                           train_iters=600, normalize=True, verbose=False, condensed=True)
+
+        # Full graph
+        # interface: model.test(full_data)
+        acc_test = model.test(data)
+        res.append(acc_test)
+
+    res = np.array(res)
+    print('Mean accuracy:', repr([res.mean(), res.std()]))
+
+if args.setting == 'ind':
+    feat_train = data.feat_train
+    adj_train = data.adj_train
+    labels_train = data.labels_train
+
+    # Setup GCN Model
+
+    model.fit_with_val(feat_train, adj_train, data, train_iters=600, normalize=True, verbose=False)
+
+    model.eval()
+    labels_test = torch.LongTensor(data.labels_test).cuda()
+    feat_test, adj_test = data.feat_test, data.adj_test
+
+    embeds = model.predict().detach()
+
+    output = model.predict(feat_test, adj_test)
+    loss_test = F.nll_loss(output, labels_test)
+    acc_test = utils.accuracy(output, labels_test)
+    print("Test set results:",
+          "loss= {:.4f}".format(loss_test.item()),
+          "accuracy= {:.4f}".format(acc_test.item()))
+
+    idx_selected = agent.select(embeds, inductive=True)
+
+    feat_train = feat_train[idx_selected]
+    adj_train = adj_train[np.ix_(idx_selected, idx_selected)]
+
+    data.labels_syn = labels_train[idx_selected]
+
+    res = []
+    runs = 10
+    for _ in tqdm(range(runs)):
+        model.fit_with_val(feat_train, adj_train, data,
+                           train_iters=600, normalize=True, verbose=False, noval=True, condensed=True)
+
+        model.eval()
+        labels_test = torch.LongTensor(data.labels_test).cuda()
+
+        # interface: model.predict(reshaped feat,reshaped adj)
+        output = model.predict(feat_test, adj_test)
+        loss_test = F.nll_loss(output, labels_test)
+        acc_test = utils.accuracy(output, labels_test)
+        res.append(acc_test.item())
+    res = np.array(res)
+    print('Mean accuracy:', repr([res.mean(), res.std()]))
