@@ -29,11 +29,11 @@ class GCondInd:
         self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
         self.pge = PGE(nfeat=d, nnodes=n, device=device, args=args).to(device)
 
-        self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
+        self.data.labels_syn = self.generate_labels_syn(data)
         self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
-        print('adj_syn:', (n,n), 'feat_syn:', self.feat_syn.shape)
+        print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
@@ -44,7 +44,7 @@ class GCondInd:
         num_class_dict = {}
         n = len(data.labels_train)
 
-        sorted_counter = sorted(counter.items(), key=lambda x:x[1])
+        sorted_counter = sorted(counter.items(), key=lambda x: x[1])
         sum_ = 0
         labels_syn = []
         self.syn_class_indices = {}
@@ -61,14 +61,13 @@ class GCondInd:
                 labels_syn += [c] * num_class_dict[c]
 
         self.num_class_dict = num_class_dict
-        return labels_syn
+        return np.array(labels_syn)
 
     def test_with_val(self, verbose=True):
         res = []
 
         data, device = self.data, self.device
-        feat_syn, pge, labels_syn = self.feat_syn.detach(), \
-                                self.pge, self.labels_syn
+        feat_syn, pge = self.feat_syn.detach(), self.pge
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
         dropout = 0.5 if self.args.dataset in ['reddit'] else 0
         model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=dropout,
@@ -83,8 +82,8 @@ class GCondInd:
             torch.save(feat_syn, f'saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         noval = True
-        model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-                     train_iters=600, normalize=True, verbose=False, noval=noval)
+        model.fit_with_val(feat_syn, adj_syn, data,
+                           train_iters=600, normalize=True, verbose=False, noval=noval, condensed=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -98,7 +97,7 @@ class GCondInd:
             print("Test set results:",
                   "loss= {:.4f}".format(loss_test.item()),
                   "accuracy= {:.4f}".format(acc_test.item()))
-        print(adj_syn.sum(), adj_syn.sum()/(adj_syn.shape[0]**2))
+        # print(adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
 
         # if False:
         #     if self.args.dataset == 'ogbn-arxiv':
@@ -124,7 +123,7 @@ class GCondInd:
     def train(self, verbose=True):
         args = self.args
         data = self.data
-        feat_syn, pge, labels_syn = self.feat_syn, self.pge, self.labels_syn
+        feat_syn, pge, labels_syn = self.feat_syn, self.pge, torch.from_numpy(self.data.labels_syn).to(self.device)
         features, adj, labels = data.feat_train, data.adj_train, data.labels_train
         syn_class_indices = self.syn_class_indices
         features, adj, labels = utils.to_tensor(features, adj, labels, device=self.device)
@@ -138,23 +137,22 @@ class GCondInd:
 
         adj = adj_norm
         adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
-                value=adj._values(), sparse_sizes=adj.size()).t()
-
+                           value=adj._values(), sparse_sizes=adj.size()).t()
 
         outer_loop, inner_loop = get_loops(args)
 
-        for it in range(args.epochs+1):
+        for it in range(args.epochs + 1):
             loss_avg = 0
-            if args.sgc==1:
+            if args.sgc == 1:
                 model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
                             nclass=data.nclass, dropout=args.dropout,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
-            elif args.sgc==2:
+            elif args.sgc == 2:
                 model = SGC1(nfeat=data.feat_train.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=args.dropout,
-                            nlayers=args.nlayers, with_bn=False,
-                            device=self.device).to(self.device)
+                             nclass=data.nclass, dropout=args.dropout,
+                             nlayers=args.nlayers, with_bn=False,
+                             device=self.device).to(self.device)
 
             else:
                 model = GCN(nfeat=data.feat_train.shape[1], nhid=args.hidden,
@@ -175,14 +173,14 @@ class GCondInd:
 
                 BN_flag = False
                 for module in model.modules():
-                    if 'BatchNorm' in module._get_name(): #BatchNorm
+                    if 'BatchNorm' in module._get_name():  # BatchNorm
                         BN_flag = True
                 if BN_flag:
-                    model.train() # for updating the mu, sigma of BatchNorm
+                    model.train()  # for updating the mu, sigma of BatchNorm
                     output_real = model.forward(features, adj_norm)
                     for module in model.modules():
-                        if 'BatchNorm' in module._get_name():  #BatchNorm
-                            module.eval() # fix mu and sigma of every BatchNorm layer
+                        if 'BatchNorm' in module._get_name():  # BatchNorm
+                            module.eval()  # fix mu and sigma of every BatchNorm layer
 
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):
@@ -190,7 +188,7 @@ class GCondInd:
                         continue
 
                     batch_size, n_id, adjs = data.retrieve_class_sampler(
-                            c, adj, transductive=False, args=args)
+                        c, adj, transductive=False, args=args)
 
                     if args.nlayers == 1:
                         adjs = [adjs]
@@ -204,15 +202,15 @@ class GCondInd:
                     if args.nlayers == 1:
                         adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
                     else:
-                        adj_syn_norm_list = [adj_syn_norm]*(args.nlayers-1) + \
-                                [adj_syn_norm[ind[0]: ind[1]]]
+                        adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
+                                            [adj_syn_norm[ind[0]: ind[1]]]
 
                     output_syn = model.forward_sampler_syn(feat_syn, adj_syn_norm_list)
                     loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
 
                     gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
                     coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
-                    loss += coeff  * match_loss(gw_syn, gw_real, args, device=self.device)
+                    loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
                 loss_avg += loss.item()
                 # TODO: regularize
@@ -233,14 +231,13 @@ class GCondInd:
                 else:
                     self.optimizer_feat.step()
 
-                if args.debug and ol % 5 ==0:
+                if args.debug and ol % 5 == 0:
                     print('Gradient matching loss:', loss.item())
 
                 if ol == outer_loop - 1:
                     # print('loss_reg:', loss_reg.item())
                     # print('Gradient matching loss:', loss.item())
                     break
-
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn)
@@ -251,16 +248,16 @@ class GCondInd:
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
                     loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
                     loss_syn_inner.backward()
-                    optimizer_model.step() # update gnn param
+                    optimizer_model.step()  # update gnn param
 
-            loss_avg /= (data.nclass*outer_loop)
+            loss_avg /= (data.nclass * outer_loop)
             if it % 50 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it, loss_avg))
 
             eval_epochs = [100, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000, 3000, 4000, 5000]
 
             if verbose and it in eval_epochs:
-            # if verbose and (it+1) % 500 == 0:
+                # if verbose and (it+1) % 500 == 0:
                 res = []
                 runs = 1 if args.dataset in ['ogbn-arxiv', 'reddit', 'flickr'] else 3
                 for i in range(runs):
@@ -268,17 +265,15 @@ class GCondInd:
                     res.append(self.test_with_val())
                 res = np.array(res)
                 print('Test:',
-                        repr([res.mean(0), res.std(0)]))
-
-
+                      repr([res.mean(0), res.std(0)]))
 
     def get_sub_adj_feat(self, features):
         data = self.data
         args = self.args
         idx_selected = []
 
-        from collections import Counter;
-        counter = Counter(self.labels_syn.cpu().numpy())
+        from collections import Counter
+        counter = Counter(self.data.labels_syn)
 
         for c in range(data.nclass):
             tmp = data.retrieve_class(c, num=counter[c])
@@ -286,21 +281,22 @@ class GCondInd:
             idx_selected = idx_selected + tmp
         idx_selected = np.array(idx_selected).reshape(-1)
         features = features[idx_selected]
+        args.nsamples = 3
+        adj_knn = torch.zeros((data.nclass * args.nsamples, data.nclass * args.nsamples)).to(self.device)
 
-        # adj_knn = torch.zeros((data.nclass*args.nsamples, data.nclass*args.nsamples)).to(self.device)
         # for i in range(data.nclass):
         #     idx = np.arange(i*args.nsamples, i*args.nsamples+args.nsamples)
         #     adj_knn[np.ix_(idx, idx)] = 1
 
-        from sklearn.metrics.pairwise import cosine_similarity
-        # features[features!=0] = 1
-        k = 2
-        sims = cosine_similarity(features.cpu().numpy())
-        sims[(np.arange(len(sims)), np.arange(len(sims)))] = 0
-        for i in range(len(sims)):
-            indices_argsort = np.argsort(sims[i])
-            sims[i, indices_argsort[: -k]] = 0
-        adj_knn = torch.FloatTensor(sims).to(self.device)
+        # from sklearn.metrics.pairwise import cosine_similarity
+        # # features[features!=0] = 1
+        # k = 2
+        # sims = cosine_similarity(features.cpu().numpy())
+        # sims[(np.arange(len(sims)), np.arange(len(sims)))] = 0
+        # for i in range(len(sims)):
+        #     indices_argsort = np.argsort(sims[i])
+        #     sims[i, indices_argsort[: -k]] = 0
+        # adj_knn = torch.FloatTensor(sims).to(self.device)
         return features, adj_knn
 
 
@@ -320,7 +316,6 @@ def get_loops(args):
     if args.dataset in ['cora']:
         return 20, 10
     if args.dataset in ['citeseer']:
-        return 20, 5 # at least 200 epochs
+        return 20, 5  # at least 200 epochs
     else:
         return 20, 5
-

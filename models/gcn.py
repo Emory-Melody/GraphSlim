@@ -180,10 +180,7 @@ class GCN(nn.Module):
         labels = data.labels_full
         data.labels_full = labels.float() if self.multi_label else labels
 
-        if noval:
-            self._train_with_val(data, train_iters, verbose, adj_val=True, **kwargs)
-        else:
-            self._train_with_val(data, train_iters, verbose, **kwargs)
+        self._train_with_val(data, train_iters, verbose, adj_val=noval, **kwargs)
 
     def _train_with_val(self, data, train_iters, verbose, adj_val=False, condensed=False):
         if adj_val:
