@@ -9,10 +9,10 @@ parser.add_argument('--setting', '-S', type=str, default='trans', help='trans/in
 parser.add_argument('--dataset', type=str, default='cora')
 parser.add_argument('--dis_metric', type=str, default='ours')
 parser.add_argument('--epochs', type=int, default=1000)
-parser.add_argument('--nlayers', type=int, default=3)
+parser.add_argument('--nlayers', type=int, default=2)
 parser.add_argument('--hidden', type=int, default=256)
-parser.add_argument('--lr_adj', type=float, default=0.01)
-parser.add_argument('--lr_feat', type=float, default=0.01)
+parser.add_argument('--lr_adj', type=float, default=1e-4)
+parser.add_argument('--lr_feat', type=float, default=1e-4)
 parser.add_argument('--lr_model', type=float, default=0.01)
 parser.add_argument('--weight_decay', type=float, default=0.0)
 parser.add_argument('--dropout', type=float, default=0.0)
@@ -38,6 +38,10 @@ print(args)
 data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
 if args.dataset in data_graphsaint:
     data = DataGraphSAINT(args.dataset)
+    if args.dataset == 'ogbn-arxiv':
+        assert args.setting == 'trans'
+    else:
+        assert args.setting == 'ind'
     # arxiv: transductive
     # flickr, reddict: inductive
 else:
