@@ -13,7 +13,7 @@ from models.parametrized_adj import PGE
 from torch_sparse import SparseTensor
 
 
-class GCondTrans:
+class GCondBase:
 
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
@@ -62,59 +62,6 @@ class GCondTrans:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    def test_with_val(self, verbose=True):
-        res = []
-
-        data, device = self.data, self.device
-        feat_syn, pge = self.feat_syn.detach(), self.pge
-
-        # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
-                    weight_decay=5e-4, nlayers=2,
-                    nclass=data.nclass, device=device).to(device)
-
-        if self.args.dataset in ['ogbn-arxiv']:
-            model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
-                        weight_decay=0e-4, nlayers=2, with_bn=False,
-                        nclass=data.nclass, device=device).to(device)
-
-        adj_syn = pge.inference(feat_syn)
-        args = self.args
-
-        if self.args.save:
-            torch.save(adj_syn, f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-
-        if self.args.lr_adj == 0:
-            n = len(data.labels_syn)
-            adj_syn = torch.zeros((n, n))
-        model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, condensed=True)
-
-        model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
-
-        labels_train = torch.LongTensor(data.labels_train).cuda()
-        output = model.predict(data.feat_full, data.adj_full)
-        loss_train = F.nll_loss(output[data.idx_train], labels_train)
-        acc_train = utils.accuracy(output[data.idx_train], labels_train)
-        if verbose:
-            print("Train set results:",
-                  "loss= {:.4f}".format(loss_train.item()),
-                  "accuracy= {:.4f}".format(acc_train.item()))
-        res.append(acc_train.item())
-
-        # Full graph
-        output = model.predict(data.feat_full, data.adj_full)
-        loss_test = F.nll_loss(output[data.idx_test], labels_test)
-        acc_test = utils.accuracy(output[data.idx_test], labels_test)
-        res.append(acc_test.item())
-        if verbose:
-            print("Test set results:",
-                  "loss= {:.4f}".format(loss_test.item()),
-                  "accuracy= {:.4f}".format(acc_test.item()))
-        return res
-
     def train(self, verbose=True):
         args = self.args
         data = self.data
@@ -136,7 +83,7 @@ class GCondTrans:
         adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
                            value=adj._values(), sparse_sizes=adj.size()).t()
 
-        outer_loop, inner_loop = get_loops(args)
+        outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
 
         for it in range(args.epochs + 1):
@@ -258,7 +205,7 @@ class GCondTrans:
                         res.append(self.test_with_val(verbose=False))
 
                 res = np.array(res)
-                print('Train/Test Mean Accuracy:',
+                print('Test Accuracy and Std:',
                       repr([res.mean(0), res.std(0)]))
 
     def get_sub_adj_feat(self, features):
@@ -274,8 +221,7 @@ class GCondTrans:
             tmp = list(tmp)
             idx_selected = idx_selected + tmp
         idx_selected = np.array(idx_selected).reshape(-1)
-        features = features[self.data.idx_train][idx_selected]
-
+        features = features[idx_selected]
         args.nsamples = 3
         adj_knn = torch.zeros((data.nclass * args.nsamples, data.nclass * args.nsamples)).to(self.device)
 
@@ -294,21 +240,76 @@ class GCondTrans:
         # adj_knn = torch.FloatTensor(sims).to(self.device)
         return features, adj_knn
 
+    def get_loops(self, args):
+        # Get the two hyper-parameters of outer-loop and inner-loop.
+        # The following values are empirically good.
+        if args.one_step:
+            return 10, 0
 
-def get_loops(args):
-    # Get the two hyper-parameters of outer-loop and inner-loop.
-    # The following values are empirically good.
-    if args.one_step:
-        if args.dataset == 'ogbn-arxiv':
-            return 5, 0
-        return 1, 0
-    if args.dataset in ['ogbn-arxiv']:
-        return args.outer, args.inner
-    if args.dataset in ['cora']:
-        return 20, 15  # sgc
-    if args.dataset in ['citeseer']:
-        return 20, 15
-    if args.dataset in ['physics']:
-        return 20, 10
-    else:
-        return 20, 10
+        if args.dataset in ['ogbn-arxiv']:
+            return 20, 0
+        if args.dataset in ['reddit']:
+            return args.outer, args.inner
+        if args.dataset in ['flickr']:
+            return args.outer, args.inner
+            # return 10, 1
+        if args.dataset in ['cora']:
+            return 20, 10
+        if args.dataset in ['citeseer']:
+            return 20, 5  # at least 200 epochs
+        else:
+            return 20,
+
+
+class GCondTrans(GCondBase):
+    def test_with_val(self, verbose=True):
+        res = []
+
+        data, device = self.data, self.device
+        feat_syn, pge = self.feat_syn.detach(), self.pge
+
+        # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
+        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
+                    weight_decay=5e-4, nlayers=2,
+                    nclass=data.nclass, device=device).to(device)
+
+        if self.args.dataset in ['ogbn-arxiv']:
+            model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
+                        weight_decay=0e-4, nlayers=2, with_bn=False,
+                        nclass=data.nclass, device=device).to(device)
+
+        adj_syn = pge.inference(feat_syn)
+        args = self.args
+
+        if self.args.save:
+            torch.save(adj_syn, f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            torch.save(feat_syn, f'dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+
+        # if self.args.lr_adj == 0:
+        #     n = len(data.labels_syn)
+        #     adj_syn = torch.zeros((n, n))
+        model.fit_with_val(feat_syn, adj_syn, data,
+                           train_iters=600, normalize=True, verbose=False, condensed=True)
+
+        model.eval()
+        labels_test = torch.LongTensor(data.labels_test).cuda()
+        output = model.predict(data.feat_full, data.adj_full)
+
+        # labels_train = torch.LongTensor(data.labels_train).cuda()
+        # loss_train = F.nll_loss(output[data.idx_train], labels_train)
+        # acc_train = utils.accuracy(output[data.idx_train], labels_train)
+        # if verbose:
+        #     print("Train set results:",
+        #           "loss= {:.4f}".format(loss_train.item()),
+        #           "accuracy= {:.4f}".format(acc_train.item()))
+        # res.append(acc_train.item())
+
+        # Full graph
+        loss_test = F.nll_loss(output[data.idx_test], labels_test)
+        acc_test = utils.accuracy(output[data.idx_test], labels_test)
+        res.append(acc_test.item())
+        if verbose:
+            print("Test set results:",
+                  "loss= {:.4f}".format(loss_test.item()),
+                  "accuracy= {:.4f}".format(acc_test.item()))
+        return res
