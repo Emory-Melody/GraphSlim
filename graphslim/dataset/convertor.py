@@ -52,8 +52,8 @@ class Pyg2Dpr(Dataset):
                     nnodes=n, val_size=0.1, test_size=0.8, stratify=self.labels)
 
 
+# prepare transductive setting by xxx_full and inductive setting by xxx_train/val/test
 class TransAndInd:
-    # transductive setting to inductive setting
 
     def __init__(self, data):
         idx_train, idx_val, idx_test = data.idx_train, data.idx_val, data.idx_test
