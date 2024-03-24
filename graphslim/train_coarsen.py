@@ -1,14 +1,12 @@
 import argparse
 import copy
-import os
 
-from tqdm import trange
 from torch import tensor
-from torch_sparse import SparseTensor
-from dataset.convertor import pyg2gsp
+from tqdm import trange
 
 from coarsening import *
 from dataset import *
+from dataset.convertor import pyg2gsp
 from models import GCN
 
 if __name__ == '__main__':
@@ -34,7 +32,7 @@ if __name__ == '__main__':
         os.mkdir(path)
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    data = get_dataset(args.dataset)
+    data = get_dataset(args.dataset, return_pyg=True)
     cpu_data = copy.deepcopy(data)
     candidate, C_list, Gc_list = coarsening(pyg2gsp(data), 1 - args.reduction_rate, args.coarsening_method)
     model = GCN(data.x.shape[1], args.hidden, data.nclass, lr=args.lr, weight_decay=args.weight_decay,

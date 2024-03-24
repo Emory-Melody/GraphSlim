@@ -133,7 +133,7 @@ def process_coarsened(data, candidate, C_list, Gc_list):
             coarsen_node += H.W.shape[0]
         number += 1
 
-    print('the size of coarsen graph features:', coarsen_features.shape)
+    # print('the size of coarsen graph features:', coarsen_features.shape)
 
     coarsen_edge = torch.from_numpy(np.array([coarsen_row, coarsen_col])).long()
     coarsen_train_labels = coarsen_train_labels.long()

@@ -1,13 +1,14 @@
 from deeprobust.graph.data import Dpr2Pyg
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
 from torchvision import datasets, transforms
+from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import TransAndInd, pyg2saint
 from graphslim.dataset.utils_graphsaint import GraphData, DataGraphSAINT
 from graphslim.utils import *
 
 
-def get_dataset(name, normalize_features=False, transform=None):
+def get_dataset(name, normalize_features=False, transform=None, return_pyg=False):
     path = osp.join('../../data')
     data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
     if name in data_graphsaint:
@@ -24,7 +25,12 @@ def get_dataset(name, normalize_features=False, transform=None):
         data = pyg2saint(data)
 
     # Define or import TransAndInd and args here
-    data = TransAndInd(data)
+    if return_pyg:
+        data.nclass = max(data.y) + 1
+        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
+        return data
+    else:
+        return TransAndInd(data)
 
     # if transform is not None and normalize_features:
     #     dataset.transform = T.Compose([T.NormalizeFeatures(), transform])
@@ -32,8 +38,6 @@ def get_dataset(name, normalize_features=False, transform=None):
     #     dataset.transform = T.NormalizeFeatures()
     # elif transform is not None:
     #     dataset.transform = transform
-
-    return data
 
 
 def splits(data, num_classes, exp):
