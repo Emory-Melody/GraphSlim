@@ -11,7 +11,7 @@ from models import GCN
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', type=str, default='pubmed')
+    parser.add_argument('--dataset', type=str, default='cora')
     # TODO: implement setting
     parser.add_argument('--setting', '-S', type=str, default='trans', help='trans/ind')
     parser.add_argument('--experiment', type=str, default='fixed')  # 'fixed', 'random', 'few'
