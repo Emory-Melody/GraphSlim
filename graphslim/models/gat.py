@@ -1,24 +1,16 @@
 """
 Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark/citation
 """
-import torch.nn as nn
-import torch.nn.functional as F
-import math
-import torch
-import torch.optim as optim
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-from deeprobust.graph import utils
 from copy import deepcopy
-from torch_geometric.nn import SGConv
-from torch_geometric.nn import APPNP as ModuleAPPNP
-# from torch_geometric.nn import GATConv
-from .mygatconv import GATConv
-import numpy as np
-import scipy as sp
-
-from torch.nn import Linear
 from itertools import repeat
+
+import scipy as sp
+import torch
+import torch.nn.functional as F
+import torch.optim as optim
+from deeprobust.graph import utils
+
+# from torch_geometric.nn import GATConv
 
 
 class GAT(torch.nn.Module):
@@ -96,14 +88,14 @@ class GAT(torch.nn.Module):
         self.conv2.reset_parameters()
 
 
-    def fit(self, feat, adj, labels, idx, data=None, train_iters=600, initialize=True, verbose=False, patience=None, noval=False, **kwargs):
+    def fit(self, feat, adj, labels, idx, data=None, train_iters=600, initialize=True, verbose=False, patience=None, val=False, **kwargs):
 
         data_train = GraphData(feat, adj, labels)
         data_train = Dpr2Pyg(data_train)[0]
 
         data_test = Dpr2Pyg(GraphData(data.feat_test, data.adj_test, None))[0]
 
-        if noval:
+        if val:
             data_val = GraphData(data.feat_val, data.adj_val, None)
             data_val = Dpr2Pyg(data_val)[0]
         else:
@@ -149,7 +141,7 @@ class GAT(torch.nn.Module):
                 self.eval()
 
                 output = self.forward(data_val)
-                if noval:
+                if val:
                     loss_val = F.nll_loss(output, labels_val)
                     acc_val = utils.accuracy(output, labels_val)
                 else:

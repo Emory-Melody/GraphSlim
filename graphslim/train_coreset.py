@@ -1,10 +1,11 @@
 import argparse
+
+from tqdm import tqdm
+
 from configs import load_config
-from utils import *
 from dataset import *
 from models.gcn import GCN
 from sparsification.coreset import KCenter, Herding, Random
-from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
@@ -17,37 +18,30 @@ parser.add_argument('--lr', type=float, default=0.01)
 parser.add_argument('--weight_decay', type=float, default=5e-4)
 parser.add_argument('--seed', type=int, default=15, help='Random seed.')
 parser.add_argument('--nlayers', type=int, default=2, help='Random seed.')
-parser.add_argument('--epochs', type=int, default=400)
-parser.add_argument('--inductive', type=int, default=1)
+parser.add_argument('--epochs', type=int, default=600)
 parser.add_argument('--save', type=int, default=0)
 parser.add_argument('--method', type=str, default='kcenter', choices=['kcenter', 'herding', 'random'])
-parser.add_argument('--reduction_rate', type=float, required=True)
+parser.add_argument('--reduction_rate', type=float, default=0.5)
 args = parser.parse_args()
 
-torch.cuda.set_device(args.gpu_id)
+if args.gpu_id is not None:
+    device = f'cuda:{args.gpu_id}'
+else:
+    device = 'cpu'
 args = load_config(args)
 print(args)
 
 seed_everything(args.seed)
 
-data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
-if args.dataset in data_graphsaint:
-    data = DataGraphSAINT(args.dataset)
-    # arxiv: transductive
-    # flickr, reddict: inductive
-else:
-    data = get_dataset(args.dataset, args.normalize_features)
-    # trans or ind is optional for cora, citeseer, pubmed
-    data = TransAndInd(data, keep_ratio=args.keep_ratio)
+data = get_dataset(args.dataset, args.normalize_features)
 
-device = 'cuda'
 num_classes = data.labels_full.max() + 1
 if args.method == 'kcenter':
-    agent = KCenter(data, args, device='cuda')
+    agent = KCenter(data, args, device=device)
 if args.method == 'herding':
-    agent = Herding(data, args, device='cuda')
+    agent = Herding(data, args, device=device)
 if args.method == 'random':
-    agent = Random(data, args, device='cuda')
+    agent = Random(data, args, device=device)
 model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=num_classes, device=device,
             weight_decay=args.weight_decay).to(device)
 
@@ -62,7 +56,7 @@ if args.setting == 'trans':
 
     # Setup GCN Model
 
-    model.fit_with_val(features, adj, data, train_iters=600, verbose=True)
+    model.fit_with_val(features, adj, data, train_iters=args.epochs, verbose=True)
     model.test(data, verbose=True)
     embeds = model.predict().detach()
 
@@ -82,7 +76,7 @@ if args.setting == 'trans':
     runs = 10
     for _ in tqdm(range(runs)):
         model.fit_with_val(feat_train, adj_train, data,
-                           train_iters=600, normalize=True, verbose=False, condensed=True)
+                           train_iters=args.epochs, normalize=True, verbose=False, condensed=True)
 
         # Full graph
         # interface: model.test(full_data)
@@ -99,7 +93,7 @@ if args.setting == 'ind':
 
     # Setup GCN Model
 
-    model.fit_with_val(feat_train, adj_train, data, train_iters=600, normalize=True, verbose=False)
+    model.fit_with_val(feat_train, adj_train, data, train_iters=args.epochs, normalize=True, verbose=False)
 
     model.eval()
     labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -125,7 +119,7 @@ if args.setting == 'ind':
     runs = 10
     for _ in tqdm(range(runs)):
         model.fit_with_val(feat_train, adj_train, data,
-                           train_iters=600, normalize=True, verbose=False, noval=True, condensed=True)
+                           train_iters=args.epochs, normalize=True, verbose=False, val=True, condensed=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()

@@ -1,15 +1,11 @@
-import numpy as np
-from pygsp import filters, reduction, graphs
-import torch
-import networkx as nx
 import matplotlib.pylab as plt
-from utils import *
-
+import networkx as nx
+from pygsp import filters, reduction
+from pygsp.utils import resistance_distance
 from sortedcontainers import SortedList
-from . import graph_utils
-from . import maxWeightMatching
 
-import scipy as sp
+from graphslim.coarsening.maxWeightMatching import *
+from graphslim.dataset import *
 
 
 def coarsening(H, coarsening_ratio, coarsening_method):
@@ -231,7 +227,7 @@ def coarsen(
                 d, V = np.linalg.eig(B.T @ (G.L).dot(B))
                 mask = d == 0
                 d[mask] = 1
-                dinvsqrt = (d+1e-9) ** (-1 / 2)
+                dinvsqrt = (d + 1e-9) ** (-1 / 2)
                 dinvsqrt[mask] = 0
                 A = B @ np.diag(dinvsqrt) @ V
 
@@ -265,7 +261,7 @@ def coarsen(
         C = iC.dot(C)
         Call.append(iC)
 
-        Wc = graph_utils.zero_diag(coarsen_matrix(G.W, iC))  # coarsen and remove self-loops
+        Wc = zero_diag(coarsen_matrix(G.W, iC))  # coarsen and remove self-loops
         Wc = (Wc + Wc.T) / 2  # this is only needed to avoid pygsp complaining for tiny errors
 
         if not hasattr(G, "coords"):
@@ -400,12 +396,12 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     # below here, everything is C specific
     n = C.shape[0]
     Pi = C.T @ C
-    S = graph_utils.get_S(G).T
+    S = get_S(G).T
     Lc = C.dot((G.L).dot(C.T))
     Lp = Pi @ G.L @ Pi
 
     if kmax > n / 2:
-        [Uc, lc] = graph_utils.eig(Lc.toarray())
+        [Uc, lc] = eig(Lc.toarray())
     else:
         lc, Uc = sp.sparse.linalg.eigsh(Lc, k=kmax, which="SM", tol=1e-3)
 
@@ -987,7 +983,7 @@ def matching_optimal(G, weights, r=0.4):
     assert min(weights) >= 0
 
     # solve it
-    tmp = np.array(maxWeightMatching.maxWeightMatching(edge_list))
+    tmp = np.array(maxWeightMatching(edge_list))
 
     # format output
     m = tmp.shape[0]
@@ -1151,7 +1147,7 @@ def kron_quality(G, Gc, kmax=30, Uk=None, lk=None):
         Cinv = (Phi @ C.T) @ np.linalg.pinv(C @ Phi @ C.T)
 
         if kmax > n / 2:
-            [Uc, lc] = graph_utils.eig(Gc.L.toarray())
+            [Uc, lc] = eig(Gc.L.toarray())
         else:
             lc, Uc = sp.sparse.linalg.eigsh(Gc.L, k=kmax, which="SM", tol=1e-3)
 
@@ -1327,7 +1323,7 @@ def graph_sparsify(M, epsilon, maxiter=10):
         raise ValueError("GRAPH_SPARSIFY: Epsilon out of required range")
 
     # Not sparse
-    resistance_distances = utils.resistance_distance(L).toarray()
+    resistance_distances = resistance_distance(L).toarray()
     # Get the Weight matrix
     if isinstance(M, graphs.Graph):
         W = M.W
@@ -1356,10 +1352,10 @@ def graph_sparsify(M, epsilon, maxiter=10):
         C = 4 * C0
         q = round(N * np.log(N) * 9 * C ** 2 / (epsilon ** 2))
 
-        results = stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(
+        results = sp.stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(
             size=int(q)
         )
-        spin_counts = stats.itemfreq(results).astype(int)
+        spin_counts = sp.stats.itemfreq(results).astype(int)
         per_spin_weights = weights / (q * Pe)
 
         counts = np.zeros(np.shape(weights)[0])
