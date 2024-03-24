@@ -1,15 +1,18 @@
-import torch.nn as nn
 from collections import Counter
-from .utils import match_loss, regularization
+
 import deeprobust.graph.utils as utils
 import numpy as np
-import torch.nn.functional as F
 import torch
-from models.gcn import GCN
-from models.sgc import SGC
-from models.sgc_multi import SGC as SGC1
-from models.parametrized_adj import PGE
+import torch.nn as nn
+import torch.nn.functional as F
 from torch_sparse import SparseTensor
+
+from graphslim.models.gcn import GCN
+from graphslim.models.parametrized_adj import PGE
+from graphslim.models.sgc import SGC
+from graphslim.models.sgc_multi import SGC as SGC1
+from graphslim.utils import regularization  # graphslim
+from graphslim.condensation.utils import match_loss  # graphslim
 
 
 class GCondBase:
@@ -42,9 +45,7 @@ class GCondBase:
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     def generate_labels_syn(self, data):
-        if not hasattr(data, 'labels_train'):
-            data.labels_train = data.labels[data.idx_train]
-        counter = Counter(data.labels_train)
+        counter = Counter(data.labels_train.tolist())
         num_class_dict = {}
         # n = len(data.labels_train)
 
@@ -334,7 +335,7 @@ class GCondInd(GCondBase):
             torch.save(feat_syn, f'saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, noval=True, condensed=True)
+                           train_iters=600, normalize=True, verbose=False, val=True, condensed=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()

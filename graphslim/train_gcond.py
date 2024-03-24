@@ -1,7 +1,7 @@
 import argparse
-from utils import *
-from dataset import *
+
 from condensation import *
+from dataset import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
@@ -35,20 +35,7 @@ torch.cuda.set_device(args.gpu_id)
 seed_everything(args.seed)
 print(args)
 
-data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
-if args.dataset in data_graphsaint:
-    data = DataGraphSAINT(args.dataset)
-    if args.dataset == 'ogbn-arxiv':
-        assert args.setting == 'trans'
-    else:
-        assert args.setting == 'ind'
-    # arxiv: transductive
-    # flickr, reddict: inductive
-else:
-    data = get_dataset(args.dataset, args.normalize_features)
-    # trans or ind is optional for cora, citeseer, pubmed
-    data = TransAndInd(data, keep_ratio=args.keep_ratio)
-
+data = get_dataset(args.dataset, normalize_features=args.normalize_features, transform=None)
 if args.setting == 'trans':
     agent = GCondTrans(data, args, device='cuda')
 elif args.setting == 'ind':

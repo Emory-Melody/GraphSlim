@@ -1,22 +1,14 @@
 import sys
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.nn import Parameter
 import torch.nn.functional as F
-from utils import match_loss, regularization, row_normalize_tensor
 import deeprobust.graph.utils as utils
-from copy import deepcopy
 import numpy as np
 from tqdm import tqdm
-from models.gcn import GCN
-from models.sgc import SGC
-from models.sgc_multi import SGC as SGC1
-from models.myappnp import APPNP
+from graphslim.models.gcn import GCN
 from models.myappnp1 import APPNP1
-from models.mycheby import Cheby
-from models.mygraphsage import GraphSage
 from models.gat import GAT
 import scipy as sp
 
@@ -87,9 +79,9 @@ class Evaluator:
                         nclass=data.nclass, device=device, dataset=self.args.dataset).to(device)
 
 
-        noval = True if args.dataset in ['reddit', 'flickr'] else False
-        model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), noval=noval, data=data,
-                     train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
+        val = True if args.dataset in ['reddit', 'flickr'] else False
+        model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), val=val, data=data,
+                     train_iters=10000 if val else 3000, normalize=True, verbose=verbose)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -182,9 +174,9 @@ class Evaluator:
                         weight_decay=weight_decay, nlayers=nlayers, with_bn=False,
                         nclass=data.nclass, device=device).to(device)
 
-        noval = True if args.dataset in ['reddit', 'flickr'] else False
+        val = True if args.dataset in ['reddit', 'flickr'] else False
         model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-                     train_iters=600, normalize=True, verbose=True, noval=noval)
+                     train_iters=600, normalize=True, verbose=True, val=val)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()

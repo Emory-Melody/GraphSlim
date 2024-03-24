@@ -6,11 +6,52 @@ import torch
 from torch import Tensor
 import torch.nn.functional as F
 from torch.nn import Parameter, Linear
-from torch_sparse import SparseTensor, set_diag
+from torch_sparse import SparseTensor, set_diag, matmul
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.utils import remove_self_loops, add_self_loops, softmax
 
 from torch_geometric.nn.inits import glorot, zeros
+import math
+
+
+class GraphConvolution(torch.nn.Module):
+
+    def __init__(self, in_features, out_features, with_bias=True):
+        super(GraphConvolution, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.weight = Parameter(torch.FloatTensor(in_features, out_features))
+        if with_bias:
+            self.bias = Parameter(torch.zeros(out_features))  # change this line
+        else:
+            self.bias = None
+
+    def reset_parameters(self):
+        stdv = 1. / math.sqrt(self.weight.T.size(1))
+        self.weight.data.uniform_(-stdv, stdv)
+        if self.bias is not None:
+            self.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, input, adj):
+        """ Graph Convolutional Layer forward function
+        """
+        if input.data.is_sparse:
+            support = torch.spmm(input, self.weight)
+        else:
+            support = torch.mm(input, self.weight)
+        if isinstance(adj, SparseTensor):
+            output = matmul(adj, support)
+        else:
+            output = torch.spmm(adj, support)
+        if self.bias is not None:
+            return output + self.bias
+        else:
+            return output
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' \
+            + str(self.in_features) + ' -> ' \
+            + str(self.out_features) + ')'
 
 
 class GATConv(MessagePassing):
@@ -134,7 +175,6 @@ class GATConv(MessagePassing):
                 x_r = self.lin_r(x_r).view(-1, H, C)
                 alpha_r = (x_r * self.att_r).sum(dim=-1)
 
-
         assert x_l is not None
         assert alpha_l is not None
 
@@ -200,4 +240,3 @@ class GATConv(MessagePassing):
         return '{}({}, {}, heads={})'.format(self.__class__.__name__,
                                              self.in_channels,
                                              self.out_channels, self.heads)
-

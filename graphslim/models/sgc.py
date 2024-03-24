@@ -10,53 +10,15 @@ from deeprobust.graph import utils
 from copy import deepcopy
 from sklearn.metrics import f1_score
 from torch.nn import init
+from graphslim.models.layers import GraphConvolution
+from graphslim.utils import row_normalize_tensor
 import torch_sparse
-
-class GraphConvolution(Module):
-    """Simple GCN layer, similar to https://github.com/tkipf/pygcn
-    """
-
-    def __init__(self, in_features, out_features, with_bias=True):
-        super(GraphConvolution, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        self.weight = Parameter(torch.FloatTensor(in_features, out_features))
-        self.bias = Parameter(torch.FloatTensor(out_features))
-        self.reset_parameters()
-
-    def reset_parameters(self):
-        # stdv = 1. / math.sqrt(self.weight.size(1))
-        stdv = 1. / math.sqrt(self.weight.T.size(1))
-        self.weight.data.uniform_(-stdv, stdv)
-        if self.bias is not None:
-            self.bias.data.uniform_(-stdv, stdv)
-
-    def forward(self, input, adj):
-        """ Graph Convolutional Layer forward function
-        """
-        if input.data.is_sparse:
-            support = torch.spmm(input, self.weight)
-        else:
-            support = torch.mm(input, self.weight)
-        if isinstance(adj, torch_sparse.SparseTensor):
-            output = torch_sparse.matmul(adj, support)
-        else:
-            output = torch.spmm(adj, support)
-        if self.bias is not None:
-            return output + self.bias
-        else:
-            return output
-
-    def __repr__(self):
-        return self.__class__.__name__ + ' (' \
-               + str(self.in_features) + ' -> ' \
-               + str(self.out_features) + ')'
 
 
 class SGC(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-            with_relu=True, with_bias=True, with_bn=False, device=None):
+                 with_relu=True, with_bias=True, with_bn=False, device=None):
 
         super(SGC, self).__init__()
 
@@ -133,7 +95,8 @@ class SGC(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True, patience=None, noval=False, **kwargs):
+    def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True,
+                     patience=None, val=False, **kwargs):
         '''data: full data class'''
         if initialize:
             self.initialize()
@@ -155,8 +118,7 @@ class SGC(nn.Module):
             adj_norm = adj
 
         if 'feat_norm' in kwargs and kwargs['feat_norm']:
-            from utils import row_normalize_tensor
-            features = row_normalize_tensor(features-features.min())
+            features = row_normalize_tensor(features - features.min())
 
         self.adj_norm = adj_norm
         self.features = features
@@ -171,7 +133,7 @@ class SGC(nn.Module):
         labels = labels.float() if self.multi_label else labels
         self.labels = labels
 
-        if noval:
+        if val:
             self._train_with_val(labels, data, train_iters, verbose, adj_val=True)
         else:
             self._train_with_val(labels, data, train_iters, verbose)
@@ -194,7 +156,7 @@ class SGC(nn.Module):
 
         for i in range(train_iters):
             if i == train_iters // 2:
-                lr = self.lr*0.1
+                lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             self.train()
@@ -226,7 +188,6 @@ class SGC(nn.Module):
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
 
-
     def test(self, idx_test):
         """Evaluate GCN performance on test set.
         Parameters
@@ -243,7 +204,6 @@ class SGC(nn.Module):
               "loss= {:.4f}".format(loss_test.item()),
               "accuracy= {:.4f}".format(acc_test.item()))
         return acc_test.item()
-
 
     @torch.no_grad()
     def predict(self, features=None, adj=None):
@@ -286,5 +246,3 @@ class SGC(nn.Module):
             self.features = features
             self.adj_norm = adj
             return self.forward(self.features, self.adj_norm)
-
-
