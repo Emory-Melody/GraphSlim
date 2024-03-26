@@ -8,7 +8,7 @@ import numpy as np
 
 from graphslim.dataset.convertor import pyg2gsp
 from graphslim.models import GCN
-from graphslim.coarsening.coarsening_utils import coarsening, process_coarsened
+from graphslim.coarsening.utils import coarsening, process_coarsened
 from graphslim.dataset.utils import splits
 
 class CoarseningBase:
