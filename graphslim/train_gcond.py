@@ -29,18 +29,14 @@ parser.add_argument('--save', type=int, default=0)
 parser.add_argument('--one_step', type=int, default=0)
 args = parser.parse_args()
 
-torch.cuda.set_device(args.gpu_id)
-
-# random seed setting
+if args.gpu_id >= 0:
+    device = f'cuda:{args.gpu_id}'
+else:
+    # if gpu_id=-1, use cpu
+    device = 'cpu'
 seed_everything(args.seed)
 print(args)
 
 data = get_dataset(args.dataset, normalize_features=args.normalize_features, transform=None)
-if args.setting == 'trans':
-    agent = GCondTrans(data, args, device='cuda')
-elif args.setting == 'ind':
-    agent = GCondInd(data, args, device='cuda')
-else:
-    raise Exception('Unknown setting')
-
+agent = GCond(data, args)
 agent.train()

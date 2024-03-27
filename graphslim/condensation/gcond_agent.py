@@ -1,5 +1,5 @@
-from collections import Counter
 import os
+from collections import Counter
 
 import deeprobust.graph.utils as utils
 import numpy as np
@@ -8,16 +8,26 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch_sparse import SparseTensor
 
+from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC as SGC1
 from graphslim.utils import regularization  # graphslim
-from graphslim.condensation.utils import match_loss  # graphslim
+
+
+def GCond(data, args):
+    if args.setting == 'trans':
+        return GCondTrans(data, args)
+    elif args.setting == 'ind':
+        return GCondInd(data, args)
+    else:
+        raise ValueError(f'Invalid: {args.setting}')
+
 
 class GCondBase:
 
-    def __init__(self, data, args, device='cuda', **kwargs):
+    def __init__(self, data, args, device='cuda', setting='trans', **kwargs):
         self.data = data
         self.args = args
         self.device = device

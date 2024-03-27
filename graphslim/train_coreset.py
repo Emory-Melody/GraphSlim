@@ -5,7 +5,7 @@ from tqdm import tqdm
 from configs import load_config
 from dataset import *
 from models.gcn import GCN
-from sparsification.coreset import KCenter, Herding, Random
+from sparsification import KCenter
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--gpu_id', type=int, default=0, help='gpu id')
@@ -25,9 +25,9 @@ parser.add_argument('--reduction_rate', type=float, default=0.5)
 args = parser.parse_args()
 
 if args.gpu_id is not None:
-    device = f'cuda:{args.gpu_id}'
+    args.device = f'cuda:{args.gpu_id}'
 else:
-    device = 'cpu'
+    args.device = 'cpu'
 args = load_config(args)
 print(args)
 
@@ -36,14 +36,10 @@ seed_everything(args.seed)
 data = get_dataset(args.dataset, args.normalize_features)
 
 num_classes = data.labels_full.max() + 1
-if args.method == 'kcenter':
-    agent = KCenter(data, args, device=device)
-if args.method == 'herding':
-    agent = Herding(data, args, device=device)
-if args.method == 'random':
-    agent = Random(data, args, device=device)
-model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=num_classes, device=device,
-            weight_decay=args.weight_decay).to(device)
+agent = KCenter(data, args)
+
+model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=num_classes, device=args.device,
+            weight_decay=args.weight_decay).to(args.device)
 
 # ============start==================#
 if args.setting == 'trans':

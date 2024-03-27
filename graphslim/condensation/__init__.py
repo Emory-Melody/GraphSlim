@@ -1,1 +1,1 @@
-from .gcond_agent import GCondTrans, GCondInd
+from .gcond_agent import GCondTrans, GCondInd, GCond
