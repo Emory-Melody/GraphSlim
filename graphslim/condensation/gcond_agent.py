@@ -14,7 +14,7 @@ from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC as SGC1
 from graphslim.utils import regularization  # graphslim
-
+from graphslim.condensation.tester_other_arcs import Evaluator
 
 def GCond(data, args):
     if args.setting == 'trans':
@@ -217,6 +217,18 @@ class GCondBase:
                 res = np.array(res)
                 print('Test Accuracy and Std:',
                       repr([res.mean(0), res.std(0)]))
+
+    def cross_architecture_eval(self):
+        args = self.args
+        data = self.data
+
+        if args.dataset in ['cora', 'citeseer']:
+            args.epsilon = 0.05
+        else:
+            args.epsilon = 0.01
+
+        agent = Evaluator(data, args, device='cuda')
+        agent.train()
 
     def get_sub_adj_feat(self, features):
         data = self.data

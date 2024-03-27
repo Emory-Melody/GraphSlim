@@ -4,7 +4,6 @@ Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark
 from copy import deepcopy
 from itertools import repeat
 
-import scipy as sp
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
@@ -12,6 +11,7 @@ from deeprobust.graph import utils
 
 # from torch_geometric.nn import GATConv
 from graphslim.models.layers import GATConv
+from graphslim.dataset.convertor import Dpr2Pyg
 
 class GAT(torch.nn.Module):
 
@@ -212,92 +212,93 @@ class GraphData:
         self.idx_val = idx_val
         self.idx_test = idx_test
 
-
-from torch_geometric.data import InMemoryDataset, Data
-
-class Dpr2Pyg(InMemoryDataset):
-
-    def __init__(self, dpr_data, transform=None, **kwargs):
-        root = 'data/' # dummy root; does not mean anything
-        self.dpr_data = dpr_data
-        super(Dpr2Pyg, self).__init__(root, transform)
-        pyg_data = self.process()
-        self.data, self.slices = self.collate([pyg_data])
-        self.transform = transform
-
-    def process____(self):
-        dpr_data = self.dpr_data
-        try:
-            edge_index = torch.LongTensor(dpr_data.adj.nonzero().cpu()).cuda().T
-        except:
-            edge_index = torch.LongTensor(dpr_data.adj.nonzero()).cuda()
-        # by default, the features in pyg data is dense
-        try:
-            x = torch.FloatTensor(dpr_data.features.cpu()).float().cuda()
-        except:
-            x = torch.FloatTensor(dpr_data.features).float().cuda()
-        try:
-            y = torch.LongTensor(dpr_data.labels.cpu()).cuda()
-        except:
-            y = dpr_data.labels
-
-        data = Data(x=x, edge_index=edge_index, y=y)
-        data.train_mask = None
-        data.val_mask = None
-        data.test_mask = None
-        return data
-
-    def process(self):
-        dpr_data = self.dpr_data
-        if type(dpr_data.adj) == torch.Tensor:
-            adj_selfloop = dpr_data.adj + torch.eye(dpr_data.adj.shape[0]).cuda()
-            edge_index_selfloop = adj_selfloop.nonzero().T
-            edge_index = edge_index_selfloop
-            edge_weight = adj_selfloop[edge_index_selfloop[0], edge_index_selfloop[1]]
-        else:
-            adj_selfloop = dpr_data.adj + sp.sparse.eye(dpr_data.adj.shape[0])
-            edge_index = torch.LongTensor(adj_selfloop.nonzero()).cuda()
-            edge_weight = torch.FloatTensor(adj_selfloop[adj_selfloop.nonzero()]).cuda()
-
-        # by default, the features in pyg data is dense
-        try:
-            x = torch.FloatTensor(dpr_data.features.cpu()).float().cuda()
-        except:
-            x = torch.FloatTensor(dpr_data.features).float().cuda()
-        try:
-            y = torch.LongTensor(dpr_data.labels.cpu()).cuda()
-        except:
-            y = dpr_data.labels
-
-
-        data = Data(x=x, edge_index=edge_index, y=y, edge_weight=edge_weight)
-        data.train_mask = None
-        data.val_mask = None
-        data.test_mask = None
-        return data
-
-    def get(self, idx):
-        data = self.data.__class__()
-
-        if hasattr(self.data, '__num_nodes__'):
-            data.num_nodes = self.data.__num_nodes__[idx]
-
-        for key in self.data.keys:
-            item, slices = self.data[key], self.slices[key]
-            s = list(repeat(slice(None), item.dim()))
-            s[self.data.__cat_dim__(key, item)] = slice(slices[idx],
-                                                   slices[idx + 1])
-            data[key] = item[s]
-        return data
-
-    @property
-    def raw_file_names(self):
-        return ['some_file_1', 'some_file_2', ...]
-
-    @property
-    def processed_file_names(self):
-        return ['data.pt']
-
-    def _download(self):
-        pass
-
+# from torch_geometric.data import InMemoryDataset, Data
+# import scipy.sparse as sp
+#
+# class Dpr2Pyg(InMemoryDataset):
+#
+#     def __init__(self, dpr_data, transform=None, **kwargs):
+#         root = 'data/' # dummy root; does not mean anything
+#         self.dpr_data = dpr_data
+#         super(Dpr2Pyg, self).__init__(root, transform)
+#         pyg_data = self.process()
+#         self.data, self.slices = self.collate([pyg_data])
+#         self.transform = transform
+#
+#     def process____(self):
+#         dpr_data = self.dpr_data
+#         try:
+#             edge_index = torch.LongTensor(dpr_data.adj.nonzero().cpu()).cuda().T
+#         except:
+#             edge_index = torch.LongTensor(dpr_data.adj.nonzero()).cuda()
+#         # by default, the features in pyg data is dense
+#         try:
+#             x = torch.FloatTensor(dpr_data.features.cpu()).float().cuda()
+#         except:
+#             x = torch.FloatTensor(dpr_data.features).float().cuda()
+#         try:
+#             y = torch.LongTensor(dpr_data.labels.cpu()).cuda()
+#         except:
+#             y = dpr_data.labels
+#
+#         data = Data(x=x, edge_index=edge_index, y=y)
+#         data.train_mask = None
+#         data.val_mask = None
+#         data.test_mask = None
+#         return data
+#
+#     def process(self):
+#         dpr_data = self.dpr_data
+#         if type(dpr_data.adj) == torch.Tensor:
+#             adj_selfloop = dpr_data.adj + torch.eye(dpr_data.adj.shape[0]).cuda()
+#             edge_index_selfloop = adj_selfloop.nonzero().T
+#             edge_index = edge_index_selfloop
+#             edge_weight = adj_selfloop[edge_index_selfloop[0], edge_index_selfloop[1]]
+#         else:
+#             adj_selfloop = dpr_data.adj + sp.eye(dpr_data.adj.shape[0])
+#             edge_index = torch.LongTensor(adj_selfloop.nonzero()).cuda()
+#             edge_weight = torch.FloatTensor(adj_selfloop[adj_selfloop.nonzero()]).cuda()
+#
+#         # by default, the features in pyg data is dense
+#         try:
+#             x = torch.FloatTensor(dpr_data.features.cpu()).float().cuda()
+#         except:
+#             x = torch.FloatTensor(dpr_data.features).float().cuda()
+#         try:
+#             y = torch.LongTensor(dpr_data.labels.cpu()).cuda()
+#         except:
+#             y = dpr_data.labels
+#
+#
+#         data = Data(x=x, edge_index=edge_index, y=y, edge_weight=edge_weight)
+#         data.train_mask = None
+#         data.val_mask = None
+#         data.test_mask = None
+#         return data
+#
+#     def get(self, idx):
+#         data = self.data.__class__()
+#
+#         if hasattr(self.data, '__num_nodes__'):
+#             data.num_nodes = self.data.__num_nodes__[idx]
+#
+#         # print(self.data.keys())
+#         for key in self.data.keys:
+#             # print(self.slices)
+#             item, slices = self.data[key], self.slices[key]
+#             s = list(repeat(slice(None), item.dim()))
+#             s[self.data.__cat_dim__(key, item)] = slice(slices[idx],
+#                                                    slices[idx + 1])
+#             data[key] = item[s]
+#         return data
+#
+#     @property
+#     def raw_file_names(self):
+#         return ['some_file_1', 'some_file_2', ...]
+#
+#     @property
+#     def processed_file_names(self):
+#         return ['data.pt']
+#
+#     def _download(self):
+#         pass

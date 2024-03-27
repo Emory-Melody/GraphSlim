@@ -1,18 +1,17 @@
+import torch.nn as nn
+import torch.nn.functional as F
+import torch
+import torch.optim as optim
+
+from deeprobust.graph import utils
 from copy import deepcopy
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from deeprobust.graph import utils
-
 from graphslim.models.layers import GraphConvolution
-from graphslim.utils import *
-
 
 class GCN(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-                 with_relu=True, with_bias=True, with_bn=False, device=None):
+            with_relu=True, with_bias=True, with_bn=False, device=None):
 
         super(GCN, self).__init__()
 
@@ -30,7 +29,7 @@ class GCN(nn.Module):
                 self.bns = torch.nn.ModuleList()
                 self.bns.append(nn.BatchNorm1d(nhid))
             self.layers.append(GraphConvolution(nfeat, nhid, with_bias=with_bias))
-            for i in range(nlayers - 2):
+            for i in range(nlayers-2):
                 self.layers.append(GraphConvolution(nhid, nhid, with_bias=with_bias))
                 if with_bn:
                     self.bns.append(nn.BatchNorm1d(nhid))
@@ -53,7 +52,6 @@ class GCN(nn.Module):
         self.multi_label = None
 
     def forward(self, x, adj):
-
         for ix, layer in enumerate(self.layers):
             x = layer(x, adj)
             if ix != len(self.layers) - 1:
@@ -96,7 +94,8 @@ class GCN(nn.Module):
         else:
             return F.log_softmax(x, dim=1)
 
-    def reset_parameters(self):
+
+    def initialize(self):
         """Initialize parameters of GCN.
         """
         for layer in self.layers:
@@ -105,32 +104,49 @@ class GCN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def fit_with_val(self, features, adj, data, labels=None, train_iters=200, initialize=True, verbose=False, normalize=True,
-                     patience=None, val=False, **kwargs):
+    def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True, patience=None, noval=False, **kwargs):
+        '''data: full data class'''
         if initialize:
-            self.reset_parameters()
+            self.initialize()
 
-        adj = my_to_tensor(adj, device=self.device) if not isinstance(adj, torch.Tensor) else adj.to(self.device)
-        features = my_to_tensor(features, device=self.device) if not isinstance(features,
-                                                                                torch.Tensor) else features.to(
-            self.device)
+        if type(adj) is not torch.Tensor:
+            features, adj, labels = utils.to_tensor(features, adj, labels, device=self.device)
+        else:
+            features = features.to(self.device)
+            adj = adj.to(self.device)
+            labels = labels.to(self.device)
 
-        self.adj_norm = utils.normalize_adj_tensor(adj, sparse=utils.is_sparse_tensor(adj)) if normalize else adj
+        if normalize:
+            if utils.is_sparse_tensor(adj):
+                adj_norm = utils.normalize_adj_tensor(adj, sparse=True)
+            else:
+                adj_norm = utils.normalize_adj_tensor(adj)
+        else:
+            adj_norm = adj
+
+        if 'feat_norm' in kwargs and kwargs['feat_norm']:
+            from utils import row_normalize_tensor
+            features = row_normalize_tensor(features-features.min())
+
+        self.adj_norm = adj_norm
         self.features = features
 
-        if len(data.labels_full.shape) > 1:
+        if len(labels.shape) > 1:
             self.multi_label = True
             self.loss = torch.nn.BCELoss()
         else:
             self.multi_label = False
             self.loss = F.nll_loss
 
-        labels = data.labels_full
-        data.labels_full = labels.float() if self.multi_label else labels
+        labels = labels.float() if self.multi_label else labels
+        self.labels = labels
 
-        self._train_with_val(data, train_iters, verbose, adj_val=val, **kwargs)
+        if noval:
+            self._train_with_val(labels, data, train_iters, verbose, adj_val=True)
+        else:
+            self._train_with_val(labels, data, train_iters, verbose)
 
-    def _train_with_val(self, data, train_iters, verbose, adj_val=False, condensed=False):
+    def _train_with_val(self, labels, data, train_iters, verbose, adj_val=False):
         if adj_val:
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
@@ -138,8 +154,6 @@ class GCN(nn.Module):
         feat_full, adj_full = utils.to_tensor(feat_full, adj_full, device=self.device)
         adj_full_norm = utils.normalize_adj_tensor(adj_full, sparse=True)
         labels_val = torch.LongTensor(data.labels_val).to(self.device)
-        labels_train = torch.LongTensor(data.labels_syn).to(self.device) if condensed else torch.LongTensor(
-            data.labels_train).to(self.device)
 
         if verbose:
             print('=== training gcn model ===')
@@ -149,14 +163,13 @@ class GCN(nn.Module):
 
         for i in range(train_iters):
             if i == train_iters // 2:
-                lr = self.lr * 0.1
+                lr = self.lr*0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             self.train()
             optimizer.zero_grad()
             output = self.forward(self.features, self.adj_norm)
-            loss_train = self.loss(output if condensed else output[data.idx_train], labels_train)
-
+            loss_train = self.loss(output, labels)
             loss_train.backward()
             optimizer.step()
 
@@ -168,10 +181,10 @@ class GCN(nn.Module):
                 output = self.forward(feat_full, adj_full_norm)
 
                 if adj_val:
-                    # loss_val = F.nll_loss(output, labels_val)
+                    loss_val = F.nll_loss(output, labels_val)
                     acc_val = utils.accuracy(output, labels_val)
                 else:
-                    # loss_val = F.nll_loss(output[data.idx_val], labels_val)
+                    loss_val = F.nll_loss(output[data.idx_val], labels_val)
                     acc_val = utils.accuracy(output[data.idx_val], labels_val)
 
                 if acc_val > best_acc_val:
@@ -183,7 +196,8 @@ class GCN(nn.Module):
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
 
-    def test(self, data=None, verbose=False):
+
+    def test(self, idx_test):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
@@ -191,19 +205,15 @@ class GCN(nn.Module):
             node testing indices
         """
         self.eval()
-        idx_test = data.idx_test
-        # whether condensed or not, use the raw graph to test
-        output = self.predict(data.feat_full, data.adj_full)
+        output = self.predict()
         # output = self.output
-        labels_test = torch.LongTensor(data.labels_test).to(self.device)
-
-        loss_test = F.nll_loss(output[idx_test], labels_test)
-        acc_test = utils.accuracy(output[idx_test], labels_test)
-        if verbose:
-            print("Test set results:",
-                  "loss= {:.4f}".format(loss_test.item()),
-                  "accuracy= {:.4f}".format(acc_test.item()))
+        loss_test = F.nll_loss(output[idx_test], self.labels[idx_test])
+        acc_test = utils.accuracy(output[idx_test], self.labels[idx_test])
+        print("Test set results:",
+              "loss= {:.4f}".format(loss_test.item()),
+              "accuracy= {:.4f}".format(acc_test.item()))
         return acc_test.item()
+
 
     @torch.no_grad()
     def predict(self, features=None, adj=None):
@@ -247,39 +257,40 @@ class GCN(nn.Module):
             self.adj_norm = adj
             return self.forward(self.features, self.adj_norm)
 
-    # def _train_with_val2(self, labels, idx_train, idx_val, train_iters, verbose):
-    #     if verbose:
-    #         print('=== training gcn model ===')
-    #     optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
-    #
-    #     best_loss_val = 100
-    #     best_acc_val = 0
-    #
-    #     for i in range(train_iters):
-    #         if i == train_iters // 2:
-    #             lr = self.lr*0.1
-    #             optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
-    #
-    #         self.train()
-    #         optimizer.zero_grad()
-    #         output = self.forward(self.features, self.adj_norm)
-    #         loss_train = F.nll_loss(output[idx_train], labels[idx_train])
-    #         loss_train.backward()
-    #         optimizer.step()
-    #
-    #         if verbose and i % 10 == 0:
-    #             print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
-    #
-    #         self.eval()
-    #         output = self.forward(self.features, self.adj_norm)
-    #         loss_val = F.nll_loss(output[idx_val], labels[idx_val])
-    #         acc_val = utils.accuracy(output[idx_val], labels[idx_val])
-    #
-    #         if acc_val > best_acc_val:
-    #             best_acc_val = acc_val
-    #             self.output = output
-    #             weights = deepcopy(self.state_dict())
-    #
-    #     if verbose:
-    #         print('=== picking the best model according to the performance on validation ===')
-    #     self.load_state_dict(weights)
+
+    def _train_with_val2(self, labels, idx_train, idx_val, train_iters, verbose):
+        if verbose:
+            print('=== training gcn model ===')
+        optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
+
+        best_loss_val = 100
+        best_acc_val = 0
+
+        for i in range(train_iters):
+            if i == train_iters // 2:
+                lr = self.lr*0.1
+                optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
+
+            self.train()
+            optimizer.zero_grad()
+            output = self.forward(self.features, self.adj_norm)
+            loss_train = F.nll_loss(output[idx_train], labels[idx_train])
+            loss_train.backward()
+            optimizer.step()
+
+            if verbose and i % 10 == 0:
+                print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
+
+            self.eval()
+            output = self.forward(self.features, self.adj_norm)
+            loss_val = F.nll_loss(output[idx_val], labels[idx_val])
+            acc_val = utils.accuracy(output[idx_val], labels[idx_val])
+
+            if acc_val > best_acc_val:
+                best_acc_val = acc_val
+                self.output = output
+                weights = deepcopy(self.state_dict())
+
+        if verbose:
+            print('=== picking the best model according to the performance on validation ===')
+        self.load_state_dict(weights)

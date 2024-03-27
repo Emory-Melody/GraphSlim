@@ -6,7 +6,7 @@ import deeprobust.graph.utils as utils
 import numpy as np
 import scipy.sparse as sp
 
-from graphslim.models import GCN, SGC, SGC1, APPNP, APPNP1, Cheby, GraphSage, GAT
+from graphslim.models import GCN1, SGC, SGC1, APPNP, APPNP1, Cheby, GraphSage, GAT
 
 
 class Evaluator:
@@ -156,7 +156,7 @@ class Evaluator:
 
         print('======= testing %s' % model_type)
         if model_type == 'MLP':
-            model_class = GCN
+            model_class = GCN1
         else:
             model_class = eval(model_type)
         weight_decay = 5e-4
@@ -226,8 +226,7 @@ class Evaluator:
         final_res = {}
         runs = self.args.nruns
 
-        # for model_type in ['GCN',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
-        for model_type in ['SGC1']:
+        for model_type in ['GCN1',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
             res = []
             nlayer = 2
             for i in range(runs):

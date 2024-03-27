@@ -3,6 +3,7 @@ from itertools import repeat
 from deeprobust.graph.data import Dataset
 from pygsp import graphs
 from scipy.sparse import csr_matrix
+import scipy.sparse
 from torch_geometric.data import InMemoryDataset, Data
 from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, to_dense_adj
@@ -188,13 +189,35 @@ class Dpr2Pyg(InMemoryDataset):
 
     def process(self):
         dpr_data = self.dpr_data
+
         edge_index = torch.LongTensor(dpr_data.adj.nonzero())
+        # if type(dpr_data.adj) == torch.Tensor:
+        #     adj_selfloop = dpr_data.adj + torch.eye(dpr_data.adj.shape[0]).cuda()
+        #     edge_index_selfloop = adj_selfloop.nonzero().T
+        #     edge_index = edge_index_selfloop
+        #     edge_weight = adj_selfloop[edge_index_selfloop[0], edge_index_selfloop[1]]
+        # else:
+        #     adj_selfloop = dpr_data.adj + sp.eye(dpr_data.adj.shape[0])
+        #     edge_index = torch.LongTensor(adj_selfloop.nonzero()).cuda()
+        #     edge_weight = torch.FloatTensor(adj_selfloop[adj_selfloop.nonzero()]).cuda()
+
         # by default, the features in pyg data is dense
-        if sp.sparse.issparse(dpr_data.features):
+        if scipy.sparse.issparse(dpr_data.features):
             x = torch.FloatTensor(dpr_data.features.todense()).float()
         else:
             x = torch.FloatTensor(dpr_data.features).float()
         y = torch.LongTensor(dpr_data.labels)
+
+        # try:
+        #     x = torch.FloatTensor(dpr_data.features.cpu()).float().cuda()
+        # except:
+        #     x = torch.FloatTensor(dpr_data.features).float().cuda()
+        # try:
+        #     y = torch.LongTensor(dpr_data.labels.cpu()).cuda()
+        # except:
+        #     y = dpr_data.labels
+
+
         data = Data(x=x, edge_index=edge_index, y=y)
         data.train_mask = None
         data.val_mask = None
