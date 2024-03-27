@@ -31,7 +31,7 @@ class Evaluator:
 
     def generate_labels_syn(self, data):
         from collections import Counter
-        counter = Counter(data.labels_train)
+        counter = Counter(data.labels_train.tolist())
         num_class_dict = {}
         n = len(data.labels_train)
 
@@ -42,6 +42,7 @@ class Evaluator:
         for ix, (c, num) in enumerate(sorted_counter):
             if ix == len(sorted_counter) - 1:
                 num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
+                print(num_class_dict[c])
                 self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
                 labels_syn += [c] * num_class_dict[c]
             else:
@@ -118,7 +119,7 @@ class Evaluator:
     def get_syn_data(self, model_type=None):
         data, device = self.data, self.device
         feat_syn, adj_param, labels_syn = self.feat_syn.detach(), \
-                                self.adj_param.detach(), self.labels_syn
+            self.adj_param.detach(), self.labels_syn
 
         args = self.args
         adj_syn = torch.load(f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
@@ -141,6 +142,7 @@ class Evaluator:
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
 
+
         return feat_syn, adj_syn, labels_syn
 
 
@@ -160,6 +162,7 @@ class Evaluator:
         weight_decay = 5e-4
         dropout = 0.5 if args.dataset in ['reddit'] else 0
 
+        print(type(data.nclass))
         model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=dropout,
                     weight_decay=weight_decay, nlayers=nlayers,
                     nclass=data.nclass, device=device).to(device)
@@ -170,11 +173,10 @@ class Evaluator:
                         weight_decay=weight_decay, nlayers=nlayers, with_bn=False,
                         nclass=data.nclass, device=device).to(device)
 
-        noval = True if args.dataset in ['reddit', 'flickr'] else False
-        # model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-        #              train_iters=600, normalize=True, verbose=True, noval=noval)
-        model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=True, noval=noval)
+        # val = False if args.dataset in ['reddit', 'flickr'] else True
+        val = False
+        model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
+                     train_iters=600, normalize=True, verbose=True, val=val)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -219,11 +221,13 @@ class Evaluator:
     def train(self, verbose=True):
         args = self.args
         data = self.data
+        data.nclass = data.nclass.item()
 
         final_res = {}
         runs = self.args.nruns
 
-        for model_type in ['GCN',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        # for model_type in ['GCN',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        for model_type in ['SGC1']:
             res = []
             nlayer = 2
             for i in range(runs):
@@ -234,15 +238,15 @@ class Evaluator:
             final_res[model_type] = [res.mean(0), res.std(0)]
 
 
-        print('=== testing GAT')
-        res = []
-        nlayer = 2
-        for i in range(runs):
-            res.append(self.test_gat(verbose=True, nlayers=nlayer, model_type='GAT'))
-        res = np.array(res)
-        print('Layer:', nlayer)
-        print('Test/Full Test/Train Mean Accuracy:',
-                repr([res.mean(0), res.std(0)]))
-        final_res['GAT'] = [res.mean(0), res.std(0)]
+        # print('=== testing GAT')
+        # res = []
+        # nlayer = 2
+        # for i in range(runs):
+        #     res.append(self.test_gat(verbose=True, nlayers=nlayer, model_type='GAT'))
+        # res = np.array(res)
+        # print('Layer:', nlayer)
+        # print('Test/Full Test/Train Mean Accuracy:',
+        #         repr([res.mean(0), res.std(0)]))
+        # final_res['GAT'] = [res.mean(0), res.std(0)]
 
         print('Final result:', final_res)
