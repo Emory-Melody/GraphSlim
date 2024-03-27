@@ -1,4 +1,5 @@
 from collections import Counter
+import os
 
 import deeprobust.graph.utils as utils
 import numpy as np
@@ -13,7 +14,6 @@ from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC as SGC1
 from graphslim.utils import regularization  # graphslim
 from graphslim.condensation.utils import match_loss  # graphslim
-
 
 class GCondBase:
 
@@ -281,9 +281,12 @@ class GCondTrans(GCondBase):
         adj_syn = pge.inference(feat_syn)
         args = self.args
 
-        if self.args.save:
-            torch.save(adj_syn, f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        if args.save:
+            save_path = 'dataset/output/saved_ours'
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
@@ -331,8 +334,11 @@ class GCondInd(GCondBase):
         args = self.args
 
         if args.save:
-            torch.save(adj_syn, f'saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            save_path = 'dataset/output/saved_ours'
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+            torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         model.fit_with_val(feat_syn, adj_syn, data,
                            train_iters=600, normalize=True, verbose=False, val=True, condensed=True)
