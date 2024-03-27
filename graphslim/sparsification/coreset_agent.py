@@ -1,30 +1,31 @@
-import torch
 from collections import Counter
+
 import numpy as np
+import torch
 
 
 class Base:
 
-    def __init__(self, data, args, device='cuda', **kwargs):
+    def __init__(self, data, args, **kwargs):
         self.data = data
         self.args = args
-        self.device = device
+        self.device = args.device
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
         # self.nnodes_syn = n
-        self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
+        self.num_class_dict = {}
+        self.syn_class_indices = {}
+        self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(self.device)
         n = len(self.labels_syn)
         print(f'selected graph size: [{n},{n}]')
 
     def generate_labels_syn(self, data):
         counter = Counter(data.labels_train)
-        num_class_dict = {}
         # n = len(data.labels_train)
-
+        num_class_dict = self.num_class_dict
         sorted_counter = sorted(counter.items(), key=lambda x: x[1])
         sum_ = 0
         labels_syn = []
-        self.syn_class_indices = {}
         for ix, (c, num) in enumerate(sorted_counter):
             # if ix == len(sorted_counter) - 1:
             #     num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
@@ -36,17 +37,12 @@ class Base:
             self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
             labels_syn += [c] * num_class_dict[c]
 
-        self.num_class_dict = num_class_dict
         return labels_syn
-
-    def select(self):
-        return
 
 
 class KCenter(Base):
-
-    def __init__(self, data, args, device='cuda', **kwargs):
-        super(KCenter, self).__init__(data, args, device='cuda', **kwargs)
+    def __init__(self, data, args, **kwargs):
+        super().__init__(data, args, **kwargs)
 
     def select(self, embeds, inductive=False):
         # feature: embeds
@@ -80,9 +76,8 @@ class KCenter(Base):
 
 
 class Herding(Base):
-
-    def __init__(self, data, args, device='cuda', **kwargs):
-        super(Herding, self).__init__(data, args, device='cuda', **kwargs)
+    def __init__(self, data, args, **kwargs):
+        super().__init__(data, args, **kwargs)
 
     def select(self, embeds, inductive=False):
         num_class_dict = self.num_class_dict
@@ -113,11 +108,10 @@ class Herding(Base):
 
 
 class Random(Base):
+    def __init__(self, data, args, **kwargs):
+        super().__init__(data, args, **kwargs)
 
-    def __init__(self, data, args, device='cuda', **kwargs):
-        super(Random, self).__init__(data, args, device='cuda', **kwargs)
-
-    def select(self, embeds, inductive=False):
+    def select(self, embed, inductive=False):
         num_class_dict = self.num_class_dict
         if inductive:
             idx_train = np.arange(len(self.data.idx_train))

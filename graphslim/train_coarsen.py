@@ -1,7 +1,7 @@
 import argparse
+
 from coarsening import *
 from dataset import *
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', type=str, default='cora')
@@ -29,9 +29,7 @@ if not os.path.isdir(path):
 torch.cuda.set_device(args.gpu_id)
 
 data = get_dataset(args.dataset, return_pyg=True)
-
+# TODO: citeseer has isolated nodes error and only one subgraphs in pubmed
 agent = CoarseningBase(data, args, device='cuda')
 
 agent.train()
-
-
