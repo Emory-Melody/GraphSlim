@@ -11,8 +11,8 @@ from sklearn.metrics import f1_score
 from torch.nn import init
 import torch_sparse
 from torch_geometric.nn.inits import zeros
-import scipy as sp
 import numpy as np
+import scipy.sparse as sp
 
 
 class ChebConvolution(Module):
@@ -405,7 +405,7 @@ def normalize_adj(mx):
     """
 
     # TODO: maybe using coo format would be better?
-    if type(mx) is not sp.lil.lil_matrix:
+    if type(mx) is not sp.lil_matrix:
         mx = mx.tolil()
     mx = mx + sp.eye(mx.shape[0])
     rowsum = np.array(mx.sum(1))
