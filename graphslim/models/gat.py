@@ -11,7 +11,7 @@ import torch.optim as optim
 from deeprobust.graph import utils
 
 # from torch_geometric.nn import GATConv
-
+from graphslim.models.layers import GATConv
 
 class GAT(torch.nn.Module):
 
