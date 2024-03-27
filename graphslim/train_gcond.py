@@ -39,6 +39,7 @@ print(args)
 
 data = get_dataset(args.dataset, normalize_features=args.normalize_features, transform=None)
 agent = GCond(data, args)
-# agent.train()
+
+agent.train()
 
 agent.cross_architecture_eval()
