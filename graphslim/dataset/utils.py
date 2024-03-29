@@ -1,10 +1,9 @@
-from deeprobust.graph.data import Dpr2Pyg
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
-from torchvision import datasets, transforms
+from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
 from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import TransAndInd, pyg2saint
-from graphslim.dataset.utils_graphsaint import GraphData, DataGraphSAINT
+from graphslim.dataset.utils_graphsaint import DataGraphSAINT
 from graphslim.utils import *
 
 
@@ -63,25 +62,24 @@ def splits(data, num_classes, exp):
 
     return data
 
-
-def get_mnist(data_path):
-    channel = 1
-    im_size = (28, 28)
-    num_classes = 10
-    mean = [0.1307]
-    std = [0.3081]
-    transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
-    dst_train = datasets.MNIST(data_path, train=True, download=True, transform=transform)  # no        augmentation
-    dst_test = datasets.MNIST(data_path, train=False, download=True, transform=transform)
-    class_names = [str(c) for c in range(num_classes)]
-
-    labels = []
-    feat = []
-    for x, y in dst_train:
-        feat.append(x.view(1, -1))
-        labels.append(y)
-    feat = torch.cat(feat, axis=0).numpy()
-    adj = sp.eye(len(feat))
-    idx = np.arange(len(feat))
-    dpr_data = GraphData(adj - adj, feat, labels, idx, idx, idx)
-    return Dpr2Pyg(dpr_data)
+# def get_mnist(data_path):
+#     channel = 1
+#     im_size = (28, 28)
+#     num_classes = 10
+#     mean = [0.1307]
+#     std = [0.3081]
+#     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])
+#     dst_train = datasets.MNIST(data_path, train=True, download=True, transform=transform)  # no        augmentation
+#     dst_test = datasets.MNIST(data_path, train=False, download=True, transform=transform)
+#     class_names = [str(c) for c in range(num_classes)]
+#
+#     labels = []
+#     feat = []
+#     for x, y in dst_train:
+#         feat.append(x.view(1, -1))
+#         labels.append(y)
+#     feat = torch.cat(feat, axis=0).numpy()
+#     adj = sp.eye(len(feat))
+#     idx = np.arange(len(feat))
+#     dpr_data = GraphData(adj - adj, feat, labels, idx, idx, idx)
+#     return Dpr2Pyg(dpr_data)
