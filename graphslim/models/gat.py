@@ -1,17 +1,18 @@
 """
 Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark/citation
 """
-from copy import deepcopy
-from itertools import repeat
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from deeprobust.graph import utils
+from copy import deepcopy
 
+from graphslim import utils
+from graphslim.evaluation import evaluate
 # from torch_geometric.nn import GATConv
 from graphslim.models.layers import GATConv
-from graphslim.dataset.convertor import Dpr2Pyg
+
+
+# from graphslim.dataset.convertor import Dpr2Pyg
 
 class GAT(torch.nn.Module):
 
@@ -91,16 +92,16 @@ class GAT(torch.nn.Module):
     def fit(self, feat, adj, labels, idx, data=None, train_iters=600, initialize=True, verbose=False, patience=None, val=False, **kwargs):
 
         data_train = GraphData(feat, adj, labels)
-        data_train = Dpr2Pyg(data_train)[0]
-
-        data_test = Dpr2Pyg(GraphData(data.feat_test, data.adj_test, None))[0]
-
-        if val:
-            data_val = GraphData(data.feat_val, data.adj_val, None)
-            data_val = Dpr2Pyg(data_val)[0]
-        else:
-            data_val = GraphData(data.feat_full, data.adj_full, None)
-            data_val = Dpr2Pyg(data_val)[0]
+        # data_train = Dpr2Pyg(data_train)[0]
+        #
+        # data_test = Dpr2Pyg(GraphData(data.feat_test, data.adj_test, None))[0]
+        #
+        # if val:
+        #     data_val = GraphData(data.feat_val, data.adj_val, None)
+        #     data_val = Dpr2Pyg(data_val)[0]
+        # else:
+        #     data_val = GraphData(data.feat_full, data.adj_full, None)
+        #     data_val = Dpr2Pyg(data_val)[0]
 
         labels_val = torch.LongTensor(data.labels_val).to(self.device)
 
@@ -186,20 +187,20 @@ class GAT(torch.nn.Module):
     # def predict(self, data):
     #     self.eval()
     #     return self.forward(data)
-    @torch.no_grad()
-    def predict(self, feat, adj):
-        self.eval()
-        data = GraphData(feat, adj, None)
-        data = Dpr2Pyg(data)[0]
-        return self.forward(data)
-
-    @torch.no_grad()
-    def predict_unnorm(self, feat, adj):
-        self.eval()
-        data = GraphData(feat, adj, None)
-        data = Dpr2Pyg(data)[0]
-
-        return self.forward(data)
+    # @torch.no_grad()
+    # def predict(self, feat, adj):
+    #     self.eval()
+    #     # data = GraphData(feat, adj, None)
+    #     # data = Dpr2Pyg(data)[0]
+    #     return self.forward(data)
+    #
+    # @torch.no_grad()
+    # def predict_unnorm(self, feat, adj):
+    #     self.eval()
+    #     # data = GraphData(feat, adj, None)
+    #     # data = Dpr2Pyg(data)[0]
+    #
+    #     return self.forward(data)
 
 
 class GraphData:

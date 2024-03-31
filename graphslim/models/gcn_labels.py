@@ -1,17 +1,17 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch
 import torch.optim as optim
-
-from deeprobust.graph import utils
+# from deeprobust.graph import utils
 from copy import deepcopy
 
 from graphslim.models.layers import GraphConvolution
 
+
 class GCN(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-            with_relu=True, with_bias=True, with_bn=False, device=None):
+                 with_relu=True, with_bias=True, with_bn=False, device=None):
 
         super(GCN, self).__init__()
 
@@ -29,7 +29,7 @@ class GCN(nn.Module):
                 self.bns = torch.nn.ModuleList()
                 self.bns.append(nn.BatchNorm1d(nhid))
             self.layers.append(GraphConvolution(nfeat, nhid, with_bias=with_bias))
-            for i in range(nlayers-2):
+            for i in range(nlayers - 2):
                 self.layers.append(GraphConvolution(nhid, nhid, with_bias=with_bias))
                 if with_bn:
                     self.bns.append(nn.BatchNorm1d(nhid))
@@ -94,7 +94,6 @@ class GCN(nn.Module):
         else:
             return F.log_softmax(x, dim=1)
 
-
     def initialize(self):
         """Initialize parameters of GCN.
         """
@@ -104,29 +103,29 @@ class GCN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True, patience=None, noval=False, **kwargs):
+    def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True,
+                     patience=None, noval=False, **kwargs):
         '''data: full data class'''
         if initialize:
             self.initialize()
 
         if type(adj) is not torch.Tensor:
-            features, adj, labels = utils.to_tensor(features, adj, labels, device=self.device)
+            features, adj, labels = to_tensor(features, adj, labels, device=self.device)
         else:
             features = features.to(self.device)
             adj = adj.to(self.device)
             labels = labels.to(self.device)
 
         if normalize:
-            if utils.is_sparse_tensor(adj):
-                adj_norm = utils.normalize_adj_tensor(adj, sparse=True)
+            if is_sparse_tensor(adj):
+                adj_norm = normalize_adj_tensor(adj, sparse=True)
             else:
-                adj_norm = utils.normalize_adj_tensor(adj)
+                adj_norm = normalize_adj_tensor(adj)
         else:
             adj_norm = adj
 
         if 'feat_norm' in kwargs and kwargs['feat_norm']:
-            from utils import row_normalize_tensor
-            features = row_normalize_tensor(features-features.min())
+            features = row_normalize_tensor(features - features.min())
 
         self.adj_norm = adj_norm
         self.features = features
@@ -151,8 +150,8 @@ class GCN(nn.Module):
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
-        feat_full, adj_full = utils.to_tensor(feat_full, adj_full, device=self.device)
-        adj_full_norm = utils.normalize_adj_tensor(adj_full, sparse=True)
+        feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
+        adj_full_norm = normalize_adj_tensor(adj_full, sparse=True)
         labels_val = torch.LongTensor(data.labels_val).to(self.device)
 
         if verbose:
@@ -163,7 +162,7 @@ class GCN(nn.Module):
 
         for i in range(train_iters):
             if i == train_iters // 2:
-                lr = self.lr*0.1
+                lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             self.train()
@@ -182,10 +181,10 @@ class GCN(nn.Module):
 
                 if adj_val:
                     loss_val = F.nll_loss(output, labels_val)
-                    acc_val = utils.accuracy(output, labels_val)
+                    acc_val = accuracy(output, labels_val)
                 else:
                     loss_val = F.nll_loss(output[data.idx_val], labels_val)
-                    acc_val = utils.accuracy(output[data.idx_val], labels_val)
+                    acc_val = accuracy(output[data.idx_val], labels_val)
 
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val
@@ -195,7 +194,6 @@ class GCN(nn.Module):
         if verbose:
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
-
 
     def test(self, idx_test):
         """Evaluate GCN performance on test set.
@@ -208,12 +206,11 @@ class GCN(nn.Module):
         output = self.predict()
         # output = self.output
         loss_test = F.nll_loss(output[idx_test], self.labels[idx_test])
-        acc_test = utils.accuracy(output[idx_test], self.labels[idx_test])
+        acc_test = accuracy(output[idx_test], self.labels[idx_test])
         print("Test set results:",
               "loss= {:.4f}".format(loss_test.item()),
               "accuracy= {:.4f}".format(acc_test.item()))
         return acc_test.item()
-
 
     @torch.no_grad()
     def predict(self, features=None, adj=None):
@@ -235,13 +232,13 @@ class GCN(nn.Module):
             return self.forward(self.features, self.adj_norm)
         else:
             if type(adj) is not torch.Tensor:
-                features, adj = utils.to_tensor(features, adj, device=self.device)
+                features, adj = to_tensor(features, adj, device=self.device)
 
             self.features = features
-            if utils.is_sparse_tensor(adj):
-                self.adj_norm = utils.normalize_adj_tensor(adj, sparse=True)
+            if is_sparse_tensor(adj):
+                self.adj_norm = normalize_adj_tensor(adj, sparse=True)
             else:
-                self.adj_norm = utils.normalize_adj_tensor(adj)
+                self.adj_norm = normalize_adj_tensor(adj)
             return self.forward(self.features, self.adj_norm)
 
     @torch.no_grad()
@@ -251,12 +248,11 @@ class GCN(nn.Module):
             return self.forward(self.features, self.adj_norm)
         else:
             if type(adj) is not torch.Tensor:
-                features, adj = utils.to_tensor(features, adj, device=self.device)
+                features, adj = to_tensor(features, adj, device=self.device)
 
             self.features = features
             self.adj_norm = adj
             return self.forward(self.features, self.adj_norm)
-
 
     def _train_with_val2(self, labels, idx_train, idx_val, train_iters, verbose):
         if verbose:
@@ -268,7 +264,7 @@ class GCN(nn.Module):
 
         for i in range(train_iters):
             if i == train_iters // 2:
-                lr = self.lr*0.1
+                lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             self.train()
@@ -284,7 +280,7 @@ class GCN(nn.Module):
             self.eval()
             output = self.forward(self.features, self.adj_norm)
             loss_val = F.nll_loss(output[idx_val], labels[idx_val])
-            acc_val = utils.accuracy(output[idx_val], labels[idx_val])
+            acc_val = accuracy(output[idx_val], labels[idx_val])
 
             if acc_val > best_acc_val:
                 best_acc_val = acc_val

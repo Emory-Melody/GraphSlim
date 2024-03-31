@@ -1,18 +1,17 @@
-import torch.nn as nn
-import torch.nn.functional as F
 import math
-import torch
-import torch.optim as optim
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-from deeprobust.graph import utils
-from copy import deepcopy
-from sklearn.metrics import f1_score
-from torch.nn import init
-import torch_sparse
-from torch_geometric.nn.inits import zeros
 import numpy as np
 import scipy.sparse as sp
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+import torch_sparse
+from copy import deepcopy
+from torch.nn.modules.module import Module
+from torch.nn.parameter import Parameter
+from torch_geometric.nn.inits import zeros
+
+from graphslim import utils
 
 
 class ChebConvolution(Module):

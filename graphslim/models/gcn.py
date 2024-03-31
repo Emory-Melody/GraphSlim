@@ -1,9 +1,7 @@
-from copy import deepcopy
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from deeprobust.graph import utils
+from copy import deepcopy
 
 from graphslim.models.layers import GraphConvolution
 from graphslim.utils import *
@@ -115,7 +113,7 @@ class GCN(nn.Module):
                                                                                 torch.Tensor) else features.to(
             self.device)
 
-        self.adj_norm = utils.normalize_adj_tensor(adj, sparse=utils.is_sparse_tensor(adj)) if normalize else adj
+        self.adj_norm = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj)) if normalize else adj
         self.features = features
 
         if len(data.labels_full.shape) > 1:
@@ -135,8 +133,8 @@ class GCN(nn.Module):
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
-        feat_full, adj_full = utils.to_tensor(feat_full, adj_full, device=self.device)
-        adj_full_norm = utils.normalize_adj_tensor(adj_full, sparse=True)
+        feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
+        adj_full_norm = normalize_adj_tensor(adj_full, sparse=True)
         labels_val = torch.LongTensor(data.labels_val).to(self.device)
         labels_train = torch.LongTensor(data.labels_syn).to(self.device) if condensed else torch.LongTensor(
             data.labels_train).to(self.device)
@@ -169,10 +167,10 @@ class GCN(nn.Module):
 
                 if adj_val:
                     # loss_val = F.nll_loss(output, labels_val)
-                    acc_val = utils.accuracy(output, labels_val)
+                    acc_val = accuracy(output, labels_val)
                 else:
                     # loss_val = F.nll_loss(output[data.idx_val], labels_val)
-                    acc_val = utils.accuracy(output[data.idx_val], labels_val)
+                    acc_val = accuracy(output[data.idx_val], labels_val)
 
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val
@@ -198,7 +196,7 @@ class GCN(nn.Module):
         labels_test = torch.LongTensor(data.labels_test).to(self.device)
 
         loss_test = F.nll_loss(output[idx_test], labels_test)
-        acc_test = utils.accuracy(output[idx_test], labels_test)
+        acc_test = accuracy(output[idx_test], labels_test)
         if verbose:
             print("Test set results:",
                   "loss= {:.4f}".format(loss_test.item()),
@@ -225,13 +223,13 @@ class GCN(nn.Module):
             return self.forward(self.features, self.adj_norm)
         else:
             if type(adj) is not torch.Tensor:
-                features, adj = utils.to_tensor(features, adj, device=self.device)
+                features, adj = to_tensor(features, adj, device=self.device)
 
             self.features = features
-            if utils.is_sparse_tensor(adj):
-                self.adj_norm = utils.normalize_adj_tensor(adj, sparse=True)
+            if is_sparse_tensor(adj):
+                self.adj_norm = normalize_adj_tensor(adj, sparse=True)
             else:
-                self.adj_norm = utils.normalize_adj_tensor(adj)
+                self.adj_norm = normalize_adj_tensor(adj)
             return self.forward(self.features, self.adj_norm)
 
     @torch.no_grad()
@@ -241,7 +239,7 @@ class GCN(nn.Module):
             return self.forward(self.features, self.adj_norm)
         else:
             if type(adj) is not torch.Tensor:
-                features, adj = utils.to_tensor(features, adj, device=self.device)
+                features, adj = to_tensor(features, adj, device=self.device)
 
             self.features = features
             self.adj_norm = adj

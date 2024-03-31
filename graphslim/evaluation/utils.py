@@ -1,7 +1,8 @@
-from utils import *
-from sklearn import metrics
 import torch.nn.functional as F
-from deeprobust.graph.utils import accuracy
+from sklearn.metrics import accuracy_score, f1_score
+
+
+# from deeprobust.graph.utils import accuracy
 
 
 def calc_f1(y_true, y_pred, is_sigmoid):
@@ -10,7 +11,7 @@ def calc_f1(y_true, y_pred, is_sigmoid):
     else:
         y_pred[y_pred > 0.5] = 1
         y_pred[y_pred <= 0.5] = 0
-    return metrics.f1_score(y_true, y_pred, average="micro"), metrics.f1_score(y_true, y_pred, average="macro")
+    return f1_score(y_true, y_pred, average="micro"), metrics.f1_score(y_true, y_pred, average="macro")
 
 
 def evaluate(output, labels, args):
@@ -26,7 +27,7 @@ def evaluate(output, labels, args):
               "F1-macro= {:.4f}".format(macro))
     else:
         loss_test = F.nll_loss(output, labels)
-        acc_test = accuracy(output, labels)
+        acc_test = accuracy_score(output, labels)
         print("Test set results:",
               "loss= {:.4f}".format(loss_test.item()),
               "accuracy= {:.4f}".format(acc_test.item()))

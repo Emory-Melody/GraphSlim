@@ -1,17 +1,15 @@
 """multiple transformaiton and multiple propagation"""
-import torch.nn as nn
-import torch.nn.functional as F
 import math
 import torch
+import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-from deeprobust.graph import utils
-from copy import deepcopy
-from sklearn.metrics import f1_score
-from torch.nn import init
 import torch_sparse
-from graphslim.utils import row_normalize_tensor
+from copy import deepcopy
+from torch.nn.modules.module import Module
+from torch.nn.parameter import Parameter
+
+from graphslim import utils
 
 
 class SGC(nn.Module):
@@ -140,7 +138,7 @@ class SGC(nn.Module):
             adj_norm = adj
 
         if 'feat_norm' in kwargs and kwargs['feat_norm']:
-            features = row_normalize_tensor(features - features.min())
+            features = utils.row_normalize_tensor(features - features.min())
 
         self.adj_norm = adj_norm
         self.features = features

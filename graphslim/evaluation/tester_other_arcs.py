@@ -1,16 +1,12 @@
-import sys
+import numpy as np
+import scipy as sp
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.nn import Parameter
 import torch.nn.functional as F
-import deeprobust.graph.utils as utils
-import numpy as np
-from tqdm import tqdm
+
+from graphslim import utils
+from graphslim.models.gat import GAT
 from graphslim.models.gcn import GCN
-from models.myappnp1 import APPNP1
-from models.gat import GAT
-import scipy as sp
 
 
 class Evaluator:

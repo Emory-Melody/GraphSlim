@@ -1,4 +1,4 @@
-from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
+import os.path as osp
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
 from torch_sparse import SparseTensor
 

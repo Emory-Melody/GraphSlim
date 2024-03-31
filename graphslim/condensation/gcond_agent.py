@@ -1,20 +1,20 @@
-import os
-from collections import Counter
-
-import deeprobust.graph.utils as utils
+# import deeprobust.graph.utils as utils
 import numpy as np
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from collections import Counter
 from torch_sparse import SparseTensor
 
+from graphslim.condensation.tester_other_arcs import Evaluator
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC as SGC1
-from graphslim.utils import regularization  # graphslim
-from graphslim.condensation.tester_other_arcs import Evaluator
+from graphslim.utils import *  # graphslim
+
 
 def GCond(data, args):
     if args.setting == 'trans':
@@ -76,7 +76,7 @@ class GCondBase:
         args = self.args
         data = self.data
         feat_syn, pge, labels_syn = self.feat_syn, self.pge, torch.from_numpy(self.data.labels_syn).to(self.device)
-        features, adj, labels = utils.to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
+        features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
         # idx_train = data.idx_train
 
         syn_class_indices = self.syn_class_indices
@@ -84,10 +84,10 @@ class GCondBase:
         feat_sub, adj_sub = self.get_sub_adj_feat(features)
         self.feat_syn.data.copy_(feat_sub)
 
-        if utils.is_sparse_tensor(adj):
-            adj_norm = utils.normalize_adj_tensor(adj, sparse=True)
+        if is_sparse_tensor(adj):
+            adj_norm = normalize_adj_tensor(adj, sparse=True)
         else:
-            adj_norm = utils.normalize_adj_tensor(adj)
+            adj_norm = normalize_adj_tensor(adj)
 
         adj = adj_norm
         adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
@@ -123,7 +123,7 @@ class GCondBase:
 
             for ol in range(outer_loop):
                 adj_syn = pge(self.feat_syn)
-                adj_syn_norm = utils.normalize_adj_tensor(adj_syn, sparse=False)
+                adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
 
                 BN_flag = False
@@ -162,7 +162,7 @@ class GCondBase:
 
                 loss_avg += loss.item()
                 if args.alpha > 0:
-                    loss_reg = args.alpha * regularization(adj_syn, utils.tensor2onehot(labels_syn))
+                    loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
                 else:
                     loss_reg = torch.tensor(0)
 
@@ -187,7 +187,7 @@ class GCondBase:
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
-                adj_syn_inner_norm = utils.normalize_adj_tensor(adj_syn_inner, sparse=False)
+                adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
                 feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
@@ -331,7 +331,7 @@ class GCondTrans(GCondBase):
 
         # Full graph
         loss_test = F.nll_loss(output[data.idx_test], labels_test)
-        acc_test = utils.accuracy(output[data.idx_test], labels_test)
+        acc_test = accuracy(output[data.idx_test], labels_test)
         res.append(acc_test.item())
         if verbose:
             print("Test set results:",
@@ -371,7 +371,7 @@ class GCondInd(GCondBase):
         output = model.predict(data.feat_test, data.adj_test)
 
         loss_test = F.nll_loss(output, labels_test)
-        acc_test = utils.accuracy(output, labels_test)
+        acc_test = accuracy(output, labels_test)
         res.append(acc_test.item())
         if verbose:
             print('Test Accuracy and Std:',
