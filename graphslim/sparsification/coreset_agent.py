@@ -1,7 +1,93 @@
-from collections import Counter
-
 import numpy as np
 import torch
+import torch.nn.functional as F
+from collections import Counter
+from tqdm import tqdm
+
+from graphslim.models import *
+from graphslim.utils import accuracy
+
+
+def body_select(data, args):
+    if args.method == 'kcenter':
+        agent = KCenter(data, args)
+    elif args.method == 'herding':
+        agent = Herding(data, args)
+    elif args.method == 'random':
+        agent = Random(data, args)
+    else:
+        pass
+
+    res = []
+    runs = 10
+    model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
+                weight_decay=args.weight_decay).to(args.device)
+    if args.setting == 'trans':
+        model.fit_with_val(data.feat_full, data.adj_full, data, train_iters=args.epochs, verbose=True)
+        model.test(data, verbose=True)
+        embeds = model.predict().detach()
+
+        idx_selected = agent.select(embeds)
+
+        # induce a graph with selected nodes
+        feat_selected = data.feat_full[idx_selected]
+        adj_selected = data.adj_full[np.ix_(idx_selected, idx_selected)]
+
+        data.labels_syn = data.labels_full[idx_selected]
+
+        # if args.save:
+        #     np.save(f'dataset/output/coreset/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
+        #             idx_selected)
+
+        for _ in tqdm(range(runs)):
+            model.fit_with_val(feat_selected, adj_selected, data,
+                               train_iters=args.epochs, normalize=True, verbose=False, condensed=True)
+
+            # Full graph
+            # interface: model.test(full_data)
+            acc_test = model.test(data)
+            res.append(acc_test)
+
+    if args.setting == 'ind':
+
+        model.fit_with_val(data.feat_train, data.adj_train, data, train_iters=args.epochs, normalize=True,
+                           verbose=False)
+
+        model.eval()
+        labels_test = torch.LongTensor(data.labels_test).cuda()
+        feat_test, adj_test = data.feat_test, data.adj_test
+
+        embeds = model.predict().detach()
+
+        output = model.predict(feat_test, adj_test)
+        loss_test = F.nll_loss(output, labels_test)
+        acc_test = accuracy(output, labels_test)
+        print("Test set results:",
+              "loss= {:.4f}".format(loss_test.item()),
+              "accuracy= {:.4f}".format(acc_test.item()))
+
+        idx_selected = agent.select(embeds, inductive=True)
+
+        feat_selected = data.feat_train[idx_selected]
+        adj_selected = data.adj_train[np.ix_(idx_selected, idx_selected)]
+
+        data.labels_syn = data.labels_train[idx_selected]
+
+        for _ in tqdm(range(runs)):
+            model.fit_with_val(feat_selected, adj_selected, data,
+                               train_iters=args.epochs, normalize=True, verbose=False, val=True, condensed=True)
+
+            model.eval()
+            labels_test = torch.LongTensor(data.labels_test).cuda()
+
+            # interface: model.predict(reshaped feat,reshaped adj)
+            output = model.predict(feat_test, adj_test)
+            loss_test = F.nll_loss(output, labels_test)
+            acc_test = utils.accuracy(output, labels_test)
+            res.append(acc_test.item())
+    res = np.array(res)
+    print('Mean accuracy:', repr([res.mean(), res.std()]))
+    return idx_selected
 
 
 class Base:

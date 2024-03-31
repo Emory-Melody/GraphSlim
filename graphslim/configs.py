@@ -1,8 +1,6 @@
 '''Configuration'''
-import json
-
 import click
-from click import Choice
+import json
 
 from utils import seed_everything
 
@@ -39,20 +37,27 @@ def load_config(args):
 
 
 @click.command()
+@click.option('--dataset', type=str, default='cora')
 @click.option('--gpu_id', type=int, default=0, help='gpu id')
 @click.option('--setting', '-S', type=str, default='trans', help='trans/ind')
-@click.option('--dataset', default='cora')
-@click.option('--hidden', type=int, default=64)
-@click.option('--normalize_features', type=bool, default=True)
-@click.option('--keep_ratio', type=float, default=1.0)
+@click.option('--experiment', type=str, default='fixed')  # 'fixed', 'random', 'few'
+@click.option('--runs', type=int, default=10)
+@click.option('--hidden', type=int, default=256)
+@click.option('--epochs', type=int, default=500)
+@click.option('--early_stopping', type=int, default=10)
 @click.option('--lr', type=float, default=0.01)
 @click.option('--weight_decay', type=float, default=5e-4)
+@click.option('--normalize_features', type=bool, default=True)
+@click.option('--reduction_rate', type=float, default=0.03)
+@click.option('--keep_ratio', type=float, default=1.0)
 @click.option('--seed', type=int, default=15, help='Random seed.')
 @click.option('--nlayers', type=int, default=2, help='number of GNN layers')
-@click.option('--epochs', type=int, default=600)
 @click.option('--save', type=int, default=0)
-@click.option('--method', default='kcenter', type=Choice(['gcond', 'kcenter', 'herding', 'random']))
-@click.option('--reduction_rate', type=float, default=0.5)
+@click.option('--method', default='kcenter',
+              type=click.Choice(
+                  ['vn',
+                   'gcond',
+                   'kcenter', 'herding', 'random']))
 @click.option('--dis_metric', type=str, default='ours')
 @click.option('--lr_adj', type=float, default=1e-4)
 @click.option('--lr_feat', type=float, default=1e-4)
@@ -60,10 +65,6 @@ def load_config(args):
 @click.option('--dropout', type=float, default=0.0)
 @click.option('--alpha', type=float, default=0, help='regularization term.')
 @click.option('--debug', type=int, default=0)
-@click.option('--sgc', type=int, default=1)
-@click.option('--inner', type=int, default=0)
-@click.option('--outer', type=int, default=20)
-@click.option('--one_step', type=int, default=0)
 @click.pass_context
 def cli(ctx, **kwargs):
     try:

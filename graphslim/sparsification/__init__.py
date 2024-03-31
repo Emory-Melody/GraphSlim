@@ -1,1 +1,1 @@
-from .coreset_agent import KCenter, Herding, Random
+from .coreset_agent import body_select

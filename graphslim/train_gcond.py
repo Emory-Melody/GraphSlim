@@ -8,4 +8,4 @@ agent = GCond(data, args)
 
 agent.train()
 
-agent.cross_architecture_eval()
+# agent.cross_architecture_eval()

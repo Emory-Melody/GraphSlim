@@ -279,7 +279,8 @@ def normalize_adj(mx):
         mx = mx.tolil()
     if mx[0, 0] == 0:
         mx = mx + sp.eye(mx.shape[0])
-    rowsum = np.array(mx.sum(1))
+    eps = 1e-9
+    rowsum = np.array(mx.sum(1)) + eps
     r_inv = np.power(rowsum, -1 / 2).flatten()
     r_inv[np.isinf(r_inv)] = 0.
     r_mat_inv = sp.diags(r_inv)
@@ -484,7 +485,7 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
     sparsecol = torch.LongTensor(sparse_mx.col).unsqueeze(1)
     sparseconcat = torch.cat((sparserow, sparsecol), 1)
     sparsedata = torch.FloatTensor(sparse_mx.data)
-    return torch.sparse.FloatTensor(sparseconcat.t(), sparsedata, torch.Size(sparse_mx.shape))
+    return torch.sparse_coo_tensor(sparseconcat.t(), sparsedata, torch.Size(sparse_mx.shape))
 
 
 # slower version....

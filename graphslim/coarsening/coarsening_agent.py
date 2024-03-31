@@ -1,15 +1,16 @@
 import copy
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import tensor
 from torch_sparse import SparseTensor
 from tqdm import trange
-import numpy as np
 
-from graphslim.dataset.convertor import pyg2gsp
-from graphslim.models import GCN
 from graphslim.coarsening.utils import coarsening, process_coarsened
+from graphslim.dataset.convertor import pyg2gsp
 from graphslim.dataset.utils import splits
+from graphslim.models import GCN
+
 
 class CoarseningBase:
     def __init__(self, data, args, device='cuda', **kwargs):
@@ -24,7 +25,7 @@ class CoarseningBase:
 
         cpu_data = copy.deepcopy(data)
 
-        candidate, C_list, Gc_list = coarsening(pyg2gsp(data), 1 - args.reduction_rate, args.coarsening_method)
+        candidate, C_list, Gc_list = coarsening(pyg2gsp(data), 1 - args.reduction_rate, args.method)
         model = GCN(data.x.shape[1], args.hidden, data.nclass, lr=args.lr, weight_decay=args.weight_decay,
                     device=device).to(device)
         all_acc = []
