@@ -1,13 +1,10 @@
 # import deeprobust.graph.utils as utils
-import numpy as np
 import os
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from collections import Counter
 from torch_sparse import SparseTensor
 
-from graphslim.condensation.tester_other_arcs import Evaluator
+from graphslim.evaluation.cross_arch_eval_agent import CrossArchEvaluator
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
@@ -227,7 +224,7 @@ class GCondBase:
         else:
             args.epsilon = 0.01
 
-        agent = Evaluator(data, args, device='cuda')
+        agent = CrossArchEvaluator(data, args, device='cuda')
         agent.train()
 
     def get_sub_adj_feat(self, features):
@@ -338,7 +335,6 @@ class GCondTrans(GCondBase):
                   "loss= {:.4f}".format(loss_test.item()),
                   "accuracy= {:.4f}".format(acc_test.item()))
         return res
-
 
 class GCondInd(GCondBase):
     def test_with_val(self, verbose=True):

@@ -2,7 +2,7 @@
 import click
 import json
 
-from utils import seed_everything
+from graphslim.utils import seed_everything
 
 
 class Obj(object):

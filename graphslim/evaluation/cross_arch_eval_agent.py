@@ -8,7 +8,7 @@ from graphslim import utils
 from graphslim.models import GCN1, GAT
 
 
-class Evaluator:
+class CrossArchEvaluator:
 
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
@@ -145,7 +145,7 @@ class Evaluator:
         return feat_syn, adj_syn, labels_syn
 
 
-    def test(self, nlayers, model_type, verbose=True):
+    def test(self, model_type, verbose=True):
         res = []
 
         args = self.args
@@ -225,14 +225,14 @@ class Evaluator:
         final_res = {}
         runs = self.args.nruns
 
-        for model_type in ['GCN1',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        for model_type in ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
             res = []
             nlayer = 2
             for i in range(runs):
                 res.append(self.test(nlayer, verbose=False, model_type=model_type))
             res = np.array(res)
             print('Test/Train Mean Accuracy:',
-                    repr([res.mean(0), res.std(0)]))
+                  repr([res.mean(0), res.std(0)]))
             final_res[model_type] = [res.mean(0), res.std(0)]
 
 

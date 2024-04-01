@@ -181,6 +181,7 @@ class GCN(nn.Module):
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
 
+
     def test(self, data=None, verbose=False):
         """Evaluate GCN performance on test set.
         Parameters

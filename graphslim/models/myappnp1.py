@@ -14,8 +14,8 @@ from graphslim import utils
 
 class APPNP1(nn.Module):
 
-    def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-            with_relu=True, with_bias=True, with_bn=False, device=None):
+    def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4, alpha=0.1,
+                 activation="relu", with_relu=True, with_bias=True, with_bn=False, device=None):
 
         super(APPNP1, self).__init__()
 
@@ -23,7 +23,18 @@ class APPNP1(nn.Module):
         self.device = device
         self.nfeat = nfeat
         self.nclass = nclass
-        self.alpha = 0.1
+        self.alpha = alpha
+        activation_functions = {
+            'sigmoid': F.sigmoid,
+            'tanh': F.tanh,
+            'relu': F.relu,
+            'linear': lambda x: x,
+            'softplus': F.softplus,
+            'leakyrelu': F.leaky_relu,
+            'relu6': F.relu6,
+            'elu': F.elu
+        }
+        self.activation = activation_functions.get(activation)
 
         if with_bn:
             self.bns = torch.nn.ModuleList()
@@ -232,7 +243,7 @@ class APPNP1(nn.Module):
         self.load_state_dict(weights)
 
 
-    def test(self, idx_test):
+    def test(self, data):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
@@ -240,10 +251,12 @@ class APPNP1(nn.Module):
             node testing indices
         """
         self.eval()
-        output = self.predict()
+        output = self.predict(data.feat_full, data.adj_full)
         # output = self.output
-        loss_test = F.nll_loss(output[idx_test], self.labels[idx_test])
-        acc_test = utils.accuracy(output[idx_test], self.labels[idx_test])
+        idx_test = data.idx_test
+        labels_test = torch.LongTensor(data.labels_test).cuda()
+        loss_test = F.nll_loss(output[idx_test], labels_test)
+        acc_test = utils.accuracy(output[idx_test], labels_test)
         print("Test set results:",
               "loss= {:.4f}".format(loss_test.item()),
               "accuracy= {:.4f}".format(acc_test.item()))
@@ -304,7 +317,7 @@ class MyLinear(Module):
         self.out_features = out_features
         self.weight = Parameter(torch.FloatTensor(in_features, out_features))
         if with_bias:
-            self.bias = Parameter(torch.FloatTensor(out_features))
+            self.bias = Parameter(torch.FloatTensor([out_features]))
         else:
             self.register_parameter('bias', None)
         self.reset_parameters()
