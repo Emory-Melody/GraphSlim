@@ -48,7 +48,7 @@ def load_config(args):
 @click.option('--lr', type=float, default=0.01)
 @click.option('--weight_decay', type=float, default=5e-4)
 @click.option('--normalize_features', type=bool, default=True)
-@click.option('--reduction_rate', type=float, default=0.03)
+@click.option('--reduction_rate', type=float, default=0.5)
 @click.option('--keep_ratio', type=float, default=1.0)
 @click.option('--seed', type=int, default=15, help='Random seed.')
 @click.option('--nlayers', type=int, default=2, help='number of GNN layers')

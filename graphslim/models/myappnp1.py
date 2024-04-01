@@ -216,7 +216,10 @@ class APPNP1(nn.Module):
             self.train()
             optimizer.zero_grad()
             output = self.forward(self.features, self.adj_norm)
-            loss_train = self.loss(output, labels)
+            if len(output) > len(labels):
+                loss_train = self.loss(output[data.idx_train], labels)
+            else:
+                loss_train = self.loss(output, labels)
             loss_train.backward()
             optimizer.step()
 

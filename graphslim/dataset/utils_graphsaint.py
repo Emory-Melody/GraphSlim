@@ -105,7 +105,7 @@ class DataGraphSAINT:
                 sizes = [10, 5]
 
         if self.class_dict2 is None:
-            print(f'sampling size per hop{sizes}')
+            # print(f'sampling size per hop{sizes}')
             self.class_dict2 = {}
             for i in range(self.nclass):
                 if transductive:

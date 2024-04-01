@@ -23,16 +23,16 @@ if __name__ == '__main__':
 
     data = get_dataset(args.dataset, args.normalize_features)
     results = []
-    for k in [2, 4, 6, 8, 10]:
-        for nhid in [16,32,64,128,256,512]:
-            for alpha in [0.1, 0.2]:
+    for k in [2]: # [2, 4, 6, 8, 10]
+        for nhid in [256]: # [16,32,64,128,256,512]
+            for alpha in [0.1]: # [0.1, 0.2]
                 for activation in ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']:
 
                     model = APPNP1(nfeat=data.feat_full.shape[1], nhid=nhid, nclass=data.nclass, device=args.device,
-                                weight_decay=args.weight_decay, nlayers=k, alpha=alpha).to(args.device)
+                                weight_decay=args.weight_decay, nlayers=k, alpha=alpha, activation=activation).to(args.device)
 
                     if args.setting == 'trans':
-                        model.fit_with_val(data.feat_train, data.adj_train, data.labels_train, data, train_iters=args.epochs, verbose=False)
+                        model.fit_with_val(data.feat_full, data.adj_full, data.labels_train, data, train_iters=args.epochs, verbose=False)
                         acc_test = model.test(data)
 
                     if args.setting == 'ind':
@@ -49,8 +49,9 @@ if __name__ == '__main__':
                         #       "accuracy= {:.4f}".format(acc_test.item()))
                     results.append(acc_test)
 
-    file_path = Path('evaluation/results.csv')
+    file_path = Path('evaluation/results_whole.csv')
     # results = csv_reader(file_path)
     # results.append(acc_test)
     csv_writer(file_path, results)
+
 

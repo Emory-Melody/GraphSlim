@@ -4,12 +4,12 @@ import torch.nn as nn
 from collections import Counter
 from torch_sparse import SparseTensor
 
-from graphslim.evaluation.cross_arch_eval_agent import CrossArchEvaluator
+from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
-from graphslim.models.sgc_multi import SGC as SGC1
+from graphslim.models.sgc_multi import SGC1
 from graphslim.utils import *  # graphslim
 
 
@@ -101,6 +101,8 @@ class GCondBase:
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
+                # TODO: fix this bug (AttributeError: 'Obj' object has no attribute 'sgc')
+                args.sgc = 1 # you should remove this line after debug
                 if args.sgc == 1:
                     model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
                                 nclass=data.nclass, dropout=args.dropout,
@@ -224,8 +226,8 @@ class GCondBase:
         else:
             args.epsilon = 0.01
 
-        agent = CrossArchEvaluator(data, args, device='cuda')
-        agent.train()
+        agent = Evaluator(data, args, device='cuda')
+        agent.train_cross()
 
     def get_sub_adj_feat(self, features):
         data = self.data
@@ -262,8 +264,9 @@ class GCondBase:
     def get_loops(self, args):
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
-        if args.one_step:
-            return 10, 0
+        # TODO: fix the bug, there is no "one_step" in args (AttributeError: 'Obj' object has no attribute 'one_step')
+        # if args.one_step:
+        #     return 10, 0
 
         if args.dataset in ['ogbn-arxiv']:
             return 20, 0

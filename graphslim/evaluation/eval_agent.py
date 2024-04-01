@@ -5,16 +5,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from graphslim import utils
-from graphslim.models import GCN1, GAT
+from graphslim.models import GCN1, GAT, APPNP1
 
 
-class CrossArchEvaluator:
+class Evaluator:
 
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
         self.args = args
         self.device = device
-        self.args.nruns = 10
+        # self.args.runs = 10
         n = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
         self.nnodes_syn = n
@@ -22,7 +22,7 @@ class CrossArchEvaluator:
         self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
         self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
         self.reset_parameters()
-        print('adj_param:', self.adj_param.shape, 'feat_syn:', self.feat_syn.shape)
+        # print('adj_param:', self.adj_param.shape, 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
         self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
@@ -115,14 +115,16 @@ class CrossArchEvaluator:
         res.append(acc_train.item())
         return res
 
-    def get_syn_data(self, model_type=None):
+    def get_syn_data(self, model_type=None, verbose=False):
         data, device = self.data, self.device
         feat_syn, adj_param, labels_syn = self.feat_syn.detach(), \
             self.adj_param.detach(), self.labels_syn
 
         args = self.args
-        adj_syn = torch.load(f'dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
-        feat_syn = torch.load(f'dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
+        # import os
+        # print(os.path.abspath(__file__))
+        adj_syn = torch.load(f'../dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
+        feat_syn = torch.load(f'../dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
 
         if model_type == 'MLP':
             adj_syn = adj_syn.to(self.device)
@@ -130,12 +132,14 @@ class CrossArchEvaluator:
         else:
             adj_syn = adj_syn.to(self.device)
 
-        print('Sum:', adj_syn.sum(), adj_syn.sum()/(adj_syn.shape[0]**2))
-        print('Sparsity:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
+        if verbose:
+            print('Sum:', adj_syn.sum(), adj_syn.sum()/(adj_syn.shape[0]**2))
+            print('Sparsity:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
 
         if self.args.epsilon > 0:
             adj_syn[adj_syn < self.args.epsilon] = 0
-            print('Sparsity after truncating:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
+            if verbose:
+                print('Sparsity after truncating:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
         feat_syn = feat_syn.to(self.device)
 
         # edge_index = adj_syn.nonzero().T
@@ -153,7 +157,8 @@ class CrossArchEvaluator:
 
         feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
 
-        print('======= testing %s' % model_type)
+        if verbose:
+            print('======= testing %s' % model_type)
         if model_type == 'MLP':
             model_class = GCN1
         else:
@@ -161,10 +166,11 @@ class CrossArchEvaluator:
         weight_decay = 5e-4
         dropout = 0.5 if args.dataset in ['reddit'] else 0
 
-        print(type(data.nclass))
+        if verbose:
+            print(type(data.nclass))
         model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=dropout,
-                    weight_decay=weight_decay, nlayers=nlayers,
-                    nclass=data.nclass, device=device).to(device)
+                    weight_decay=weight_decay, nlayers=args.nlayers,
+                    nclass=data.nclass, device=device, activation=args.activation).to(device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
         if args.dataset in ['ogbn-arxiv', 'arxiv']:
@@ -175,7 +181,7 @@ class CrossArchEvaluator:
         # val = False if args.dataset in ['reddit', 'flickr'] else True
         val = False
         model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-                     train_iters=600, normalize=True, verbose=True, val=val)
+                     train_iters=600, normalize=True, verbose=verbose, val=val)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -217,7 +223,7 @@ class CrossArchEvaluator:
             res.append(acc_train.item())
         return res
 
-    def train(self, verbose=True):
+    def train_cross(self, verbose=True):
         args = self.args
         data = self.data
         data.nclass = data.nclass.item()
@@ -227,9 +233,8 @@ class CrossArchEvaluator:
 
         for model_type in ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
             res = []
-            nlayer = 2
             for i in range(runs):
-                res.append(self.test(nlayer, verbose=False, model_type=model_type))
+                res.append(self.test(model_type=model_type, verbose=False))
             res = np.array(res)
             print('Test/Train Mean Accuracy:',
                   repr([res.mean(0), res.std(0)]))
@@ -248,3 +253,30 @@ class CrossArchEvaluator:
         # final_res['GAT'] = [res.mean(0), res.std(0)]
 
         print('Final result:', final_res)
+
+    def train(self, model_type, verbose=True):
+        # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
+        args = self.args
+        data = self.data
+        data.nclass = data.nclass
+
+        final_res = {}
+        runs = self.args.runs
+        res = []
+        for i in range(runs):
+            res.append(self.test(model_type=model_type, verbose=False))
+            break
+        res = np.array(res)
+
+        if runs > 1:
+            return res
+        else:
+            return res[0][0]
+        # print('Test/Train Mean Accuracy:',
+        #       repr([res.mean(0), res.std(0)]))
+        # final_res[model_type] = [res.mean(0), res.std(0)]
+        #
+        # print('Final result:', final_res)
+
+
+
