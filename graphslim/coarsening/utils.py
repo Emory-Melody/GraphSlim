@@ -3,9 +3,11 @@ import networkx as nx
 from pygsp import filters, reduction
 from pygsp.utils import resistance_distance
 from sortedcontainers import SortedList
+from sys import version as sys_version
 
 # from graphslim.coarsening.maxWeightMatching import *
 from graphslim.dataset import *
+
 
 """Weighted maximum matching in general graphs.
 
@@ -21,30 +23,9 @@ A C program for maximum weight matching by Ed Rothberg was used extensively
 to validate this new code.
 """
 
-#
-# Changes:
-#
-# 2013-04-07
-#   * Added Python 3 compatibility with contributions from Daniel Saunders.
-#
-# 2008-06-08
-#   * First release.
-#
 
-# from __future__ import print_function
-from sys import version as sys_version
-# If assigned, DEBUG(str) is called with lots of debug messages.
 DEBUG = None
-"""def DEBUG(s):
-    from sys import stderr
-    print('DEBUG:', s, file=stderr)
-"""
-
-# Check delta2/delta3 computation after every substage;
-# only works on integer weights, slows down the algorithm to O(n^4).
 CHECK_DELTA = False
-
-# Check optimality of solution before returning; only works on integer weights.
 CHECK_OPTIMUM = False
 def maxWeightMatching(edges, maxcardinality=False):
     """Compute a maximum-weighted matching in the general undirected
@@ -861,275 +842,6 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     return mate
 
-def coarsening(H, coarsening_ratio, coarsening_method):
-    if H.A.shape[-1] != H.A.shape[1]:
-        H.logger.error('Inconsistent shape to extract components. '
-                       'Square matrix required.')
-        return None
-
-    if H.is_directed():
-        raise NotImplementedError('Directed graphs not supported yet.')
-
-    graphs = []
-
-    visited = np.zeros(H.A.shape[-1], dtype=bool)
-
-    while not visited.all():
-        stack = set([np.nonzero(~visited)[0][0]])
-        comp = []
-
-        while len(stack):
-            v = stack.pop()
-            if not visited[v]:
-                comp.append(v)
-                visited[v] = True
-
-                stack.update(set([idx for idx in H.A[v, :].nonzero()[1]
-                                  if not visited[idx]]))
-
-        comp = sorted(comp)
-        G = H.subgraph(comp)
-        G.info = {'orig_idx': comp}
-        graphs.append(G)
-
-    print('the number of subgraphs is', len(graphs))
-    candidate = sorted(graphs, key=lambda x: len(x.info['orig_idx']), reverse=True)
-    number = 0
-    C_list = []
-    Gc_list = []
-    while number < len(candidate):
-        H = candidate[number]
-        if len(H.info['orig_idx']) > 10:
-            C, Gc, Call, Gall = coarsen(H, r=coarsening_ratio, method=coarsening_method)
-            C_list.append(C)
-            Gc_list.append(Gc)
-        number += 1
-    return candidate, C_list, Gc_list
-
-
-def process_coarsened(data, candidate, C_list, Gc_list):
-    train_mask = data.train_mask
-    val_mask = data.val_mask
-    labels = data.y
-    n_classes = max(data.y) + 1
-    features = data.x
-    coarsen_node = 0
-    number = 0
-    coarsen_row = None
-    coarsen_col = None
-    coarsen_features = torch.Tensor([])
-    coarsen_train_labels = torch.Tensor([])
-    coarsen_train_mask = torch.Tensor([]).bool()
-    coarsen_val_labels = torch.Tensor([])
-    coarsen_val_mask = torch.Tensor([]).bool()
-
-    while number < len(candidate):
-        H = candidate[number]
-        keep = H.info['orig_idx']
-        H_features = features[keep]
-        H_labels = labels[keep]
-        H_train_mask = train_mask[keep]
-        H_val_mask = val_mask[keep]
-        if len(H.info['orig_idx']) > 10 and torch.sum(H_train_mask) + torch.sum(H_val_mask) > 0:
-            train_labels = one_hot(H_labels, n_classes)
-            train_labels[~H_train_mask] = torch.Tensor([0 for _ in range(n_classes)])
-            val_labels = one_hot(H_labels, n_classes)
-            val_labels[~H_val_mask] = torch.Tensor([0 for _ in range(n_classes)])
-            C = C_list[number]
-            Gc = Gc_list[number]
-
-            new_train_mask = torch.BoolTensor(np.sum(C.dot(train_labels), axis=1))
-            mix_label = torch.FloatTensor(C.dot(train_labels))
-            mix_label[mix_label > 0] = 1
-            mix_mask = torch.sum(mix_label, dim=1)
-            new_train_mask[mix_mask > 1] = False
-
-            new_val_mask = torch.BoolTensor(np.sum(C.dot(val_labels), axis=1))
-            mix_label = torch.FloatTensor(C.dot(val_labels))
-            mix_label[mix_label > 0] = 1
-            mix_mask = torch.sum(mix_label, dim=1)
-            new_val_mask[mix_mask > 1] = False
-
-            coarsen_features = torch.cat([coarsen_features, torch.FloatTensor(C.dot(H_features))], dim=0)
-            coarsen_train_labels = torch.cat(
-                [coarsen_train_labels, torch.argmax(torch.FloatTensor(C.dot(train_labels)), dim=1).float()], dim=0)
-            coarsen_train_mask = torch.cat([coarsen_train_mask, new_train_mask], dim=0)
-            coarsen_val_labels = torch.cat(
-                [coarsen_val_labels, torch.argmax(torch.FloatTensor(C.dot(val_labels)), dim=1).float()], dim=0)
-            coarsen_val_mask = torch.cat([coarsen_val_mask, new_val_mask], dim=0)
-
-            if coarsen_row is None:
-                coarsen_row = Gc.W.tocoo().row
-                coarsen_col = Gc.W.tocoo().col
-            else:
-                current_row = Gc.W.tocoo().row + coarsen_node
-                current_col = Gc.W.tocoo().col + coarsen_node
-                coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
-                coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
-            coarsen_node += Gc.W.shape[0]
-
-        elif torch.sum(H_train_mask) + torch.sum(H_val_mask) > 1:
-
-            coarsen_features = torch.cat([coarsen_features, H_features], dim=0)
-            coarsen_train_labels = torch.cat([coarsen_train_labels, H_labels.float()], dim=0)
-            coarsen_train_mask = torch.cat([coarsen_train_mask, H_train_mask], dim=0)
-            coarsen_val_labels = torch.cat([coarsen_val_labels, H_labels.float()], dim=0)
-            coarsen_val_mask = torch.cat([coarsen_val_mask, H_val_mask], dim=0)
-
-            if coarsen_row is None:
-                raise Exception('The graph does not need coarsening.')
-            else:
-                current_row = H.W.tocoo().row + coarsen_node
-                current_col = H.W.tocoo().col + coarsen_node
-                coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
-                coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
-            coarsen_node += H.W.shape[0]
-        number += 1
-
-    # print('the size of coarsen graph features:', coarsen_features.shape)
-
-    coarsen_edge = torch.from_numpy(np.array([coarsen_row, coarsen_col])).long()
-    coarsen_train_labels = coarsen_train_labels.long()
-    coarsen_val_labels = coarsen_val_labels.long()
-
-    return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_val_labels, coarsen_val_mask, coarsen_edge
-
-
-def coarsen(
-        G,
-        K=10,
-        r=0.5,
-        max_levels=10,
-        method="variation_neighborhood",
-        algorithm="greedy",
-        Uk=None,
-        lk=None,
-        max_level_r=0.99,
-):
-    """
-    This function provides a common interface for coarsening algorithms that contract subgraphs
-
-    Parameters
-    ----------
-    G : pygsp Graph
-    K : int
-        The size of the subspace we are interested in preserving.
-    r : float between (0,1)
-        The desired reduction defined as 1 - n/N.
-    method : String
-        ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron'] 
-    
-    Returns
-    -------
-    C : np.array of size n x N
-        The coarsening matrix.
-    Gc : pygsp Graph
-        The smaller graph.
-    Call : list of np.arrays
-        Coarsening matrices for each level
-    Gall : list of (n_levels+1) pygsp Graphs
-        All graphs involved in the multilevel coarsening
-
-    Example
-    -------
-    C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)
-    """
-    r = np.clip(r, 0, 0.999)
-    G0 = G
-    N = G.N
-
-    # current and target graph sizes
-    n, n_target = N, np.ceil((1 - r) * N)
-
-    C = sp.sparse.eye(N, format="csc")
-    Gc = G
-
-    Call, Gall = [], []
-    Gall.append(G)
-
-    for level in range(1, max_levels + 1):
-
-        G = Gc
-
-        # how much more we need to reduce the current graph
-        r_cur = np.clip(1 - n_target / n, 0.0, max_level_r)
-
-        if "variation" in method:
-
-            if level == 1:
-                if (Uk is not None) and (lk is not None) and (len(lk) >= K):
-                    mask = lk < 1e-10
-                    lk[mask] = 1
-                    lsinv = lk ** (-0.5)
-                    lsinv[mask] = 0
-                    B = Uk[:, :K] @ np.diag(lsinv[:K])
-                else:
-                    offset = 2 * max(G.dw)
-                    T = offset * sp.sparse.eye(G.N, format="csc") - G.L
-                    lk, Uk = sp.sparse.linalg.eigsh(T, k=K, which="LM", tol=1e-5)
-                    lk = (offset - lk)[::-1]
-                    Uk = Uk[:, ::-1]
-                    mask = lk < 1e-10
-                    lk[mask] = 1
-                    lsinv = lk ** (-0.5)
-                    lsinv[mask] = 0
-                    B = Uk @ np.diag(lsinv)
-                A = B
-            else:
-                B = iC.dot(B)
-                d, V = np.linalg.eig(B.T @ (G.L).dot(B))
-                mask = d == 0
-                d[mask] = 1
-                dinvsqrt = (d + 1e-9) ** (-1 / 2)
-                dinvsqrt[mask] = 0
-                A = B @ np.diag(dinvsqrt) @ V
-
-            if method == "variation_edges":
-                coarsening_list = contract_variation_edges(
-                    G, K=K, A=A, r=r_cur, algorithm=algorithm
-                )
-            else:
-                coarsening_list = contract_variation_linear(
-                    G, K=K, A=A, r=r_cur, mode=method
-                )
-
-        else:
-            weights = get_proximity_measure(G, method, K=K)
-
-            if algorithm == "optimal":
-                # the edge-weight should be light at proximal edges
-                weights = -weights
-                if "rss" not in method:
-                    weights -= min(weights)
-                coarsening_list = matching_optimal(G, weights=weights, r=r_cur)
-
-            elif algorithm == "greedy":
-                coarsening_list = matching_greedy(G, weights=weights, r=r_cur)
-
-        iC = get_coarsening_matrix(G, coarsening_list)
-
-        if iC.shape[1] - iC.shape[0] <= 2:
-            break  # avoid too many levels for so few nodes
-
-        C = iC.dot(C)
-        Call.append(iC)
-
-        Wc = zero_diag(coarsen_matrix(G.W, iC))  # coarsen and remove self-loops
-        Wc = (Wc + Wc.T) / 2  # this is only needed to avoid pygsp complaining for tiny errors
-
-        if not hasattr(G, "coords"):
-            Gc = graphs.Graph(Wc)
-        else:
-            Gc = graphs.Graph(Wc, coords=coarsen_vector(G.coords, iC))
-        Gall.append(Gc)
-
-        n = Gc.N
-
-        if n <= n_target:
-            break
-
-    return C, Gc, Call, Gall
-
 
 ################################################################################
 # General coarsening utility functions
@@ -1445,7 +1157,7 @@ def contract_variation_edges(G, A=None, K=10, r=0.5, algorithm="greedy"):
 
     # cost function for the edge
     def subgraph_cost(G, A, edge):
-        edge, w = edge[:2].astype(np.int), edge[2]
+        edge, w = edge[:2].astype(np.int_), edge[2]
         deg_new = 2 * deg[edge] - w
         L = np.array([[deg_new[0], -w], [-w, deg_new[1]]])
         B = Pibot @ A[edge, :]
@@ -1529,7 +1241,7 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
 
     if "cliques" in mode:
 
-        Gnx = nx.from_scipy_sparse_matrix(G.W)
+        Gnx = nx.from_scipy_sparse_array(G.W)
         for clique in nx.find_cliques(Gnx):
             family.append(CandidateSet(np.array(clique)))
 
@@ -1779,7 +1491,7 @@ def generate_test_vectors(
 
     if method == "JC" or method == "Jacobi":
 
-        deg = G.dw.astype(np.float)
+        deg = G.dw.astype(np.float_)
         D = sp.sparse.diags(deg, 0)
         deginv = deg ** (-1)
         deginv[deginv == np.Inf] = 0

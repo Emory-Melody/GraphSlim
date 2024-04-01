@@ -55,7 +55,7 @@ def load_config(args):
 @click.option('--save', type=int, default=0)
 @click.option('--method', default='kcenter',
               type=click.Choice(
-                  ['vn',
+                  ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron',
                    'gcond',
                    'kcenter', 'herding', 'random']))
 @click.option('--dis_metric', type=str, default='ours')
