@@ -12,7 +12,7 @@ from torch.nn.parameter import Parameter
 from graphslim import utils
 
 
-class SGC(nn.Module):
+class SGC1(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  ntrans=2, with_bias=True, with_bn=False, device=None):
