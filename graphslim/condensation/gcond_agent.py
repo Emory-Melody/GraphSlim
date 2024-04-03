@@ -1,11 +1,12 @@
 # import deeprobust.graph.utils as utils
 import os
-import torch.nn as nn
 from collections import Counter
+
+import torch.nn as nn
 from torch_sparse import SparseTensor
 
-from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.condensation.utils import match_loss  # graphslim
+from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
@@ -13,7 +14,7 @@ from graphslim.models.sgc_multi import SGC1
 from graphslim.utils import *  # graphslim
 
 
-def GCond(data, args):
+def router_condense(data, args):
     if args.setting == 'trans':
         return GCondTrans(data, args)
     elif args.setting == 'ind':

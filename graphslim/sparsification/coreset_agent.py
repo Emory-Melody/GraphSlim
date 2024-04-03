@@ -1,14 +1,18 @@
+from collections import Counter
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-from collections import Counter
 from tqdm import tqdm
 
 from graphslim.models import *
 from graphslim.utils import accuracy
 
 
-def body_select(data, args):
+def router_select(data, args):
+    '''
+    workflows routing to each method and different settings
+    '''
     if args.method == 'kcenter':
         agent = KCenter(data, args)
     elif args.method == 'herding':
