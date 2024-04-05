@@ -5,6 +5,7 @@ from pygsp import graphs
 from scipy.sparse import csr_matrix
 from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, to_dense_adj
+from torch_sparse import SparseTensor
 
 
 # prepare transductive setting by xxx_full and inductive setting by xxx_train/val/test
@@ -116,14 +117,20 @@ def pyg2gsp(data):
     return G
 
 
-def pyg2saint(data):
+def pyg_saint(data):
     data.idx_train = data.train_mask.nonzero().view(-1)
     data.idx_val = data.val_mask.nonzero().view(-1)
     data.idx_test = data.test_mask.nonzero().view(-1)
     # reference type
-    data.feat_full = data.x
-    data.labels_full = data.y
-    data.adj_full = ei2csr(data.edge_index, data.x.shape[0])
+    # pyg format use x,y,edge_index
+    if data.has_attr('x'):
+        data.feat_full = data.x
+        data.labels_full = data.y
+        data.adj_full = ei2csr(data.edge_index, data.x.shape[0])
+        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
+    # saint format use feat,labels,adj
+    elif data.has_attr('feat_full'):
+        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
     return data
 
 

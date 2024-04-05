@@ -1,35 +1,35 @@
 import os.path as osp
-from torch_geometric.datasets import Planetoid, Coauthor, CitationFull
-from torch_sparse import SparseTensor
 
-from graphslim.dataset.convertor import TransAndInd, pyg2saint
+from ogb.nodeproppred import PygNodePropPredDataset
+from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon
+
+from graphslim.dataset.convertor import TransAndInd, pyg_saint
 from graphslim.dataset.utils_graphsaint import DataGraphSAINT
 from graphslim.utils import *
 
 
 def get_dataset(name, normalize_features=False, transform=None, return_pyg=False):
-    path = osp.join('../../data')
-    data_graphsaint = ['flickr', 'reddit', 'ogbn-arxiv']
-    if name in data_graphsaint:
+    path = osp.join('../../../data')
+    if name in ['flickr', 'reddit']:
         data = DataGraphSAINT(name)
     else:
-        if name == 'dblp':
+        if name in ['dblp', 'cora_ml']:
             dataset = CitationFull(root=path, name=name)
-        elif name == 'Physics':
+        elif name in ['physics', 'cs']:
             dataset = Coauthor(root=path, name=name)
-        else:
+        elif name in ['cora', 'citeseer', 'pubmed']:
             dataset = Planetoid(root=path, name=name)
+        elif name in ['photo', 'computers']:
+            dataset = Amazon(root=path, name=name)
+        elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100M', 'ogbn-arxiv']:
+            dataset = PygNodePropPredDataset(name, root=path)
+        else:
+            pass
         data = dataset[0]
-        # default format: torch_sparse.SparseTensor
-        data = pyg2saint(data)
+    # support both pyg and saint format
+    data = pyg_saint(data)
 
-    # Define or import TransAndInd and args here
-    if return_pyg:
-        data.nclass = max(data.y) + 1
-        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
-        return data
-    else:
-        return TransAndInd(data)
+    return TransAndInd(data)
 
     # if transform is not None and normalize_features:
     #     dataset.transform = T.Compose([T.NormalizeFeatures(), transform])
