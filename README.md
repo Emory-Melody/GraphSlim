@@ -10,7 +10,7 @@ For reddit, flickr and arxiv, we use the datasets provided by [GraphSAINT](https
 They are available on [Google Drive link](https://drive.google.com/open?id=1zycmmDES39zVlbVCYs88JTJ1Wm5FbfLz) (alternatively, [BaiduYun link (code: f1ao)](https://pan.baidu.com/s/1SOb0SiSAXavwAcNqkttwcg)). Rename the folder
 to `data` at the root directory. Note that the links are provided by GraphSAINT team.
 
-Put all datasets in `../data` in your system!
+Put all datasets in `../../data` in your system!
 
 # Abstract
 
