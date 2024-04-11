@@ -3,7 +3,7 @@ from configs import *
 from dataset import *
 
 args = cli(standalone_mode=False)
-data = get_dataset(args.dataset, normalize_features=args.normalize_features, transform=None)
+data = get_dataset(args.dataset, args)
 agent = router_condense(data, args)
 agent.train()
 

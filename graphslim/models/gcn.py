@@ -1,7 +1,8 @@
+from copy import deepcopy
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from copy import deepcopy
 
 from graphslim.models.layers import GraphConvolution
 from graphslim.utils import *
@@ -103,8 +104,9 @@ class GCN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def fit_with_val(self, features, adj, data, labels=None, train_iters=200, initialize=True, verbose=False, normalize=True,
-                     patience=None, val=False, **kwargs):
+    def fit_with_val(self, features, adj, data, labels=None, train_iters=200, initialize=True, verbose=False,
+                     normalize=True,
+                     val=False, **kwargs):
         if initialize:
             self.reset_parameters()
 
@@ -128,15 +130,15 @@ class GCN(nn.Module):
 
         self._train_with_val(data, train_iters, verbose, adj_val=val, **kwargs)
 
-    def _train_with_val(self, data, train_iters, verbose, adj_val=False, condensed=False):
-        if adj_val:
-            feat_full, adj_full = data.feat_val, data.adj_val
-        else:
-            feat_full, adj_full = data.feat_full, data.adj_full
-        feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
-        adj_full_norm = normalize_adj_tensor(adj_full, sparse=True)
+    def _train_with_val(self, data, train_iters, verbose, adj_val=False, reindexed_trainset=False, reduced=False):
+        # TODO: we can have two strategies:
+        #  1) validate on the original validation set,
+        #  2) validate on all the nodes except for test set
+        if reduced:
+            reindexed_trainset = True
+
         labels_val = torch.LongTensor(data.labels_val).to(self.device)
-        labels_train = torch.LongTensor(data.labels_syn).to(self.device) if condensed else torch.LongTensor(
+        labels_train = torch.LongTensor(data.labels_syn).to(self.device) if reduced else torch.LongTensor(
             data.labels_train).to(self.device)
 
         if verbose:
@@ -144,7 +146,16 @@ class GCN(nn.Module):
         optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         best_acc_val = 0
-
+        # TODO: we can have two strategies:
+        #  1) validate on the original validation set,
+        #  2) validate on all the nodes except for test set
+        # ====only for inductive setting when evaluate the reduced graph====#
+        if adj_val:
+            feat_full, adj_full = data.feat_val, data.adj_val
+        else:
+            feat_full, adj_full = data.feat_full, data.adj_full
+        feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
+        adj_full_norm = normalize_adj_tensor(adj_full, sparse=True)
         for i in range(train_iters):
             if i == train_iters // 2:
                 lr = self.lr * 0.1
@@ -153,7 +164,7 @@ class GCN(nn.Module):
             self.train()
             optimizer.zero_grad()
             output = self.forward(self.features, self.adj_norm)
-            loss_train = self.loss(output if condensed else output[data.idx_train], labels_train)
+            loss_train = self.loss(output if reindexed_trainset else output[data.idx_train], labels_train)
 
             loss_train.backward()
             optimizer.step()
@@ -180,7 +191,6 @@ class GCN(nn.Module):
         if verbose:
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
-
 
     def test(self, data=None, verbose=False):
         """Evaluate GCN performance on test set.

@@ -103,7 +103,7 @@ class GCondBase:
                              device=self.device).to(self.device)
             else:
                 # TODO: fix this bug (AttributeError: 'Obj' object has no attribute 'sgc')
-                args.sgc = 1 # you should remove this line after debug
+                args.sgc = 1  # you should remove this line after debug
                 if args.sgc == 1:
                     model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
                                 nclass=data.nclass, dropout=args.dropout,
@@ -161,10 +161,10 @@ class GCondBase:
                     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
                 loss_avg += loss.item()
-                if args.alpha > 0:
-                    loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
-                else:
-                    loss_reg = torch.tensor(0)
+                # if args.alpha > 0:
+                #     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
+                # else:
+                loss_reg = torch.tensor(0)
 
                 loss = loss + loss_reg
 
@@ -272,16 +272,16 @@ class GCondBase:
         if args.dataset in ['ogbn-arxiv']:
             return 20, 0
         if args.dataset in ['reddit']:
-            return args.outer, args.inner
+            return 10, 1
         if args.dataset in ['flickr']:
-            return args.outer, args.inner
+            return 10, 1
             # return 10, 1
         if args.dataset in ['cora']:
             return 20, 10
         if args.dataset in ['citeseer']:
             return 20, 5  # at least 200 epochs
         else:
-            return 20,
+            return 20, 1
 
 
 class GCondTrans(GCondBase):
@@ -315,7 +315,7 @@ class GCondTrans(GCondBase):
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
         model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, condensed=True)
+                           train_iters=600, normalize=True, verbose=False, reduced=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -340,6 +340,7 @@ class GCondTrans(GCondBase):
                   "accuracy= {:.4f}".format(acc_test.item()))
         return res
 
+
 class GCondInd(GCondBase):
     def test_with_val(self, verbose=True):
         res = []
@@ -363,7 +364,7 @@ class GCondInd(GCondBase):
             torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
 
         model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, val=True, condensed=True)
+                           train_iters=600, normalize=True, verbose=False, val=True, reduced=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()

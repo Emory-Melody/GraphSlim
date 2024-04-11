@@ -45,7 +45,7 @@ def router_select(data, args):
 
         for _ in tqdm(range(runs)):
             model.fit_with_val(feat_selected, adj_selected, data,
-                               train_iters=args.epochs, normalize=True, verbose=False, condensed=True)
+                               train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
 
             # Full graph
             # interface: model.test(full_data)
@@ -55,7 +55,7 @@ def router_select(data, args):
     if args.setting == 'ind':
 
         model.fit_with_val(data.feat_train, data.adj_train, data, train_iters=args.epochs, normalize=True,
-                           verbose=False)
+                           verbose=False, reindexed_trainset=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -79,15 +79,15 @@ def router_select(data, args):
 
         for _ in tqdm(range(runs)):
             model.fit_with_val(feat_selected, adj_selected, data,
-                               train_iters=args.epochs, normalize=True, verbose=False, val=True, condensed=True)
+                               train_iters=args.epochs, normalize=True, verbose=False, val=True, reduced=True)
 
             model.eval()
             labels_test = torch.LongTensor(data.labels_test).cuda()
 
             # interface: model.predict(reshaped feat,reshaped adj)
             output = model.predict(feat_test, adj_test)
-            loss_test = F.nll_loss(output, labels_test)
-            acc_test = utils.accuracy(output, labels_test)
+            # loss_test = F.nll_loss(output, labels_test)
+            acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())
     res = np.array(res)
     print('Mean accuracy:', repr([res.mean(), res.std()]))

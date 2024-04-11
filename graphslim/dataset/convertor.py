@@ -3,113 +3,10 @@ import numpy as np
 import torch
 from pygsp import graphs
 from scipy.sparse import csr_matrix
-from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, to_dense_adj
 from torch_sparse import SparseTensor
 
-
-# prepare transductive setting by xxx_full and inductive setting by xxx_train/val/test
-class TransAndInd:
-
-    def __init__(self, data):
-        idx_train, idx_val, idx_test = data.idx_train, data.idx_val, data.idx_test
-        self.adj_full, self.feat_full, self.labels_full = data.adj_full, data.feat_full, data.labels_full
-        self.nclass = self.labels_full.max() + 1
-        self.idx_train = np.array(idx_train).reshape(-1)
-        self.idx_val = np.array(idx_val).reshape(-1)
-        self.idx_test = np.array(idx_test).reshape(-1)
-
-        self.adj_train = self.adj_full[np.ix_(self.idx_train, self.idx_train)]
-        self.adj_val = self.adj_full[np.ix_(self.idx_val, self.idx_val)]
-        self.adj_test = self.adj_full[np.ix_(self.idx_test, self.idx_test)]
-        # if inductive
-        # print('size of adj_train:', self.adj_train.shape)
-        # print('#edges in adj_train:', self.adj_train.sum())
-
-        self.labels_train = self.labels_full[idx_train]
-        self.labels_val = self.labels_full[idx_val]
-        self.labels_test = self.labels_full[idx_test]
-
-        self.feat_train = self.feat_full[idx_train]
-        self.feat_val = self.feat_full[idx_val]
-        self.feat_test = self.feat_full[idx_test]
-
-        self.class_dict = None
-        self.samplers = None
-        self.class_dict2 = None
-
-    def retrieve_class(self, c, num=256):
-        if self.class_dict is None:
-            self.class_dict = {}
-            for i in range(self.nclass):
-                self.class_dict['class_%s' % i] = (self.labels_train == i)
-        idx = np.arange(len(self.labels_train))
-        idx = idx[self.class_dict['class_%s' % c]]
-        return np.random.permutation(idx)[:num]
-
-    def retrieve_class_sampler(self, c, adj, transductive, num=256, args=None):
-        if self.class_dict2 is None:
-            self.class_dict2 = {}
-            for i in range(self.nclass):
-                if transductive:
-                    idx = self.idx_train[self.labels_train == i]
-                else:
-                    idx = np.arange(len(self.labels_train))[self.labels_train == i]
-                self.class_dict2[i] = idx
-
-        if args.nlayers == 1:
-            sizes = [15]
-        if args.nlayers == 2:
-            sizes = [10, 5]
-            # sizes = [-1, -1]
-        if args.nlayers == 3:
-            sizes = [15, 10, 5]
-        if args.nlayers == 4:
-            sizes = [15, 10, 5, 5]
-        if args.nlayers == 5:
-            sizes = [15, 10, 5, 5, 5]
-
-        if self.samplers is None:
-            self.samplers = []
-            for i in range(self.nclass):
-                node_idx = torch.LongTensor(self.class_dict2[i])
-                self.samplers.append(NeighborSampler(adj,
-                                                     node_idx=node_idx,
-                                                     sizes=sizes, batch_size=num,
-                                                     num_workers=12, return_e_id=False,
-                                                     num_nodes=adj.size(0),
-                                                     shuffle=True))
-        batch = np.random.permutation(self.class_dict2[c])[:num]
-        out = self.samplers[c].sample(batch)
-        return out
-
-    def retrieve_class_multi_sampler(self, c, adj, transductive, num=256, args=None):
-        if self.class_dict2 is None:
-            self.class_dict2 = {}
-            for i in range(self.nclass):
-                if transductive:
-                    idx = self.idx_train[self.labels_train == i]
-                else:
-                    idx = np.arange(len(self.labels_train))[self.labels_train == i]
-                self.class_dict2[i] = idx
-
-        if self.samplers is None:
-            self.samplers = []
-            for l in range(2):
-                layer_samplers = []
-                sizes = [15] if l == 0 else [10, 5]
-                for i in range(self.nclass):
-                    node_idx = torch.LongTensor(self.class_dict2[i])
-                    layer_samplers.append(NeighborSampler(adj,
-                                                          node_idx=node_idx,
-                                                          sizes=sizes, batch_size=num,
-                                                          num_workers=12, return_e_id=False,
-                                                          num_nodes=adj.size(0),
-                                                          shuffle=True))
-                self.samplers.append(layer_samplers)
-        batch = np.random.permutation(self.class_dict2[c])[:num]
-        out = self.samplers[args.nlayers - 1][c].sample(batch)
-        return out
+from graphslim.dataset.utils import splits
 
 
 def pyg2gsp(data):
@@ -117,25 +14,36 @@ def pyg2gsp(data):
     return G
 
 
-def pyg_saint(data):
-    data.idx_train = data.train_mask.nonzero().view(-1)
-    data.idx_val = data.val_mask.nonzero().view(-1)
-    data.idx_test = data.test_mask.nonzero().view(-1)
+def pyg_saint(data, args):
     # reference type
     # pyg format use x,y,edge_index
-    if data.has_attr('x'):
+    if hasattr(data, 'x'):
         data.feat_full = data.x
         data.labels_full = data.y
         data.adj_full = ei2csr(data.edge_index, data.x.shape[0])
         data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
     # saint format use feat,labels,adj
-    elif data.has_attr('feat_full'):
+    elif hasattr(data, 'feat_full'):
+        data.edge_index = csr2ei(data.adj_full)
         data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
+        data.x = data.feat_full
+        data.y = data.labels_full
+    # ensure all dataset has a split
+    if not hasattr(data, 'train_mask'):
+        data = splits(data, args.split)
+    data.idx_train = data.train_mask.nonzero().view(-1)
+    data.idx_val = data.val_mask.nonzero().view(-1)
+    data.idx_test = data.test_mask.nonzero().view(-1)
     return data
 
 
+def csr2ei(adjacency_matrix_csr):
+    adjacency_matrix_coo = adjacency_matrix_csr.tocoo()
+    edge_index = torch.tensor([adjacency_matrix_coo.row, adjacency_matrix_coo.col], dtype=torch.long)
+    return edge_index
+
+
 def ei2csr(edge_index, num_nodes):
-    edge_index = edge_index
     edge_index = edge_index.t()
     edge_index_np = edge_index.numpy()
     adjacency_matrix_csr = csr_matrix((np.ones(edge_index_np.shape[1]), (edge_index_np[0], edge_index_np[1])),

@@ -1,12 +1,12 @@
 # import matplotlib.pylab as plt
+from sys import version as sys_version
+
 import networkx as nx
 from pygsp import filters, reduction
 from pygsp.utils import resistance_distance
 from sortedcontainers import SortedList
-from sys import version as sys_version
 
 # from graphslim.coarsening.maxWeightMatching import *
-from graphslim.dataset import *
 
 
 """Weighted maximum matching in general graphs.
@@ -1952,4 +1952,13 @@ def graph_sparsify(M, epsilon, maxiter=10):
 
     return Mnew
 
+
+def zero_diag(A):
+    import scipy as sp
+
+    if sp.sparse.issparse(A):
+        return A - sp.sparse.dia_matrix((A.diagonal()[np.newaxis, :], [0]), shape=(A.shape[0], A.shape[1]))
+    else:
+        D = A.diagonal()
+        return A - np.diag(D)
 ##############################################################################

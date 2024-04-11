@@ -1,20 +1,20 @@
 import copy
+
 import numpy as np
+import scipy as sp
 import torch
 import torch.nn.functional as F
+from pygsp import graphs
 from torch import tensor
 from torch_sparse import SparseTensor
 from tqdm import trange
-import scipy as sp
-from pygsp import graphs
 
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
-    matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector
+    matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
 from graphslim.dataset.convertor import pyg2gsp
 from graphslim.dataset.utils import splits
-from graphslim.dataset.utils_scaling import zero_diag
-from graphslim.utils import one_hot
 from graphslim.models import GCN
+from graphslim.utils import one_hot
 
 
 class CoarseningBase:

@@ -1,8 +1,9 @@
 '''Configuration'''
-import click
 import json
 
-from graphslim.utils import seed_everything
+import click
+
+from utils import seed_everything
 
 
 class Obj(object):
@@ -37,34 +38,34 @@ def load_config(args):
 
 
 @click.command()
-@click.option('--dataset', type=str, default='cora')
-@click.option('--gpu_id', type=int, default=0, help='gpu id')
-@click.option('--setting', '-S', type=str, default='trans', help='trans/ind')
-@click.option('--experiment', type=str, default='fixed')  # 'fixed', 'random', 'few'
-@click.option('--runs', type=int, default=10)
-@click.option('--hidden', type=int, default=256)
-@click.option('--epochs', type=int, default=500)
-@click.option('--early_stopping', type=int, default=10)
-@click.option('--lr', type=float, default=0.01)
-@click.option('--weight_decay', type=float, default=5e-4)
-@click.option('--normalize_features', type=bool, default=True)
-@click.option('--reduction_rate', type=float, default=0.5)
-@click.option('--keep_ratio', type=float, default=1.0)
-@click.option('--seed', type=int, default=15, help='Random seed.')
-@click.option('--nlayers', type=int, default=2, help='number of GNN layers')
-@click.option('--save', type=int, default=0)
-@click.option('--method', default='kcenter',
+@click.option('--dataset', default='cora', show_default=True)
+@click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
+@click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
+@click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
+@click.option('--runs', default=10, show_default=True)
+@click.option('--hidden', '-H', default=256, show_default=True)
+@click.option('--epochs', '--eps', default=400, show_default=True)
+@click.option('--early_stopping', '-E', default=10, show_default=True)
+@click.option('--lr', default=0.01, show_default=True)
+@click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
+@click.option('--normalize_features', '--normalize', is_flag=True, show_default=True)
+@click.option('--reduction_rate', '-R', default=0.5, show_default=True)
+@click.option('--seed', default=42, help='Random seed.', show_default=True)
+@click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
+@click.option('--save', is_flag=True, show_default=True)
+@click.option('--method', '-M', default='kcenter',
               type=click.Choice(
-                  ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron',
+                  ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
+                   'affinity_GS', 'kron',
                    'gcond',
-                   'kcenter', 'herding', 'random']))
-@click.option('--dis_metric', type=str, default='ours')
-@click.option('--lr_adj', type=float, default=1e-4)
-@click.option('--lr_feat', type=float, default=1e-4)
-@click.option('--lr_model', type=float, default=0.01)
-@click.option('--dropout', type=float, default=0.0)
-@click.option('--alpha', type=float, default=0, help='regularization term.')
-@click.option('--debug', type=int, default=0)
+                   'kcenter', 'herding', 'random']), show_default=True)
+@click.option('--dis_metric', default='ours', show_default=True)
+@click.option('--lr_adj', default=1e-4, show_default=True)
+@click.option('--lr_feat', default=1e-4, show_default=True)
+@click.option('--lr_model', default=0.01, show_default=True)
+@click.option('--dropout', default=0.0, show_default=True)
+@click.option('--alpha', default=0, help='regularization term.', show_default=True)
+@click.option('--debug', is_flag=True, show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     try:
@@ -79,3 +80,7 @@ def cli(ctx, **kwargs):
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)
     # print(args)
+
+
+if __name__ == '__main__':
+    cli()

@@ -8,6 +8,6 @@ if __name__ == '__main__':
     # load specific augments
     args = load_config(args)
 
-    data = get_dataset(args.dataset, args.normalize_features)
+    data = get_dataset(args.dataset, args)
 
     result = router_select(data, args)

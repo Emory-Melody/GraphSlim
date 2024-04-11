@@ -1,3 +1,1 @@
-from .utils import *
-from .utils_graphsaint import *
-from .utils_scaling import *
+from .main_loader import get_dataset
