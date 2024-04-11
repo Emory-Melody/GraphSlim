@@ -3,6 +3,13 @@ from torch_geometric.loader import NeighborSampler
 from graphslim.utils import *
 
 
+def merge_attributes(original_data, new_data):
+    for attr in vars(new_data):
+        if attr not in vars(original_data):
+            setattr(original_data, attr, getattr(new_data, attr))
+    return original_data
+
+
 class TransAndInd:
 
     def __init__(self, data):
@@ -342,19 +349,7 @@ def splits(data, exp):
 #     return S
 #
 # # Compare the spectum of L and Lc
-# def eig(A, order='ascend'):
-#     # eigenvalue decomposition
-#     [l, X] = np.linalg.eigh(A)
-#
-#     # reordering indices
-#     idx = l.argsort()
-#     if order == 'descend':
-#         idx = idx[::-1]
-#
-#     # reordering
-#     l = np.real(l[idx])
-#     X = X[:, idx]
-#     return (X, np.real(l))
+
 #
 
 #

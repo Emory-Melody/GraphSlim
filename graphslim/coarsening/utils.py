@@ -1,8 +1,11 @@
 # import matplotlib.pylab as plt
-from sys import version as sys_version
+import numbers
 
+import matplotlib.pyplot as plt
 import networkx as nx
-from pygsp import filters, reduction
+import numpy as np
+import scipy as sp
+from pygsp import filters, reduction, graphs
 from pygsp.utils import resistance_distance
 from sortedcontainers import SortedList
 
@@ -23,10 +26,11 @@ A C program for maximum weight matching by Ed Rothberg was used extensively
 to validate this new code.
 """
 
-
 DEBUG = None
 CHECK_DELTA = False
 CHECK_OPTIMUM = False
+
+
 def maxWeightMatching(edges, maxcardinality=False):
     """Compute a maximum-weighted matching in the general undirected
     weighted graph given by "edges".  If "maxcardinality" is true,
@@ -54,11 +58,11 @@ def maxWeightMatching(edges, maxcardinality=False):
     # the paper by Galil; read the paper before reading this code.
     #
 
-    # Python 2/3 compatibility.
-    if sys_version < '3':
-        integer_types = (int, long)
-    else:
-        integer_types = (int,)
+    # # Python 2/3 compatibility.
+    # if sys_version < '3':
+    #     integer_types = (int, long)
+    # else:
+    #     integer_types = (int,)
 
     # Deal swiftly with empty graphs.
     if not edges:
@@ -750,7 +754,7 @@ def maxWeightMatching(edges, maxcardinality=False):
                 if (blossomparent[b] == -1 and label[b] == 1 and
                         bestedge[b] != -1):
                     kslack = slack(bestedge[b])
-                    if isinstance(kslack, integer_types):
+                    if isinstance(kslack, numbers.Integral):
                         assert (kslack % 2) == 0
                         d = kslack // 2
                     else:
@@ -1866,7 +1870,7 @@ def my_graph_multiresolution(
 
         Gs[i + 1].mr = {"idx": ind, "orig_idx": Gs[i].mr["orig_idx"][ind], "level": i}
 
-        L_reg = Gs[i].L + reg_eps * sparse.eye(Gs[i].N)
+        L_reg = Gs[i].L + reg_eps * sp.sparse.eye(Gs[i].N)
         Gs[i].mr["K_reg"] = reduction.kron_reduction(L_reg, ind)
         Gs[i].mr["green_kernel"] = filters.Filter(Gs[i], lambda x: 1.0 / (reg_eps + x))
 
@@ -1896,12 +1900,12 @@ def graph_sparsify(M, epsilon, maxiter=10):
         W = np.diag(L.diagonal()) - L.toarray()
         W[W < 1e-10] = 0
 
-    W = sparse.coo_matrix(W)
+    W = sp.sparse.coo_matrix(W)
     W.data[W.data < 1e-10] = 0
     W = W.tocsc()
     W.eliminate_zeros()
 
-    start_nodes, end_nodes, weights = sparse.find(sparse.tril(W))
+    start_nodes, end_nodes, weights = sp.sparse.find(sp.sparse.tril(W))
 
     # Calculate the new weights.
     weights = np.maximum(0, weights)
@@ -1927,11 +1931,11 @@ def graph_sparsify(M, epsilon, maxiter=10):
         counts[spin_counts[:, 0]] = spin_counts[:, 1]
         new_weights = counts * per_spin_weights
 
-        sparserW = sparse.csc_matrix(
+        sparserW = sp.sparse.csc_matrix(
             (new_weights, (start_nodes, end_nodes)), shape=(N, N)
         )
         sparserW = sparserW + sparserW.T
-        sparserL = sparse.diags(sparserW.diagonal(), 0) - sparserW
+        sparserL = sp.sparse.diags(sparserW.diagonal(), 0) - sparserW
 
     #        if graphs.Graph(W=sparserW).is_connected():
     #            break
@@ -1941,16 +1945,50 @@ def graph_sparsify(M, epsilon, maxiter=10):
     #            epsilon -= (epsilon - 1/np.sqrt(N)) / 2.
 
     if isinstance(M, graphs.Graph):
-        sparserW = sparse.diags(sparserL.diagonal(), 0) - sparserL
+        sparserW = sp.sparse.diags(sparserL.diagonal(), 0) - sparserL
         if not M.is_directed():
             sparserW = (sparserW + sparserW.T) / 2.0
 
         Mnew = graphs.Graph(W=sparserW)
         # M.copy_graph_attributes(Mnew)
     else:
-        Mnew = sparse.lil_matrix(sparserL)
+        Mnew = sp.sparse.lil_matrix(sparserL)
 
     return Mnew
+
+
+def get_S(G):
+    """
+    Construct the N x |E| gradient matrix S
+    """
+    # the edge set
+    edges = G.get_edge_list()
+    weights = np.array(edges[2])
+    edges = np.array(edges[0:2])
+    M = edges.shape[1]
+
+    # Construct the N x |E| gradient matrix S
+    S = np.zeros((G.N, M))
+    for e in np.arange(M):
+        S[edges[0, e], e] = np.sqrt(weights[e])
+        S[edges[1, e], e] = -np.sqrt(weights[e])
+
+    return S
+
+
+def eig(A, order='ascend'):
+    # eigenvalue decomposition
+    [l, X] = np.linalg.eigh(A)
+
+    # reordering indices
+    idx = l.argsort()
+    if order == 'descend':
+        idx = idx[::-1]
+
+    # reordering
+    l = np.real(l[idx])
+    X = X[:, idx]
+    return (X, np.real(l))
 
 
 def zero_diag(A):

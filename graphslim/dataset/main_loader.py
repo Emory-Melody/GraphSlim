@@ -4,7 +4,7 @@ from ogb.nodeproppred import PygNodePropPredDataset
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit
 
 from graphslim.dataset.convertor import pyg_saint
-from graphslim.dataset.utils import TransAndInd
+from graphslim.dataset.utils import TransAndInd, merge_attributes
 
 
 def get_dataset(name, args):
@@ -40,4 +40,4 @@ def get_dataset(name, args):
     # support both pyg and saint format
     data = pyg_saint(data, args)
     # support both transductive and inductive tasks
-    return TransAndInd(data)
+    return merge_attributes(data, TransAndInd(data))

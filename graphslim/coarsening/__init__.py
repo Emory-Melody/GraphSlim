@@ -1,1 +1,1 @@
-from .coarsening_agent import CoarseningBase
+from .coarsening_agent import router_coarse

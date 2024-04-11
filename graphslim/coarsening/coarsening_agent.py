@@ -17,6 +17,10 @@ from graphslim.models import GCN
 from graphslim.utils import one_hot
 
 
+def router_coarse(data, args):
+    return CoarseningBase(data, args)
+
+
 class CoarseningBase:
     def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
@@ -44,7 +48,7 @@ class CoarseningBase:
             coarsen_val_labels = coarsen_val_labels.to(device)
             coarsen_val_mask = coarsen_val_mask.to(device)
             coarsen_edge = SparseTensor(row=coarsen_edge[1], col=coarsen_edge[0]).to(device)
-            data = splits(data, data.nclass, args.experiment)
+            data = splits(data, args.split)
             data = data.to(device)
 
             if args.normalize_features:

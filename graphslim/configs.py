@@ -1,5 +1,6 @@
 '''Configuration'''
 import json
+import os
 
 import click
 
@@ -76,6 +77,10 @@ def cli(ctx, **kwargs):
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
         seed_everything(args.seed)
+        path = "checkpoints/"
+        if not os.path.isdir(path):
+            os.mkdir(path)
+        args.path = path
         return args
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)
