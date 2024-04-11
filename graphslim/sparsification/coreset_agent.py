@@ -5,8 +5,9 @@ import torch
 import torch.nn.functional as F
 from tqdm import tqdm
 
+from graphslim.dataset.utils import save_reduced
 from graphslim.models import *
-from graphslim.utils import accuracy
+from graphslim.utils import accuracy, seed_everything
 
 
 def router_select(data, args):
@@ -23,7 +24,6 @@ def router_select(data, args):
         pass
 
     res = []
-    runs = 10
     model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
                 weight_decay=args.weight_decay).to(args.device)
     if args.setting == 'trans':
@@ -43,7 +43,8 @@ def router_select(data, args):
         #     np.save(f'dataset/output/coreset/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
         #             idx_selected)
 
-        for _ in tqdm(range(runs)):
+        for i in tqdm(range(args.runs)):
+            seed_everything(args.seed + i)
             model.fit_with_val(feat_selected, adj_selected, data,
                                train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
 
@@ -76,8 +77,11 @@ def router_select(data, args):
         adj_selected = data.adj_train[np.ix_(idx_selected, idx_selected)]
 
         data.labels_syn = data.labels_train[idx_selected]
+        if args.save:
+            save_reduced(adj_selected, feat_selected, data.labels_syn, args)
 
-        for _ in tqdm(range(runs)):
+        for i in tqdm(range(args.runs)):
+            seed_everything(args.seed + i)
             model.fit_with_val(feat_selected, adj_selected, data,
                                train_iters=args.epochs, normalize=True, verbose=False, val=True, reduced=True)
 

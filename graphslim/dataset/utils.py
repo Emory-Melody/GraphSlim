@@ -1,3 +1,5 @@
+import os
+
 from torch_geometric.loader import NeighborSampler
 
 from graphslim.utils import *
@@ -148,6 +150,17 @@ def splits(data, exp):
     data.test_mask = index2mask(test_index, size=data.num_nodes)
 
     return data
+
+
+def save_reduced(adj_syn, feat_syn, labels_syn, args):
+    save_path = 'dataset/output/saved_ours'
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+    torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    torch.save(labels_syn, f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    print("Saved reduced data")
+
 
 # =============from graphsaint================#
 # import networkx as nx

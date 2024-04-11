@@ -16,6 +16,7 @@ def dict2obj(d):
     return json.loads(json.dumps(d), object_hook=Obj)
 
 
+# recommended hyperparameters here
 def load_config(args):
     dataset = args.dataset
     if dataset in ['flickr']:
@@ -39,7 +40,7 @@ def load_config(args):
 
 
 @click.command()
-@click.option('--dataset', default='cora', show_default=True)
+@click.option('--dataset', '-D', default='cora', show_default=True)
 @click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
@@ -54,6 +55,7 @@ def load_config(args):
 @click.option('--seed', default=42, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--save', is_flag=True, show_default=True)
+@click.option('--debug', is_flag=True, show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
@@ -65,8 +67,8 @@ def load_config(args):
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--lr_model', default=0.01, show_default=True)
 @click.option('--dropout', default=0.0, show_default=True)
-@click.option('--alpha', default=0, help='regularization term.', show_default=True)
-@click.option('--debug', is_flag=True, show_default=True)
+# model specific args
+@click.option('--alpha', default=0, help='for appnp', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     try:

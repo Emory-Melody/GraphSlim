@@ -1,17 +1,17 @@
 # import deeprobust.graph.utils as utils
-import os
 from collections import Counter
 
 import torch.nn as nn
 from torch_sparse import SparseTensor
 
 from graphslim.condensation.utils import match_loss  # graphslim
+from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
 from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC1
-from graphslim.utils import *  # graphslim
+from graphslim.utils import *
 
 
 def router_condense(data, args):
@@ -25,7 +25,7 @@ def router_condense(data, args):
 
 class GCondBase:
 
-    def __init__(self, data, args, device='cuda', setting='trans', **kwargs):
+    def __init__(self, data, args, device='cuda', **kwargs):
         self.data = data
         self.args = args
         self.device = device
@@ -207,12 +207,8 @@ class GCondBase:
             if verbose and it in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 res = []
-                runs = 1 if args.dataset in ['ogbn-arxiv'] else 10
-                for i in range(runs):
-                    if args.dataset in ['ogbn-arxiv']:
-                        res.append(self.test_with_val(verbose=False))
-                    else:
-                        res.append(self.test_with_val(verbose=False))
+                for i in range(args.runs):
+                    res.append(self.test_with_val(verbose=False))
 
                 res = np.array(res)
                 print('Test Accuracy and Std:',
@@ -296,21 +292,9 @@ class GCondTrans(GCondBase):
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 
-        if self.args.dataset in ['ogbn-arxiv']:
-            model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
-                        weight_decay=0e-4, nlayers=2, with_bn=False,
-                        nclass=data.nclass, device=device).to(device)
-
         adj_syn = pge.inference(feat_syn)
-        args = self.args
-
-        if args.save:
-            save_path = 'dataset/output/saved_ours'
-            if not os.path.exists(save_path):
-                os.makedirs(save_path)
-            torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-
+        if self.args.save:
+            save_reduced(adj_syn, feat_syn, data.labels_syn, self.args)
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
@@ -354,14 +338,8 @@ class GCondInd(GCondBase):
                     nclass=data.nclass, device=device).to(device)
 
         adj_syn = pge.inference(feat_syn)
-        args = self.args
-
-        if args.save:
-            save_path = 'dataset/output/saved_ours'
-            if not os.path.exists(save_path):
-                os.makedirs(save_path)
-            torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-            torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        if self.args.save:
+            save_reduced(adj_syn, feat_syn, data.labels_syn, self.args)
 
         model.fit_with_val(feat_syn, adj_syn, data,
                            train_iters=600, normalize=True, verbose=False, val=True, reduced=True)

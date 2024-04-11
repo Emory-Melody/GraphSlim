@@ -12,9 +12,9 @@ from tqdm import trange
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
 from graphslim.dataset.convertor import pyg2gsp
-from graphslim.dataset.utils import splits
+from graphslim.dataset.utils import splits, save_reduced
 from graphslim.models import GCN
-from graphslim.utils import one_hot
+from graphslim.utils import one_hot, seed_everything
 
 
 def router_coarse(data, args):
@@ -40,9 +40,12 @@ class CoarseningBase:
         all_acc = []
 
         for i in trange(args.runs):
+            seed_everything(args.seed + i)
             coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_val_labels, coarsen_val_mask, coarsen_edge = process_coarsened(
                 cpu_data, candidate, C_list, Gc_list)
             coarsen_features = coarsen_features.to(device)
+            if args.save:
+                save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
             coarsen_train_labels = coarsen_train_labels.to(device)
             coarsen_train_mask = coarsen_train_mask.to(device)
             coarsen_val_labels = coarsen_val_labels.to(device)

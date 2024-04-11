@@ -40,4 +40,4 @@ def get_dataset(name, args):
     # support both pyg and saint format
     data = pyg_saint(data, args)
     # support both transductive and inductive tasks
-    return merge_attributes(data, TransAndInd(data))
+    return merge_attributes(TransAndInd(data), data)
