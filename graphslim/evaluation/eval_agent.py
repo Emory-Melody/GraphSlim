@@ -5,7 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from graphslim import utils
-from graphslim.models import GCN1, GAT, APPNP1
+from graphslim.dataset import *
+from graphslim.models import GCN1, GAT
 
 
 class Evaluator:
@@ -18,7 +19,7 @@ class Evaluator:
         n = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
         self.nnodes_syn = n
-        self.adj_param= nn.Parameter(torch.FloatTensor(n, n).to(device))
+        self.adj_param = nn.Parameter(torch.FloatTensor(n, n).to(device))
         self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
         self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
         self.reset_parameters()
@@ -34,7 +35,7 @@ class Evaluator:
         num_class_dict = {}
         n = len(data.labels_train)
 
-        sorted_counter = sorted(counter.items(), key=lambda x:x[1])
+        sorted_counter = sorted(counter.items(), key=lambda x: x[1])
         sum_ = 0
         labels_syn = []
         self.syn_class_indices = {}
@@ -53,19 +54,17 @@ class Evaluator:
         self.num_class_dict = num_class_dict
         return labels_syn
 
-
     def test_gat(self, nlayers, model_type, verbose=False):
         res = []
         args = self.args
 
         if args.dataset in ['cora', 'citeseer']:
-            args.epsilon = 0.5 # Make the graph sparser as GAT does not work well on dense graph
+            args.epsilon = 0.5  # Make the graph sparser as GAT does not work well on dense graph
         else:
             args.epsilon = 0.01
 
         print('======= testing %s' % model_type)
         data, device = self.data, self.device
-
 
         feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
@@ -75,10 +74,9 @@ class Evaluator:
                         weight_decay=0e-4, nlayers=self.args.nlayers, lr=0.001,
                         nclass=data.nclass, device=device, dataset=self.args.dataset).to(device)
 
-
         noval = True if args.dataset in ['reddit', 'flickr'] else False
         model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), noval=noval, data=data,
-                     train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
+                  train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -116,15 +114,16 @@ class Evaluator:
         return res
 
     def get_syn_data(self, model_type=None, verbose=False):
-        data, device = self.data, self.device
-        feat_syn, adj_param, labels_syn = self.feat_syn.detach(), \
-            self.adj_param.detach(), self.labels_syn
-
+        # data, device = self.data, self.device
         args = self.args
+        if self.args.save:
+            adj_syn, feat_syn, labels_syn = load_reduced(args)
+        else:
+            feat_syn, adj_param, labels_syn = self.feat_syn.detach(), \
+                self.adj_param.detach(), self.labels_syn
+
         # import os
         # print(os.path.abspath(__file__))
-        adj_syn = torch.load(f'../dataset/output/saved_ours/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
-        feat_syn = torch.load(f'../dataset/output/saved_ours/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cuda')
 
         if model_type == 'MLP':
             adj_syn = adj_syn.to(self.device)
@@ -133,21 +132,19 @@ class Evaluator:
             adj_syn = adj_syn.to(self.device)
 
         if verbose:
-            print('Sum:', adj_syn.sum(), adj_syn.sum()/(adj_syn.shape[0]**2))
-            print('Sparsity:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
+            print('Sum:', adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
+            print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         if self.args.epsilon > 0:
             adj_syn[adj_syn < self.args.epsilon] = 0
             if verbose:
-                print('Sparsity after truncating:', adj_syn.nonzero().shape[0]/(adj_syn.shape[0]**2))
+                print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
         feat_syn = feat_syn.to(self.device)
 
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
 
-
         return feat_syn, adj_syn, labels_syn
-
 
     def test(self, model_type, verbose=True):
         res = []
@@ -164,24 +161,23 @@ class Evaluator:
         else:
             model_class = eval(model_type)
         weight_decay = 5e-4
-        dropout = 0.5 if args.dataset in ['reddit'] else 0
 
         if verbose:
             print(type(data.nclass))
-        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=dropout,
-                    weight_decay=weight_decay, nlayers=args.nlayers,
-                    nclass=data.nclass, device=device, activation=args.activation).to(device)
+        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout,
+                            weight_decay=weight_decay, nlayers=args.nlayers,
+                            nclass=data.nclass, device=device, activation=args.activation).to(device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
         if args.dataset in ['ogbn-arxiv', 'arxiv']:
             model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=0.,
-                        weight_decay=weight_decay, nlayers=nlayers, with_bn=False,
-                        nclass=data.nclass, device=device).to(device)
+                                weight_decay=weight_decay, nlayers=args.nlayers, with_bn=False,
+                                nclass=data.nclass, device=device).to(device)
 
         # val = False if args.dataset in ['reddit', 'flickr'] else True
         val = False
         model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-                     train_iters=600, normalize=True, verbose=verbose, val=val)
+                           train_iters=600, normalize=True, verbose=verbose, val=val)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -240,7 +236,6 @@ class Evaluator:
                   repr([res.mean(0), res.std(0)]))
             final_res[model_type] = [res.mean(0), res.std(0)]
 
-
         # print('=== testing GAT')
         # res = []
         # nlayer = 2
@@ -277,6 +272,3 @@ class Evaluator:
         # final_res[model_type] = [res.mean(0), res.std(0)]
         #
         # print('Final result:', final_res)
-
-
-

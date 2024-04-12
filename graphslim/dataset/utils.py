@@ -53,6 +53,15 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args):
     torch.save(labels_syn, f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     print("Saved reduced data")
 
+
+def load_reduced(args):
+    save_path = 'dataset/output/saved_ours'
+    adj_syn = torch.load(f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    feat_syn = torch.load(f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    labels_syn = torch.load(f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    print("Loaded reduced data")
+    return adj_syn, feat_syn, labels_syn
+
 # =============from graphsaint================#
 # import networkx as nx
 # import numpy as np

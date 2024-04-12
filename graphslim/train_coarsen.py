@@ -1,6 +1,6 @@
 from configs import cli
-from dataset import *
 from graphslim.coarsening import *
+from graphslim.dataset import *
 
 if __name__ == '__main__':
     # TODO: do we need a dictionary to transfer the different reduction ratios?

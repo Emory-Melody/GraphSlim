@@ -1,7 +1,7 @@
 from configs import cli
 from configs import load_config
-from dataset import *
-from sparsification import router_select
+from graphslim.dataset import *
+from graphslim.sparsification import router_select
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)

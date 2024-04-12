@@ -2,6 +2,7 @@
 from collections import Counter
 
 import torch.nn as nn
+from torch_sparse import SparseTensor
 
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.dataset.utils import save_reduced
@@ -13,21 +14,13 @@ from graphslim.models.sgc_multi import SGC1
 from graphslim.utils import *
 
 
-def router_condense(data, args):
-    if args.setting == 'trans':
-        return GCondTrans(data, args)
-    elif args.setting == 'ind':
-        return GCondInd(data, args)
-    else:
-        raise ValueError(f'Invalid: {args.setting}')
+class GCond:
 
-
-class GCondBase:
-
-    def __init__(self, data, args, **kwargs):
+    def __init__(self, setting, data, args, **kwargs):
         self.data = data
         self.args = args
         self.device = args.device
+        self.setting = setting
         device = self.device
 
         # n = data.nclass * args.nsamples
@@ -102,7 +95,6 @@ class GCondBase:
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
-                # TODO: fix this bug (AttributeError: 'Obj' object has no attribute 'sgc')
                 args.sgc = 1  # you should remove this line after debug
                 if args.sgc == 1:
                     model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
@@ -207,12 +199,20 @@ class GCondBase:
             if verbose and it in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 res = []
-                for i in range(args.runs):
-                    res.append(self.test_with_val(verbose=False))
+                # for i in range(args.runs):
+                if self.setting == 'trans':
+                    res.append(self.test_with_val_trans(verbose=False))
+                else:
+                    res.append(self.test_with_val_ind(verbose=False))
 
                 res = np.array(res)
                 print('Test Accuracy and Std:',
                       repr([res.mean(0), res.std(0)]))
+
+            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn, feat_syn, labels_syn
+            if self.args.save:
+                save_reduced(adj_syn, feat_syn, labels_syn, self.args)
+            return data
 
     def cross_architecture_eval(self):
         args = self.args
@@ -279,9 +279,7 @@ class GCondBase:
         else:
             return 20, 1
 
-
-class GCondTrans(GCondBase):
-    def test_with_val(self, verbose=True):
+    def test_with_val_trans(self, verbose=True):
         res = []
 
         data, device = self.data, self.device
@@ -293,8 +291,7 @@ class GCondTrans(GCondBase):
                     nclass=data.nclass, device=device).to(device)
 
         adj_syn = pge.inference(feat_syn)
-        if self.args.save:
-            save_reduced(adj_syn, feat_syn, data.labels_syn, self.args)
+
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
@@ -324,22 +321,19 @@ class GCondTrans(GCondBase):
                   "accuracy= {:.4f}".format(acc_test.item()))
         return res
 
-
-class GCondInd(GCondBase):
-    def test_with_val(self, verbose=True):
+    def test_with_val_ind(self, verbose=True):
         res = []
 
         data, device = self.data, self.device
         feat_syn, pge = self.feat_syn.detach(), self.pge
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        dropout = 0.5 if self.args.dataset in ['reddit'] else 0
-        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=dropout,
+        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 
         adj_syn = pge.inference(feat_syn)
-        if self.args.save:
-            save_reduced(adj_syn, feat_syn, data.labels_syn, self.args)
+
+        self.data.adj_syn = adj_syn
 
         model.fit_with_val(feat_syn, adj_syn, data,
                            train_iters=600, normalize=True, verbose=False, val=True, reduced=True)
