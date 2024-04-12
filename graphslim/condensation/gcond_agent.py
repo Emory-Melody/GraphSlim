@@ -2,7 +2,6 @@
 from collections import Counter
 
 import torch.nn as nn
-from torch_sparse import SparseTensor
 
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.dataset.utils import save_reduced
@@ -25,10 +24,11 @@ def router_condense(data, args):
 
 class GCondBase:
 
-    def __init__(self, data, args, device='cuda', **kwargs):
+    def __init__(self, data, args, **kwargs):
         self.data = data
         self.args = args
-        self.device = device
+        self.device = args.device
+        device = self.device
 
         # n = data.nclass * args.nsamples
 

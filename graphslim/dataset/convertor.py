@@ -4,37 +4,11 @@ import torch
 from pygsp import graphs
 from scipy.sparse import csr_matrix
 from torch_geometric.utils import to_undirected, to_dense_adj
-from torch_sparse import SparseTensor
-
-from graphslim.dataset.utils import splits
 
 
 def pyg2gsp(data):
     G = graphs.Graph(W=to_dense_adj(to_undirected(data.edge_index))[0])
     return G
-
-
-def pyg_saint(data, args):
-    # reference type
-    # pyg format use x,y,edge_index
-    if hasattr(data, 'x'):
-        data.feat_full = data.x
-        data.labels_full = data.y
-        data.adj_full = ei2csr(data.edge_index, data.x.shape[0])
-        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
-    # saint format use feat,labels,adj
-    elif hasattr(data, 'feat_full'):
-        data.edge_index = csr2ei(data.adj_full)
-        data.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
-        data.x = data.feat_full
-        data.y = data.labels_full
-    # ensure all dataset has a split
-    if not hasattr(data, 'train_mask'):
-        data = splits(data, args.split)
-    data.idx_train = data.train_mask.nonzero().view(-1)
-    data.idx_val = data.val_mask.nonzero().view(-1)
-    data.idx_test = data.test_mask.nonzero().view(-1)
-    return data
 
 
 def csr2ei(adjacency_matrix_csr):

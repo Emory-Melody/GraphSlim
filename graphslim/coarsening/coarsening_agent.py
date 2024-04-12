@@ -12,9 +12,9 @@ from tqdm import trange
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
 from graphslim.dataset.convertor import pyg2gsp
-from graphslim.dataset.utils import splits, save_reduced
+from graphslim.dataset.utils import save_reduced
 from graphslim.models import GCN
-from graphslim.utils import one_hot, seed_everything
+from graphslim.utils import one_hot, seed_everything, to_tensor
 
 
 def router_coarse(data, args):
@@ -51,8 +51,7 @@ class CoarseningBase:
             coarsen_val_labels = coarsen_val_labels.to(device)
             coarsen_val_mask = coarsen_val_mask.to(device)
             coarsen_edge = SparseTensor(row=coarsen_edge[1], col=coarsen_edge[0]).to(device)
-            data = splits(data, args.split)
-            data = data.to(device)
+            # data = splits(data, args.split)
 
             if args.normalize_features:
                 coarsen_features = F.normalize(coarsen_features, p=1)
@@ -63,6 +62,9 @@ class CoarseningBase:
 
             best_val_loss = float('inf')
             val_loss_history = []
+            data.x, data.sparse_adj, data.y = to_tensor(data.x, data.sparse_adj, data.y,
+                                                        device=device)
+            # 这里可以再封装
             for epoch in range(args.epochs):
 
                 model.train()

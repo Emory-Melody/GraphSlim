@@ -219,17 +219,18 @@ def to_tensor(adj, features, labels=None, device='cpu'):
     """
     if sp.issparse(adj):
         adj = sparse_mx_to_torch_sparse_tensor(adj)
-    else:
-        adj = torch.FloatTensor(adj)
+    # if isinstance(adj,SparseTensor):
+    # else:
+    #     adj = torch.FloatTensor(adj)
     if sp.issparse(features):
         features = sparse_mx_to_torch_sparse_tensor(features)
-    else:
-        features = torch.FloatTensor(np.array(features))
+    # else:
+    #     features = torch.FloatTensor(np.array(features))
 
     if labels is None:
         return adj.to(device), features.to(device)
     else:
-        labels = torch.LongTensor(labels)
+        labels = labels.long()
         return adj.to(device), features.to(device), labels.to(device)
 
 
@@ -860,11 +861,11 @@ def ravel_multiple_indices(ixs, shape, reverse=False):
     return ixs[:, 0] * shape[1] + ixs[:, 1]
 
 
-def visualize(your_var):
-    """visualize computation graph"""
-    from torchviz import make_dot
-    make_dot(your_var).view()
-
+# def visualize(your_var):
+#     """visualize computation graph"""
+#     from torchviz import make_dot
+#     make_dot(your_var).view()
+#
 
 def reshape_mx(mx, shape):
     indices = mx.nonzero()

@@ -1,11 +1,13 @@
+import csv
+from pathlib import Path
+
+from scipy.stats import pearsonr
+
 from graphslim.configs import cli
 from graphslim.configs import load_config
 from graphslim.dataset import *
-from graphslim.models import *
-import csv
-from scipy.stats import pearsonr
-from pathlib import Path
 from graphslim.evaluation.eval_agent import Evaluator
+
 
 def csv_writer(file_path, num):
     with file_path.open(mode='w', newline='') as file:
@@ -19,7 +21,7 @@ def csv_reader(file_path):
     return data
 
 class NasEvaluator:
-    def __init__(self, args, data):
+    def __init__(self, data, args):
         self.args = args
         self.data = data
 
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     else:
         args.epsilon = 0.01
 
-    NasEvaluator = NasEvaluator(args, data)
+    NasEvaluator = NasEvaluator(data, args)
 
     # NasEvaluator.evaluate_syn()
 
