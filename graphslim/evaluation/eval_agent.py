@@ -1,33 +1,34 @@
 import numpy as np
 import scipy.sparse as sp
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 
 from graphslim import utils
 from graphslim.dataset import *
-from graphslim.models import GCN1, GAT
+from graphslim.models import GCN, GAT
+from graphslim.utils import accuracy
 
 
 class Evaluator:
 
-    def __init__(self, data, args, device='cuda', **kwargs):
-        self.data = data
+    def __init__(self, args, device='cuda', **kwargs):
+        # self.data = data
         self.args = args
-        self.device = device
+        self.device = args.device
         # self.args.runs = 10
-        n = int(data.feat_train.shape[0] * args.reduction_rate)
-        d = data.feat_train.shape[1]
-        self.nnodes_syn = n
-        self.adj_param = nn.Parameter(torch.FloatTensor(n, n).to(device))
-        self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
-        self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
+        # n = int(data.feat_train.shape[0] * args.reduction_rate)
+        # d = data.feat_train.shape[1]
+        # self.nnodes_syn = n
+        # self.adj_param = nn.Parameter(torch.FloatTensor(n, n).to(device))
+        # self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
+        # self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
         self.reset_parameters()
         # print('adj_param:', self.adj_param.shape, 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
-        self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
-        self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
+        pass
+        # self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
+        # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     def generate_labels_syn(self, data):
         from collections import Counter
@@ -113,17 +114,12 @@ class Evaluator:
         res.append(acc_train.item())
         return res
 
-    def get_syn_data(self, model_type=None, verbose=False):
-        # data, device = self.data, self.device
-        args = self.args
-        if self.args.save:
-            adj_syn, feat_syn, labels_syn = load_reduced(args)
-        else:
-            feat_syn, adj_param, labels_syn = self.feat_syn.detach(), \
-                self.adj_param.detach(), self.labels_syn
+    def get_syn_data(self, data, model_type=None, verbose=False, sparse=False):
 
-        # import os
-        # print(os.path.abspath(__file__))
+        if self.args.save:
+            adj_syn, feat_syn, labels_syn = load_reduced(self.args)
+        else:
+            adj_syn, feat_syn, labels_syn = data.adj_syn, data.feat_syn, data.labels_syn
 
         if model_type == 'MLP':
             adj_syn = adj_syn.to(self.device)
@@ -135,10 +131,12 @@ class Evaluator:
             print('Sum:', adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
             print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
-        if self.args.epsilon > 0:
+        # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
+        if sparse and self.args.epsilon > 0:
             adj_syn[adj_syn < self.args.epsilon] = 0
             if verbose:
                 print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+
         feat_syn = feat_syn.to(self.device)
 
         # edge_index = adj_syn.nonzero().T
@@ -146,38 +144,39 @@ class Evaluator:
 
         return feat_syn, adj_syn, labels_syn
 
-    def test(self, model_type, verbose=True):
+    def test(self, data, model_type, verbose=True):
         res = []
 
-        args = self.args
-        data, device = self.data, self.device
-
-        feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
+        feat_syn, adj_syn, labels_syn = self.get_syn_data(data, model_type)
 
         if verbose:
             print('======= testing %s' % model_type)
         if model_type == 'MLP':
-            model_class = GCN1
+            model_class = GCN
         else:
             model_class = eval(model_type)
         weight_decay = 5e-4
 
         if verbose:
             print(type(data.nclass))
-        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout,
-                            weight_decay=weight_decay, nlayers=args.nlayers,
-                            nclass=data.nclass, device=device, activation=args.activation).to(device)
+        model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
+                            weight_decay=weight_decay, nlayers=self.args.nlayers,
+                            nclass=data.nclass, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
-        if args.dataset in ['ogbn-arxiv', 'arxiv']:
-            model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=0.,
-                                weight_decay=weight_decay, nlayers=args.nlayers, with_bn=False,
-                                nclass=data.nclass, device=device).to(device)
+        if self.args.dataset in ['ogbn-arxiv', 'arxiv']:
+            model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
+                                weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
+                                nclass=data.nclass, device=self.device).to(self.device)
 
         # val = False if args.dataset in ['reddit', 'flickr'] else True
-        val = False
-        model.fit_with_val(feat_syn, adj_syn, labels_syn, data,
-                           train_iters=600, normalize=True, verbose=verbose, val=val)
+        if self.args.setting == 'inductive':
+            val = True
+        else:
+            val = False
+        print(type(data))
+        model.fit_with_val(feat_syn, adj_syn, data, labels_syn,
+                           train_iters=600, normalize=True, verbose=verbose, val=val, reduced=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -187,9 +186,9 @@ class Evaluator:
         else:
             output = model.predict(data.feat_test, data.adj_test)
 
-        if args.dataset in ['reddit', 'flickr']:
+        if self.args.dataset in ['reddit', 'flickr']:
             loss_test = F.nll_loss(output, labels_test)
-            acc_test = utils.accuracy(output, labels_test)
+            acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())
             if verbose:
                 print("Test set results:",
@@ -201,7 +200,7 @@ class Evaluator:
             # Full graph
             output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
-            acc_test = utils.accuracy(output[data.idx_test], labels_test)
+            acc_test = accuracy(output[data.idx_test], labels_test)
             res.append(acc_test.item())
             if verbose:
                 print("Test full set results:",
@@ -211,7 +210,7 @@ class Evaluator:
             labels_train = torch.LongTensor(data.labels_train).cuda()
             output = model.predict(data.feat_train, data.adj_train)
             loss_train = F.nll_loss(output, labels_train)
-            acc_train = utils.accuracy(output, labels_train)
+            acc_train = accuracy(output, labels_train)
             if verbose:
                 print("Train set results:",
                       "loss= {:.4f}".format(loss_train.item()),
@@ -227,7 +226,7 @@ class Evaluator:
         final_res = {}
         runs = self.args.nruns
 
-        for model_type in ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        for model_type in ['GCN', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
             res = []
             for i in range(runs):
                 res.append(self.test(model_type=model_type, verbose=False))
@@ -249,21 +248,19 @@ class Evaluator:
 
         print('Final result:', final_res)
 
-    def train(self, model_type, verbose=True):
+    def train(self, data, model_type, verbose=True):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
-        args = self.args
-        data = self.data
-        data.nclass = data.nclass
+        self.data = data
+        nclass = data.nclass
 
         final_res = {}
-        runs = self.args.runs
         res = []
-        for i in range(runs):
-            res.append(self.test(model_type=model_type, verbose=False))
+        for i in range(self.args.runs):
+            res.append(self.test(data, model_type=model_type, verbose=False))
             break
         res = np.array(res)
 
-        if runs > 1:
+        if self.args.runs > 1:
             return res
         else:
             return res[0][0]

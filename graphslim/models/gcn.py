@@ -106,7 +106,8 @@ class GCN(nn.Module):
 
     def fit_with_val(self, features, adj, data, labels=None, train_iters=200, initialize=True, verbose=False,
                      normalize=True,
-                     val=False, **kwargs):
+                     val=False,
+                     reduced=False, **kwargs):
         if initialize:
             self.reset_parameters()
 
@@ -128,7 +129,7 @@ class GCN(nn.Module):
         labels = data.labels_full
         data.labels_full = labels.float() if self.multi_label else labels
 
-        self._train_with_val(data, train_iters, verbose, adj_val=val, **kwargs)
+        self._train_with_val(data, train_iters, verbose, adj_val=val, reduced=reduced, **kwargs)
 
     def _train_with_val(self, data, train_iters, verbose, adj_val=False, reindexed_trainset=False, reduced=False):
         # TODO: we can have two strategies:

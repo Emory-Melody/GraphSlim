@@ -1,1 +1,1 @@
-from .coarsening_agent import router_coarse
+from .coarsening_agent import Coarsen

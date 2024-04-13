@@ -1,12 +1,12 @@
-from configs import cli
-from graphslim.coarsening import *
+from configs import *
+from evaluation.eval_agent import Evaluator
+from graphslim.coarsening import Coarsen
 from graphslim.dataset import *
 
-if __name__ == '__main__':
-    # TODO: do we need a dictionary to transfer the different reduction ratios?
-    args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args)
-    # TODO: change to router_coarsening
-    agent = router_coarse(data, args)
+args = cli(standalone_mode=False)
 
-    agent.train()
+graph = get_dataset(args.dataset, args)
+agent = Coarsen(args)
+reduced_graph = agent.train(graph)
+evaluator = Evaluator(args)
+print(evaluator.train(reduced_graph, 'GCN'))
