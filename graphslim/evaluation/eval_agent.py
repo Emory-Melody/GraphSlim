@@ -1,7 +1,10 @@
+from collections import Counter
+
 import numpy as np
 import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
+from tqdm import trange
 
 from graphslim import utils
 from graphslim.dataset import *
@@ -11,7 +14,7 @@ from graphslim.utils import accuracy
 
 class Evaluator:
 
-    def __init__(self, args, device='cuda', **kwargs):
+    def __init__(self, args, **kwargs):
         # self.data = data
         self.args = args
         self.device = args.device
@@ -31,7 +34,6 @@ class Evaluator:
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     def generate_labels_syn(self, data):
-        from collections import Counter
         counter = Counter(data.labels_train.tolist())
         num_class_dict = {}
         n = len(data.labels_train)
@@ -122,10 +124,7 @@ class Evaluator:
             adj_syn, feat_syn, labels_syn = data.adj_syn, data.feat_syn, data.labels_syn
 
         if model_type == 'MLP':
-            adj_syn = adj_syn.to(self.device)
             adj_syn = adj_syn - adj_syn
-        else:
-            adj_syn = adj_syn.to(self.device)
 
         if verbose:
             print('Sum:', adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
@@ -137,18 +136,15 @@ class Evaluator:
             if verbose:
                 print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
-        feat_syn = feat_syn.to(self.device)
-
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
 
-        return feat_syn, adj_syn, labels_syn
+        return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
 
     def test(self, data, model_type, verbose=True):
         res = []
 
-        feat_syn, adj_syn, labels_syn = self.get_syn_data(data, model_type)
-
+        feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
         if verbose:
             print('======= testing %s' % model_type)
         if model_type == 'MLP':
@@ -157,36 +153,29 @@ class Evaluator:
             model_class = eval(model_type)
         weight_decay = 5e-4
 
-        if verbose:
-            print(type(data.nclass))
         model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
                             weight_decay=weight_decay, nlayers=self.args.nlayers,
                             nclass=data.nclass, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
-        if self.args.dataset in ['ogbn-arxiv', 'arxiv']:
-            model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
-                                weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
-                                nclass=data.nclass, device=self.device).to(self.device)
+        # if self.args.dataset in ['ogbn-arxiv', 'arxiv']:
+        #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
+        #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
+        #                         nclass=data.nclass, device=self.device).to(self.device)
 
-        # val = False if args.dataset in ['reddit', 'flickr'] else True
-        if self.args.setting == 'inductive':
-            val = True
-        else:
-            val = False
-        print(type(data))
-        model.fit_with_val(feat_syn, adj_syn, data, labels_syn,
-                           train_iters=600, normalize=True, verbose=verbose, val=val, reduced=True)
+        model.fit_with_val(data, train_iters=600, normalize=True, verbose=verbose, setting=self.args.setting,
+                           reduced=True)
 
         model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
+        labels_test = data.labels_test.long().cuda()
 
         if model_type == 'MLP':
             output = model.predict_unnorm(data.feat_test, sp.eye(len(data.feat_test)))
         else:
             output = model.predict(data.feat_test, data.adj_test)
 
-        if self.args.dataset in ['reddit', 'flickr']:
+        # TODO: 不以数据集区分,而是transductive/inductive
+        if self.args.setting == 'ind':
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())
@@ -224,11 +213,10 @@ class Evaluator:
         data.nclass = data.nclass.item()
 
         final_res = {}
-        runs = self.args.nruns
 
         for model_type in ['GCN', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
             res = []
-            for i in range(runs):
+            for i in range(args.runs):
                 res.append(self.test(model_type=model_type, verbose=False))
             res = np.array(res)
             print('Test/Train Mean Accuracy:',
@@ -248,19 +236,19 @@ class Evaluator:
 
         print('Final result:', final_res)
 
-    def train(self, data, model_type, verbose=True):
+    def evaluate(self, data, model_type, verbose=True):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
-        self.data = data
-        nclass = data.nclass
+        # self.data = data
+        args = self.args
 
-        final_res = {}
         res = []
-        for i in range(self.args.runs):
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type)
+        for i in trange(args.runs):
             res.append(self.test(data, model_type=model_type, verbose=False))
-            break
         res = np.array(res)
 
-        if self.args.runs > 1:
+        if args.runs > 1:
+            print(f'Test Mean Accuracy: {repr([res.mean(0), res.std(0)])}')
             return res
         else:
             return res[0][0]

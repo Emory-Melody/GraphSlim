@@ -36,6 +36,7 @@ class GCond:
 
         self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
         self.pge = PGE(nfeat=d, nnodes=n, device=device, args=args).to(device)
+        self.adj_syn = torch.zeros((n, n)).to(device)
 
         self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
@@ -72,15 +73,12 @@ class GCond:
 
         syn_class_indices = self.syn_class_indices
 
+        # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat(features)
         self.feat_syn.data.copy_(feat_sub)
 
-        if is_sparse_tensor(adj):
-            adj_norm = normalize_adj_tensor(adj, sparse=True)
-        else:
-            adj_norm = normalize_adj_tensor(adj)
+        adj = normalize_adj_tensor(adj, sparse=True)
 
-        adj = adj_norm
         adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
                            value=adj._values(), sparse_sizes=adj.size()).t()
 
@@ -95,21 +93,13 @@ class GCond:
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
-                args.sgc = 1  # you should remove this line after debug
-                if args.sgc == 1:
-                    model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
-                                nclass=data.nclass, dropout=args.dropout,
-                                nlayers=args.nlayers, with_bn=False,
-                                device=self.device).to(self.device)
-                else:
-                    model = GCN(nfeat=data.feat_train.shape[1], nhid=args.hidden,
-                                nclass=data.nclass, dropout=args.dropout, nlayers=args.nlayers,
-                                device=self.device).to(self.device)
+                model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
+                            nclass=data.nclass, dropout=args.dropout,
+                            nlayers=args.nlayers, with_bn=False,
+                            device=self.device).to(self.device)
 
             model.initialize()
-
             model_parameters = list(model.parameters())
-
             optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr_model)
             model.train()
 
@@ -124,7 +114,7 @@ class GCond:
                         BN_flag = True
                 if BN_flag:
                     model.train()  # for updating the mu, sigma of BatchNorm
-                    output_real = model.forward(features, adj_norm)
+                    # output_real = model.forward(features, adj)
                     for module in model.modules():
                         if 'BatchNorm' in module._get_name():  # BatchNorm
                             module.eval()  # fix mu and sigma of every BatchNorm layer
@@ -132,7 +122,7 @@ class GCond:
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):
                     batch_size, n_id, adjs = data.retrieve_class_sampler(
-                        c, adj, transductive=True, args=args)
+                        c, adj, transductive=True if args.setting == 'trans' else False, args=args)
                     if args.nlayers == 1:
                         adjs = [adjs]
 
@@ -194,25 +184,25 @@ class GCond:
                 print('Epoch {}, loss_avg: {}'.format(it, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [100, 200, 400, 600, 800, 1000]
+            # eval_epochs = [100, 200, 400, 600, 800, 1000]
+            #
+            # if verbose and it in eval_epochs:
+            #     # if verbose and (it+1) % 50 == 0:
+            #     res = []
+            #     # for i in range(args.runs):
+            #     if self.setting == 'trans':
+            #         res.append(self.test_with_val_trans(verbose=False))
+            #     else:
+            #         res.append(self.test_with_val_ind(verbose=False))
+            #
+            # res = np.array(res)
+            # print('Test Accuracy and Std:',
+            #       repr([res.mean(0), res.std(0)]))
 
-            if verbose and it in eval_epochs:
-                # if verbose and (it+1) % 50 == 0:
-                res = []
-                # for i in range(args.runs):
-                if self.setting == 'trans':
-                    res.append(self.test_with_val_trans(verbose=False))
-                else:
-                    res.append(self.test_with_val_ind(verbose=False))
-
-                res = np.array(res)
-                print('Test Accuracy and Std:',
-                      repr([res.mean(0), res.std(0)]))
-
-            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn, feat_syn, labels_syn
-            if self.args.save:
-                save_reduced(adj_syn, feat_syn, labels_syn, self.args)
-            return data
+        data.adj_syn, data.feat_syn, data.labels_syn = adj_syn, feat_syn, labels_syn
+        if args.save:
+            save_reduced(adj_syn, feat_syn, labels_syn, args)
+        return data
 
     def cross_architecture_eval(self):
         args = self.args
@@ -231,7 +221,6 @@ class GCond:
         args = self.args
         idx_selected = []
 
-        from collections import Counter
         counter = Counter(self.data.labels_syn)
 
         for c in range(data.nclass):
@@ -240,8 +229,8 @@ class GCond:
             idx_selected = idx_selected + tmp
         idx_selected = np.array(idx_selected).reshape(-1)
         features = features[idx_selected]
-        args.nsamples = 3
-        adj_knn = torch.zeros((data.nclass * args.nsamples, data.nclass * args.nsamples)).to(self.device)
+        args.knnsamples = 3
+        adj_knn = torch.zeros((self.nnodes_syn, self.nnodes_syn)).to(self.device)
 
         # for i in range(data.nclass):
         #     idx = np.arange(i*args.nsamples, i*args.nsamples+args.nsamples)
@@ -264,7 +253,10 @@ class GCond:
         # TODO: fix the bug, there is no "one_step" in args (AttributeError: 'Obj' object has no attribute 'one_step')
         # if args.one_step:
         #     return 10, 0
-
+        if args.one_step:
+            if args.dataset == 'ogbn-arxiv':
+                return 5, 0
+            return 1, 0
         if args.dataset in ['ogbn-arxiv']:
             return 20, 0
         if args.dataset in ['reddit']:
@@ -295,8 +287,8 @@ class GCond:
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
-        model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, reduced=True)
+        model.fit_with_val(feat_syn, adj_syn, data.labels_syn,
+                           train_iters=600, normalize=True, verbose=False, setting='trans', reduced=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()
@@ -335,8 +327,8 @@ class GCond:
 
         self.data.adj_syn = adj_syn
 
-        model.fit_with_val(feat_syn, adj_syn, data,
-                           train_iters=600, normalize=True, verbose=False, val=True, reduced=True)
+        model.fit_with_val(feat_syn, adj_syn, data.labels_syn,
+                           train_iters=600, normalize=True, verbose=False, setting='ind', reduced=True)
 
         model.eval()
         labels_test = torch.LongTensor(data.labels_test).cuda()

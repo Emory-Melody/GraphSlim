@@ -91,32 +91,17 @@ def index_to_mask(index, size):
     return mask
 
 
-def my_to_tensor(adj, features=None, labels=None, device='cpu'):
-    """Convert adj, features, labels from array or sparse matrix to
-    torch Tensor.
-
-    Parameters
-    ----------
-    adj : scipy.sparse.csr_matrix
-        the adjacency matrix.
-    features : scipy.sparse.csr_matrix
-        node features
-    labels : numpy.array
-        node labels
-    device : str
-        'cpu' or 'cuda'
-    """
-    if sp.issparse(adj):
-        adj = sparse_mx_to_torch_sparse_tensor(adj)
-    else:
-        adj = torch.FloatTensor(adj)
-    if features is None:
-        return adj.to(device)
-    elif labels is None:
-        return adj.to(device), features.to(device)
-    elif labels is not None:
-        labels = torch.LongTensor(labels)
-        return adj.to(device), features.to(device), labels.to(device)
+def to_tensor(*vars, device='cpu'):
+    tensor_list = []
+    for var in vars:
+        if sp.issparse(var):
+            var = sparse_mx_to_torch_sparse_tensor(var)
+        elif isinstance(var, np.ndarray):
+            var = torch.from_numpy(var)
+        else:
+            var = var
+        tensor_list.append(var.to(device))
+    return tensor_list
 
 
 # ============the following is copy from deeprobust/graph/utils.py=================
@@ -200,38 +185,6 @@ def preprocess(adj, features, labels, preprocess_adj=False, preprocess_feature=F
             features = torch.FloatTensor(features)
         adj = torch.FloatTensor(adj.todense())
     return adj.to(device), features.to(device), labels.to(device)
-
-
-def to_tensor(adj, features, labels=None, device='cpu'):
-    """Convert adj, features, labels from array or sparse matrix to
-    torch Tensor.
-
-    Parameters
-    ----------
-    adj : scipy.sparse.csr_matrix
-        the adjacency matrix.
-    features : scipy.sparse.csr_matrix
-        node features
-    labels : numpy.array
-        node labels
-    device : str
-        'cpu' or 'cuda'
-    """
-    if sp.issparse(adj):
-        adj = sparse_mx_to_torch_sparse_tensor(adj)
-    # if isinstance(adj,SparseTensor):
-    # else:
-    #     adj = torch.FloatTensor(adj)
-    if sp.issparse(features):
-        features = sparse_mx_to_torch_sparse_tensor(features)
-    # else:
-    #     features = torch.FloatTensor(np.array(features))
-
-    if labels is None:
-        return adj.to(device), features.to(device)
-    else:
-        labels = labels.long()
-        return adj.to(device), features.to(device), labels.to(device)
 
 
 def normalize_feature(mx):
@@ -334,10 +287,6 @@ def normalize_adj_tensor(adj, sparse=False):
     """
     device = adj.device
     if sparse:
-        # warnings.warn('If you find the training process is too slow, you can uncomment line 207 in deeprobust/graph/utils.py. Note that you need to install torch_sparse')
-        # TODO if this is too slow, uncomment the following code,
-        # but you need to install torch_scatter
-        # return normalize_sparse_tensor(adj)
         adj = to_scipy(adj)
         mx = normalize_adj(adj)
         return sparse_mx_to_torch_sparse_tensor(mx).to(device)

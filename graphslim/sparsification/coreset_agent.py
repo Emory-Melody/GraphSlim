@@ -46,7 +46,8 @@ def router_select(data, args):
         for i in tqdm(range(args.runs)):
             seed_everything(args.seed + i)
             model.fit_with_val(feat_selected, adj_selected, data,
-                               train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
+                               train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True,
+                               reduced=True)
 
             # Full graph
             # interface: model.test(full_data)

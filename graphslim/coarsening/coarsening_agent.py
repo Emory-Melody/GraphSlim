@@ -6,13 +6,14 @@ import torch
 import torch.nn.functional as F
 from pygsp import graphs
 from torch_geometric.utils import to_dense_adj
+from tqdm import trange
 
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
 from graphslim.dataset.convertor import pyg2gsp
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import GCN
-from graphslim.utils import one_hot, seed_everything
+from graphslim.utils import one_hot, seed_everything, accuracy
 
 
 def router_coarse(data, args):
@@ -47,7 +48,7 @@ def router_coarse(data, args):
         #     np.save(f'dataset/output/coreset/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
         #             idx_selected)
 
-        for i in tqdm(range(args.runs)):
+        for i in trange(args.runs):
             seed_everything(args.seed + i)
             model.fit_with_val(feat_selected, adj_selected, data,
                                train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
@@ -84,7 +85,7 @@ def router_coarse(data, args):
         if args.save:
             save_reduced(adj_selected, feat_selected, data.labels_syn, args)
 
-        for i in tqdm(range(args.runs)):
+        for i in trange(args.runs):
             seed_everything(args.seed + i)
             model.fit_with_val(feat_selected, adj_selected, data,
                                train_iters=args.epochs, normalize=True, verbose=False, val=True, reduced=True)

@@ -6,7 +6,7 @@ from graphslim.dataset import *
 args = cli(standalone_mode=False)
 
 graph = get_dataset(args.dataset, args)
-agent = GCond(args.setting, graph, args)
+agent = GCond(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.train(graph)
-evaluator = Evaluator(reduced_graph, args)
-evaluator.train('GCN')
+evaluator = Evaluator(args)
+evaluator.evaluate(reduced_graph, 'GCN')

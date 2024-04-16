@@ -19,8 +19,8 @@ class GCN(nn.Module):
         self.device = device
         self.nfeat = nfeat
         self.nclass = nclass
-
         self.layers = nn.ModuleList([])
+        self.loss = None
 
         if nlayers == 1:
             self.layers.append(GraphConvolution(nfeat, nclass, with_bias=with_bias))
@@ -104,19 +104,16 @@ class GCN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def fit_with_val(self, features, adj, data, labels=None, train_iters=200, initialize=True, verbose=False,
-                     normalize=True,
-                     val=False,
-                     reduced=False, **kwargs):
-        if initialize:
-            self.reset_parameters()
+    def fit_with_val(self, data, train_iters=200, verbose=False,
+                     normalize=True, setting='trans', reduced=False, reindex=False,
+                     **kwargs):
 
-        adj = my_to_tensor(adj, device=self.device) if not isinstance(adj, torch.Tensor) else adj.to(self.device)
-        features = my_to_tensor(features, device=self.device) if not isinstance(features,
-                                                                                torch.Tensor) else features.to(
-            self.device)
-
-        self.adj_norm = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj)) if normalize else adj
+        self.reset_parameters()
+        if reduced:
+            adj, features, labels = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, device=self.device)
+        else:
+            adj, features, labels = to_tensor(data.adj_full, data.feat_full, data.labels_full, device=self.device)
+        self.adj_norm = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
         self.features = features
 
         if len(data.labels_full.shape) > 1:
@@ -126,21 +123,13 @@ class GCN(nn.Module):
             self.multi_label = False
             self.loss = F.nll_loss
 
-        labels = data.labels_full
-        data.labels_full = labels.float() if self.multi_label else labels
-
-        self._train_with_val(data, train_iters, verbose, adj_val=val, reduced=reduced, **kwargs)
-
-    def _train_with_val(self, data, train_iters, verbose, adj_val=False, reindexed_trainset=False, reduced=False):
         # TODO: we can have two strategies:
         #  1) validate on the original validation set,
         #  2) validate on all the nodes except for test set
         if reduced:
-            reindexed_trainset = True
+            reindex = True
 
-        labels_val = torch.LongTensor(data.labels_val).to(self.device)
-        labels_train = torch.LongTensor(data.labels_syn).to(self.device) if reduced else torch.LongTensor(
-            data.labels_train).to(self.device)
+        labels_val = data.labels_val.long().to(self.device)
 
         if verbose:
             print('=== training gcn model ===')
@@ -151,21 +140,22 @@ class GCN(nn.Module):
         #  1) validate on the original validation set,
         #  2) validate on all the nodes except for test set
         # ====only for inductive setting when evaluate the reduced graph====#
-        if adj_val:
+        if setting == 'ind':
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
-        adj_full_norm = normalize_adj_tensor(adj_full, sparse=True)
+        adj_full_norm = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
+
+        self.train()
         for i in range(train_iters):
             if i == train_iters // 2:
                 lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
-            self.train()
             optimizer.zero_grad()
             output = self.forward(self.features, self.adj_norm)
-            loss_train = self.loss(output if reindexed_trainset else output[data.idx_train], labels_train)
+            loss_train = self.loss(output if reindex else output[data.idx_train], labels)
 
             loss_train.backward()
             optimizer.step()
@@ -177,7 +167,7 @@ class GCN(nn.Module):
                 self.eval()
                 output = self.forward(feat_full, adj_full_norm)
 
-                if adj_val:
+                if setting == 'ind':
                     # loss_val = F.nll_loss(output, labels_val)
                     acc_val = accuracy(output, labels_val)
                 else:

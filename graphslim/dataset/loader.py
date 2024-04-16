@@ -50,9 +50,9 @@ def get_dataset(name, args):
 class TransAndInd:
 
     def __init__(self, data):
-        self.class_dict = None
+        self.class_dict = None  # sample the training data per class when initializing synthetic graph
         self.samplers = None
-        self.class_dict2 = None
+        self.class_dict2 = None  # sample from the same class when training
         self.sparse_adj = None
         self.adj_full = None
         self.feat_full = None
@@ -100,6 +100,7 @@ class TransAndInd:
         return data
 
     def retrieve_class(self, c, num=256):
+        # change the initialization strategy here
         if self.class_dict is None:
             self.class_dict = {}
             for i in range(self.nclass):
@@ -156,9 +157,14 @@ class TransAndInd:
 
         if self.samplers is None:
             self.samplers = []
-            for l in range(2):
+            for l in range(args.nlayers):
                 layer_samplers = []
-                sizes = [15] if l == 0 else [10, 5]
+                if l == 0:
+                    sizes = [15]
+                elif l == 1:
+                    sizes = [10, 5]
+                else:
+                    sizes = [10, 5, 5]
                 for i in range(self.nclass):
                     node_idx = torch.LongTensor(self.class_dict2[i])
                     layer_samplers.append(NeighborSampler(adj,
