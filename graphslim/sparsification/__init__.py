@@ -1,1 +1,1 @@
-from .coreset_agent import router_select
+from .coreset_agent import CoreSet

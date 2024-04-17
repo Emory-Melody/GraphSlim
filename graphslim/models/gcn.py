@@ -110,9 +110,11 @@ class GCN(nn.Module):
 
         self.reset_parameters()
         if reduced:
-            adj, features, labels = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, device=self.device)
+            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, data.labels_val,
+                                                          device=self.device)
         else:
-            adj, features, labels = to_tensor(data.adj_full, data.feat_full, data.labels_full, device=self.device)
+            adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, data.labels_train,
+                                                          data.labels_val, device=self.device)
         self.adj_norm = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
         self.features = features
 
@@ -128,8 +130,6 @@ class GCN(nn.Module):
         #  2) validate on all the nodes except for test set
         if reduced:
             reindex = True
-
-        labels_val = data.labels_val.long().to(self.device)
 
         if verbose:
             print('=== training gcn model ===')

@@ -62,11 +62,10 @@ def load_config(args):
                    'affinity_GS', 'kron',
                    'gcond',
                    'kcenter', 'herding', 'random']), show_default=True)
-@click.option('--dis_metric', default='mse', show_default=True)
+@click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--one_step', is_flag=True, show_default=True)
-@click.option('--lr_model', default=0.01, show_default=True)
 @click.option('--dropout', default=0.0, show_default=True)
 # model specific args
 @click.option('--alpha', default=0, help='for appnp', show_default=True)
@@ -84,6 +83,7 @@ def cli(ctx, **kwargs):
         if not os.path.isdir(path):
             os.mkdir(path)
         args.path = path
+        args = load_config(args)
         return args
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)

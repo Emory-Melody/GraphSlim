@@ -108,13 +108,16 @@ def router_coarse(data, args):
 
 
 class Coarsen:
-    def __init__(self, args, **kwargs):
+    def __init__(self, setting, data, args, **kwargs):
+        self.setting = setting
         self.args = args
         self.device = args.device
+        # pass data for initialization
 
-    def train(self, data):
+    def reduce(self, data):
         args = self.args
-        device = self.device
+        setting = self.setting
+        # device = self.device
 
         cpu_data = copy.deepcopy(data)
 
@@ -132,8 +135,8 @@ class Coarsen:
 
         data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_train_labels
 
-        if self.args.save:
-            save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, self.args)
+        if args.save:
+            save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
 
         return data
 

@@ -9,7 +9,7 @@ from tqdm import trange
 from graphslim import utils
 from graphslim.dataset import *
 from graphslim.models import GCN, GAT
-from graphslim.utils import accuracy
+from graphslim.utils import accuracy, seed_everything
 
 
 class Evaluator:
@@ -143,7 +143,6 @@ class Evaluator:
 
     def test(self, data, model_type, verbose=True):
         res = []
-
         feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
         if verbose:
             print('======= testing %s' % model_type)
@@ -196,15 +195,15 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-            labels_train = torch.LongTensor(data.labels_train).cuda()
-            output = model.predict(data.feat_train, data.adj_train)
-            loss_train = F.nll_loss(output, labels_train)
-            acc_train = accuracy(output, labels_train)
-            if verbose:
-                print("Train set results:",
-                      "loss= {:.4f}".format(loss_train.item()),
-                      "accuracy= {:.4f}".format(acc_train.item()))
-            res.append(acc_train.item())
+            # labels_train = torch.LongTensor(data.labels_train).cuda()
+            # output = model.predict(data.feat_train, data.adj_train)
+            # loss_train = F.nll_loss(output, labels_train)
+            # acc_train = accuracy(output, labels_train)
+            # if verbose:
+            #     print("Train set results:",
+            #           "loss= {:.4f}".format(loss_train.item()),
+            #           "accuracy= {:.4f}".format(acc_train.item()))
+            # res.append(acc_train.item())
         return res
 
     def train_cross(self, verbose=True):
@@ -244,11 +243,12 @@ class Evaluator:
         res = []
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type)
         for i in trange(args.runs):
+            seed_everything(args.seed + i)
             res.append(self.test(data, model_type=model_type, verbose=False))
         res = np.array(res)
 
         if args.runs > 1:
-            print(f'Test Mean Accuracy: {repr([res.mean(0), res.std(0)])}')
+            print(f'Test Mean Accuracy: {res.mean(0)[0]} +/- {res.std(0)[0]}')
             return res
         else:
             return res[0][0]

@@ -21,7 +21,6 @@ class GCond:
         self.args = args
         self.device = args.device
         self.setting = setting
-        device = self.device
 
         # n = data.nclass * args.nsamples
 
@@ -34,9 +33,9 @@ class GCond:
 
         # from collections import Counter; print(Counter(data.labels_train))
 
-        self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
-        self.pge = PGE(nfeat=d, nnodes=n, device=device, args=args).to(device)
-        self.adj_syn = torch.zeros((n, n)).to(device)
+        self.feat_syn = nn.Parameter(torch.zeros(n, d).to(self.device))
+        self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
+        self.adj_syn = None
 
         self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
@@ -64,7 +63,7 @@ class GCond:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    def train(self, verbose=True):
+    def reduce(self, verbose=True):
         args = self.args
         data = self.data
         feat_syn, pge, labels_syn = self.feat_syn, self.pge, torch.from_numpy(self.data.labels_syn).to(self.device)
@@ -100,7 +99,7 @@ class GCond:
 
             model.initialize()
             model_parameters = list(model.parameters())
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr_model)
+            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
 
             for ol in range(outer_loop):

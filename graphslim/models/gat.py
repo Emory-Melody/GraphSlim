@@ -1,13 +1,14 @@
 """
 Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark/citation
 """
+from copy import deepcopy
+
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from copy import deepcopy
 
 from graphslim import utils
-from graphslim.evaluation import evaluate
+# from graphslim.evaluation import evaluate
 # from torch_geometric.nn import GATConv
 from graphslim.models.layers import GATConv
 
