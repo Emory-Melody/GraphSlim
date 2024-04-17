@@ -8,7 +8,6 @@ from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.models.gcn import GCN
 from graphslim.models.parametrized_adj import PGE
-from graphslim.models.sgc import SGC
 from graphslim.models.sgc_multi import SGC1
 from graphslim.utils import *
 
@@ -76,7 +75,9 @@ class GCond:
         self.feat_syn.data.copy_(feat_sub)
 
         adj = normalize_adj_tensor(adj, sparse=True)
-
+        # adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
+        #                    value=adj.values(), sparse_sizes=adj.size()).t()
+        #
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
 
@@ -89,8 +90,8 @@ class GCond:
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
-                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=args.dropout,
+                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                            nclass=data.nclass, dropout=args.dropout, weight_decay=args.weight_decay,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
 
@@ -184,7 +185,7 @@ class GCond:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [100, 200, 400, 600, 800, 1000]
+            eval_epochs = [100, 200, 400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
             data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn, labels_syn
 
             if verbose and it + 1 in eval_epochs:
@@ -277,7 +278,7 @@ class GCond:
         data, device = self.data, self.device
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 

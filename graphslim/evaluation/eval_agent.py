@@ -1,7 +1,6 @@
 from collections import Counter
 
 import numpy as np
-import scipy.sparse as sp
 import torch
 import torch.nn.functional as F
 from tqdm import trange
@@ -142,6 +141,7 @@ class Evaluator:
         return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
 
     def test(self, data, model_type, verbose=True):
+        args = self.args
         res = []
         feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
         if verbose:
@@ -152,8 +152,8 @@ class Evaluator:
             model_class = eval(model_type)
         weight_decay = 5e-4
 
-        model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
-                            weight_decay=weight_decay, nlayers=self.args.nlayers,
+        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout, lr=args.lr_test,
+                            weight_decay=weight_decay, nlayers=args.nlayers,
                             nclass=data.nclass, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
@@ -162,18 +162,16 @@ class Evaluator:
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
 
-        model.fit_with_val(data, train_iters=600, normalize=True, verbose=verbose, setting=self.args.setting,
+        model.fit_with_val(data, train_iters=1000, normalize=True, verbose=verbose, setting=args.setting,
                            reduced=True)
 
         model.eval()
         labels_test = data.labels_test.long().cuda()
 
-        if model_type == 'MLP':
-            output = model.predict_unnorm(data.feat_test, sp.eye(len(data.feat_test)))
-        else:
-            output = model.predict(data.feat_test, data.adj_test)
+        # if model_type == 'MLP':
+        #     output = model.predict(data.feat_test, sp.eye(len(data.feat_test),normadj))
+        output = model.predict(data.feat_test, data.adj_test)
 
-        # TODO: 不以数据集区分,而是transductive/inductive
         if self.args.setting == 'ind':
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)

@@ -96,11 +96,11 @@ def to_tensor(*vars, device='cpu'):
     tensor_list = []
     for var in vars:
         if sp.issparse(var):
-            var = sparse_mx_to_torch_sparse_tensor(var)
+            var = sparse_mx_to_torch_sparse_tensor(var).coalesce()
         elif isinstance(var, np.ndarray):
             var = torch.from_numpy(var)
         else:
-            var = var
+            pass
         tensor_list.append(var.to(device))
     return tensor_list
 
@@ -290,7 +290,7 @@ def normalize_adj_tensor(adj, sparse=False):
     if sparse:
         adj = to_scipy(adj)
         mx = normalize_adj(adj)
-        adj = sparse_mx_to_torch_sparse_tensor(mx).coalesce().to(device)
+        adj = sparse_mx_to_torch_sparse_tensor(mx).to(device).coalesce()
         adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
                            value=adj.values(), sparse_sizes=adj.size()).t()
         return adj

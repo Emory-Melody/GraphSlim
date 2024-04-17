@@ -94,7 +94,7 @@ class GCN(nn.Module):
         else:
             return F.log_softmax(x, dim=1)
 
-    def reset_parameters(self):
+    def initialize(self):
         """Initialize parameters of GCN.
         """
         for layer in self.layers:
@@ -107,7 +107,8 @@ class GCN(nn.Module):
                      normalize=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 
-        self.reset_parameters()
+        self.initialize()
+        # data for training
         if reduced:
             adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, data.labels_val,
                                                           device=self.device)
@@ -117,7 +118,10 @@ class GCN(nn.Module):
         else:
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
                                                           data.labels_val, device=self.device)
-        self.adj_norm = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
+        if normalize:
+            self.adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
+        else:
+            self.adj = adj
         self.features = features
 
         if len(data.labels_full.shape) > 1:
@@ -141,13 +145,14 @@ class GCN(nn.Module):
         # TODO: we can have two strategies:
         #  1) validate on the original validation set,
         #  2) validate on all the nodes except for test set
-        # ====only for inductive setting when evaluate the reduced graph====#
+        # data for validation
         if setting == 'ind':
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
-        adj_full_norm = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
+        if normalize:
+            adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
 
         self.train()
         for i in range(train_iters):
@@ -156,7 +161,7 @@ class GCN(nn.Module):
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             optimizer.zero_grad()
-            output = self.forward(self.features, self.adj_norm)
+            output = self.forward(self.features, self.adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
 
             loss_train.backward()
@@ -167,7 +172,7 @@ class GCN(nn.Module):
 
             with torch.no_grad():
                 self.eval()
-                output = self.forward(feat_full, adj_full_norm)
+                output = self.forward(feat_full, adj_full)
 
                 if setting == 'ind':
                     # loss_val = F.nll_loss(output, labels_val)
