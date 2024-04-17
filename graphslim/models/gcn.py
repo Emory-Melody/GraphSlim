@@ -1,6 +1,5 @@
 from copy import deepcopy
 
-import torch
 import torch.nn as nn
 import torch.optim as optim
 
@@ -206,46 +205,14 @@ class GCN(nn.Module):
         return acc_test.item()
 
     @torch.no_grad()
-    def predict(self, features=None, adj=None):
-        """By default, the inputs should be unnormalized adjacency
-        Parameters
-        ----------
-        features :
-            node features. If `features` and `adj` are not given, this function will use previous stored `features` and `adj` from training to make predictions.
-        adj :
-            adjcency matrix. If `features` and `adj` are not given, this function will use previous stored `features` and `adj` from training to make predictions.
-        Returns
-        -------
-        torch.FloatTensor
-            output (log probabilities) of GCN
-        """
+    def predict(self, features=None, adj=None, normadj=True):
 
         self.eval()
-        if features is None and adj is None:
-            return self.forward(self.features, self.adj_norm)
-        else:
-            if type(adj) is not torch.Tensor:
-                features, adj = to_tensor(features, adj, device=self.device)
+        features, adj = to_tensor(features, adj, device=self.device)
+        if normadj:
+            adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
-            self.features = features
-            if is_sparse_tensor(adj):
-                self.adj_norm = normalize_adj_tensor(adj, sparse=True)
-            else:
-                self.adj_norm = normalize_adj_tensor(adj)
-            return self.forward(self.features, self.adj_norm)
-
-    @torch.no_grad()
-    def predict_unnorm(self, features=None, adj=None):
-        self.eval()
-        if features is None and adj is None:
-            return self.forward(self.features, self.adj_norm)
-        else:
-            if type(adj) is not torch.Tensor:
-                features, adj = to_tensor(features, adj, device=self.device)
-
-            self.features = features
-            self.adj_norm = adj
-            return self.forward(self.features, self.adj_norm)
+        return self.forward(features, adj)
 
     # def _train_with_val2(self, labels, idx_train, idx_val, train_iters, verbose):
     #     if verbose:

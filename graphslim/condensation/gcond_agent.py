@@ -2,7 +2,6 @@
 from collections import Counter
 
 import torch.nn as nn
-from torch_sparse import SparseTensor
 
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.dataset.utils import save_reduced
@@ -33,7 +32,7 @@ class GCond:
 
         # from collections import Counter; print(Counter(data.labels_train))
 
-        self.feat_syn = nn.Parameter(torch.zeros(n, d).to(self.device))
+        self.feat_syn = nn.Parameter(torch.empty(n, d).to(self.device))
         self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
         self.adj_syn = None
 
@@ -43,7 +42,7 @@ class GCond:
         print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
-        self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
+        self.pge.reset_parameters()
 
     def generate_labels_syn(self, data):
         counter = Counter(data.labels_train.tolist())
@@ -66,7 +65,7 @@ class GCond:
     def reduce(self, verbose=True):
         args = self.args
         data = self.data
-        feat_syn, pge, labels_syn = self.feat_syn, self.pge, torch.from_numpy(self.data.labels_syn).to(self.device)
+        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
         # idx_train = data.idx_train
 
@@ -78,21 +77,19 @@ class GCond:
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
-        adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
-                           value=adj._values(), sparse_sizes=adj.size()).t()
-
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
 
-        for it in range(args.epochs + 1):
+        for it in range(args.epochs):
+            seed_everything(args.seed + it)
             if args.dataset in ['ogbn-arxiv']:
-                model = SGC1(nfeat=feat_syn.shape[1], nhid=self.args.hidden,
+                model = SGC1(nfeat=feat_syn.shape[1], nhid=args.hidden,
                              dropout=0.0, with_bn=False,
                              weight_decay=0e-4, nlayers=2,
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
-                model = SGC(nfeat=data.feat_train.shape[1], nhid=args.hidden,
+                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
                             nclass=data.nclass, dropout=args.dropout,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
@@ -145,26 +142,30 @@ class GCond:
                 # if args.alpha > 0:
                 #     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
                 # else:
-                loss_reg = torch.tensor(0)
+                # loss_reg = torch.tensor(0)
 
-                loss = loss + loss_reg
+                # loss = loss + loss_reg
 
                 # update sythetic graph
                 self.optimizer_feat.zero_grad()
                 self.optimizer_pge.zero_grad()
                 loss.backward()
-                if ol % 50 < 10:
+                if args.one_step:
+                    self.optimizer_feat.step()
                     self.optimizer_pge.step()
                 else:
-                    self.optimizer_feat.step()
+                    if ol < outer_loop // 4:
+                        self.optimizer_pge.step()
+                    else:
+                        self.optimizer_feat.step()
 
-                if args.debug and ol % 5 == 0:
-                    print('Gradient matching loss:', loss.item())
+                # if verbose and ol % 5 == 0:
+                #     print('Gradient matching loss:', loss.item())
 
-                if ol == outer_loop - 1:
-                    # print('loss_reg:', loss_reg.item())
-                    # print('Gradient matching loss:', loss.item())
-                    break
+                # if ol == outer_loop - 1:
+                #     # print('loss_reg:', loss_reg.item())
+                #     # print('Gradient matching loss:', loss.item())
+                #     break
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
@@ -179,28 +180,28 @@ class GCond:
                     optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
-            if it % 50 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it, loss_avg))
+            if verbose and (it + 1) % 100 == 0:
+                print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # eval_epochs = [100, 200, 400, 600, 800, 1000]
-            #
-            # if verbose and it in eval_epochs:
-            #     # if verbose and (it+1) % 50 == 0:
-            #     res = []
-            #     # for i in range(args.runs):
-            #     if self.setting == 'trans':
-            #         res.append(self.test_with_val_trans(verbose=False))
-            #     else:
-            #         res.append(self.test_with_val_ind(verbose=False))
-            #
-            # res = np.array(res)
-            # print('Test Accuracy and Std:',
-            #       repr([res.mean(0), res.std(0)]))
+            eval_epochs = [100, 200, 400, 600, 800, 1000]
+            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn, labels_syn
 
-        data.adj_syn, data.feat_syn, data.labels_syn = adj_syn, feat_syn, labels_syn
+            if verbose and it + 1 in eval_epochs:
+                # if verbose and (it+1) % 50 == 0:
+                res = []
+                for i in range(3):
+                    if self.setting == 'trans':
+                        res.append(self.test_with_val_trans(verbose=False))
+                    else:
+                        res.append(self.test_with_val_ind(verbose=False))
+
+                res = np.array(res)
+                print('Test Accuracy and Std:',
+                      repr([res.mean(0), res.std(0)]))
+
         if args.save:
-            save_reduced(adj_syn, feat_syn, labels_syn, args)
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return data
 
     def cross_architecture_eval(self):
@@ -274,23 +275,20 @@ class GCond:
         res = []
 
         data, device = self.data, self.device
-        feat_syn, pge = self.feat_syn.detach(), self.pge
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
-
-        adj_syn = pge.inference(feat_syn)
 
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
-        model.fit_with_val(feat_syn, adj_syn, data.labels_syn,
+        model.fit_with_val(data,
                            train_iters=600, normalize=True, verbose=False, setting='trans', reduced=True)
 
         model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
+        labels_test = data.labels_test.long().to(self.args.device)
         output = model.predict(data.feat_full, data.adj_full)
 
         # labels_train = torch.LongTensor(data.labels_train).cuda()
@@ -316,25 +314,20 @@ class GCond:
         res = []
 
         data, device = self.data, self.device
-        feat_syn, pge = self.feat_syn.detach(), self.pge
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 
-        adj_syn = pge.inference(feat_syn)
-
-        self.data.adj_syn = adj_syn
-
-        model.fit_with_val(feat_syn, adj_syn, data.labels_syn,
+        model.fit_with_val(data,
                            train_iters=600, normalize=True, verbose=False, setting='ind', reduced=True)
 
         model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
+        labels_test = data.labels_test.long().to(self.args.device)
 
         output = model.predict(data.feat_test, data.adj_test)
 
-        loss_test = F.nll_loss(output, labels_test)
+        # loss_test = F.nll_loss(output, labels_test)
         acc_test = accuracy(output, labels_test)
         res.append(acc_test.item())
         if verbose:

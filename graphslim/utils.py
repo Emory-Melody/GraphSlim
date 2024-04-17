@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
+from torch_sparse import SparseTensor
 
 
 # from deeprobust.graph.utils import *
@@ -289,7 +290,11 @@ def normalize_adj_tensor(adj, sparse=False):
     if sparse:
         adj = to_scipy(adj)
         mx = normalize_adj(adj)
-        return sparse_mx_to_torch_sparse_tensor(mx).to(device)
+        adj = sparse_mx_to_torch_sparse_tensor(mx).to(device)
+        adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
+                           value=adj._values(), sparse_sizes=adj.size()).t()
+        return adj
+
     else:
         mx = adj + torch.eye(adj.shape[0]).to(device)
         rowsum = mx.sum(1)

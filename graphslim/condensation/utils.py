@@ -1,4 +1,4 @@
-from utils import *
+import torch
 
 def match_loss(gw_syn, gw_real, args, device):
     dis = torch.tensor(0.0).to(device)

@@ -45,7 +45,7 @@ def load_config(args):
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--runs', default=10, show_default=True)
-@click.option('--hidden', '-H', default=64, show_default=True)
+@click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--epochs', '--eps', default=400, show_default=True)
 @click.option('--early_stopping', '-E', default=10, show_default=True)
 @click.option('--lr', default=0.01, show_default=True)
@@ -55,7 +55,7 @@ def load_config(args):
 @click.option('--seed', default=42, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--save', is_flag=True, show_default=True)
-@click.option('--debug', is_flag=True, show_default=True)
+@click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
