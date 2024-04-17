@@ -72,7 +72,7 @@ class GCond:
         syn_class_indices = self.syn_class_indices
 
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat(features)
+        feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
 
         adj = normalize_adj_tensor(adj, sparse=True)
@@ -118,7 +118,7 @@ class GCond:
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):
                     batch_size, n_id, adjs = data.retrieve_class_sampler(
-                        c, adj, transductive=True if args.setting == 'trans' else False, args=args)
+                        c, adj, args)
                     if args.nlayers == 1:
                         adjs = [adjs]
 
@@ -216,7 +216,7 @@ class GCond:
         agent = Evaluator(data, args, device='cuda')
         agent.train_cross()
 
-    def get_sub_adj_feat(self, features):
+    def get_sub_adj_feat(self):
         data = self.data
         args = self.args
         idx_selected = []
@@ -228,7 +228,7 @@ class GCond:
             tmp = list(tmp)
             idx_selected = idx_selected + tmp
         idx_selected = np.array(idx_selected).reshape(-1)
-        features = features[idx_selected]
+        features = data.feat_train[idx_selected]
         args.knnsamples = 3
         adj_knn = torch.zeros((self.nnodes_syn, self.nnodes_syn)).to(self.device)
 

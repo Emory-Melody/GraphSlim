@@ -290,9 +290,9 @@ def normalize_adj_tensor(adj, sparse=False):
     if sparse:
         adj = to_scipy(adj)
         mx = normalize_adj(adj)
-        adj = sparse_mx_to_torch_sparse_tensor(mx).to(device)
-        adj = SparseTensor(row=adj._indices()[0], col=adj._indices()[1],
-                           value=adj._values(), sparse_sizes=adj.size()).t()
+        adj = sparse_mx_to_torch_sparse_tensor(mx).coalesce().to(device)
+        adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
+                           value=adj.values(), sparse_sizes=adj.size()).t()
         return adj
 
     else:

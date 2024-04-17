@@ -2,7 +2,7 @@
 import numpy as np
 import torch
 from pygsp import graphs
-from scipy.sparse import csr_matrix
+from scipy.sparse import coo_matrix
 from torch_geometric.utils import to_undirected, to_dense_adj
 
 
@@ -18,10 +18,9 @@ def csr2ei(adjacency_matrix_csr):
 
 
 def ei2csr(edge_index, num_nodes):
-    edge_index = edge_index.t()
-    edge_index_np = edge_index.numpy()
-    adjacency_matrix_csr = csr_matrix((np.ones(edge_index_np.shape[1]), (edge_index_np[0], edge_index_np[1])),
-                                      shape=(num_nodes, num_nodes))
+    edge_index = edge_index.numpy()
+    scoo = coo_matrix((np.ones_like(edge_index[0]), (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes))
+    adjacency_matrix_csr = scoo.tocsr()
     return adjacency_matrix_csr
 
 # class Pyg2Dpr(Dataset):

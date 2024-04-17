@@ -1,18 +1,20 @@
 """multiple transformaiton and multiple propagation"""
 import math
+from copy import deepcopy
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch_sparse
-from copy import deepcopy
 from torch.nn.modules.module import Module
 from torch.nn.parameter import Parameter
 
 from graphslim import utils
+from graphslim.models.sgc import SGC
 
 
-class SGC1(nn.Module):
+class SGC1(SGC):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  ntrans=2, with_bias=True, with_bn=False, device=None):

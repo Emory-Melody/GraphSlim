@@ -1,12 +1,7 @@
+import numpy as np
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
-import torch
-import torch.optim as optim
-from torch.nn.parameter import Parameter
-from torch.nn.modules.module import Module
-from itertools import product
-import numpy as np
 
 
 class PGE(nn.Module):

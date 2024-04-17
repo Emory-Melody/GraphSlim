@@ -15,6 +15,7 @@ def splits(data, exp):
     if not hasattr(data, 'train_mask'):
         indices = []
         for i in range(num_classes):
+            data.y = data.y.reshape(-1)
             index = (data.y == i).nonzero().view(-1)
             index = index[torch.randperm(index.size(0))]
             indices.append(index)

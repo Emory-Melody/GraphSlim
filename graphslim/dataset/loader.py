@@ -109,11 +109,11 @@ class TransAndInd:
         idx = idx[self.class_dict['class_%s' % c]]
         return np.random.permutation(idx)[:num]
 
-    def retrieve_class_sampler(self, c, adj, transductive, num=256, args=None):
+    def retrieve_class_sampler(self, c, adj, args, num=256):
         if self.class_dict2 is None:
             self.class_dict2 = {}
             for i in range(self.nclass):
-                if transductive:
+                if args.setting == 'ind':
                     idx = self.idx_train[self.labels_train == i]
                 else:
                     idx = np.arange(len(self.labels_train))[self.labels_train == i]
@@ -138,7 +138,7 @@ class TransAndInd:
                 self.samplers.append(NeighborSampler(adj,
                                                      node_idx=node_idx,
                                                      sizes=sizes, batch_size=num,
-                                                     num_workers=12, return_e_id=False,
+                                                     num_workers=8, return_e_id=False,
                                                      num_nodes=adj.size(0),
                                                      shuffle=True))
         batch = np.random.permutation(self.class_dict2[c])[:num]
