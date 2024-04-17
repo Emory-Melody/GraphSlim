@@ -187,6 +187,7 @@ class GCond:
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
             eval_epochs = [100, 200, 400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
             data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn, labels_syn
+            self.data = data
 
             if verbose and it + 1 in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
