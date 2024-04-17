@@ -34,7 +34,7 @@ class CoreSet:
         if self.setting == 'trans':
             model.fit_with_val(data, train_iters=600, verbose=True, setting='trans')
             # model.test(data, verbose=True)
-            embeds = model.predict().detach()
+            embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.agent(embeds, data, args)
 
@@ -61,20 +61,11 @@ class CoreSet:
 
         if self.setting == 'ind':
             model.fit_with_val(data, train_iters=600, normalize=True,
-                               verbose=False, setting='ind', reindex=True)
+                               verbose=True, setting='ind', reindex=True)
 
             model.eval()
-            labels_test = data.labels_test.long().to(args.device)
-            feat_test, adj_test = data.feat_test, data.adj_test
 
-            embeds = model.predict().detach()
-
-            output = model.predict(feat_test, adj_test)
-            loss_test = F.nll_loss(output, labels_test)
-            acc_test = accuracy(output, labels_test)
-            print("Test set results:",
-                  "loss= {:.4f}".format(loss_test.item()),
-                  "accuracy= {:.4f}".format(acc_test.item()))
+            embeds = model.predict(data.feat_train, data.adj_train).detach()
 
             idx_selected = self.agent(embeds, data, args)
 
@@ -112,18 +103,13 @@ def prepare_select(data, args):
     else:
         idx_train = data.idx_train
     labels_train = data.labels_train
-    d = data.feat_train.shape[1]
-    counter = Counter(data.labels_train)
+    # d = data.feat_train.shape[1]
+    counter = Counter(data.labels_train.tolist())
     # n = len(data.labels_train)
     sorted_counter = sorted(counter.items(), key=lambda x: x[1])
     sum_ = 0
     labels_syn = []
     for ix, (c, num) in enumerate(sorted_counter):
-        # if ix == len(sorted_counter) - 1:
-        #     num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
-        #     self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-        #     labels_syn += [c] * num_class_dict[c]
-        # else:
         num_class_dict[c] = max(int(num * args.reduction_rate), 1)
         sum_ += num_class_dict[c]
         syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
