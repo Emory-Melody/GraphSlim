@@ -151,9 +151,8 @@ class Evaluator:
         else:
             model_class = eval(model_type)
 
-        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=0, lr=args.lr_test,
-                            weight_decay=5e-4, nlayers=args.nlayers,
-                            nclass=data.nclass, device=self.device).to(self.device)
+        model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass, nlayers=args.nlayers,
+                            dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
         # if self.args.dataset in ['ogbn-arxiv', 'arxiv']:
@@ -245,7 +244,7 @@ class Evaluator:
             res.append(self.test(data, model_type=model_type, verbose=False))
         res = np.array(res)
 
-        print(f'Test Mean Accuracy: {res.mean(0)[0]} +/- {res.std(0)[0]}')
+        print(f'Test Mean Accuracy: {100 * res.mean(0)[0]:.2f} +/- {100 * res.std(0)[0]:.2f}')
         return res
         # else:
         #     return res[0][0]

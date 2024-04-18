@@ -7,12 +7,12 @@ from graphslim.models.layers import GraphConvolution
 from graphslim.utils import *
 
 
-class GCN(nn.Module):
+class BaseGNN(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  with_relu=True, with_bias=True, with_bn=False, device=None):
 
-        super(GCN, self).__init__()
+        super(BaseGNN, self).__init__()
 
         assert device is not None, "Please specify 'device'!"
         self.device = device
@@ -20,19 +20,6 @@ class GCN(nn.Module):
         self.nclass = nclass
         self.layers = nn.ModuleList([])
         self.loss = None
-
-        if nlayers == 1:
-            self.layers.append(GraphConvolution(nfeat, nclass, with_bias=with_bias))
-        else:
-            if with_bn:
-                self.bns = torch.nn.ModuleList()
-                self.bns.append(nn.BatchNorm1d(nhid))
-            self.layers.append(GraphConvolution(nfeat, nhid, with_bias=with_bias))
-            for i in range(nlayers - 2):
-                self.layers.append(GraphConvolution(nhid, nhid, with_bias=with_bias))
-                if with_bn:
-                    self.bns.append(nn.BatchNorm1d(nhid))
-            self.layers.append(GraphConvolution(nhid, nclass, with_bias=with_bias))
 
         self.dropout = dropout
         self.lr = lr
@@ -50,6 +37,15 @@ class GCN(nn.Module):
         self.adj_norm = None
         self.features = None
         self.multi_label = None
+
+    def initialize(self):
+        """Initialize parameters of GCN.
+        """
+        for layer in self.layers:
+            layer.reset_parameters()
+        if self.with_bn:
+            for bn in self.bns:
+                bn.reset_parameters()
 
     def forward(self, x, adj):
 
@@ -80,29 +76,6 @@ class GCN(nn.Module):
             return torch.sigmoid(x)
         else:
             return F.log_softmax(x, dim=1)
-
-    def forward_sampler_syn(self, x, adjs):
-        for ix, (adj) in enumerate(adjs):
-            x = self.layers[ix](x, adj)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                if self.with_relu:
-                    x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
-
-        if self.multi_label:
-            return torch.sigmoid(x)
-        else:
-            return F.log_softmax(x, dim=1)
-
-    def initialize(self):
-        """Initialize parameters of GCN.
-        """
-        for layer in self.layers:
-            layer.reset_parameters()
-        if self.with_bn:
-            for bn in self.bns:
-                bn.reset_parameters()
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
                      normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
@@ -225,6 +198,39 @@ class GCN(nn.Module):
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         return self.forward(features, adj)
+
+
+class GCN(BaseGNN):
+    def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
+                 with_relu=True, with_bias=True, with_bn=False, device=None):
+        super(GCN, self).__init__(nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
+                                  with_relu=True, with_bias=True, with_bn=False, device=device)
+        if nlayers == 1:
+            self.layers.append(GraphConvolution(nfeat, nclass, with_bias=with_bias))
+        else:
+            if with_bn:
+                self.bns = torch.nn.ModuleList()
+                self.bns.append(nn.BatchNorm1d(nhid))
+            self.layers.append(GraphConvolution(nfeat, nhid, with_bias=with_bias))
+            for i in range(nlayers - 2):
+                self.layers.append(GraphConvolution(nhid, nhid, with_bias=with_bias))
+                if with_bn:
+                    self.bns.append(nn.BatchNorm1d(nhid))
+            self.layers.append(GraphConvolution(nhid, nclass, with_bias=with_bias))
+
+    # def forward_sampler_syn(self, x, adjs):
+    #     for ix, (adj) in enumerate(adjs):
+    #         x = self.layers[ix](x, adj)
+    #         if ix != len(self.layers) - 1:
+    #             x = self.bns[ix](x) if self.with_bn else x
+    #             if self.with_relu:
+    #                 x = F.relu(x)
+    #             x = F.dropout(x, self.dropout, training=self.training)
+    #
+    #     if self.multi_label:
+    #         return torch.sigmoid(x)
+    #     else:
+    #         return F.log_softmax(x, dim=1)
 
     # def _train_with_val2(self, labels, idx_train, idx_val, train_iters, verbose):
     #     if verbose:

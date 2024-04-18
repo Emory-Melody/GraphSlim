@@ -239,3 +239,163 @@ class GATConv(MessagePassing):
         return '{}({}, {}, heads={})'.format(self.__class__.__name__,
                                              self.in_channels,
                                              self.out_channels, self.heads)
+
+
+class SageConvolution(torch.nn.Module):
+
+    def __init__(self, in_features, out_features, with_bias=True, root_weight=False):
+        super(SageConvolution, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.weight_l = Parameter(torch.FloatTensor(in_features, out_features))
+        self.bias_l = Parameter(torch.FloatTensor(out_features))
+        self.weight_r = Parameter(torch.FloatTensor(in_features, out_features))
+        self.bias_r = Parameter(torch.FloatTensor(out_features))
+        self.reset_parameters()
+        self.root_weight = root_weight
+        # self.weight = Parameter(torch.FloatTensor(out_features, in_features))
+        # self.linear = torch.nn.Linear(self.in_features, self.out_features)
+
+    def reset_parameters(self):
+        # stdv = 1. / math.sqrt(self.weight.size(1))
+        stdv = 1. / math.sqrt(self.weight_l.T.size(1))
+        self.weight_l.data.uniform_(-stdv, stdv)
+        self.bias_l.data.uniform_(-stdv, stdv)
+
+        stdv = 1. / math.sqrt(self.weight_r.T.size(1))
+        self.weight_r.data.uniform_(-stdv, stdv)
+        self.bias_r.data.uniform_(-stdv, stdv)
+
+    def forward(self, input, adj, size=None):
+        """ Graph Convolutional Layer forward function
+        """
+        if input.data.is_sparse:
+            support = torch.spmm(input, self.weight_l)
+        else:
+            support = torch.mm(input, self.weight_l)
+        if isinstance(adj, SparseTensor):
+            output = matmul(adj, support)
+        else:
+            output = torch.spmm(adj, support)
+        output = output + self.bias_l
+
+        if self.root_weight:
+            if size is not None:
+                output = output + input[:size[1]] @ self.weight_r + self.bias_r
+            else:
+                output = output + input @ self.weight_r + self.bias_r
+        else:
+            output = output
+
+        return output
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' \
+            + str(self.in_features) + ' -> ' \
+            + str(self.out_features) + ')'
+
+
+class ChebConvolution(torch.nn.Module):
+    """Simple GCN layer, similar to https://github.com/tkipf/pygcn
+    """
+
+    def __init__(self, in_features, out_features, with_bias=True, single_param=True, K=2):
+        """set single_param to True to alleivate the overfitting issue"""
+        super(ChebConvolution, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.lins = torch.nn.ModuleList([
+            MyLinear(in_features, out_features, with_bias=False) for _ in range(K)])
+        # self.lins = torch.nn.ModuleList([
+        #    MyLinear(in_features, out_features, with_bias=True) for _ in range(K)])
+        if with_bias:
+            self.bias = Parameter(torch.Tensor(out_features))
+        else:
+            self.register_parameter('bias', None)
+        self.single_param = single_param
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        for lin in self.lins:
+            lin.reset_parameters()
+        zeros(self.bias)
+
+    def forward(self, input, adj, size=None):
+        """ Graph Convolutional Layer forward function
+        """
+        # support = torch.mm(input, self.weight_l)
+        x = input
+        Tx_0 = x[:size[1]] if size is not None else x
+        Tx_1 = x  # dummy
+        output = self.lins[0](Tx_0)
+
+        if len(self.lins) > 1:
+            if isinstance(adj, SparseTensor):
+                Tx_1 = matmul(adj, x)
+            else:
+                Tx_1 = torch.spmm(adj, x)
+
+            if self.single_param:
+                output = output + self.lins[0](Tx_1)
+            else:
+                output = output + self.lins[1](Tx_1)
+
+        for lin in self.lins[2:]:
+            if self.single_param:
+                lin = self.lins[0]
+            if isinstance(adj, SparseTensor):
+                Tx_2 = matmul(adj, Tx_1)
+            else:
+                Tx_2 = torch.spmm(adj, Tx_1)
+            Tx_2 = 2. * Tx_2 - Tx_0
+            output = output + lin.forward(Tx_2)
+            Tx_0, Tx_1 = Tx_1, Tx_2
+
+        if self.bias is not None:
+            return output + self.bias
+        else:
+            return output
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' \
+            + str(self.in_features) + ' -> ' \
+            + str(self.out_features) + ')'
+
+
+class MyLinear(torch.nn.Module):
+    """Simple Linear layer, modified from https://github.com/tkipf/pygcn
+    """
+
+    def __init__(self, in_features, out_features, with_bias=True):
+        super(MyLinear, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.weight = Parameter(torch.empty(in_features, out_features))
+        if with_bias:
+            self.bias = Parameter(torch.zeros(out_features))
+        else:
+            self.register_parameter('bias', None)
+        self.reset_parameters()
+
+    def reset_parameters(self):
+        # stdv = 1. / math.sqrt(self.weight.size(1))
+        stdv = 1. / math.sqrt(self.weight.T.size(1))
+        self.weight.data.uniform_(-stdv, stdv)
+        if self.bias is not None:
+            self.bias.data.uniform_(-stdv, stdv)
+
+    def forward(self, input):
+        if input.data.is_sparse:
+            support = torch.spmm(input, self.weight)
+        else:
+            support = torch.mm(input, self.weight)
+        output = support
+        if self.bias is not None:
+            return output + self.bias
+        else:
+            return output
+
+    def __repr__(self):
+        return self.__class__.__name__ + ' (' \
+            + str(self.in_features) + ' -> ' \
+            + str(self.out_features) + ')'

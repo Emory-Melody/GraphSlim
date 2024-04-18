@@ -47,6 +47,7 @@ def load_config(args):
 @click.option('--runs', default=10, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
+@click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--epochs', '--eps', default=400, show_default=True)
 @click.option('--early_stopping', '-E', default=10, show_default=True)
 @click.option('--lr', default=0.01, show_default=True)

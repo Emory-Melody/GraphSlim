@@ -63,7 +63,6 @@ class GCond:
         data = self.data
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
-        # idx_train = data.idx_train
 
         syn_class_indices = self.syn_class_indices
 
@@ -72,16 +71,14 @@ class GCond:
         self.feat_syn.data.copy_(feat_sub)
 
         adj = normalize_adj_tensor(adj, sparse=True)
-        # adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
-        #                    value=adj.values(), sparse_sizes=adj.size()).t()
-        #
+
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         # best_val = 0
 
         for it in range(args.epochs):
             # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv']:
+            if args.dataset in ['ogbn-arxiv', 'flickr', 'reddit']:
                 model = SGC1(nfeat=feat_syn.shape[1], nhid=args.hidden,
                              dropout=0.0, with_bn=False,
                              weight_decay=0e-4, nlayers=2,
@@ -165,11 +162,6 @@ class GCond:
 
                 # if verbose and ol % 5 == 0:
                 #     print('Gradient matching loss:', loss.item())
-
-                # if ol == outer_loop - 1:
-                #     # print('loss_reg:', loss_reg.item())
-                #     # print('Gradient matching loss:', loss.item())
-                #     break
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
@@ -275,7 +267,7 @@ class GCond:
             return 10, 1
             # return 10, 1
         if args.dataset in ['cora']:
-            return 20, 1
+            return 20, 10
         if args.dataset in ['citeseer']:
             return 20, 5  # at least 200 epochs
         else:

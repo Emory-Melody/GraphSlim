@@ -3,8 +3,10 @@ import os.path as osp
 import numpy as np
 import torch
 from ogb.nodeproppred import PygNodePropPredDataset
+from sklearn.preprocessing import StandardScaler
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit
 from torch_geometric.loader import NeighborSampler
+from torch_geometric.utils import to_undirected
 from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import ei2csr, csr2ei
@@ -38,10 +40,16 @@ def get_dataset(name, args):
             dataset = Amazon(root=path, name=name)
         elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv']:
             dataset = PygNodePropPredDataset(name, root=path)
-        else:
-            raise ValueError("Dataset name not recognized.")
+    else:
+        raise ValueError("Dataset name not recognized.")
     data = dataset[0]
     data = splits(data, args.split)
+    if name in ['ogbn-arxiv']:
+        data.edge_index = to_undirected(data.edge_index, data.num_nodes)
+        feat_train = data.x[data.idx_train]
+        scaler = StandardScaler()
+        scaler.fit(feat_train)
+        data.feat = scaler.transform(data.x)
 
     data = TransAndInd(data)
     return data
@@ -145,35 +153,35 @@ class TransAndInd:
         out = self.samplers[c].sample(batch)
         return out
 
-    def retrieve_class_multi_sampler(self, c, adj, transductive, num=256, args=None):
-        if self.class_dict2 is None:
-            self.class_dict2 = {}
-            for i in range(self.nclass):
-                if transductive:
-                    idx = self.idx_train[self.labels_train == i]
-                else:
-                    idx = np.arange(len(self.labels_train))[self.labels_train == i]
-                self.class_dict2[i] = idx
-
-        if self.samplers is None:
-            self.samplers = []
-            for l in range(args.nlayers):
-                layer_samplers = []
-                if l == 0:
-                    sizes = [15]
-                elif l == 1:
-                    sizes = [10, 5]
-                else:
-                    sizes = [10, 5, 5]
-                for i in range(self.nclass):
-                    node_idx = torch.LongTensor(self.class_dict2[i])
-                    layer_samplers.append(NeighborSampler(adj,
-                                                          node_idx=node_idx,
-                                                          sizes=sizes, batch_size=num,
-                                                          num_workers=12, return_e_id=False,
-                                                          num_nodes=adj.size(0),
-                                                          shuffle=True))
-                self.samplers.append(layer_samplers)
-        batch = np.random.permutation(self.class_dict2[c])[:num]
-        out = self.samplers[args.nlayers - 1][c].sample(batch)
-        return out
+    # def retrieve_class_multi_sampler(self, c, adj, transductive, num=256, args=None):
+    #     if self.class_dict2 is None:
+    #         self.class_dict2 = {}
+    #         for i in range(self.nclass):
+    #             if transductive:
+    #                 idx = self.idx_train[self.labels_train == i]
+    #             else:
+    #                 idx = np.arange(len(self.labels_train))[self.labels_train == i]
+    #             self.class_dict2[i] = idx
+    #
+    #     if self.samplers is None:
+    #         self.samplers = []
+    #         for l in range(args.nlayers):
+    #             layer_samplers = []
+    #             if l == 0:
+    #                 sizes = [15]
+    #             elif l == 1:
+    #                 sizes = [10, 5]
+    #             else:
+    #                 sizes = [10, 5, 5]
+    #             for i in range(self.nclass):
+    #                 node_idx = torch.LongTensor(self.class_dict2[i])
+    #                 layer_samplers.append(NeighborSampler(adj,
+    #                                                       node_idx=node_idx,
+    #                                                       sizes=sizes, batch_size=num,
+    #                                                       num_workers=12, return_e_id=False,
+    #                                                       num_nodes=adj.size(0),
+    #                                                       shuffle=True))
+    #             self.samplers.append(layer_samplers)
+    #     batch = np.random.permutation(self.class_dict2[c])[:num]
+    #     out = self.samplers[args.nlayers - 1][c].sample(batch)
+    #     return out
