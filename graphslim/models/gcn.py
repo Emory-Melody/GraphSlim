@@ -104,7 +104,7 @@ class GCN(nn.Module):
                 bn.reset_parameters()
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
-                     normalize=True, setting='trans', reduced=False, reindex=False,
+                     normadj=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 
         self.initialize()
@@ -118,7 +118,7 @@ class GCN(nn.Module):
         else:
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
                                                           data.labels_val, device=self.device)
-        if normalize:
+        if normadj:
             self.adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
         else:
             self.adj = adj
@@ -151,7 +151,7 @@ class GCN(nn.Module):
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
-        if normalize:
+        if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
 
         self.train()

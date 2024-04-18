@@ -1,14 +1,11 @@
-# import deeprobust.graph.utils as utils
 from collections import Counter
 
 import torch.nn as nn
 
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.dataset.utils import save_reduced
-from graphslim.evaluation.eval_agent import Evaluator
-from graphslim.models.gcn import GCN
-from graphslim.models.parametrized_adj import PGE
-from graphslim.models.sgc_multi import SGC1
+from graphslim.evaluation import Evaluator
+from graphslim.models import GCN, PGE, SGC1, SGC
 from graphslim.utils import *
 
 
@@ -90,7 +87,7 @@ class GCond:
                              nclass=data.nclass,
                              device=self.device).to(self.device)
             else:
-                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
                             nclass=data.nclass, dropout=args.dropout, weight_decay=args.weight_decay,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
@@ -171,7 +168,10 @@ class GCond:
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
                 adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
-                feat_syn_inner_norm = feat_syn_inner
+                if args.normalize_features:
+                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
+                else:
+                    feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
@@ -185,18 +185,15 @@ class GCond:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [100, 200, 400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn, labels_syn
+            eval_epochs = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn_inner, labels_syn
             self.data = data
 
             if verbose and it + 1 in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 res = []
                 for i in range(3):
-                    if self.setting == 'trans':
-                        res.append(self.test_with_val_trans(verbose=False))
-                    else:
-                        res.append(self.test_with_val_ind(verbose=False))
+                    res.append(self.test_with_val_trans(verbose=False, setting=args.setting))
 
                 res = np.array(res)
                 print('Test Accuracy and Std:',
@@ -273,68 +270,39 @@ class GCond:
         else:
             return 20, 1
 
-    def test_with_val_trans(self, verbose=True):
+    def test_with_val_trans(self, verbose=True, setting='trans'):
         res = []
 
         data, device = self.data, self.device
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
                     weight_decay=5e-4, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
+        # same for ind and trans when reduced
         model.fit_with_val(data,
-                           train_iters=600, normalize=True, verbose=False, setting='trans', reduced=True)
-
+                           train_iters=600, normadj=True, verbose=False, reduced=True)
         model.eval()
         labels_test = data.labels_test.long().to(self.args.device)
-        output = model.predict(data.feat_full, data.adj_full)
+        if setting == 'trans':
 
-        # labels_train = torch.LongTensor(data.labels_train).cuda()
-        # loss_train = F.nll_loss(output[data.idx_train], labels_train)
-        # acc_train = utils.accuracy(output[data.idx_train], labels_train)
-        # if verbose:
-        #     print("Train set results:",
-        #           "loss= {:.4f}".format(loss_train.item()),
-        #           "accuracy= {:.4f}".format(acc_train.item()))
-        # res.append(acc_train.item())
+            output = model.predict(data.feat_full, data.adj_full)
+            acc_test = accuracy(output[data.idx_test], labels_test)
 
-        # Full graph
-        loss_test = F.nll_loss(output[data.idx_test], labels_test)
-        acc_test = accuracy(output[data.idx_test], labels_test)
-        res.append(acc_test.item())
-        if verbose:
-            print("Test set results:",
-                  "loss= {:.4f}".format(loss_test.item()),
-                  "accuracy= {:.4f}".format(acc_test.item()))
-        return res
-
-    def test_with_val_ind(self, verbose=True):
-        res = []
-
-        data, device = self.data, self.device
-        # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=self.args.dropout,
-                    weight_decay=5e-4, nlayers=2,
-                    nclass=data.nclass, device=device).to(device)
-
-        model.fit_with_val(data,
-                           train_iters=600, normalize=True, verbose=False, setting='ind', reduced=True)
-
-        model.eval()
-        labels_test = data.labels_test.long().to(self.args.device)
-
-        output = model.predict(data.feat_test, data.adj_test)
-
-        # loss_test = F.nll_loss(output, labels_test)
-        acc_test = accuracy(output, labels_test)
+        else:
+            output = model.predict(data.feat_test, data.adj_test)
+            # loss_test = F.nll_loss(output, labels_test)
+            acc_test = accuracy(output, labels_test)
         res.append(acc_test.item())
         if verbose:
             print('Test Accuracy and Std:',
                   repr([res.mean(0), res.std(0)]))
+        return res
+
         # print(adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
 
         # if False:
@@ -356,4 +324,3 @@ class GCond:
         #               "loss= {:.4f}".format(loss_train.item()),
         #               "accuracy= {:.4f}".format(acc_train.item()))
         #     res.append(acc_train.item())
-        return res

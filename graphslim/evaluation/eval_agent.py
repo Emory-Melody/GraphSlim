@@ -150,10 +150,9 @@ class Evaluator:
             model_class = GCN
         else:
             model_class = eval(model_type)
-        weight_decay = 5e-4
 
-        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout, lr=args.lr_test,
-                            weight_decay=weight_decay, nlayers=args.nlayers,
+        model = model_class(nfeat=feat_syn.shape[1], nhid=args.hidden, dropout=0, lr=args.lr_test,
+                            weight_decay=5e-4, nlayers=args.nlayers,
                             nclass=data.nclass, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
@@ -162,7 +161,7 @@ class Evaluator:
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
 
-        model.fit_with_val(data, train_iters=1000, normalize=True, verbose=verbose, setting=args.setting,
+        model.fit_with_val(data, train_iters=600, normalize=True, verbose=verbose, setting=args.setting,
                            reduced=True)
 
         model.eval()
