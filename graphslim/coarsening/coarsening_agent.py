@@ -10,7 +10,7 @@ from tqdm import trange
 
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
-from graphslim.dataset.convertor import pyg2gsp
+from graphslim.dataset.convertor import pyg2gsp, csr2ei
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import GCN
 from graphslim.utils import one_hot, seed_everything, accuracy
@@ -121,17 +121,24 @@ class Coarsen:
 
         cpu_data = copy.deepcopy(data)
 
-        candidate, C_list, Gc_list = self.coarsening(pyg2gsp(data), 1 - args.reduction_rate, args.method)
-        # model = GCN(data.x.shape[1], args.hidden, data.nclass, lr=args.lr, weight_decay=args.weight_decay,
-        #             device=device).to(device)
-        coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_val_labels, coarsen_val_mask, coarsen_edge = self.process_coarsened(
-            cpu_data, candidate, C_list, Gc_list)
+        if args.setting == 'trans':
+            candidate, C_list, Gc_list = self.coarsening(pyg2gsp(data.edge_index), 1 - args.reduction_rate, args.method)
+            coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
+                cpu_data, candidate, C_list, Gc_list)
 
-        train_idx = np.nonzero(coarsen_train_mask.numpy())[0]
-        coarsen_features = coarsen_features[train_idx]
-        coarsen_edge = to_dense_adj(coarsen_edge)[0].numpy()
-        coarsen_edge = torch.from_numpy(coarsen_edge[np.ix_(train_idx, train_idx)])
-        coarsen_train_labels = coarsen_train_labels[train_idx]
+            train_idx = np.nonzero(coarsen_train_mask.numpy())[0]
+            coarsen_features = coarsen_features[train_idx]
+            coarsen_edge = to_dense_adj(coarsen_edge)[0].numpy()
+            coarsen_edge = torch.from_numpy(coarsen_edge[np.ix_(train_idx, train_idx)])
+            coarsen_train_labels = coarsen_train_labels[train_idx]
+        else:
+            candidate, C_list, Gc_list = self.coarsening(pyg2gsp(csr2ei(data.adj_train)), 1 - args.reduction_rate,
+                                                         args.method)
+            coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
+                cpu_data, candidate, C_list, Gc_list)
+
+            coarsen_edge = to_dense_adj(coarsen_edge)[0].numpy()
+            coarsen_edge = torch.from_numpy(coarsen_edge)
 
         data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_train_labels
 
@@ -249,9 +256,14 @@ class Coarsen:
     def process_coarsened(self, data, candidate, C_list, Gc_list):
         train_mask = data.train_mask
         val_mask = data.val_mask
-        labels = data.y
+
         n_classes = max(data.y) + 1
-        features = data.x
+        if self.args.setting == 'trans':
+            features = data.x
+            labels = data.y
+        else:
+            features = data.x[train_mask]
+            labels = data.y[train_mask]
         coarsen_node = 0
         number = 0
         coarsen_row = None
@@ -259,21 +271,21 @@ class Coarsen:
         coarsen_features = torch.Tensor([])
         coarsen_train_labels = torch.Tensor([])
         coarsen_train_mask = torch.Tensor([]).bool()
-        coarsen_val_labels = torch.Tensor([])
-        coarsen_val_mask = torch.Tensor([]).bool()
 
         while number < len(candidate):
             H = candidate[number]
             keep = H.info['orig_idx']
             H_features = features[keep]
             H_labels = labels[keep]
-            H_train_mask = train_mask[keep]
-            H_val_mask = val_mask[keep]
-            if len(H.info['orig_idx']) > 10 and torch.sum(H_train_mask) + torch.sum(H_val_mask) > 0:
+            if self.args.setting == "trans":
+                H_train_mask = train_mask[keep]
+            else:
+                H_train_mask = torch.ones(size=(len(H_labels),))
+
+            if len(H.info['orig_idx']) > 10 and torch.sum(H_train_mask) > 0:
                 train_labels = one_hot(H_labels, n_classes)
-                train_labels[~H_train_mask] = torch.Tensor([0 for _ in range(n_classes)])
-                val_labels = one_hot(H_labels, n_classes)
-                val_labels[~H_val_mask] = torch.Tensor([0 for _ in range(n_classes)])
+                if self.args.setting == "trans":
+                    train_labels[~H_train_mask] = torch.Tensor([0 for _ in range(n_classes)])
                 C = C_list[number]
                 Gc = Gc_list[number]
 
@@ -283,19 +295,10 @@ class Coarsen:
                 mix_mask = torch.sum(mix_label, dim=1)
                 new_train_mask[mix_mask > 1] = False
 
-                new_val_mask = torch.BoolTensor(np.sum(C.dot(val_labels), axis=1))
-                mix_label = torch.FloatTensor(C.dot(val_labels))
-                mix_label[mix_label > 0] = 1
-                mix_mask = torch.sum(mix_label, dim=1)
-                new_val_mask[mix_mask > 1] = False
-
                 coarsen_features = torch.cat([coarsen_features, torch.FloatTensor(C.dot(H_features))], dim=0)
                 coarsen_train_labels = torch.cat(
                     [coarsen_train_labels, torch.argmax(torch.FloatTensor(C.dot(train_labels)), dim=1).float()], dim=0)
                 coarsen_train_mask = torch.cat([coarsen_train_mask, new_train_mask], dim=0)
-                coarsen_val_labels = torch.cat(
-                    [coarsen_val_labels, torch.argmax(torch.FloatTensor(C.dot(val_labels)), dim=1).float()], dim=0)
-                coarsen_val_mask = torch.cat([coarsen_val_mask, new_val_mask], dim=0)
 
                 if coarsen_row is None:
                     coarsen_row = Gc.W.tocoo().row
@@ -307,19 +310,21 @@ class Coarsen:
                     coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
                 coarsen_node += Gc.W.shape[0]
 
-            elif torch.sum(H_train_mask) + torch.sum(H_val_mask) > 0:
+            elif torch.sum(H_train_mask) > 0:
 
                 coarsen_features = torch.cat([coarsen_features, H_features], dim=0)
                 coarsen_train_labels = torch.cat([coarsen_train_labels, H_labels.float()], dim=0)
                 coarsen_train_mask = torch.cat([coarsen_train_mask, H_train_mask], dim=0)
-                coarsen_val_labels = torch.cat([coarsen_val_labels, H_labels.float()], dim=0)
-                coarsen_val_mask = torch.cat([coarsen_val_mask, H_val_mask], dim=0)
 
                 if coarsen_row is None:
                     raise Exception('The graph does not need coarsening.')
                 else:
-                    current_row = H.W.tocoo().row + coarsen_node
-                    current_col = H.W.tocoo().col + coarsen_node
+                    if len(H.W.tocoo().row) == 0:
+                        current_row = np.array([coarsen_node])
+                        current_col = np.array([coarsen_node])
+                    else:
+                        current_row = H.W.tocoo().row + coarsen_node
+                        current_col = H.W.tocoo().col + coarsen_node
                     coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
                     coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
                 coarsen_node += H.W.shape[0]
@@ -329,9 +334,8 @@ class Coarsen:
 
         coarsen_edge = torch.from_numpy(np.array([coarsen_row, coarsen_col])).long()
         coarsen_train_labels = coarsen_train_labels.long()
-        coarsen_val_labels = coarsen_val_labels.long()
 
-        return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_val_labels, coarsen_val_mask, coarsen_edge
+        return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge
 
     def coarsen(
             self,

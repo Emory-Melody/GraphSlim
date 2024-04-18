@@ -6,8 +6,8 @@ from scipy.sparse import coo_matrix
 from torch_geometric.utils import to_undirected, to_dense_adj
 
 
-def pyg2gsp(data):
-    G = graphs.Graph(W=to_dense_adj(to_undirected(data.edge_index))[0])
+def pyg2gsp(edge_index):
+    G = graphs.Graph(W=to_dense_adj(to_undirected(edge_index))[0])
     return G
 
 
