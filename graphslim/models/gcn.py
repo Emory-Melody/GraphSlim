@@ -40,6 +40,7 @@ class GCN(nn.Module):
             self.weight_decay = 0
         else:
             self.weight_decay = weight_decay
+
         self.with_relu = with_relu
         self.with_bn = with_bn
         self.with_bias = with_bias
@@ -104,7 +105,7 @@ class GCN(nn.Module):
                 bn.reset_parameters()
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
-                     normadj=True, setting='trans', reduced=False, reindex=False,
+                     normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 
         self.initialize()
@@ -119,10 +120,10 @@ class GCN(nn.Module):
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
                                                           data.labels_val, device=self.device)
         if normadj:
-            self.adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
-        else:
-            self.adj = adj
-        self.features = features
+            adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
+
+        if normfeat:
+            features = F.normalize(features, dim=0)
 
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
@@ -153,6 +154,8 @@ class GCN(nn.Module):
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
+        if normfeat:
+            feat_full = F.normalize(feat_full, dim=0)
 
         self.train()
         for i in range(train_iters):
@@ -161,7 +164,7 @@ class GCN(nn.Module):
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             optimizer.zero_grad()
-            output = self.forward(self.features, self.adj)
+            output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
 
             loss_train.backward()
@@ -189,6 +192,7 @@ class GCN(nn.Module):
         if verbose:
             print('=== picking the best model according to the performance on validation ===')
         self.load_state_dict(weights)
+        return best_acc_val
 
     def test(self, data=None, verbose=False):
         """Evaluate GCN performance on test set.

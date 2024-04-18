@@ -161,7 +161,8 @@ class Evaluator:
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
 
-        model.fit_with_val(data, train_iters=600, normalize=True, verbose=verbose, setting=args.setting,
+        model.fit_with_val(data, train_iters=600, normadj=True, normfeat=self.args.normalize_features, verbose=verbose,
+                           setting=args.setting,
                            reduced=True)
 
         model.eval()
@@ -244,11 +245,10 @@ class Evaluator:
             res.append(self.test(data, model_type=model_type, verbose=False))
         res = np.array(res)
 
-        if args.runs > 1:
-            print(f'Test Mean Accuracy: {res.mean(0)[0]} +/- {res.std(0)[0]}')
-            return res
-        else:
-            return res[0][0]
+        print(f'Test Mean Accuracy: {res.mean(0)[0]} +/- {res.std(0)[0]}')
+        return res
+        # else:
+        #     return res[0][0]
         # print('Test/Train Mean Accuracy:',
         #       repr([res.mean(0), res.std(0)]))
         # final_res[model_type] = [res.mean(0), res.std(0)]

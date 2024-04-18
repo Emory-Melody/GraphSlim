@@ -45,6 +45,7 @@ def load_config(args):
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--runs', default=10, show_default=True)
+@click.option('--run_reduction', default=3, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--epochs', '--eps', default=400, show_default=True)
 @click.option('--early_stopping', '-E', default=10, show_default=True)

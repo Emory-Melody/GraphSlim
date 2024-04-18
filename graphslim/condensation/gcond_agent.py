@@ -77,9 +77,10 @@ class GCond:
         #
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
+        # best_val = 0
 
         for it in range(args.epochs):
-            seed_everything(args.seed + it)
+            # seed_everything(args.seed + it)
             if args.dataset in ['ogbn-arxiv']:
                 model = SGC1(nfeat=feat_syn.shape[1], nhid=args.hidden,
                              dropout=0.0, with_bn=False,
@@ -88,7 +89,7 @@ class GCond:
                              device=self.device).to(self.device)
             else:
                 model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=args.dropout, weight_decay=args.weight_decay,
+                            nclass=data.nclass, dropout=0, weight_decay=args.weight_decay,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
 
@@ -152,10 +153,15 @@ class GCond:
                     self.optimizer_feat.step()
                     self.optimizer_pge.step()
                 else:
-                    if ol < outer_loop // 4:
+                    if it % 50 < 10:
                         self.optimizer_pge.step()
                     else:
                         self.optimizer_feat.step()
+                # else:
+                #     if ol < outer_loop // 5:
+                #         self.optimizer_pge.step()
+                #     else:
+                #         self.optimizer_feat.step()
 
                 # if verbose and ol % 5 == 0:
                 #     print('Gradient matching loss:', loss.item())
@@ -186,18 +192,23 @@ class GCond:
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
             eval_epochs = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner, feat_syn_inner, labels_syn
-            self.data = data
+            # if it == 0:
+            data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
 
             if verbose and it + 1 in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 res = []
                 for i in range(3):
-                    res.append(self.test_with_val_trans(verbose=False, setting=args.setting))
+                    res.append(self.test_with_val(verbose=False, setting=args.setting))
 
                 res = np.array(res)
+                current_val = res.mean()
                 print('Test Accuracy and Std:',
-                      repr([res.mean(0), res.std(0)]))
+                      repr([current_val, res.std()]))
+
+                # if current_val > best_val:
+                #     best_val = current_val
+                #     data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
 
         if args.save:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
@@ -264,30 +275,31 @@ class GCond:
             return 10, 1
             # return 10, 1
         if args.dataset in ['cora']:
-            return 20, 10
+            return 20, 1
         if args.dataset in ['citeseer']:
             return 20, 5  # at least 200 epochs
         else:
             return 20, 1
 
-    def test_with_val_trans(self, verbose=True, setting='trans'):
+    def test_with_val(self, verbose=True, setting='trans'):
         res = []
 
-        data, device = self.data, self.device
+        args, data, device = self.args, self.data, self.device
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=self.args.hidden, dropout=0.5,
-                    weight_decay=5e-4, nlayers=2,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout,
+                    weight_decay=args.weight_decay, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)
         #     adj_syn = torch.zeros((n, n))
         # same for ind and trans when reduced
-        model.fit_with_val(data,
-                           train_iters=600, normadj=True, verbose=False, reduced=True)
-        model.eval()
-        labels_test = data.labels_test.long().to(self.args.device)
+        acc_val = model.fit_with_val(data,
+                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=False,
+                                     reduced=True)
+        # model.eval()
+        labels_test = data.labels_test.long().to(args.device)
         if setting == 'trans':
 
             output = model.predict(data.feat_full, data.adj_full)
@@ -298,6 +310,7 @@ class GCond:
             # loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
         res.append(acc_test.item())
+        # res.append(acc_val.item())
         if verbose:
             print('Test Accuracy and Std:',
                   repr([res.mean(0), res.std(0)]))
