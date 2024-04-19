@@ -17,4 +17,4 @@ if __name__ == '__main__':
         res = evaluator.evaluate(reduced_graph, 'GCN')
         all_res.append(res)
     all_res = np.array(all_res).reshape(-1)
-    print('Final Mean:', all_res.mean(), '+/-', all_res.std())
+    print('Test Mean Result:', all_res.mean(), '+/-', all_res.std())
