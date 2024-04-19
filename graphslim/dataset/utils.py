@@ -52,7 +52,8 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args):
     torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     torch.save(labels_syn, f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    print("Saved reduced data")
+    if args.verbose:
+        print("Saved reduced data")
 
 
 def load_reduced(args):

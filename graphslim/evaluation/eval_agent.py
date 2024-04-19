@@ -119,7 +119,6 @@ class Evaluator:
 
         adj_syn, feat_syn, labels_syn = load_reduced(self.args)
 
-
         if model_type == 'MLP':
             adj_syn = adj_syn - adj_syn
 
@@ -242,8 +241,8 @@ class Evaluator:
             res.append(self.test(data, model_type=model_type, verbose=False))
         res = np.array(res)
 
-        print(f'Test Mean Accuracy: {100 * res.mean(0)[0]:.2f} +/- {100 * res.std(0)[0]:.2f}')
-        return res
+        print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        return res.mean(), res.std()
         # else:
         #     return res[0][0]
         # print('Test/Train Mean Accuracy:',

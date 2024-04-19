@@ -3,7 +3,6 @@ from collections import Counter
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import *
@@ -20,7 +19,7 @@ class CoreSet:
         self.device = args.device
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 
-    def reduce(self, data):
+    def reduce(self, data, verbose=False):
         if verbose:
             start = time.perf_counter()
         args = self.args
@@ -33,10 +32,10 @@ class CoreSet:
             self.agent = Random
         else:
             self.agent = None
-        model = APPNPRich(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
+        model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
                     weight_decay=args.weight_decay).to(args.device)
         if self.setting == 'trans':
-            model.fit_with_val(data, train_iters=600, verbose=True, setting='trans')
+            model.fit_with_val(data, train_iters=600, verbose=verbose, setting='trans')
             # model.test(data, verbose=True)
             embeds = model.predict(data.feat_full, data.adj_full).detach()
 
@@ -45,7 +44,6 @@ class CoreSet:
             # induce a graph with selected nodes
             data.feat_syn = data.feat_full[idx_selected]
             data.adj_syn = data.adj_full[np.ix_(idx_selected, idx_selected)]
-
             data.labels_syn = data.labels_full[idx_selected]
 
             # if args.save:
@@ -65,7 +63,7 @@ class CoreSet:
 
         if self.setting == 'ind':
             model.fit_with_val(data, train_iters=600, normalize=True,
-                               verbose=True, setting='ind', reindex=True)
+                               verbose=verbose, setting='ind', reindex=True)
 
             model.eval()
 
@@ -75,7 +73,6 @@ class CoreSet:
 
             data.feat_syn = data.feat_train[idx_selected]
             data.adj_syn = data.adj_train[np.ix_(idx_selected, idx_selected)]
-
             data.labels_syn = data.labels_train[idx_selected]
 
             # for i in tqdm(range(args.runs)):
@@ -91,6 +88,8 @@ class CoreSet:
             #     # loss_test = F.nll_loss(output, labels_test)
             #     acc_test = accuracy(output, labels_test)
             #     res.append(acc_test.item())
+        print('selected nodes:', idx_selected.shape[0])
+        print('induced edges:', data.adj_syn.sum())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
                                                                  device='cpu')
         save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
@@ -106,9 +105,6 @@ class CoreSet:
                 origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
             condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
             print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
-
-        if args.save:
-            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data
 

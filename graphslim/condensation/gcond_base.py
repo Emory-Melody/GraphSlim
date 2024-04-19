@@ -1,5 +1,6 @@
-from collections import Counter
 import time
+from collections import Counter
+
 import torch.nn as nn
 
 from graphslim.condensation.utils import match_loss  # graphslim
@@ -58,12 +59,11 @@ class GCond:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    def reduce(self, verbose=True):
+    def reduce(self, data, verbose=True):
         if verbose:
             start = time.perf_counter()
 
         args = self.args
-        data = self.data
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
 
@@ -186,7 +186,7 @@ class GCond:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+            eval_epochs = [400, 600, 1000]
             # if it == 0:
 
             if it + 1 in eval_epochs:
@@ -194,7 +194,7 @@ class GCond:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):
-                    res.append(self.test_with_val(verbose=False, setting=args.setting))
+                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
 
                 res = np.array(res)
                 current_val = res.mean()
@@ -222,8 +222,6 @@ class GCond:
             condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
             print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
 
-        if args.save:
-            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return data
 
     def cross_architecture_eval(self):
@@ -308,8 +306,8 @@ class GCond:
         #     adj_syn = torch.zeros((n, n))
         # same for ind and trans when reduced
         acc_val = model.fit_with_val(data,
-                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=False,
-                                     reduced=True)
+                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=verbose,
+                                     setting=setting, reduced=True)
         # model.eval()
         # labels_test = data.labels_test.long().to(args.device)
         # if setting == 'trans':
@@ -323,9 +321,9 @@ class GCond:
         #     acc_test = accuracy(output, labels_test)
         # res.append(acc_test.item())
         res.append(acc_val.item())
-        if verbose:
-            print('Val Accuracy and Std:',
-                  repr([res.mean(0), res.std(0)]))
+        # if verbose:
+        #     print('Val Accuracy and Std:',
+        #           repr([res.mean(0), res.std(0)]))
         return res
 
         # print(adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))

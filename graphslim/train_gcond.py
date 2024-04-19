@@ -7,7 +7,7 @@ args = cli(standalone_mode=False)
 
 graph = get_dataset(args.dataset, args)
 agent = GCond(setting=args.setting, data=graph, args=args)
-reduced_graph = agent.reduce(graph)
+reduced_graph = agent.reduce(graph, verbose=args.verbose)
 evaluator = Evaluator(args)
 evaluator.evaluate(reduced_graph, model_type='GCN')
 # python -m coarserning.kcenter
