@@ -7,6 +7,8 @@ import torch.sparse as ts
 from sklearn.model_selection import train_test_split
 from torch_sparse import SparseTensor
 
+from graphslim.dataset.convertor import csr2ei
+
 
 # from deeprobust.graph.utils import *
 
@@ -130,15 +132,14 @@ def encode_onehot(labels):
 def getsize_mb(elements):
     size = 0
     for e in elements:
-        if type(e) == dict:
-            for v in e.values():
-                if type(v) == SparseTensor:
-                    row, col, value = v.coo()
-                    size += row.element_size() * row.nelement()
-                    size += col.element_size() * col.nelement()
-                    size += value.element_size() * value.nelement()
-                else:
-                    size += v.element_size() * v.nelement()
+        if type(e) == SparseTensor:
+            row, col, value = e.coo()
+            size += row.element_size() * row.nelement()
+            size += col.element_size() * col.nelement()
+            size += value.element_size() * value.nelement()
+        elif isinstance(e, sp.csr_matrix):
+            e = csr2ei(e)
+            size += e.element_size() * e.nelement()
         else:
             size += e.element_size() * e.nelement()
     return size / 1024 / 1024
