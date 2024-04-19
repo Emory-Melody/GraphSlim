@@ -127,6 +127,21 @@ def encode_onehot(labels):
     return onehot_mx
 
 
+def getsize_mb(elements):
+    size = 0
+    for e in elements:
+        if type(e) == dict:
+            for v in e.values():
+                if type(v) == SparseTensor:
+                    row, col, value = v.coo()
+                    size += row.element_size() * row.nelement()
+                    size += col.element_size() * col.nelement()
+                    size += value.element_size() * value.nelement()
+                else:
+                    size += v.element_size() * v.nelement()
+        else:
+            size += e.element_size() * e.nelement()
+    return size / 1024 / 1024
 def tensor2onehot(labels):
     """Convert label tensor to label onehot tensor.
 

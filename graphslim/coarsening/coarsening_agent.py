@@ -14,7 +14,7 @@ from graphslim.coarsening.utils import contract_variation_edges, contract_variat
 from graphslim.dataset.convertor import pyg2gsp, csr2ei
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import GCN
-from graphslim.utils import one_hot, seed_everything, accuracy
+from graphslim.utils import one_hot, seed_everything, accuracy, getsize_mb
 
 
 def router_coarse(data, args):
@@ -152,6 +152,13 @@ class Coarsen:
             runTime_ms = runTime * 1000
             print("Reduce Time: ", runTime, "s")
             print("Reduce Time: ", runTime_ms, "ms")
+            if args.setting == 'trans':
+                origin_storage = getsize_mb([data.x, data.edge_index, data.y])
+            else:
+                origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
+            condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
+            print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
+            # print(f'Condensed graph:{condensed_storage:.2f}Mb')
 
         if args.save:
             save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
