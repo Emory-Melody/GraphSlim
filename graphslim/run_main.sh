@@ -14,7 +14,18 @@ python train_coarsen.py -D citeseer -S trans -R 0.025 -M variation_neighborhoods
 # citeceer 3.6%
 python train_coarsen.py -D citeseer -S trans -R 1 -M variation_neighborhoods
 # =========================================================
+#  flickr 0.1%
+python train_coarsen.py -D flickr -S ind -R 0.001 -M variation_neighborhoods
+#  flickr 0.5%
+python train_coarsen.py -D flickr -S ind -R 0.005 -M variation_neighborhoods
 #  flickr 1%
+python train_coarsen.py -D flickr -S ind -R 0.01 -M variation_neighborhoods
+# =========================================================
+#  reddit 0.05%
+python train_coarsen.py -D reddit -S ind -R 0.005 -M variation_neighborhoods
+#  reddit 0.1%
+
+#  reddit 0.2%
 
 
 # =================================================Condensation===================================================

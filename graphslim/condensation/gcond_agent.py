@@ -59,6 +59,9 @@ class GCond:
         return np.array(labels_syn)
 
     def reduce(self, verbose=True):
+        if verbose:
+            start = time.perf_counter()
+
         args = self.args
         data = self.data
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
@@ -201,6 +204,12 @@ class GCond:
                 # if current_val > best_val:
                 #     best_val = current_val
                 #     data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
+        if verbose:
+            end = time.perf_counter()
+            runTime = end - start
+            runTime_ms = runTime * 1000
+            print("Reduce Time: ", runTime, "s")
+            print("Reduce Time: ", runTime_ms, "ms")
 
         if args.save:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)

@@ -1,12 +1,12 @@
+import time
 from collections import Counter
 
 import numpy as np
 import torch
-import torch.nn.functional as F
 
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import *
-from graphslim.utils import accuracy, to_tensor
+from graphslim.utils import to_tensor
 
 
 class CoreSet:
@@ -20,6 +20,8 @@ class CoreSet:
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 
     def reduce(self, data):
+        if verbose:
+            start = time.perf_counter()
         args = self.args
         if args.method == 'kcenter':
             self.agent = KCenter
@@ -89,6 +91,13 @@ class CoreSet:
             #     res.append(acc_test.item())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
                                                                  device='cpu')
+        if verbose:
+            end = time.perf_counter()
+            runTime = end - start
+            runTime_ms = runTime * 1000
+            print("Reduce Time: ", runTime, "s")
+            print("Reduce Time: ", runTime_ms, "ms")
+
         if args.save:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 

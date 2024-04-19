@@ -1,4 +1,5 @@
 import copy
+import time
 
 import numpy as np
 import scipy as sp
@@ -114,7 +115,10 @@ class Coarsen:
         self.device = args.device
         # pass data for initialization
 
-    def reduce(self, data):
+    def reduce(self, data, verbose=True):
+        if verbose:
+            start = time.perf_counter()
+
         args = self.args
         setting = self.setting
         # device = self.device
@@ -141,6 +145,13 @@ class Coarsen:
             coarsen_edge = torch.from_numpy(coarsen_edge)
 
         data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_train_labels
+
+        if verbose:
+            end = time.perf_counter()
+            runTime = end - start
+            runTime_ms = runTime * 1000
+            print("Reduce Time: ", runTime, "s")
+            print("Reduce Time: ", runTime_ms, "ms")
 
         if args.save:
             save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
@@ -310,24 +321,24 @@ class Coarsen:
                     coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
                 coarsen_node += Gc.W.shape[0]
 
-            elif torch.sum(H_train_mask) > 0:
-
-                coarsen_features = torch.cat([coarsen_features, H_features], dim=0)
-                coarsen_train_labels = torch.cat([coarsen_train_labels, H_labels.float()], dim=0)
-                coarsen_train_mask = torch.cat([coarsen_train_mask, H_train_mask], dim=0)
-
-                if coarsen_row is None:
-                    raise Exception('The graph does not need coarsening.')
-                else:
-                    if len(H.W.tocoo().row) == 0:
-                        current_row = np.array([coarsen_node])
-                        current_col = np.array([coarsen_node])
-                    else:
-                        current_row = H.W.tocoo().row + coarsen_node
-                        current_col = H.W.tocoo().col + coarsen_node
-                    coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
-                    coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
-                coarsen_node += H.W.shape[0]
+            # elif torch.sum(H_train_mask) > 0:
+            #
+            #     coarsen_features = torch.cat([coarsen_features, H_features], dim=0)
+            #     coarsen_train_labels = torch.cat([coarsen_train_labels, H_labels.float()], dim=0)
+            #     coarsen_train_mask = torch.cat([coarsen_train_mask, H_train_mask], dim=0)
+            #
+            #     if coarsen_row is None:
+            #         raise Exception('The graph does not need coarsening.')
+            #     else:
+            #         if len(H.W.tocoo().row) == 0:
+            #             current_row = np.array([coarsen_node])
+            #             current_col = np.array([coarsen_node])
+            #         else:
+            #             current_row = H.W.tocoo().row + coarsen_node
+            #             current_col = H.W.tocoo().col + coarsen_node
+            #         coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
+            #         coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
+            #     coarsen_node += H.W.shape[0]
             number += 1
 
         # print('the size of coarsen graph features:', coarsen_features.shape)
