@@ -221,7 +221,7 @@ class Evaluator:
         final_res = {}
         runs = self.args.nruns
 
-        for model_type in ['GCN',  'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        for model_type in ['GCN', 'GraphSage', 'SGCRich', 'MLP', 'APPNPRich', 'Cheby']:
             res = []
             nlayer = 2
             for i in range(runs):

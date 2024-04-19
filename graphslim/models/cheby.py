@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
 
+from graphslim.models.base import BaseGNN
 from graphslim.models.layers import ChebConvolution
 
 
-class Cheby(nn.Module):
+class Cheby(BaseGNN):
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  with_relu=True, with_bias=True, with_bn=False, device=None):

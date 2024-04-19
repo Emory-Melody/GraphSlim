@@ -117,10 +117,8 @@ class Evaluator:
 
     def get_syn_data(self, data, model_type=None, verbose=False, sparse=False):
 
-        if self.args.save:
-            adj_syn, feat_syn, labels_syn = load_reduced(self.args)
-        else:
-            adj_syn, feat_syn, labels_syn = data.adj_syn, data.feat_syn, data.labels_syn
+        adj_syn, feat_syn, labels_syn = load_reduced(self.args)
+
 
         if model_type == 'MLP':
             adj_syn = adj_syn - adj_syn
@@ -210,7 +208,7 @@ class Evaluator:
 
         final_res = {}
 
-        for model_type in ['GCN', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']:
+        for model_type in ['GCN', 'GraphSage', 'SGCRich', 'MLP', 'APPNPRich', 'Cheby']:
             res = []
             for i in range(args.runs):
                 res.append(self.test(model_type=model_type, verbose=False))

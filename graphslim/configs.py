@@ -56,7 +56,6 @@ def load_config(args):
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
 @click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
-@click.option('--save', is_flag=True, show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(

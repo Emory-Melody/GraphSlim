@@ -6,7 +6,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch_geometric.data import NeighborSampler
 
-from graphslim.models.gcn import BaseGNN
+from graphslim.models.base import BaseGNN
 from graphslim.models.layers import SageConvolution
 from graphslim.utils import is_sparse_tensor, normalize_adj_tensor, to_tensor, accuracy
 
@@ -65,7 +65,7 @@ class GraphSage(BaseGNN):
             reindex = True
 
         if verbose:
-            print('=== training gcn model ===')
+            print('=== training GNN model ===')
         optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         best_acc_val = 0

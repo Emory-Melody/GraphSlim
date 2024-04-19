@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch_sparse
 
-from graphslim.models.gcn import BaseGNN
+from graphslim.models.base import BaseGNN
 from graphslim.models.layers import GraphConvolution, MyLinear
 
 
@@ -17,6 +17,7 @@ class SGC(BaseGNN):
                                   with_relu, with_bias, with_bn, device=device)
 
         self.conv = GraphConvolution(nfeat, nclass, with_bias=with_bias)
+        self.nlayers = nlayers
 
         if not with_relu:
             self.weight_decay = 0
@@ -59,14 +60,17 @@ class SGC(BaseGNN):
                 bn.reset_parameters()
 
 
-class SGC1(BaseGNN):
+class SGCRich(BaseGNN):
+    '''
+    multiple transformation layers
+    '''
 
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  ntrans=2, with_relu=True, with_bias=True, with_bn=False, device=None):
 
         """nlayers indicates the number of propagations"""
-        super(SGC1, self).__init__(nfeat, nhid, nclass, nlayers, dropout, lr, weight_decay,
-                                   with_relu, with_bias, with_bn, device=device)
+        super(SGCRich, self).__init__(nfeat, nhid, nclass, nlayers, dropout, lr, weight_decay,
+                                      with_relu, with_bias, with_bn, device=device)
         self.nlayers = nlayers
         self.layers = nn.ModuleList([])
         if ntrans == 1:
@@ -136,14 +140,6 @@ class SGC1(BaseGNN):
     #     else:
     #         return F.log_softmax(x, dim=1)
 
-    def initialize(self):
-        """Initialize parameters of GCN.
-        """
-        for layer in self.layers:
-            layer.reset_parameters()
-        if self.with_bn:
-            for bn in self.bns:
-                bn.reset_parameters()
     #
     # def fit_with_val(self, features, adj, labels, data, train_iters=200, initialize=True, verbose=False, normalize=True,
     #                  patience=None, val=False, **kwargs):

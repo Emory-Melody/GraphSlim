@@ -3,6 +3,7 @@ from collections import Counter
 
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import *
@@ -23,6 +24,7 @@ class CoreSet:
         if verbose:
             start = time.perf_counter()
         args = self.args
+        # TODO:to subclasses
         if args.method == 'kcenter':
             self.agent = KCenter
         elif args.method == 'herding':
@@ -31,7 +33,7 @@ class CoreSet:
             self.agent = Random
         else:
             self.agent = None
-        model = APPNP1(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
+        model = APPNPRich(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
                     weight_decay=args.weight_decay).to(args.device)
         if self.setting == 'trans':
             model.fit_with_val(data, train_iters=600, verbose=True, setting='trans')
@@ -91,6 +93,7 @@ class CoreSet:
             #     res.append(acc_test.item())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
                                                                  device='cpu')
+        save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         if verbose:
             end = time.perf_counter()
             runTime = end - start

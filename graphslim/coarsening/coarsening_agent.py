@@ -13,100 +13,9 @@ from graphslim.coarsening.utils import contract_variation_edges, contract_variat
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
 from graphslim.dataset.convertor import pyg2gsp, csr2ei
 from graphslim.dataset.utils import save_reduced
+
 from graphslim.models import GCN
 from graphslim.utils import one_hot, seed_everything, accuracy, getsize_mb
-
-
-def router_coarse(data, args):
-    '''
-        workflows routing to each method and different settings
-    '''
-    if args.method == 'vng':
-        agent = VNG(data, args)
-    elif args.method in ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge',
-                         'algebraic_JC', 'affinity_GS', 'kron']:
-        agent = Coarsen(data, args)
-    else:
-        pass
-
-    res = []
-    model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
-                weight_decay=args.weight_decay).to(args.device)
-    if args.setting == 'trans':
-        model.fit_with_val(data.feat_full, data.adj_full, data, train_iters=args.epochs, verbose=True)
-        model.test(data, verbose=True)
-        embeds = model.predict().detach()
-
-        idx_selected = agent.select(embeds)
-
-        # induce a graph with selected nodes
-        feat_selected = data.feat_full[idx_selected]
-        adj_selected = data.adj_full[np.ix_(idx_selected, idx_selected)]
-
-        data.labels_syn = data.labels_full[idx_selected]
-
-        # if args.save:
-        #     np.save(f'dataset/output/coreset/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
-        #             idx_selected)
-
-        for i in trange(args.runs):
-            seed_everything(args.seed + i)
-            model.fit_with_val(feat_selected, adj_selected, data,
-                               train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
-
-            # Full graph
-            # interface: model.test(full_data)
-            acc_test = model.test(data)
-            res.append(acc_test)
-
-    if args.setting == 'ind':
-
-        model.fit_with_val(data.feat_train, data.adj_train, data, train_iters=args.epochs, normalize=True,
-                           verbose=False, reindexed_trainset=True)
-
-        model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
-        feat_test, adj_test = data.feat_test, data.adj_test
-
-        embeds = model.predict().detach()
-
-        output = model.predict(feat_test, adj_test)
-        loss_test = F.nll_loss(output, labels_test)
-        acc_test = accuracy(output, labels_test)
-        print("Test set results:",
-              "loss= {:.4f}".format(loss_test.item()),
-              "accuracy= {:.4f}".format(acc_test.item()))
-
-        idx_selected = agent.select(embeds, inductive=True)
-
-        feat_selected = data.feat_train[idx_selected]
-        adj_selected = data.adj_train[np.ix_(idx_selected, idx_selected)]
-
-        data.labels_syn = data.labels_train[idx_selected]
-        if args.save:
-            save_reduced(adj_selected, feat_selected, data.labels_syn, args)
-
-        for i in trange(args.runs):
-            seed_everything(args.seed + i)
-            model.fit_with_val(feat_selected, adj_selected, data,
-                               train_iters=args.epochs, normalize=True, verbose=False, val=True, reduced=True)
-
-            model.eval()
-            labels_test = torch.LongTensor(data.labels_test).cuda()
-
-            # interface: model.predict(reshaped feat,reshaped adj)
-            output = model.predict(feat_test, adj_test)
-            # loss_test = F.nll_loss(output, labels_test)
-            acc_test = accuracy(output, labels_test)
-            res.append(acc_test.item())
-
-    res = np.array(res)
-    print('Mean accuracy:', repr([res.mean(), res.std()]))
-
-    # return idx_selected
-    #
-    # return CoarseningBase(data, args)
-
 
 class Coarsen:
     def __init__(self, setting, data, args, **kwargs):
@@ -160,8 +69,7 @@ class Coarsen:
             print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
             # print(f'Condensed graph:{condensed_storage:.2f}Mb')
 
-        if args.save:
-            save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
+        save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
 
         return data
 
