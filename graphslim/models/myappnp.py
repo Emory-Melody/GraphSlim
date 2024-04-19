@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torch_sparse
+from torch_sparse import SparseTensor
 
 from graphslim.models.gcn import BaseGNN
 from graphslim.models.layers import MyLinear
@@ -18,9 +19,10 @@ class APPNP(BaseGNN):
                  ntrans=1, with_bias=True, with_bn=False, device=None):
 
         super(APPNP, self).__init__(nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-                                    ntrans=1, with_bias=True, with_bn=False, device=device)
+                                    with_relu=True, with_bias=True, with_bn=False, device=device)
 
         self.alpha = 0.1
+        self.nlayers = nlayers
 
         with_bn = False
 
@@ -53,7 +55,10 @@ class APPNP(BaseGNN):
         for i in range(self.nlayers):
             # adj_drop = self.sparse_dropout(adj, training=self.training)
             adj_drop = adj
-            x = torch.spmm(adj_drop, x)
+            if isinstance(adj_drop, SparseTensor):
+                x = torch_sparse.matmul(adj_drop, x)
+            else:
+                x = torch.spmm(adj_drop, x)
             x = x * (1 - self.alpha)
             x = x + self.alpha * h
 

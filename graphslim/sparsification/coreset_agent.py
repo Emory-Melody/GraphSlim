@@ -29,7 +29,7 @@ class CoreSet:
             self.agent = Random
         else:
             self.agent = None
-        model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
+        model = APPNP1(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
                     weight_decay=args.weight_decay).to(args.device)
         if self.setting == 'trans':
             model.fit_with_val(data, train_iters=600, verbose=True, setting='trans')
