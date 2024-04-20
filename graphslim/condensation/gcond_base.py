@@ -84,12 +84,12 @@ class GCond:
             if args.dataset in ['ogbn-arxiv', 'flickr', 'reddit']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                                 dropout=0.0, with_bn=False,
-                                weight_decay=0e-4, nlayers=2,
+                                weight_decay=0e-4, nlayers=args.nlayers,
                                 nclass=data.nclass,
                                 device=self.device).to(self.device)
             else:
                 model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=0, weight_decay=args.weight_decay,
+                            nclass=data.nclass, dropout=0, weight_decay=0,
                             nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
 
@@ -149,14 +149,11 @@ class GCond:
                 self.optimizer_feat.zero_grad()
                 self.optimizer_pge.zero_grad()
                 loss.backward()
-                if args.one_step:
-                    self.optimizer_feat.step()
+
+                if it % 50 < 10:
                     self.optimizer_pge.step()
                 else:
-                    if it % 50 < 10:
-                        self.optimizer_pge.step()
-                    else:
-                        self.optimizer_feat.step()
+                    self.optimizer_feat.step()
                 # else:
                 #     if ol < outer_loop // 5:
                 #         self.optimizer_pge.step()
@@ -206,9 +203,6 @@ class GCond:
                     best_val = current_val
                     save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
-                # if current_val > best_val:
-                #     best_val = current_val
-                #     data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
         if verbose:
             end = time.perf_counter()
             runTime = end - start
@@ -270,10 +264,8 @@ class GCond:
     def get_loops(self, args):
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
-        # TODO: fix the bug, there is no "one_step" in args (AttributeError: 'Obj' object has no attribute 'one_step')
-        # if args.one_step:
-        #     return 10, 0
-        if args.one_step:
+
+        if args.method == 'doscond':
             if args.dataset == 'ogbn-arxiv':
                 return 5, 0
             return 1, 0
@@ -291,7 +283,7 @@ class GCond:
         else:
             return 20, 1
 
-    def test_with_val(self, verbose=True, setting='trans'):
+    def test_with_val(self, verbose=False, setting='trans'):
         res = []
 
         args, data, device = self.args, self.data, self.device
@@ -306,7 +298,7 @@ class GCond:
         #     adj_syn = torch.zeros((n, n))
         # same for ind and trans when reduced
         acc_val = model.fit_with_val(data,
-                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=verbose,
+                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=False,
                                      setting=setting, reduced=True)
         # model.eval()
         # labels_test = data.labels_test.long().to(args.device)

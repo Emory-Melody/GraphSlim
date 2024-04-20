@@ -16,25 +16,44 @@ def dict2obj(d):
     return json.loads(json.dumps(d), object_hook=Obj)
 
 
-# recommended hyperparameters here
-def load_config(args):
-    dataset = args.dataset
-    if dataset in ['flickr']:
-        args.nlayers = 2
-        args.hidden = 256
-        args.weight_decay = 5e-3
-        args.dropout = 0.0
+# fix setting here
+def setting_config(args):
+    if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv']:
+        args.setting = 'trans'
+    if args.dataset in ['flickr', 'reddit']:
+        args.setting = 'ind'
+    args.epochs = 1000
+    args.hidden = 256
+    args.eval_hidden = 256
+    args.eval_epochs = 600
+    return args
 
-    if dataset in ['reddit']:
-        args.nlayers = 2
-        args.hidden = 256
-        args.weight_decay = 0e-4
-        args.dropout = 0
 
-    if dataset in ['ogbn-arxiv']:
-        args.hidden = 256
-        args.weight_decay = 0
-        args.dropout = 0
+# recommend hyperparameters here
+def method_config(args):
+    if args.method in ['gcond', 'gcondx', 'doscond']:
+        if args.dataset in ['flickr']:
+            args.nlayers = 2
+            args.hidden = 256
+            args.weight_decay = 5e-3
+            args.dropout = 0.0
+
+        if args.dataset in ['reddit']:
+            args.nlayers = 2
+            args.hidden = 256
+            args.weight_decay = 0e-4
+            args.dropout = 0
+
+        if args.dataset in ['ogbn-arxiv']:
+            args.hidden = 256
+            args.weight_decay = 0
+            args.dropout = 0
+        if args.method in ['gcond', 'gcondx']:
+            args.dis_metric = 'ours'
+        if args.method in ['doscond']:
+            args.dis_metric = 'mse'
+            args.lr_feat = 1e-2
+            args.lr_adj = 1e-2
 
     return args
 
@@ -48,8 +67,9 @@ def load_config(args):
 @click.option('--run_reduction', default=3, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
+@click.option('--eval_epochs', '--ee', default=600, show_default=True)
 @click.option('--epochs', '--eps', default=400, show_default=True)
-@click.option('--early_stopping', '-E', default=10, show_default=True)
+# @click.option('--early_stopping', '-E', default=10, show_default=True)
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
 @click.option('--normalize_features', '--normalize', is_flag=True, show_default=True)
@@ -61,13 +81,14 @@ def load_config(args):
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
                    'affinity_GS', 'kron',
-                   'gcond',
-                   'kcenter', 'herding', 'random']), show_default=True)
+                   'gcond', 'doscond', 'gcondx',
+                   'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--lr_test', default=1e-2, show_default=True)
-@click.option('--one_step', is_flag=True, show_default=True)
+@click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
+# @click.option('--one_step', is_flag=True, show_default=True)
 @click.option('--dropout', default=0.0, show_default=True)
 # model specific args
 @click.option('--alpha', default=0, help='for appnp', show_default=True)
@@ -85,7 +106,9 @@ def cli(ctx, **kwargs):
         if not os.path.isdir(path):
             os.mkdir(path)
         args.path = path
-        args = load_config(args)
+        # for benchmark, we need unified settings and reduce flexibility of args
+        args = method_config(args)
+        args = setting_config(args)
         return args
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)

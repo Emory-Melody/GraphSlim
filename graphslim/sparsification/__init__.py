@@ -1,1 +1,4 @@
-from .coreset_agent import CoreSet
+# from .coreset_base import CoreSet
+from .herding import Herding
+from .kcenter import KCenter
+from .random import Random

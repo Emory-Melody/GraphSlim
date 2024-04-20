@@ -115,7 +115,7 @@ class Evaluator:
         res.append(acc_train.item())
         return res
 
-    def get_syn_data(self, data, model_type=None, verbose=False, sparse=False):
+    def get_syn_data(self, data, model_type=None, verbose=False):
 
         adj_syn, feat_syn, labels_syn = load_reduced(self.args)
 
@@ -127,7 +127,7 @@ class Evaluator:
             print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-        if sparse and self.args.epsilon > 0:
+        if self.args.epsilon > 0:
             adj_syn[adj_syn < self.args.epsilon] = 0
             if verbose:
                 print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
@@ -157,7 +157,8 @@ class Evaluator:
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
 
-        model.fit_with_val(data, train_iters=600, normadj=True, normfeat=self.args.normalize_features, verbose=verbose,
+        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=self.args.normalize_features,
+                           verbose=verbose,
                            setting=args.setting,
                            reduced=True)
 

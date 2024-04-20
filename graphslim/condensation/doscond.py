@@ -7,7 +7,7 @@ from graphslim.models import *
 from graphslim.utils import *
 
 
-class GCondX(GCond):
+class DosCond(GCond):
     def reduce(self, data, verbose=True):
         if verbose:
             start = time.perf_counter()
@@ -21,7 +21,6 @@ class GCondX(GCond):
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
-        self.adj_syn = torch.eye(feat_sub.shape[0], device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -49,7 +48,9 @@ class GCondX(GCond):
             model.train()
 
             for ol in range(outer_loop):
-                adj_syn_norm = self.adj_syn
+                adj_syn = pge(self.feat_syn)
+                adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                # feat_syn_norm = feat_syn
 
                 BN_flag = False
                 for module in model.modules():
@@ -86,27 +87,25 @@ class GCondX(GCond):
                     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
                 loss_avg += loss.item()
+                # if args.alpha > 0:
+                #     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
+                # else:
+                # loss_reg = torch.tensor(0)
 
+                # loss = loss + loss_reg
+
+                # update sythetic graph
                 self.optimizer_feat.zero_grad()
+                self.optimizer_pge.zero_grad()
                 loss.backward()
                 self.optimizer_feat.step()
+                self.optimizer_pge.step()
 
                 feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = adj_syn_inner_norm = adj_syn_norm
-                if args.normalize_features:
-                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                else:
-                    feat_syn_inner_norm = feat_syn_inner
-                for j in range(inner_loop):
-                    optimizer_model.zero_grad()
-                    output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
-                    loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
-                    loss_syn_inner.backward()
-                    # print(loss_syn_inner.item())
-                    optimizer_model.step()  # update gnn param
+                adj_syn_inner = pge.inference(feat_syn_inner)
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and (it + 1) % 100 == 0:
+            if verbose and (it + 1) % 50 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
@@ -114,10 +113,11 @@ class GCondX(GCond):
             # if it == 0:
 
             if it + 1 in eval_epochs:
+                # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):
-                    res.append(self.test_with_val(verbose=False, setting=args.setting))
+                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
 
                 res = np.array(res)
                 current_val = res.mean()
