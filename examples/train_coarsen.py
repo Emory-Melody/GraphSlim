@@ -1,6 +1,6 @@
 from configs import *
 from evaluation.eval_agent import Evaluator
-from graphslim.coarsening.coarsening_agent import Coarsen
+from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.dataset import *
 
 args = cli(standalone_mode=False)

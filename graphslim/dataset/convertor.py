@@ -11,9 +11,11 @@ def pyg2gsp(edge_index):
     return G
 
 
+
 def csr2ei(adjacency_matrix_csr):
     adjacency_matrix_coo = adjacency_matrix_csr.tocoo()
-    edge_index = torch.tensor(np.array([adjacency_matrix_coo.row, adjacency_matrix_coo.col]), dtype=torch.long)
+    # Convert numpy arrays directly to a tensor
+    edge_index = torch.tensor(np.vstack([adjacency_matrix_coo.row, adjacency_matrix_coo.col]), dtype=torch.long)
     return edge_index
 
 

@@ -35,7 +35,7 @@ def method_config(args):
     if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx']:
         if args.dataset in ['flickr']:
             args.nlayers = 2
-            args.weight_decay = 5e-3
+            args.weight_decay = 0
             args.dropout = 0.0
 
         if args.dataset in ['reddit']:
@@ -50,9 +50,12 @@ def method_config(args):
             args.dis_metric = 'ours'
         if args.method in ['doscond', 'doscondx']:
             args.dis_metric = 'mse'
-            args.lr_feat = 1e-2
-            args.lr_adj = 1e-2
-
+            if args.dataset in ['flickr', 'reddit']:
+                args.lr_feat = 5e-3
+                args.lr_feat = 5e-3
+            else:
+                args.lr_feat = 1e-2
+                args.lr_adj = 1e-2
 
     return args
 
