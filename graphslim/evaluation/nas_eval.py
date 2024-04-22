@@ -4,9 +4,9 @@ from pathlib import Path
 from scipy.stats import pearsonr
 
 from graphslim.configs import cli
-from graphslim.configs import load_config
 from graphslim.dataset import *
 from graphslim.evaluation.eval_agent import Evaluator
+import numpy as np
 
 
 def csv_writer(file_path, num):
@@ -55,12 +55,28 @@ class NasEvaluator:
         pearson_corr, _ = pearsonr(np.array(list(map(float, results_syn))), np.array(list(map(float, results_whole))))
         print("Pearson:", pearson_corr)
 
+    def cal_hit_index(self):
+        # Read the CSV files and get the first row as a list of numbers
+        results_syn = [int(x) for x in csv_reader(Path('results_syn.csv'))[0]]
+        results_whole = [int(x) for x in csv_reader(Path('results_whole.csv'))[0]]
+
+        # Find the index of the top value in results_whole
+        top_index_whole = results_whole.index(max(results_whole))
+
+        # Sort results_syn while retaining original indices
+        sorted_results_syn_indices = sorted(range(len(results_syn)), key=lambda k: results_syn[k])
+
+        # Find where the top index from results_whole hits in the sorted results_syn indices
+        hit_position = sorted_results_syn_indices.index(top_index_whole)
+
+        # Output the original lists and the hit position
+        print("Original results_syn:", results_syn)
+        print("Original results_whole:", results_whole)
+        print("Hit position:", hit_position + 1)  # Adding 1 to make it 1-based index
+
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
-    # load specific augments
-    args = load_config(args)
-
     data = get_dataset(args.dataset, args.normalize_features)
 
     if args.dataset in ['cora', 'citeseer']:
