@@ -59,6 +59,8 @@ class CoreSet:
                 data.adj_syn = torch.eye(data.feat_syn.shape[0], device=args.device)
                 data.labels_syn = data.labels_train[idx_selected]
             else:
+                model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
+                            weight_decay=args.weight_decay).to(args.device)
                 model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='ind', reindex=True)
 
                 model.eval()

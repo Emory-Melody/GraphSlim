@@ -205,7 +205,7 @@ class Coarsen:
                 H_train_mask = torch.ones(size=(len(H_labels),))
 
             if len(H.info['orig_idx']) > 10 and torch.sum(H_train_mask) > 0:
-                train_labels = one_hot(H_labels, n_classes)
+                train_labels = one_hot(H_labels, n_classes)  # Shape: (H_labels.shape[0], n_classes)
                 if self.args.setting == "trans":
                     train_labels[~H_train_mask] = torch.Tensor([0 for _ in range(n_classes)])
                 C = C_list[number]

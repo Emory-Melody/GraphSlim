@@ -46,15 +46,21 @@ class BaseGNN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
-    def forward(self, x, adj):
+    def forward(self, x, adj, output_layer_features=False):
+        outputs = []
 
         for ix, layer in enumerate(self.layers):
+            if output_layer_features:
+                outputs.append(x)
             x = layer(x, adj)
             if ix != len(self.layers) - 1:
                 x = self.bns[ix](x) if self.with_bn else x
                 if self.with_relu:
                     x = F.relu(x)
                 x = F.dropout(x, self.dropout, training=self.training)
+
+        if output_layer_features:
+            return outputs
 
         if self.multi_label:
             return torch.sigmoid(x)
@@ -91,6 +97,7 @@ class BaseGNN(nn.Module):
         else:
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
                                                           data.labels_val, device=self.device)
+        print(adj.shape)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
@@ -189,11 +196,11 @@ class BaseGNN(nn.Module):
         return acc_test.item()
 
     @torch.no_grad()
-    def predict(self, features=None, adj=None, normadj=True):
+    def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):
 
         self.eval()
         features, adj = to_tensor(features, adj, device=self.device)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
-        return self.forward(features, adj)
+        return self.forward(features, adj, output_layer_features=output_layer_features)

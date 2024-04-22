@@ -135,7 +135,8 @@ class Evaluator:
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
 
-        return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
+        # return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
+        return feat_syn, adj_syn, labels_syn
 
     def test(self, data, model_type, verbose=True):
         args = self.args
@@ -156,7 +157,6 @@ class Evaluator:
         #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
-
         model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=self.args.normalize_features,
                            verbose=verbose,
                            setting=args.setting,
