@@ -8,6 +8,9 @@ from graphslim.utils import *
 
 
 class DosCond(GCond):
+    def __init__(self):
+        super(DosCond, self).__init__()
+
     def reduce(self, data, verbose=True):
         if verbose:
             start = time.perf_counter()
@@ -21,6 +24,8 @@ class DosCond(GCond):
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
+        self.sparsity = self.adj_syn.mean().item()
+        self.adj_syn.data.copy_(self.adj_syn * 10 - 5)  # max:5; min:-5
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -51,17 +56,7 @@ class DosCond(GCond):
                 adj_syn = pge(self.feat_syn)
                 adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
-
-                BN_flag = False
-                for module in model.modules():
-                    if 'BatchNorm' in module._get_name():  # BatchNorm
-                        BN_flag = True
-                if BN_flag:
-                    model.train()  # for updating the mu, sigma of BatchNorm
-                    # output_real = model.forward(features, adj)
-                    for module in model.modules():
-                        if 'BatchNorm' in module._get_name():  # BatchNorm
-                            module.eval()  # fix mu and sigma of every BatchNorm layer
+                model = self.check_bn(model)
 
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):

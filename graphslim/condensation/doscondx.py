@@ -7,7 +7,7 @@ from graphslim.models import *
 from graphslim.utils import *
 
 
-class GCondX(GCond):
+class DosCondX(GCond):
     def reduce(self, data, verbose=True):
         if verbose:
             start = time.perf_counter()
@@ -51,16 +51,7 @@ class GCondX(GCond):
             for ol in range(outer_loop):
                 adj_syn_norm = self.adj_syn
 
-                BN_flag = False
-                for module in model.modules():
-                    if 'BatchNorm' in module._get_name():  # BatchNorm
-                        BN_flag = True
-                if BN_flag:
-                    model.train()  # for updating the mu, sigma of BatchNorm
-                    # output_real = model.forward(features, adj)
-                    for module in model.modules():
-                        if 'BatchNorm' in module._get_name():  # BatchNorm
-                            module.eval()  # fix mu and sigma of every BatchNorm layer
+                model = self.check_bn(model)
 
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):

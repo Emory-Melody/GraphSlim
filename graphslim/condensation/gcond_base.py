@@ -103,16 +103,7 @@ class GCond:
                 adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
 
-                BN_flag = False
-                for module in model.modules():
-                    if 'BatchNorm' in module._get_name():  # BatchNorm
-                        BN_flag = True
-                if BN_flag:
-                    model.train()  # for updating the mu, sigma of BatchNorm
-                    # output_real = model.forward(features, adj)
-                    for module in model.modules():
-                        if 'BatchNorm' in module._get_name():  # BatchNorm
-                            module.eval()  # fix mu and sigma of every BatchNorm layer
+                model = self.check_bn(model)
 
                 loss = torch.tensor(0.0).to(self.device)
                 for c in range(data.nclass):
@@ -282,6 +273,19 @@ class GCond:
             return 20, 5  # at least 200 epochs
         else:
             return 20, 1
+
+    def check_bn(self, model):
+        BN_flag = False
+        for module in model.modules():
+            if 'BatchNorm' in module._get_name():  # BatchNorm
+                BN_flag = True
+        if BN_flag:
+            model.train()  # for updating the mu, sigma of BatchNorm
+            # output_real = model.forward(features, adj)
+            for module in model.modules():
+                if 'BatchNorm' in module._get_name():  # BatchNorm
+                    module.eval()  # fix mu and sigma of every BatchNorm layer
+        return model
 
     def test_with_val(self, verbose=False, setting='trans'):
         res = []
