@@ -1,9 +1,10 @@
-from graphslim.sparsification.model_based_coreset_base import MBCoreSet
-import torch
 import numpy as np
+import torch
+
+from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
-class KCenter(MBCoreSet):
+class KCenterAgg(MFCoreSet):
 
     def select(self, embeds):
         idx_selected = []
@@ -25,4 +26,3 @@ class KCenter(MBCoreSet):
             idx_selected.append(idx[idx_centers])
         # return np.array(idx_selected).reshape(-1)
         return np.hstack(idx_selected)
-

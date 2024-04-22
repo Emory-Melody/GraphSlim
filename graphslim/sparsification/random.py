@@ -1,10 +1,10 @@
 import numpy as np
 
-from graphslim.sparsification.coreset_base import CoreSet
+from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
-class Random(CoreSet):
-    def select(self, embedds):
+class Random(MFCoreSet):
+    def select(self, embedds=None):
         idx_selected = []
 
         for class_id, cnt in self.num_class_dict.items():

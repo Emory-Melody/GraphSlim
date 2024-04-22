@@ -53,6 +53,7 @@ def method_config(args):
             args.lr_feat = 1e-2
             args.lr_adj = 1e-2
 
+
     return args
 
 
@@ -79,7 +80,7 @@ def method_config(args):
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
                    'affinity_GS', 'kron', 'vng',
-                   'gcond', 'doscond', 'gcondx',
+                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'sntk', 'disco', 'sgdd',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)

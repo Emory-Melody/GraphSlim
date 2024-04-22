@@ -1,10 +1,10 @@
 import numpy as np
 import torch
 
-from graphslim.sparsification.model_based_coreset_base import MBCoreSet
+from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
-class Herding(MBCoreSet):
+class HerdingAgg(MFCoreSet):
     def select(self, embeds):
 
         idx_selected = []
