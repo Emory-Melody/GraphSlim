@@ -94,6 +94,14 @@ def index_to_mask(index, size):
     return mask
 
 
+def cal_storage(data, setting):
+    if setting == 'trans':
+        origin_storage = getsize_mb([data.x, data.edge_index, data.y])
+    else:
+        origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
+    condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
+    print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
+
 def to_tensor(*vars, device='cpu'):
     tensor_list = []
     for var in vars:

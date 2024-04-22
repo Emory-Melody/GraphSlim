@@ -7,7 +7,7 @@ from sklearn.cluster import KMeans
 
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import GCN
-from graphslim.utils import one_hot, getsize_mb
+from graphslim.utils import one_hot, cal_storage
 
 
 class VNG:
@@ -52,16 +52,8 @@ class VNG:
 
         if verbose:
             end = time.perf_counter()
-            runTime = end - start
-            runTime_ms = runTime * 1000
-            print("Reduce Time: ", runTime, "s")
-            print("Reduce Time: ", runTime_ms, "ms")
-            if args.setting == 'trans':
-                origin_storage = getsize_mb([data.x, data.edge_index, data.y])
-            else:
-                origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
-            condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
-            print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
+            print("Reduce Time: ", (end - start) * 1000, "ms")
+            cal_storage(data, setting=args.setting)
 
         save_reduced(coarsen_edge, coarsen_features, coarsen_labels, args)
 
@@ -76,7 +68,7 @@ class VNG:
 
         column_sum = np.sum(A_tr, axis=0)
         column_sum = np.asarray(column_sum).reshape(-1)
-        for i in range(X_tr_0.shape[0]):  # 防止出现部分old node只与new node有连边，导致column_sum等于0的情况
+        for i in range(X_tr_0.shape[0]):  # 防止出现column_sum等于0的情况
             if column_sum[i] == 0:
                 column_sum[i] = 1
 
