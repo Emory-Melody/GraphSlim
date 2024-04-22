@@ -26,31 +26,29 @@ def setting_config(args):
     args.hidden = 256
     args.eval_hidden = 256
     args.eval_epochs = 600
+    args.normalize_features = True
     return args
 
 
 # recommend hyperparameters here
 def method_config(args):
-    if args.method in ['gcond', 'gcondx', 'doscond']:
+    if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx']:
         if args.dataset in ['flickr']:
             args.nlayers = 2
-            args.hidden = 256
             args.weight_decay = 5e-3
             args.dropout = 0.0
 
         if args.dataset in ['reddit']:
             args.nlayers = 2
-            args.hidden = 256
-            args.weight_decay = 0e-4
+            args.weight_decay = 0
             args.dropout = 0
 
         if args.dataset in ['ogbn-arxiv']:
-            args.hidden = 256
             args.weight_decay = 0
             args.dropout = 0
         if args.method in ['gcond', 'gcondx']:
             args.dis_metric = 'ours'
-        if args.method in ['doscond']:
+        if args.method in ['doscond', 'doscondx']:
             args.dis_metric = 'mse'
             args.lr_feat = 1e-2
             args.lr_adj = 1e-2
@@ -72,7 +70,7 @@ def method_config(args):
 # @click.option('--early_stopping', '-E', default=10, show_default=True)
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
-@click.option('--normalize_features', '--normalize', is_flag=True, show_default=True)
+@click.option('--normalize_features', is_flag=True, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
 @click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
@@ -83,6 +81,7 @@ def method_config(args):
                    'affinity_GS', 'kron',
                    'gcond', 'doscond', 'gcondx',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
+@click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
@@ -108,6 +107,7 @@ def cli(ctx, **kwargs):
         args.path = path
         # for benchmark, we need unified settings and reduce flexibility of args
         args = method_config(args)
+        # setting_config has higher priority than methods_config
         args = setting_config(args)
         return args
     except Exception as e:

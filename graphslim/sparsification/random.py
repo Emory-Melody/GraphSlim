@@ -4,7 +4,7 @@ from graphslim.sparsification.coreset_base import CoreSet
 
 
 class Random(CoreSet):
-    def select(self):
+    def select(self, embedds):
         idx_selected = []
 
         for class_id, cnt in self.num_class_dict.items():
