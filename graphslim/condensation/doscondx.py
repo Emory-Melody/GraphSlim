@@ -1,16 +1,17 @@
-import time
-
-from graphslim.condensation.gcond_base import GCond
+from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss  # graphslim
 from graphslim.dataset.utils import save_reduced
+from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import *
 from graphslim.utils import *
 
 
-class DosCondX(GCond):
+class DosCondX(GCondBase):
+    def __init__(self, setting, data, args, **kwargs):
+        super(DosCondX, self).__init__(setting, data, args, **kwargs)
+
+    @verbose_time_memory
     def reduce(self, data, verbose=True):
-        if verbose:
-            start = time.perf_counter()
 
         args = self.args
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
@@ -119,18 +120,5 @@ class DosCondX(GCond):
                 if current_val > best_val:
                     best_val = current_val
                     save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
-
-        if verbose:
-            end = time.perf_counter()
-            runTime = end - start
-            runTime_ms = runTime * 1000
-            print("Reduce Time: ", runTime, "s")
-            print("Reduce Time: ", runTime_ms, "ms")
-            if args.setting == 'trans':
-                origin_storage = getsize_mb([data.x, data.edge_index, data.y])
-            else:
-                origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
-            condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
-            print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
 
         return data

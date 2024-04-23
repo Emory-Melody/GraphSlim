@@ -7,8 +7,6 @@ import torch.sparse as ts
 from sklearn.model_selection import train_test_split
 from torch_sparse import SparseTensor
 
-from graphslim.dataset.convertor import csr2ei
-
 
 # from deeprobust.graph.utils import *
 
@@ -94,13 +92,13 @@ def index_to_mask(index, size):
     return mask
 
 
-def cal_storage(data, setting):
-    if setting == 'trans':
-        origin_storage = getsize_mb([data.x, data.edge_index, data.y])
-    else:
-        origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
-    condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
-    print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
+# def cal_storage(data, setting):
+#     if setting == 'trans':
+#         origin_storage = getsize_mb([data.x, data.edge_index, data.y])
+#     else:
+#         origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
+#     condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
+#     print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
 
 def to_tensor(*vars, device='cpu'):
     tensor_list = []
@@ -137,20 +135,6 @@ def encode_onehot(labels):
     return onehot_mx
 
 
-def getsize_mb(elements):
-    size = 0
-    for e in elements:
-        if type(e) == SparseTensor:
-            row, col, value = e.coo()
-            size += row.element_size() * row.nelement()
-            size += col.element_size() * col.nelement()
-            size += value.element_size() * value.nelement()
-        elif isinstance(e, sp.csr_matrix):
-            e = csr2ei(e)
-            size += e.element_size() * e.nelement()
-        else:
-            size += e.element_size() * e.nelement()
-    return size / 1024 / 1024
 def tensor2onehot(labels):
     """Convert label tensor to label onehot tensor.
 

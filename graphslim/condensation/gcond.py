@@ -1,14 +1,15 @@
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
-from graphslim.evaluation.utils import verbose_time_memory
+from graphslim.evaluation import *
 from graphslim.models import *
 from graphslim.utils import *
 
 
-class DosCond(GCondBase):
+class GCond(GCondBase):
+
     def __init__(self, setting, data, args, **kwargs):
-        super(DosCond, self).__init__(setting, data, args, **kwargs)
+        super(GCond, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -22,8 +23,6 @@ class DosCond(GCondBase):
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
-        # self.sparsity = self.adj_syn.mean().item()
-        # self.adj_syn.data.copy_(self.adj_syn * 10 - 5)  # max:5; min:-5
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -54,6 +53,7 @@ class DosCond(GCondBase):
                 adj_syn = pge(self.feat_syn)
                 adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
+
                 model = self.check_bn(model)
 
                 loss = torch.tensor(0.0).to(self.device)
@@ -91,21 +91,44 @@ class DosCond(GCondBase):
                 self.optimizer_feat.zero_grad()
                 self.optimizer_pge.zero_grad()
                 loss.backward()
-                self.optimizer_feat.step()
-                self.optimizer_pge.step()
+
+                if it % 50 < 10:
+                    self.optimizer_pge.step()
+                else:
+                    self.optimizer_feat.step()
+                # else:
+                #     if ol < outer_loop // 5:
+                #         self.optimizer_pge.step()
+                #     else:
+                #         self.optimizer_feat.step()
+
+                # if verbose and ol % 5 == 0:
+                #     print('Gradient matching loss:', loss.item())
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
+                adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
+                if args.normalize_features:
+                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
+                else:
+                    feat_syn_inner_norm = feat_syn_inner
+                for j in range(inner_loop):
+                    optimizer_model.zero_grad()
+                    output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
+                    loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
+                    loss_syn_inner.backward()
+                    # print(loss_syn_inner.item())
+                    optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # eval_epochs = [400, 600, 1000]
+            eval_epochs = [400, 600, 1000]
             # if it == 0:
 
-            if it + 1 in args.checkpoint:
+            if it + 1 in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []

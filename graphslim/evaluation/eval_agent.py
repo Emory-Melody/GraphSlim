@@ -115,7 +115,7 @@ class Evaluator:
         res.append(acc_train.item())
         return res
 
-    def get_syn_data(self, data, model_type=None, verbose=False):
+    def get_syn_data(self, model_type=None, verbose=False):
 
         adj_syn, feat_syn, labels_syn = load_reduced(self.args)
 
@@ -123,7 +123,7 @@ class Evaluator:
             adj_syn = adj_syn - adj_syn
 
         if verbose:
-            print('Sum:', adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
+            # print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
             print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
@@ -236,7 +236,7 @@ class Evaluator:
         args = self.args
 
         res = []
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
         for i in trange(args.runs):
             seed_everything(args.seed + i)
             res.append(self.test(data, model_type=model_type, verbose=False))
