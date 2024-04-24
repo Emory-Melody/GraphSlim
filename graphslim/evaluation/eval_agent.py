@@ -242,6 +242,7 @@ class Evaluator:
 
         res = []
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
+
         for i in trange(args.runs):
             seed_everything(args.seed + i)
             res.append(self.test(data, model_type=model_type, verbose=False))

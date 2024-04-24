@@ -63,6 +63,26 @@ def method_config(args):
                 args.lr_adj = 1e-4
             else:
                 args.lr_adj = 1e-3
+    if args.method in ['gcsntk']:
+        args.adj = False
+        args.iter = 1
+        args.epochs_train = 200
+        args.scale = 'average'
+        if args.dataset in ['cora', 'citeseer', 'pubmed']:
+            args.k = 2
+            args.K = 2
+            args.L = 2
+            args.lr = 0.01
+            if args.dataset in ['cora']:
+                args.ridge = 1e0
+            if args.dataset in ['pubmed']:
+                args.ridge = 1e-3
+        if args.dataset in ['ogbn-arxiv', 'flickr']:
+            args.k = 1
+            args.K = 1
+            args.L = 1
+            args.lr = 0.001
+            args.ridge = 1e-5
 
     return args
 
@@ -90,7 +110,7 @@ def method_config(args):
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
                    'affinity_GS', 'kron', 'vng',
-                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'sntk', 'disco', 'sgdd',
+                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'sntk', 'disco', 'sgdd', 'gcsntk',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)

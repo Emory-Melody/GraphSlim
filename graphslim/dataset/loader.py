@@ -185,3 +185,4 @@ class TransAndInd:
     #     batch = np.random.permutation(self.class_dict2[c])[:num]
     #     out = self.samplers[args.nlayers - 1][c].sample(batch)
     #     return out
+

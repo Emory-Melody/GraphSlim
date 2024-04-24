@@ -16,6 +16,7 @@ def seed_everything(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
+    # torch.backends.cudnn.deterministic = True
 
 
 def regularization(adj, x, eig_real=None):
