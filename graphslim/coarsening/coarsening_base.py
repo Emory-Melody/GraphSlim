@@ -25,7 +25,7 @@ class Coarsen:
     def reduce(self, data, verbose=True):
 
         args = self.args
-        setting = self.setting
+        # setting = self.setting
         # device = self.device
 
         cpu_data = copy.deepcopy(data)

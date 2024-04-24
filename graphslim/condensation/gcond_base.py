@@ -103,7 +103,7 @@ class GCondBase:
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
 
-        if args.method == 'doscond':
+        if args.method == ['doscond', 'doscondx']:
             if args.dataset == 'ogbn-arxiv':
                 return 5, 0
             return 1, 0

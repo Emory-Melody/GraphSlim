@@ -24,7 +24,7 @@ def setting_config(args):
         args.setting = 'ind'
     args.epochs = 1000
     args.hidden = 256
-    args.checkpoint = [400, 600, 1000]
+    args.checkpoints = [400, 600, 1000]
     args.eval_hidden = 256
     args.eval_epochs = 600
     args.normalize_features = True
@@ -51,12 +51,8 @@ def method_config(args):
             args.dis_metric = 'ours'
         if args.method in ['doscond', 'doscondx']:
             args.dis_metric = 'mse'
-            # if args.dataset in ['flickr', 'reddit']:
-            #     args.lr_feat = 5e-3
-            #     args.lr_feat = 5e-3
-            # else:
-            args.lr_feat = 1e-2
-            args.lr_adj = 1e-2
+            args.lr_feat = 5e-2
+            args.lr_adj = 5e-2
 
     return args
 

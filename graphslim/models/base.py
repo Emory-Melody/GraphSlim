@@ -97,7 +97,6 @@ class BaseGNN(nn.Module):
         else:
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
                                                           data.labels_val, device=self.device)
-        print(adj.shape)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 

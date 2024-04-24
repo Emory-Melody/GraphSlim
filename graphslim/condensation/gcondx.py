@@ -32,7 +32,7 @@ class GCondX(GCondBase):
 
         for it in range(args.epochs):
             # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv', 'flickr', 'reddit']:
+            if args.dataset in ['ogbn-arxiv', 'flickr']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                                 dropout=0.0, with_bn=False,
                                 weight_decay=0e-4, nlayers=args.nlayers,
@@ -102,10 +102,9 @@ class GCondX(GCondBase):
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [400, 600, 1000]
             # if it == 0:
 
-            if it + 1 in eval_epochs:
+            if it + 1 in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):

@@ -44,7 +44,7 @@ class Evaluator:
         for ix, (c, num) in enumerate(sorted_counter):
             if ix == len(sorted_counter) - 1:
                 num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
-                print(num_class_dict[c])
+                # print(num_class_dict[c])
                 self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
                 labels_syn += [c] * num_class_dict[c]
             else:
@@ -117,6 +117,7 @@ class Evaluator:
 
     def get_syn_data(self, model_type=None, verbose=False):
 
+        args = self.args
         adj_syn, feat_syn, labels_syn = load_reduced(self.args)
 
         if model_type == 'MLP':
@@ -127,7 +128,11 @@ class Evaluator:
             print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-        if self.args.epsilon > 0:
+        if args.dataset in ['cora', 'citeseer']:
+            args.epsilon = 0.05
+        else:
+            args.epsilon = 0.01
+        if args.epsilon > 0:
             adj_syn[adj_syn < self.args.epsilon] = 0
             if verbose:
                 print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))

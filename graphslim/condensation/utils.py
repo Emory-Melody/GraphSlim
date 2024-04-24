@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 
 def match_loss(gw_syn, gw_real, args, device):
     dis = torch.tensor(0.0).to(device)
@@ -40,7 +41,6 @@ def match_loss(gw_syn, gw_real, args, device):
 def distance_wb(gwr, gws):
     shape = gwr.shape
 
-    # TODO: output node!!!!
     if len(gwr.shape) == 2:
         gwr = gwr.T
         gws = gws.T
@@ -62,3 +62,4 @@ def distance_wb(gwr, gws):
         1 - torch.sum(gwr * gws, dim=-1) / (torch.norm(gwr, dim=-1) * torch.norm(gws, dim=-1) + 0.000001))
     dis = dis_weight
     return dis
+

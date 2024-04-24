@@ -33,16 +33,15 @@ class DosCond(GCondBase):
 
         for it in range(args.epochs):
             # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv', 'flickr', 'reddit']:
+            if args.dataset in ['ogbn-arxiv']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                                 dropout=0.0, with_bn=False,
                                 weight_decay=0e-4, nlayers=args.nlayers,
                                 nclass=data.nclass,
                                 device=self.device).to(self.device)
             else:
-                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=0, weight_decay=0,
-                            nlayers=args.nlayers, with_bn=False,
+                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
+                            nclass=data.nclass, dropout=0, nlayers=args.nlayers,
                             device=self.device).to(self.device)
 
             model.initialize()

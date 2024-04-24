@@ -3,7 +3,7 @@ import numpy as np
 from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
-class CentD(MFCoreSet):
+class CentP(MFCoreSet):
     # select nodes with topk PR value in each class
     def select(self, embedds=None):
         pr = self.pagerank_algorithm()  # Retrieve PageRank values, assumed to be a dictionary or array

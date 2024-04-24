@@ -15,8 +15,8 @@ class GCond(GCondBase):
     def reduce(self, data, verbose=True):
 
         args = self.args
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
+        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         syn_class_indices = self.syn_class_indices
 
@@ -32,7 +32,7 @@ class GCond(GCondBase):
 
         for it in range(args.epochs):
             # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv', 'flickr', 'reddit']:
+            if args.dataset in ['ogbn-arxiv', 'flickr']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                                 dropout=0.0, with_bn=False,
                                 weight_decay=0e-4, nlayers=args.nlayers,
@@ -125,10 +125,9 @@ class GCond(GCondBase):
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            eval_epochs = [400, 600, 1000]
             # if it == 0:
 
-            if it + 1 in eval_epochs:
+            if it + 1 in args.checkpoints:
                 # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []

@@ -74,6 +74,44 @@ def row_normalize_tensor(mx):
     return mx
 
 
+# sfgc utils#
+
+def one_hot_sfgc(x,
+                 num_classes,
+                 center=True,
+                 dtype=np.float32):
+    assert len(x.shape) == 1
+    one_hot_vectors = np.array(x[:, None] == np.arange(num_classes), dtype)
+    if center:
+        one_hot_vectors = one_hot_vectors - 1. / num_classes
+    return one_hot_vectors
+
+
+def calc(gntk, feat1, feat2, diag1, diag2, A1, A2):
+    return gntk.gntk(feat1, feat2, diag1, diag2, A1, A2)
+
+
+def loss_acc_fn_train(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
+    # print(k_ss.device, torch.abs(torch.tensor(reg)).to(k_ss.device),torch.trace(k_ss).device, torch.eye(k_ss.shape[0]).device)
+    k_ss_reg = (k_ss + torch.abs(torch.tensor(reg)).to(k_ss.device) * torch.trace(k_ss).to(k_ss.device) * torch.eye(
+        k_ss.shape[0]).to(k_ss.device) / k_ss.shape[0])
+    pred = torch.matmul(k_ts[data.idx_train, :].cuda(), torch.matmul(torch.linalg.inv(k_ss_reg).cuda(),
+                                                                     torch.from_numpy(y_support).to(
+                                                                         torch.float64).cuda()))
+    mse_loss = torch.nn.functional.mse_loss(pred.to(torch.float64).cuda(),
+                                            torch.from_numpy(y_target).to(torch.float64).cuda(), reduction="mean")
+    acc = 0
+    return mse_loss, acc
+
+
+def loss_acc_fn_eval(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
+    k_ss_reg = (k_ss + np.abs(reg) * np.trace(k_ss) * np.eye(k_ss.shape[0]) / k_ss.shape[0])
+    pred = np.dot(k_ts, np.linalg.inv(k_ss_reg).dot(y_support))
+    mse_loss = 0.5 * np.mean((pred - y_target) ** 2)
+    acc = np.mean(np.argmax(pred, axis=1) == np.argmax(y_target, axis=1))
+    return mse_loss, acc
+
+
 # =================scaling up========#
 
 
@@ -100,7 +138,8 @@ def index_to_mask(index, size):
 #     condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
 #     print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
 
-def to_tensor(*vars, device='cpu'):
+def to_tensor(*vars, **kwargs):
+    device = kwargs.get('device', 'cpu')
     tensor_list = []
     for var in vars:
         if sp.issparse(var):
@@ -110,6 +149,13 @@ def to_tensor(*vars, device='cpu'):
         else:
             pass
         tensor_list.append(var.to(device))
+    for key, value in kwargs.items():
+        if key != 'device':
+            if 'label' in key:
+                tensor = torch.tensor(value, dtype=torch.long).to(device)
+            else:
+                tensor = torch.tensor(value).to(device)
+            tensor_list.append(tensor)
     return tensor_list
 
 
