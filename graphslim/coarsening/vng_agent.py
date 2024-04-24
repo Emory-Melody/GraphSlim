@@ -1,13 +1,13 @@
 import copy
-import time
 
 import numpy as np
 import torch
 from sklearn.cluster import KMeans
 
 from graphslim.dataset.utils import save_reduced
+from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import GCN
-from graphslim.utils import one_hot, cal_storage
+from graphslim.utils import one_hot
 
 
 class VNG:
@@ -17,10 +17,8 @@ class VNG:
         self.device = args.device
         # pass data for initialization
 
-    def reduce(self, data, verbose=True):
-        if verbose:
-            start = time.perf_counter()
-
+    @verbose_time_memory
+    def reduce(self, data, verbose=False):
         args = self.args
         setting = self.setting
         # device = self.device
@@ -49,11 +47,6 @@ class VNG:
             coarsen_edge, coarsen_features, coarsen_labels = self.vng(embeds, data.adj_train, labels)
 
         data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_labels
-
-        if verbose:
-            end = time.perf_counter()
-            print("Reduce Time: ", (end - start) * 1000, "ms")
-            cal_storage(data, setting=args.setting)
 
         save_reduced(coarsen_edge, coarsen_features, coarsen_labels, args)
 

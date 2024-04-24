@@ -1,22 +1,30 @@
-from tqdm import trange
-
 from graphslim.condensation.gcond_base import GCondBase
-from graphslim.condensation.utils import match_loss  # graphslim
+from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
-from graphslim.evaluation.utils import verbose_time_memory
+from graphslim.evaluation import *
 from graphslim.models import *
 from graphslim.utils import *
 
 
-class DosCondX(GCondBase):
+class SGDD(GCondBase):
+
     def __init__(self, setting, data, args, **kwargs):
-        super(DosCondX, self).__init__(setting, data, args, **kwargs)
+        super(SGDD, self).__init__(setting, data, args, **kwargs)
+        if data.adj_full.shape[0] < 5000:
+            args.mx_size = data.adj_full.shape[0]
+        else:
+            args.mx_size = 5000
+            # data.adj_mx = data.adj_full[:args.mx_size, :args.mx_size]
+        self.IGNR = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args).to(
+            self.device)
+        self.optimizer_IGNR = torch.optim.Adam(self.IGNR.parameters(), lr=args.lr_adj)
+        self.graphon = 1
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
 
         args = self.args
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        feat_syn, IGNR, labels_syn = to_tensor(self.feat_syn, self.IGNR, label=data.labels_syn, device=self.device)
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         syn_class_indices = self.syn_class_indices
@@ -24,7 +32,6 @@ class DosCondX(GCondBase):
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
-        self.adj_syn = torch.eye(feat_sub.shape[0], device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -32,7 +39,7 @@ class DosCondX(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        for it in trange(args.epochs):
+        for it in range(args.epochs):
             # seed_everything(args.seed + it)
             if args.dataset in ['ogbn-arxiv']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
@@ -41,12 +48,12 @@ class DosCondX(GCondBase):
                                 nclass=data.nclass,
                                 device=self.device).to(self.device)
             else:
-                # model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
-                #             nclass=data.nclass, dropout=0, nlayers=args.nlayers,
+                # model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                #             nclass=data.nclass, dropout=0, weight_decay=0,
+                #             nlayers=args.nlayers, with_bn=False,
                 #             device=self.device).to(self.device)
-                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=0, weight_decay=0,
-                            nlayers=args.nlayers, with_bn=False,
+                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
+                            nclass=data.nclass, dropout=0, nlayers=args.nlayers,
                             device=self.device).to(self.device)
 
             model.initialize()
@@ -55,7 +62,16 @@ class DosCondX(GCondBase):
             model.train()
 
             for ol in range(outer_loop):
-                adj_syn_norm = self.adj_syn
+
+                if adj.size(0) > 5000:
+                    random_nodes = np.random.choice(list(range(adj.size(0))), 5000, replace=False)
+                    adj_syn, opt_loss = IGNR(self.feat_syn, Lx=adj[random_nodes].to_dense()[:, random_nodes])
+                else:
+                    adj_syn, opt_loss = IGNR(self.feat_syn, Lx=adj)
+
+                # adj_syn = pge(self.feat_syn)
+                adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                # feat_syn_norm = feat_syn
 
                 model = self.check_bn(model)
 
@@ -83,37 +99,62 @@ class DosCondX(GCondBase):
                     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
                 loss_avg += loss.item()
+                # if args.alpha > 0:
+                #     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
+                # else:
+                # loss_reg = torch.tensor(0)
 
+                # loss = loss + loss_reg
+
+                # update sythetic graph
                 self.optimizer_feat.zero_grad()
-                loss.backward()
-                self.optimizer_feat.step()
+                self.optimizer_IGNR.zero_grad()
+
+                if it % 50 < 10:
+                    loss = loss + args.opt_scale * opt_loss
+                    loss.backward()
+                    self.optimizer_IGNR.step()
+                else:
+                    loss.backward()
+                    self.optimizer_feat.step()
+                # else:
+                #     if ol < outer_loop // 5:
+                #         self.optimizer_pge.step()
+                #     else:
+                #         self.optimizer_feat.step()
+
+                # if verbose and ol % 5 == 0:
+                #     print('Gradient matching loss:', loss.item())
 
                 feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = adj_syn_inner_norm = adj_syn_norm
-                # if args.normalize_features:
-                #     feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                # else:
-                #     feat_syn_inner_norm = feat_syn_inner
-                # for j in range(inner_loop):
-                #     optimizer_model.zero_grad()
-                #     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
-                #     loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
-                #     loss_syn_inner.backward()
-                #     # print(loss_syn_inner.item())
-                #     optimizer_model.step()  # update gnn param
+                adj_syn_inner = IGNR.inference(feat_syn_inner)
+                adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
+                if args.normalize_features:
+                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
+                else:
+                    feat_syn_inner_norm = feat_syn_inner
+                for j in range(inner_loop):
+                    optimizer_model.zero_grad()
+                    output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
+                    loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
+                    loss_syn_inner.backward()
+                    # print(loss_syn_inner.item())
+                    optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and (it + 1) % 100 == 0:
+            if verbose and (it + 1) % 10 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
+            # eval_epochs = [400, 600, 1000]
             # if it == 0:
 
             if it + 1 in args.checkpoints:
+                # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):
-                    res.append(self.test_with_val(verbose=False, setting=args.setting))
+                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
 
                 res = np.array(res)
                 current_val = res.mean()

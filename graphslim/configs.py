@@ -33,7 +33,7 @@ def setting_config(args):
 
 # recommend hyperparameters here
 def method_config(args):
-    if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx']:
+    if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx', 'sgdd']:
         if args.dataset in ['flickr']:
             args.nlayers = 2
             args.weight_decay = 0
@@ -53,6 +53,16 @@ def method_config(args):
             args.dis_metric = 'mse'
             args.lr_feat = 5e-2
             args.lr_adj = 5e-2
+        if args.method in ['sgdd']:
+            args.opt_scale = 0.1
+            args.ep_ratio = 0.5
+            args.sinkhorn_iter = 5
+            args.dis_metric = 'mse'
+            args.lr_feat = 1e-4
+            if args.dataset in ['ogbn-arxiv', 'reddit']:
+                args.lr_adj = 1e-4
+            else:
+                args.lr_adj = 1e-3
 
     return args
 
@@ -101,6 +111,7 @@ def cli(ctx, **kwargs):
         else:
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
+        print("device:", args.device)
         seed_everything(args.seed)
         path = "checkpoints/"
         if not os.path.isdir(path):

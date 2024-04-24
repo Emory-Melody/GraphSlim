@@ -21,6 +21,7 @@ class GCondBase:
         n = self.data.labels_syn.shape[0]
         self.nnodes_syn = n
         d = data.feat_train.shape[1]
+        self.d = d
         print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
         print(f'actual reduced size:{n}')
 
@@ -107,6 +108,17 @@ class GCondBase:
             if args.dataset == 'ogbn-arxiv':
                 return 5, 0
             return 1, 0
+        if args.method == 'sgdd':
+            if args.dataset in ['ogbn-arxiv']:
+                return 20, 0
+            if args.dataset in ['cora']:
+                return 20, 15
+            if args.dataset in ['citeseer']:
+                return 20, 15
+            if args.dataset in ['physics']:
+                return 20, 10
+            else:
+                return 20, 10
         if args.dataset in ['ogbn-arxiv']:
             return 20, 0
         if args.dataset in ['reddit']:

@@ -1,3 +1,4 @@
+from .IGNR import GraphonLearner as IGNR
 from .appnp import APPNP, APPNPRich
 from .cheby import Cheby
 from .gat import GAT

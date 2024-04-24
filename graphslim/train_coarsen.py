@@ -16,7 +16,7 @@ if __name__ == '__main__':
             agent = VNG(setting=args.setting, data=graph, args=args)
         else:
             agent = Coarsen(setting=args.setting, data=graph, args=args)
-        reduced_graph = agent.reduce(graph)
+        reduced_graph = agent.reduce(graph, verbose=True)
         if args.setting == 'trans':
             print("real reduction rate", reduced_graph.feat_syn.shape[0] / graph.x.shape[0] * 100, "%")
         else:
