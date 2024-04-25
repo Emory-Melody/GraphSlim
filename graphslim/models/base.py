@@ -48,7 +48,8 @@ class BaseGNN(nn.Module):
 
     def forward(self, x, adj, output_layer_features=False):
         outputs = []
-
+        if isinstance(adj, list):
+            adj = torch.as_tensor(adj)
         for ix, layer in enumerate(self.layers):
             if output_layer_features:
                 outputs.append(x)

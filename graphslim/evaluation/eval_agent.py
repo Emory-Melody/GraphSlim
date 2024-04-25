@@ -118,7 +118,7 @@ class Evaluator:
     def get_syn_data(self, model_type=None, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(self.args)
+        adj_syn, feat_syn, labels_syn = load_reduced(args)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
 
@@ -127,18 +127,20 @@ class Evaluator:
 
         if verbose:
             # print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
-            print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-        if args.dataset in ['cora', 'citeseer']:
-            args.epsilon = 0.05
-        else:
-            args.epsilon = 0.01
-        if args.method not in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco', 'sgdd']:
-            if args.epsilon > 0:
-                adj_syn[adj_syn < args.epsilon] = 0
-                if verbose:
-                    print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+            if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco', 'sgdd']:
+                print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+                if args.dataset in ['cora', 'citeseer']:
+                    args.epsilon = 0.05
+                else:
+                    args.epsilon = 0.01
+                if args.epsilon > 0:
+                    adj_syn[adj_syn < args.epsilon] = 0
+                    if verbose:
+                        print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+            else:
+                print("structure free methods do not need to truncate the adjacency matrix")
 
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
@@ -165,7 +167,7 @@ class Evaluator:
         #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
-        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=self.args.normalize_features,
+        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
                            verbose=verbose,
                            setting=args.setting,
                            reduced=True)

@@ -27,12 +27,17 @@ class SGC(BaseGNN):
         if with_bn:
             print('Warning: SGC does not have bn!!!')
 
-    def forward(self, x, adj):
+    def forward(self, x, adj, output_layer_features=False):
         weight = self.conv.weight
         bias = self.conv.bias
         x = torch.mm(x, weight)
         for i in range(self.nlayers):
-            x = torch.spmm(adj, x)
+            if isinstance(adj, list) or len(adj.shape) == 3:
+                # only synthetic graph use batched adj
+                adj = torch.as_tensor(adj)
+                x = torch.matmul(adj, x)
+            else:
+                x = torch.spmm(adj, x)
         x = x + bias
         if self.multi_label:
             return torch.sigmoid(x)

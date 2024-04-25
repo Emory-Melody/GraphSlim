@@ -153,7 +153,10 @@ def to_tensor(*vars, **kwargs):
             else:
                 tensor = value
             tensor_list.append(tensor)
-    return tensor_list
+    if len(tensor_list) == 1:
+        return tensor_list[0]
+    else:
+        return tensor_list
 
 
 def check_type(var, device):

@@ -86,7 +86,7 @@ class NasEvaluator:
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args.normalize_features)
+    data = get_dataset(args.dataset, args)
 
     if args.dataset in ['cora', 'citeseer']:
         args.epsilon = 0.05

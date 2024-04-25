@@ -5,3 +5,4 @@ from .gcondx import GCondX
 from .gcsntk import GCSNTK
 from .sfgc import SFGC
 from .sgdd import SGDD
+from .msgc import MSGC

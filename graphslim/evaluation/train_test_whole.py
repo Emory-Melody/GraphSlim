@@ -21,7 +21,7 @@ if __name__ == '__main__':
     # load specific augments
     args = load_config(args)
 
-    data = get_dataset(args.dataset, args.normalize_features)
+    data = get_dataset(args.dataset, args)
     results = []
     for k in [2]: # [2, 4, 6, 8, 10]
         for nhid in [256]: # [16,32,64,128,256,512]

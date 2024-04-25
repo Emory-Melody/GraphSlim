@@ -129,10 +129,10 @@ class SGDD(GCondBase):
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = IGNR.inference(feat_syn_inner)
                 adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
-                if args.normalize_features:
-                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                else:
-                    feat_syn_inner_norm = feat_syn_inner
+                # if args.normalize_features:
+                #     feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
+                # else:
+                feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)

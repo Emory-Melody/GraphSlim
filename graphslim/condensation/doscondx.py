@@ -51,7 +51,7 @@ class DosCondX(GCondBase):
 
             model.initialize()
             model_parameters = list(model.parameters())
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
+            # optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
 
             for ol in range(outer_loop):
@@ -90,17 +90,6 @@ class DosCondX(GCondBase):
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = adj_syn_inner_norm = adj_syn_norm
-                # if args.normalize_features:
-                #     feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                # else:
-                #     feat_syn_inner_norm = feat_syn_inner
-                # for j in range(inner_loop):
-                #     optimizer_model.zero_grad()
-                #     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
-                #     loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
-                #     loss_syn_inner.backward()
-                #     # print(loss_syn_inner.item())
-                #     optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
             if verbose and (it + 1) % 100 == 0:

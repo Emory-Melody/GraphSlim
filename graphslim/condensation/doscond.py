@@ -104,7 +104,7 @@ class DosCond(GCondBase):
             # eval_epochs = [400, 600, 1000]
             # if it == 0:
 
-            if it + 1 in args.checkpoint:
+            if it + 1 in args.checkpoints:
                 # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []

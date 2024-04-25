@@ -14,8 +14,8 @@ class GCondX(GCondBase):
     def reduce(self, data, verbose=True):
 
         args = self.args
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, data.labels_syn, device=self.device)
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
+        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         syn_class_indices = self.syn_class_indices
 
@@ -46,7 +46,7 @@ class GCondX(GCondBase):
 
             model.initialize()
             model_parameters = list(model.parameters())
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
+            # optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
 
             for ol in range(outer_loop):

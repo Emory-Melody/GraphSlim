@@ -102,7 +102,7 @@ class SFGC(GCondBase):
         # =============stage 2 coreset init==================#
         agent = KCenter(setting=args.setting, data=data, args=args)
         init_data = agent.reduce(data, verbose=args.verbose)
-        # =============stage 3 trajectory alignment==================#
+        # =============stage 3 trajectory alignment and GNTK evaluation==================#
 
         feat_init, adj_init, labels_init = to_tensor(init_data.feat_syn, init_data.adj_syn, init_data.labels_syn,
                                                      device=self.device)
@@ -124,6 +124,7 @@ class SFGC(GCondBase):
             optimizer_lr = torch.optim.Adam([syn_lr], lr=args.lr_lr)
 
         eval_it_pool = np.arange(0, args.ITER + 1, args.eval_interval).tolist()
+        args.eval_type = 'M'
         model_eval_pool = self.get_eval_pool(args.eval_type, args.condense_model, args.eval_model)
         accs_all_exps = dict()  # record performances of all experiments
 
@@ -439,7 +440,7 @@ class SFGC(GCondBase):
 
         return score_syn_mean, acc_syn_mean, feat_syn_eval, adj_syn_eval, labels_syn_eval
 
-    def get_eval_pool(eval_mode, model, model_eval):
+    def get_eval_pool(self, eval_mode, model, model_eval):
         if eval_mode == 'M':  # multiple architectures
             model_eval_pool = [model, 'GAT', 'MLP', 'APPNP', 'GraphSage', 'Cheby', 'GCN']
         elif eval_mode == 'S':  # itself

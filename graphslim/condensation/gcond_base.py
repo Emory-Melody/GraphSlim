@@ -146,6 +146,9 @@ class GCondBase:
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
+    def intermediate_evaluation(self):
+        pass
+
     def test_with_val(self, verbose=False, setting='trans'):
         res = []
 

@@ -98,7 +98,7 @@ def method_config(args):
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
 @click.option('--epochs', '--eps', default=400, show_default=True)
-# @click.option('--early_stopping', '-E', default=10, show_default=True)
+@click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
 @click.option('--normalize_features', is_flag=True, show_default=True)
@@ -106,6 +106,10 @@ def method_config(args):
 @click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
+@click.option('--init',
+              type=click.Choice(
+                  ['random', 'clustering', 'degree', 'pagerank', 'kcenter', 'herding']
+              ), show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
