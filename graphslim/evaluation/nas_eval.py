@@ -1,12 +1,12 @@
 import csv
 from pathlib import Path
 
+import numpy as np
 from scipy.stats import pearsonr
 
 from graphslim.configs import cli
 from graphslim.dataset import *
 from graphslim.evaluation.eval_agent import Evaluator
-import numpy as np
 
 
 def csv_writer(file_path, num):
@@ -14,11 +14,13 @@ def csv_writer(file_path, num):
         writer = csv.writer(file)
         writer.writerow(num)
 
+
 def csv_reader(file_path):
     with file_path.open(mode='r', newline='') as file:
         reader = csv.reader(file)
         data = list(reader)
     return data
+
 
 class NasEvaluator:
     def __init__(self, data, args):
@@ -74,6 +76,13 @@ class NasEvaluator:
         print("Original results_whole:", results_whole)
         print("Hit position:", hit_position + 1)  # Adding 1 to make it 1-based index
 
+    def best_nas_results(self):
+        # Read the CSV files and get the first row as a list of numbers
+        results_syn = [int(x) for x in csv_reader(Path('results_syn.csv'))[0]]
+        results_whole = [int(x) for x in csv_reader(Path('results_whole.csv'))[0]]
+
+        return max(results_syn), max(results_whole)
+
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
@@ -89,7 +98,3 @@ if __name__ == '__main__':
     # NasEvaluator.evaluate_syn()
 
     NasEvaluator.cal_pearson()
-
-
-
-

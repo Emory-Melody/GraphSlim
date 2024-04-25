@@ -150,7 +150,7 @@ class TransAndInd:
                                                      num_nodes=adj.size(0),
                                                      shuffle=True))
         batch = np.random.permutation(self.class_dict2[c])[:num]
-        out = self.samplers[c].sample(batch)
+        out = self.samplers[c].sample(batch.astype(np.int64))
         return out
 
     # def retrieve_class_multi_sampler(self, c, adj, transductive, num=256, args=None):

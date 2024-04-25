@@ -8,7 +8,7 @@ from tqdm import trange
 from graphslim import utils
 from graphslim.dataset import *
 from graphslim.models import GCN, GAT
-from graphslim.utils import accuracy, seed_everything
+from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
 
 
 class Evaluator:
@@ -119,6 +119,8 @@ class Evaluator:
 
         args = self.args
         adj_syn, feat_syn, labels_syn = load_reduced(self.args)
+        if is_sparse_tensor(adj_syn):
+            adj_syn = adj_syn.to_dense()
 
         if model_type == 'MLP':
             adj_syn = adj_syn - adj_syn
@@ -132,10 +134,11 @@ class Evaluator:
             args.epsilon = 0.05
         else:
             args.epsilon = 0.01
-        if args.epsilon > 0:
-            adj_syn[adj_syn < self.args.epsilon] = 0
-            if verbose:
-                print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+        if args.method not in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco', 'sgdd']:
+            if args.epsilon > 0:
+                adj_syn[adj_syn < args.epsilon] = 0
+                if verbose:
+                    print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
 
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
@@ -168,13 +171,13 @@ class Evaluator:
                            reduced=True)
 
         model.eval()
-        labels_test = data.labels_test.long().cuda()
+        labels_test = data.labels_test.long().to(args.device)
 
         # if model_type == 'MLP':
         #     output = model.predict(data.feat_test, sp.eye(len(data.feat_test),normadj))
         output = model.predict(data.feat_test, data.adj_test)
 
-        if self.args.setting == 'ind':
+        if args.setting == 'ind':
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())

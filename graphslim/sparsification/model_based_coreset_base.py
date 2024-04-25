@@ -8,6 +8,9 @@ from graphslim.utils import to_tensor
 
 
 class MBCoreSet(CoreSet):
+    def __init__(self, setting, data, args, **kwarg):
+        super(MBCoreSet, self).__init__(setting, data, args, **kwarg)
+
     @verbose_time_memory
     def reduce(self, data, verbose=False):
 

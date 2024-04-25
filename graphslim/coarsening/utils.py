@@ -1,7 +1,7 @@
 # import matplotlib.pylab as plt
 import numbers
 
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import scipy as sp

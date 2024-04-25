@@ -51,8 +51,8 @@ def method_config(args):
             args.dis_metric = 'ours'
         if args.method in ['doscond', 'doscondx']:
             args.dis_metric = 'mse'
-            args.lr_feat = 5e-2
-            args.lr_adj = 5e-2
+            args.lr_feat = 1e-2
+            args.lr_adj = 1e-2
         if args.method in ['sgdd']:
             args.opt_scale = 0.1
             args.ep_ratio = 0.5
@@ -109,8 +109,8 @@ def method_config(args):
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
-                   'affinity_GS', 'kron', 'vng',
-                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'sntk', 'disco', 'sgdd', 'gcsntk',
+                   'affinity_GS', 'kron', 'vng', 'clustering',
+                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
@@ -131,7 +131,7 @@ def cli(ctx, **kwargs):
         else:
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
-        print("device:", args.device)
+        # print("device:", args.device)
         seed_everything(args.seed)
         path = "checkpoints/"
         if not os.path.isdir(path):

@@ -25,9 +25,9 @@ class CentP(MFCoreSet):
 
     def pagerank_algorithm(self, damping_factor=0.85, max_iterations=100, convergence_threshold=0.0001):
         if self.args.setting == 'ind':
-            adj = self.data.adj_train.todense()
+            adj = self.data.adj_train.astype(np.uint8).todense()
         else:
-            adj = self.data.adj_full.todense()
+            adj = self.data.adj_full.astype(np.uint8).todense()
         n = adj.shape[0]
 
         # 构建转移矩阵

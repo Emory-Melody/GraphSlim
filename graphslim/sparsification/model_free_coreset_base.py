@@ -10,7 +10,7 @@ from graphslim.utils import normalize_adj_tensor, to_tensor
 
 class MFCoreSet(CoreSet):
     def __init__(self, setting, data, args, **kwargs):
-        super(CoreSet).__init__(setting, data, args, **kwargs)
+        super(MFCoreSet, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=False):
@@ -52,7 +52,7 @@ class MFCoreSet(CoreSet):
 
         print('selected nodes:', idx_selected.shape[0])
         print('induced edges:', data.adj_syn.sum())
-        data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
+        data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
                                                                  device='cpu')
         save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 

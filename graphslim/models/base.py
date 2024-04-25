@@ -89,14 +89,15 @@ class BaseGNN(nn.Module):
         self.initialize()
         # data for training
         if reduced:
-            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, data.labels_val,
+            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
+                                                          label2=data.labels_val,
                                                           device=self.device)
         elif setting == 'trans':
-            adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, data.labels_train,
-                                                          data.labels_val, device=self.device)
+            adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, label=data.labels_train,
+                                                          label2=data.labels_val, device=self.device)
         else:
-            adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,
-                                                          data.labels_val, device=self.device)
+            adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, label=data.labels_train,
+                                                          label2=data.labels_val, device=self.device)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
@@ -110,9 +111,6 @@ class BaseGNN(nn.Module):
             self.multi_label = False
             self.loss = F.nll_loss
 
-        # TODO: we can have two strategies:
-        #  1) validate on the original validation set,
-        #  2) validate on all the nodes except for test set
         if reduced:
             reindex = True
 

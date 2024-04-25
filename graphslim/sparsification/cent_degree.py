@@ -7,9 +7,9 @@ class CentD(MFCoreSet):
     # select nodes with topk PR value in each class
     def select(self, embedds=None):
         if self.args.setting == 'ind':
-            adj = self.data.adj_train.todense()
+            adj = self.data.adj_train(np.uint8).todense()
         else:
-            adj = self.data.adj_full.todense()
+            adj = self.data.adj_full.astype(np.uint8).todense()
         pr = np.asarray(np.sum(adj, axis=1)).ravel()
         idx_selected = []
 

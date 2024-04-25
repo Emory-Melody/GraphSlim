@@ -32,6 +32,8 @@ class SFGC(GCondBase):
             features = data.feat_full
             adj = data.adj_full
             labels = data.labels_full
+
+        features, adj, label = to_tensor(features, adj, label=labels, device=self.device)
         device = args.device
 
         trajectories = []
@@ -42,8 +44,8 @@ class SFGC(GCondBase):
 
             model_class = eval(model_type)
 
-            model = model_class(nfeat=features.shape[1], nhid=args.teacher_hidden, dropout=args.teacher_dropout,
-                                nlayers=args.teacher_nlayers,
+            model = model_class(nfeat=features.shape[1], nhid=args.hidden, dropout=args.dropout,
+                                nlayers=args.nlayers,
                                 nclass=data.nclass, device=device).to(device)
             # print(model)
 
@@ -51,7 +53,7 @@ class SFGC(GCondBase):
 
             model_parameters = list(model.parameters())
 
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr, weight_decay=args.wd_teacher)
+            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr, weight_decay=args.weight_decay)
 
             timestamps = []
 
@@ -62,7 +64,7 @@ class SFGC(GCondBase):
             # lr_schedule = [args.teacher_epochs // 2 + 1]
             #
             # lr = args.lr
-            for e in range(args.teacher_epochs + 1):
+            for e in range(args.epochs):
                 model.train()
                 optimizer_model.zero_grad()
                 _, output = model.forward(features, adj)

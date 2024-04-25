@@ -143,21 +143,27 @@ def to_tensor(*vars, **kwargs):
     device = kwargs.get('device', 'cpu')
     tensor_list = []
     for var in vars:
-        if sp.issparse(var):
-            var = sparse_mx_to_torch_sparse_tensor(var).coalesce()
-        elif isinstance(var, np.ndarray):
-            var = torch.from_numpy(var)
-        else:
-            pass
-        tensor_list.append(var.to(device))
+        var = check_type(var, device)
+        tensor_list.append(var)
     for key, value in kwargs.items():
         if key != 'device':
+            value = check_type(value, device)
             if 'label' in key:
-                tensor = torch.tensor(value, dtype=torch.long).to(device)
+                tensor = value.long()
             else:
-                tensor = torch.tensor(value).to(device)
+                tensor = value
             tensor_list.append(tensor)
     return tensor_list
+
+
+def check_type(var, device):
+    if sp.issparse(var):
+        var = sparse_mx_to_torch_sparse_tensor(var).coalesce()
+    elif isinstance(var, np.ndarray):
+        var = torch.from_numpy(var)
+    else:
+        pass
+    return var.to(device)
 
 
 # ============the following is copy from deeprobust/graph/utils.py=================
