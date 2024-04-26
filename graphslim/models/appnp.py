@@ -137,12 +137,13 @@ class APPNPRich(BaseGNN):
 
         self.sparse_dropout = SparseDropout(dprob=0)
 
-    def forward(self, x, adj):
+    def forward(self, x, adj, output_layer_features=None):
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:
                 x = self.bns[ix](x) if self.with_bn else x
-                x = F.relu(x)
+                # x = F.relu(x)
+                x = self.activation(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
         h = x
@@ -167,7 +168,7 @@ class APPNPRich(BaseGNN):
             x = layer(x)
             if ix != len(self.layers) - 1:
                 x = self.bns[ix](x) if self.with_bn else x
-                x = F.relu(x)
+                x = self.activation(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
         h = x

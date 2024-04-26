@@ -61,7 +61,7 @@ def load_reduced(args):
     adj_syn = torch.load(f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     feat_syn = torch.load(f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     labels_syn = torch.load(f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    print("Loaded reduced data")
+    # print("Loaded reduced data")
     return adj_syn, feat_syn, labels_syn
 
 # =============from graphsaint================#

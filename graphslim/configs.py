@@ -4,7 +4,7 @@ import os
 
 import click
 
-from utils import seed_everything
+from graphslim.utils import seed_everything
 
 
 class Obj(object):

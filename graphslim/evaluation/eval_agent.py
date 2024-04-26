@@ -148,7 +148,7 @@ class Evaluator:
         # return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
         return feat_syn, adj_syn, labels_syn
 
-    def test(self, data, model_type, verbose=True):
+    def test(self, data, model_type, verbose=True, reduced=True):
         args = self.args
         res = []
         feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
@@ -167,10 +167,15 @@ class Evaluator:
         #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
-        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
-                           verbose=verbose,
-                           setting=args.setting,
-                           reduced=True)
+        if reduced:
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
+                               verbose=verbose,
+                               setting=args.setting,
+                               reduced=True)
+        else:
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
+                               verbose=verbose,
+                               setting=args.setting)
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
@@ -240,7 +245,7 @@ class Evaluator:
 
         print('Final result:', final_res)
 
-    def evaluate(self, data, model_type, verbose=True):
+    def evaluate(self, data, model_type, verbose=True, reduced=None):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
         # self.data = data
         args = self.args
@@ -248,17 +253,59 @@ class Evaluator:
         res = []
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
 
-        for i in trange(args.runs):
+        if verbose:
+            runs = trange(args.runs)
+        else:
+            runs = range(args.runs)
+        for i in runs:
             seed_everything(args.seed + i)
-            res.append(self.test(data, model_type=model_type, verbose=False))
+            res.append(self.test(data, model_type=model_type, verbose=verbose, reduced=reduced))
         res = np.array(res)
 
-        print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        if verbose:
+            print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
         return res.mean(), res.std()
-        # else:
-        #     return res[0][0]
-        # print('Test/Train Mean Accuracy:',
-        #       repr([res.mean(0), res.std(0)]))
-        # final_res[model_type] = [res.mean(0), res.std(0)]
-        #
-        # print('Final result:', final_res)
+
+    def nas_evaluate(self, data, model_type, verbose=True, reduced=None):
+        args = self.args
+        res = []
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
+        if verbose:
+            runs = trange(args.runs)
+        else:
+            runs = range(args.runs)
+        for i in runs:
+            seed_everything(args.seed + i)
+            if verbose:
+                print('======= testing %s' % model_type)
+            model_class = eval(model_type)
+
+            feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
+
+            if reduced:
+                model = model_class(nfeat=data.x.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
+                                    nlayers=args.nlayers,
+                                    dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
+                                    activation=args.activation).to(self.device)
+
+                best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
+                                                  normfeat=args.normalize_features,
+                                                  verbose=verbose,
+                                                  setting=args.setting,
+                                                  reduced=True)
+            else:
+                model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
+                                    nlayers=args.nlayers,
+                                    dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
+                                    activation=args.activation).to(self.device)
+
+                best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
+                                                  normfeat=args.normalize_features,
+                                                  verbose=verbose,
+                                                  setting=args.setting)
+            res.append(best_acc_val.item())
+        res = np.array(res)
+
+        if verbose:
+            print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        return res.mean(), res.std()
