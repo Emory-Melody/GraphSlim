@@ -36,6 +36,7 @@ class BaseGNN(nn.Module):
         self.adj_norm = None
         self.features = None
         self.multi_label = None
+        self.float_label = None
 
     def initialize(self):
         """Initialize parameters of GCN.
@@ -65,6 +66,8 @@ class BaseGNN(nn.Module):
 
         if self.multi_label:
             return torch.sigmoid(x)
+        if self.float_label:
+            return F.softmax(x, dim=1)
         else:
             return F.log_softmax(x, dim=1)
 
@@ -108,6 +111,9 @@ class BaseGNN(nn.Module):
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
             self.loss = torch.nn.BCELoss()
+        elif len(labels.shape) > 1:  # for GCSNTK, use MSE for training
+            self.float_label = True
+            self.loss = torch.nn.MSELoss()
         else:
             self.multi_label = False
             self.loss = F.nll_loss

@@ -65,15 +65,15 @@ def method_config(args):
                 args.lr_adj = 1e-3
     if args.method in ['gcsntk']:
         args.adj = False
-        args.iter = 1
+        args.iter = 3
         args.epochs_train = 200
-        args.scale = 'average'
         if args.dataset in ['cora', 'citeseer', 'pubmed']:
             args.k = 2
             args.K = 2
             args.L = 2
             args.lr = 0.01
-            if args.dataset in ['cora']:
+            args.scale = 'average'
+            if args.dataset in ['cora', 'citeseer']:
                 args.ridge = 1e0
             if args.dataset in ['pubmed']:
                 args.ridge = 1e-3
@@ -83,6 +83,11 @@ def method_config(args):
             args.L = 1
             args.lr = 0.001
             args.ridge = 1e-5
+            args.accumulate_steps = 10
+            args.scale = 'add'
+            if args.dataset in ['flickr']:
+                args.batch_size = 2000
+                args.adj = True
 
     return args
 

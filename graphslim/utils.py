@@ -148,7 +148,7 @@ def to_tensor(*vars, **kwargs):
     for key, value in kwargs.items():
         if key != 'device':
             value = check_type(value, device)
-            if 'label' in key:
+            if 'label' in key and len(value.shape) == 1:
                 tensor = value.long()
             else:
                 tensor = value
