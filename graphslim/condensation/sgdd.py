@@ -10,21 +10,24 @@ class SGDD(GCondBase):
 
     def __init__(self, setting, data, args, **kwargs):
         super(SGDD, self).__init__(setting, data, args, **kwargs)
-        if data.adj_full.shape[0] < 5000:
-            args.mx_size = data.adj_full.shape[0]
-        else:
-            args.mx_size = 5000
-            # data.adj_mx = data.adj_full[:args.mx_size, :args.mx_size]
-        self.IGNR = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args).to(
-            self.device)
-        self.optimizer_IGNR = torch.optim.Adam(self.IGNR.parameters(), lr=args.lr_adj)
-        self.graphon = 1
+        self.pge = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
+                        ).to(self.device)
+        self.reset_parameters()
+        self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
+
+    def reset_parameters(self):
+        self.pge.reset_parameters()
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
-
         args = self.args
-        feat_syn, IGNR, labels_syn = to_tensor(self.feat_syn, self.IGNR, label=data.labels_syn, device=self.device)
+
+        if data.adj_full.shape[0] < args.mx_size:
+            args.mx_size = data.adj_full.shape[0]
+        else:
+            data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
+
+        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         syn_class_indices = self.syn_class_indices
@@ -41,19 +44,16 @@ class SGDD(GCondBase):
 
         for it in range(args.epochs):
             # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv']:
+            if args.dataset in ['ogbn-arxiv', 'flickr']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                                 dropout=0.0, with_bn=False,
                                 weight_decay=0e-4, nlayers=args.nlayers,
                                 nclass=data.nclass,
                                 device=self.device).to(self.device)
             else:
-                # model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                #             nclass=data.nclass, dropout=0, weight_decay=0,
-                #             nlayers=args.nlayers, with_bn=False,
-                #             device=self.device).to(self.device)
-                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
-                            nclass=data.nclass, dropout=0, nlayers=args.nlayers,
+                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                            nclass=data.nclass, dropout=0, weight_decay=0,
+                            nlayers=args.nlayers, with_bn=False,
                             device=self.device).to(self.device)
 
             model.initialize()
@@ -62,14 +62,7 @@ class SGDD(GCondBase):
             model.train()
 
             for ol in range(outer_loop):
-
-                if adj.size(0) > 5000:
-                    random_nodes = np.random.choice(list(range(adj.size(0))), 5000, replace=False)
-                    adj_syn, opt_loss = IGNR(self.feat_syn, Lx=adj[random_nodes].to_dense()[:, random_nodes])
-                else:
-                    adj_syn, opt_loss = IGNR(self.feat_syn, Lx=adj)
-
-                # adj_syn = pge(self.feat_syn)
+                adj_syn, opt_loss = pge(self.feat_syn, Lx=data.adj_mx)
                 adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
 
@@ -99,23 +92,27 @@ class SGDD(GCondBase):
                     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
                 loss_avg += loss.item()
-                # if args.alpha > 0:
-                #     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
-                # else:
-                # loss_reg = torch.tensor(0)
 
-                # loss = loss + loss_reg
+                if args.alpha > 0:
+                    loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
+                else:
+                    loss_reg = torch.tensor(0)
+
+                if args.opt_scale > 0:
+                    loss_opt = args.opt_scale * opt_loss
+                else:
+                    loss_opt = torch.tensor(0)
+
+                loss = loss + loss_reg + loss_opt
 
                 # update sythetic graph
                 self.optimizer_feat.zero_grad()
-                self.optimizer_IGNR.zero_grad()
+                self.optimizer_pge.zero_grad()
+                loss.backward()
 
                 if it % 50 < 10:
-                    loss = loss + args.opt_scale * opt_loss
-                    loss.backward()
-                    self.optimizer_IGNR.step()
+                    self.optimizer_pge.step()
                 else:
-                    loss.backward()
                     self.optimizer_feat.step()
                 # else:
                 #     if ol < outer_loop // 5:
@@ -127,12 +124,12 @@ class SGDD(GCondBase):
                 #     print('Gradient matching loss:', loss.item())
 
                 feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = IGNR.inference(feat_syn_inner)
+                adj_syn_inner = pge.inference(feat_syn_inner)
                 adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
-                # if args.normalize_features:
-                #     feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                # else:
-                feat_syn_inner_norm = feat_syn_inner
+                if args.normalize_features:
+                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
+                else:
+                    feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
@@ -146,7 +143,6 @@ class SGDD(GCondBase):
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # eval_epochs = [400, 600, 1000]
             # if it == 0:
 
             if it + 1 in args.checkpoints:

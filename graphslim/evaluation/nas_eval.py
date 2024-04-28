@@ -134,7 +134,7 @@ if __name__ == '__main__':
     else:
         args.epsilon = 0.01
 
-    NasEvaluator = NasEvaluator(data, args)
+    NasEvaluator = NasEvaluator(args)
 
     NasEvaluator.evaluate()
 

@@ -120,7 +120,7 @@ class GCondBase:
             else:
                 return 20, 10
         if args.dataset in ['ogbn-arxiv']:
-            return 20, 0
+            return 20, 3
         if args.dataset in ['reddit']:
             return 10, 1
         if args.dataset in ['flickr']:

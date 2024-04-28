@@ -245,7 +245,7 @@ class Evaluator:
 
         print('Final result:', final_res)
 
-    def evaluate(self, data, model_type, verbose=True, reduced=None):
+    def evaluate(self, data, model_type, verbose=True, reduced=True):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
         # self.data = data
         args = self.args

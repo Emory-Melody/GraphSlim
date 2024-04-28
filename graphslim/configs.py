@@ -22,12 +22,10 @@ def setting_config(args):
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
-    args.epochs = 1000
     args.hidden = 256
     args.checkpoints = [400, 600, 1000]
     args.eval_hidden = 256
     args.eval_epochs = 600
-    args.normalize_features = True
     return args
 
 
@@ -54,15 +52,27 @@ def method_config(args):
             args.lr_feat = 1e-2
             args.lr_adj = 1e-2
         if args.method in ['sgdd']:
-            args.opt_scale = 0.1
-            args.ep_ratio = 0.5
-            args.sinkhorn_iter = 5
-            args.dis_metric = 'mse'
+            args.normalize_features = False
+            args.epochs = 600
+            args.mx_size = 100
+            args.dis_metric = 'ours'
+            args.lr = 0.01
             args.lr_feat = 1e-4
+            args.lr_adj = 1e-4
+            args.alpha = 0
+            args.opt_scale = 1e-11
+            args.ep_ratio = 0.5
+            args.sinkhorn_iter = 10
+            args.beta = 0.5
+            args.weight_decay = 0
+            args.dropout = 0
             if args.dataset in ['ogbn-arxiv', 'reddit']:
-                args.lr_adj = 1e-4
-            else:
-                args.lr_adj = 1e-3
+                args.epochs = 500
+                args.lr_feat = 0.01
+                args.opt_scale = 1e-12
+            elif args.dataset in ['citeseer']:
+                args.opt_scale = 1e-9
+
     if args.method in ['gcsntk']:
         args.adj = False
         args.iter = 3
@@ -102,7 +112,7 @@ def method_config(args):
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
-@click.option('--epochs', '--eps', default=400, show_default=True)
+@click.option('--epochs', '--eps', default=1000, show_default=True)
 @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)

@@ -122,7 +122,7 @@ class TransAndInd:
         if self.class_dict2 is None:
             self.class_dict2 = {}
             for i in range(self.nclass):
-                if args.setting == 'ind':
+                if args.setting == 'trans':
                     idx = self.idx_train[self.labels_train == i]
                 else:
                     idx = np.arange(len(self.labels_train))[self.labels_train == i]

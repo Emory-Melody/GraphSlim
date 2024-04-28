@@ -206,9 +206,9 @@ def tensor2onehot(labels):
 
     """
 
-    eye = torch.eye(labels.max() + 1)
+    eye = torch.eye(labels.max() + 1).to(labels.device)
     onehot_mx = eye[labels]
-    return onehot_mx.to(labels.device)
+    return onehot_mx
 
 
 def preprocess(adj, features, labels, preprocess_adj=False, preprocess_feature=False, sparse=False, device='cpu'):
