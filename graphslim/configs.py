@@ -23,9 +23,10 @@ def setting_config(args):
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
     args.hidden = 256
-    args.checkpoints = [400, 600, 1000]
+    args.checkpoints = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     args.eval_hidden = 256
     args.eval_epochs = 600
+    args.normalize_features = False
     return args
 
 
@@ -33,14 +34,12 @@ def setting_config(args):
 def method_config(args):
     if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx', 'sgdd']:
         if args.dataset in ['flickr']:
-            args.nlayers = 2
-            args.weight_decay = 0
-            args.dropout = 0.0
+            args.lr_feat = 0.005
+            args.lr_adj = 0.005
 
         if args.dataset in ['reddit']:
-            args.nlayers = 2
-            args.weight_decay = 0
-            args.dropout = 0
+            args.lr_feat = 0.1
+            args.lr_adj = 0.1
 
         if args.dataset in ['ogbn-arxiv']:
             args.weight_decay = 0

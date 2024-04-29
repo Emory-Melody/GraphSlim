@@ -123,8 +123,7 @@ class SFGC(GCondBase):
             syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
             optimizer_lr = torch.optim.Adam([syn_lr], lr=args.lr_lr)
 
-        eval_it_pool = np.arange(0, args.ITER + 1, args.eval_interval).tolist()
-        args.eval_type = 'M'
+        args.eval_type = 'GCN'
         model_eval_pool = self.get_eval_pool(args.eval_type, args.condense_model, args.eval_model)
         accs_all_exps = dict()  # record performances of all experiments
 
@@ -226,22 +225,22 @@ class SFGC(GCondBase):
                 adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
                 adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 adj_syn_input = adj_syn_cal_norm
-            for step in range(args.syn_steps):
+            for step in range(200):
                 forward_params = student_params[-1]
                 feat_out, output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
                 loss_syn = F.nll_loss(output_syn, self.labels_syn)
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
                 acc_syn = accuracy(output_syn, self.labels_syn)
                 student_params.append(student_params[-1] - syn_lr * grad)
-                if step % 500 == 0:
-                    _, output_test = model.forward(features, adj_tensor_norm, flat_param=student_params[-1])
-                if args.setting == 'ind':
-                    acc_test = accuracy(output_test, labels)
-                else:
-                    acc_test = accuracy(output_test[data.idx_test], labels[data.idx_test])
-                print('loss = {:.4f},acc_syn = {:.4f},acc_test = {:.4f}'.format(loss_syn.item(),
-                                                                                acc_syn.item(),
-                                                                                acc_test.item()))
+                # if step % 500 == 0:
+                #     _, output_test = model.forward(features, adj_tensor_norm, flat_param=student_params[-1])
+                # if args.setting == 'ind':
+                #     acc_test = accuracy(output_test, labels)
+                # else:
+                #     acc_test = accuracy(output_test[data.idx_test], labels[data.idx_test])
+                # print('loss = {:.4f},acc_syn = {:.4f},acc_test = {:.4f}'.format(loss_syn.item(),
+                #                                                                 acc_syn.item(),
+                #                                                                 acc_test.item()))
 
             param_loss = torch.tensor(0.0).to(self.device)
             param_dist = torch.tensor(0.0).to(self.device)
@@ -279,7 +278,7 @@ class SFGC(GCondBase):
                         start_epoch,
                         syn_lr.item()))
 
-            if it in eval_it_pool and it > 0:
+            if it in args.checkpoints:
                 for model_eval in model_eval_pool:
                     print('Evaluation: model_train = {}, model_eval = {}, iteration = {}'.format(args.condense_model,
                                                                                                  model_eval,

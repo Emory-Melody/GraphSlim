@@ -1,4 +1,5 @@
 import math
+
 import torch
 import torch.nn as nn
 
@@ -37,6 +38,7 @@ class StructureBasedNeuralTangentKernel(nn.Module):
 
     def aggr(self, S, aggr_optor, n1, n2, scale_mat):
         S = torch.sparse.mm(aggr_optor, S.reshape(-1)[:, None]).reshape(n1, n2) * scale_mat
+        S += 1e-9
         return S
 
     def update_sigma(self, S, diag1, diag2):

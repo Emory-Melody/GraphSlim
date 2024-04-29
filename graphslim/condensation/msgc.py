@@ -17,10 +17,9 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
         self.x_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
-        self.batch_size = 2  # just for test
+        self.batch_size = 16  # just for test
         self.n_classes = data.nclass
         self.device = args.device
-        self.initial = args.init
 
         self.adj_mlp = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
@@ -48,19 +47,20 @@ class MSGC(GCondBase):
                           device=self.device).to(args.device)
 
         self.reset_adj_batch()
-
+        # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.x_syn.data.copy_(feat_sub)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
         optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)
-        ##############################在不同的初始化下进行优化###############################
-        smallest_loss = 99999.
+        # smallest_loss = 99999.
+        best_val = 0
         args.window = args.patience
         losses = FixLenList(args.window)
         x_syns = FixLenList(args.window)
         adj_t_syns = FixLenList(args.window)
         optimizer_basic_model = torch.optim.Adam(basic_model.parameters(), lr=args.lr)
+
         for it in trange(args.epochs):
             basic_model.initialize()
             loss_avg = 0
@@ -114,26 +114,38 @@ class MSGC(GCondBase):
                     loss.backward()
                     optimizer_basic_model.step()
                     losses.append(loss.item())
-            #################完成了某个初始化下的优化，下面进行记录，评价###########################
-            loss_avg /= (data.nclass * 20)
-            losses.append(loss_avg)
-            x_syns.append(x_syn.clone())
-            adj_t_syns.append(adj_t_syn.clone())
-            loss_window = sum(losses) / len(losses)
-            if loss_window < smallest_loss:
-                patience = 0
-                smallest_loss = loss_window
+            if it + 1 in args.checkpoints:
+                loss_avg /= (data.nclass * 20)
+                losses.append(loss_avg)
+                x_syns.append(x_syn.clone())
+                adj_t_syns.append(adj_t_syn.clone())
+                # loss_window = sum(losses) / len(losses)
+                # if loss_window < smallest_loss:
+                # patience = 0
+                # smallest_loss = loss_window
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 # add batch sum
-                best_adj_t_syn = torch.sum(sum(adj_t_syns.data) / len(adj_t_syns.data), dim=0)
-                print(
-                    f'{it} loss:{smallest_loss:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
-            else:
-                patience += 1
-                if patience >= args.patience:
-                    break
+                best_adj_t_syn = torch.mean(sum(adj_t_syns.data) / len(adj_t_syns.data), dim=0)
+                # print(
+                #     f'{it} loss:{smallest_loss:.4f}')
+                # else:
+                #     patience += 1
+                #     if patience >= args.patience:
+                #         break
+                data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, self.y_syn
+                res = []
+                for i in range(3):
+                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
 
-        save_reduced(best_adj_t_syn, best_x_syn, data.labels_syn, args)
+                res = np.array(res)
+                current_val = res.mean()
+                if verbose:
+                    print('Val Accuracy and Std:',
+                          repr([current_val, res.std()]))
+
+                if current_val > best_val:
+                    best_val = current_val
+                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data
 

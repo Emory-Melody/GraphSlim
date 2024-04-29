@@ -166,7 +166,7 @@ def check_type(var, device):
         var = torch.from_numpy(var)
     else:
         pass
-    return var.to(device)
+    return var.float().to(device)
 
 
 # ============the following is copy from deeprobust/graph/utils.py=================
@@ -360,13 +360,27 @@ def normalize_adj_tensor(adj, sparse=False):
         return adj
 
     else:
-        mx = adj + torch.eye(adj.shape[0]).to(device)
-        rowsum = mx.sum(1)
-        r_inv = rowsum.pow(-1 / 2).flatten()
-        r_inv[torch.isinf(r_inv)] = 0.
-        r_mat_inv = torch.diag(r_inv)
-        mx = r_mat_inv @ mx
-        mx = mx @ r_mat_inv
+        if len(adj.shape) == 3:
+            adjs = []
+            for i in range(adj.shape[0]):
+                adj = adj[i]
+                adj = dense_gcn_norm(adj, device)
+                adjs.append(adj)
+            return torch.stack(adjs)
+        else:
+            adj = dense_gcn_norm(adj, device)
+
+            return adj
+
+
+def dense_gcn_norm(adj, device):
+    mx = adj + torch.eye(adj.shape[0]).to(device)
+    rowsum = mx.sum(1)
+    r_inv = rowsum.pow(-1 / 2).flatten()
+    r_inv[torch.isinf(r_inv)] = 0.
+    r_mat_inv = torch.diag(r_inv)
+    mx = r_mat_inv @ mx
+    mx = mx @ r_mat_inv
     return mx
 
 

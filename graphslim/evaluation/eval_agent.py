@@ -132,7 +132,7 @@ class Evaluator:
             if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco', 'sgdd']:
                 print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
                 if args.dataset in ['cora', 'citeseer']:
-                    args.epsilon = 0.05
+                    args.epsilon = 0.005
                 else:
                     args.epsilon = 0.01
                 if args.epsilon > 0:
@@ -259,7 +259,7 @@ class Evaluator:
             runs = range(args.runs)
         for i in runs:
             seed_everything(args.seed + i)
-            res.append(self.test(data, model_type=model_type, verbose=verbose, reduced=reduced))
+            res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced))
         res = np.array(res)
 
         if verbose:

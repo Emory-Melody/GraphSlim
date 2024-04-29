@@ -1,3 +1,5 @@
+from tqdm import trange
+
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
@@ -16,13 +18,17 @@ class GCond(GCondBase):
 
         args = self.args
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        if args.setting == 'trans':
+            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        else:
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
+                                              device=self.device)
 
         syn_class_indices = self.syn_class_indices
 
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.feat_syn.data.copy_(feat_sub)
+        self.feat_syn.data.copy_(torch.from_numpy(feat_sub))
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -30,13 +36,13 @@ class GCond(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        for it in range(args.epochs):
+        for it in trange(args.epochs):
             # seed_everything(args.seed + it)
             if args.dataset in ['ogbn-arxiv', 'flickr']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                                dropout=0.0, with_bn=False,
-                                weight_decay=0e-4, nlayers=args.nlayers,
-                                nclass=data.nclass,
+                                dropout=0, with_bn=False,
+                                weight_decay=0, nlayers=args.nlayers,
+                                nclass=data.nclass, ntrans=2,
                                 device=self.device).to(self.device)
             else:
                 model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
@@ -66,15 +72,25 @@ class GCond(GCondBase):
                     adjs = [adj.to(self.device) for adj in adjs]
                     output = model.forward_sampler(features[n_id], adjs)
                     loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-
                     gw_real = torch.autograd.grad(loss_real, model_parameters)
                     gw_real = list((_.detach().clone() for _ in gw_real))
-                    output_syn = model.forward(feat_syn, adj_syn_norm)
+                    if args.setting == 'ind':
+                        ind = syn_class_indices[c]
+                        if args.nlayers == 1:
+                            adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
+                        else:
+                            adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
+                                                [adj_syn_norm[ind[0]: ind[1]]]
 
-                    ind = syn_class_indices[c]
-                    loss_syn = F.nll_loss(
-                        output_syn[ind[0]: ind[1]],
-                        labels_syn[ind[0]: ind[1]])
+                        output_syn = model.forward_syn(feat_syn, adj_syn_norm_list)
+                        loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
+                    else:
+                        output_syn = model.forward(feat_syn, adj_syn_norm)
+                        ind = syn_class_indices[c]
+                        loss_syn = F.nll_loss(
+                            output_syn[ind[0]: ind[1]],
+                            labels_syn[ind[0]: ind[1]])
+
                     gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
                     coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
                     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
@@ -108,10 +124,7 @@ class GCond(GCondBase):
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
                 adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
-                if args.normalize_features:
-                    feat_syn_inner_norm = F.normalize(feat_syn_inner, dim=0)
-                else:
-                    feat_syn_inner_norm = feat_syn_inner
+                feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)

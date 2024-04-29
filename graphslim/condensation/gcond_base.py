@@ -104,7 +104,7 @@ class GCondBase:
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
 
-        if args.method == ['doscond', 'doscondx']:
+        if args.method in ['doscond', 'doscondx']:
             if args.dataset == 'ogbn-arxiv':
                 return 5, 0
             return 1, 0
@@ -119,19 +119,12 @@ class GCondBase:
                 return 20, 10
             else:
                 return 20, 10
-        if args.dataset in ['ogbn-arxiv']:
-            return 20, 3
-        if args.dataset in ['reddit']:
-            return 10, 1
-        if args.dataset in ['flickr']:
-            return 10, 1
-            # return 10, 1
-        if args.dataset in ['cora']:
-            return 20, 10
-        if args.dataset in ['citeseer']:
-            return 20, 5  # at least 200 epochs
-        else:
-            return 20, 1
+        if args.method in ['gcond', 'gcondx']:
+            if args.dataset in ['flickr', 'reddit']:
+                return 10, 1
+            if args.dataset in ['ogbn-arxiv', 'cora', 'citeseer']:
+                return 20, 3
+        return 10, 1
 
     def check_bn(self, model):
         BN_flag = False

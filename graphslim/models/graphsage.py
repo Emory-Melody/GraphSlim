@@ -52,7 +52,7 @@ class GraphSage(BaseGNN):
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         if normfeat:
-            features = F.normalize(features, dim=0)
+            features = F.normalize(features, p=1, dim=1)
 
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
@@ -78,7 +78,7 @@ class GraphSage(BaseGNN):
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
         if normfeat:
-            feat_full = F.normalize(feat_full, dim=0)
+            feat_full = F.normalize(feat_full, p=1, dim=1)
         if adj.density() > 0.5:  # if the weighted graph is too dense, we need a larger neighborhood size
             sizes = [30, 20]
         else:

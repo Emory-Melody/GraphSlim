@@ -49,8 +49,6 @@ class BaseGNN(nn.Module):
 
     def forward(self, x, adj, output_layer_features=False):
         outputs = []
-        if isinstance(adj, list):
-            adj = torch.as_tensor(adj)
         for ix, layer in enumerate(self.layers):
             if output_layer_features:
                 outputs.append(x)
@@ -106,7 +104,7 @@ class BaseGNN(nn.Module):
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         if normfeat:
-            features = F.normalize(features, dim=0)
+            features = F.normalize(features, p=1, dim=1)
 
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
@@ -138,7 +136,7 @@ class BaseGNN(nn.Module):
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
         if normfeat:
-            feat_full = F.normalize(feat_full, dim=0)
+            feat_full = F.normalize(feat_full, p=1, dim=1)
 
         self.train()
         for i in range(train_iters):
