@@ -129,7 +129,7 @@ class Evaluator:
             # print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
 
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-            if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco', 'sgdd']:
+            if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
                 print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
                 if args.dataset in ['cora', 'citeseer']:
                     args.epsilon = 0.005

@@ -22,11 +22,11 @@ def setting_config(args):
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
+    args.epochs = 1000
     args.hidden = 256
     args.checkpoints = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     args.eval_hidden = 256
     args.eval_epochs = 600
-    args.normalize_features = False
     return args
 
 
@@ -52,7 +52,6 @@ def method_config(args):
             args.lr_adj = 1e-2
         if args.method in ['sgdd']:
             args.normalize_features = False
-            args.epochs = 600
             args.mx_size = 100
             args.dis_metric = 'ours'
             args.lr = 0.01
@@ -64,9 +63,7 @@ def method_config(args):
             args.sinkhorn_iter = 10
             args.beta = 0.5
             args.weight_decay = 0
-            args.dropout = 0
             if args.dataset in ['ogbn-arxiv', 'reddit']:
-                args.epochs = 500
                 args.lr_feat = 0.01
                 args.opt_scale = 1e-12
             elif args.dataset in ['citeseer']:

@@ -110,7 +110,7 @@ class GCondBase:
             return 1, 0
         if args.method == 'sgdd':
             if args.dataset in ['ogbn-arxiv']:
-                return 20, 0
+                return 20, 3
             if args.dataset in ['cora']:
                 return 20, 15
             if args.dataset in ['citeseer']:

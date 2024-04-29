@@ -1,3 +1,7 @@
+from collections import Counter
+
+import torch.nn as nn
+
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
@@ -7,16 +11,31 @@ from graphslim.utils import *
 
 
 class SGDD(GCondBase):
-
     def __init__(self, setting, data, args, **kwargs):
-        super(SGDD, self).__init__(setting, data, args, **kwargs)
+        # super(SGDD, self).__init__(setting, data, args, **kwargs)
+        self.data = data
+        self.args = args
+        self.device = args.device
+        self.setting = setting
+
+        self.data.labels_syn = self.generate_labels_syn(data)
+        self.nnodes_syn = len(self.data.labels_syn)
+        self.d = data.feat_train.shape[1]
+
+        print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
+        print(f'actual reduced size:{self.nnodes_syn}')
+
+        self.feat_syn = nn.Parameter(torch.FloatTensor(self.nnodes_syn, self.d).to(self.device))
         self.pge = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
                         ).to(self.device)
         self.reset_parameters()
+        self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
+        print('adj_syn:', (self.nnodes_syn, self.nnodes_syn), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
-        self.pge.reset_parameters()
+        self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
+        # self.pge.reset_parameters()
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -33,7 +52,7 @@ class SGDD(GCondBase):
         syn_class_indices = self.syn_class_indices
 
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat()
+        feat_sub, adj_sub = self.get_sub_adj_feat(features)
         self.feat_syn.data.copy_(feat_sub)
 
         adj = normalize_adj_tensor(adj, sparse=True)
@@ -42,7 +61,7 @@ class SGDD(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        for it in range(args.epochs):
+        for it in range(args.epochs + 1):
             # seed_everything(args.seed + it)
             if args.dataset in ['ogbn-arxiv', 'flickr']:
                 model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
@@ -62,7 +81,8 @@ class SGDD(GCondBase):
             model.train()
 
             for ol in range(outer_loop):
-                adj_syn, opt_loss = pge(self.feat_syn, Lx=data.adj_mx)
+                adj_syn, opt_loss = self.pge(self.feat_syn, Lx=data.adj_mx)
+
                 adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
 
@@ -72,6 +92,7 @@ class SGDD(GCondBase):
                 for c in range(data.nclass):
                     batch_size, n_id, adjs = data.retrieve_class_sampler(
                         c, adj, args)
+
                     if args.nlayers == 1:
                         adjs = [adjs]
 
@@ -122,6 +143,10 @@ class SGDD(GCondBase):
 
                 # if verbose and ol % 5 == 0:
                 #     print('Gradient matching loss:', loss.item())
+                if ol == outer_loop - 1:
+                    # print('loss_reg:', loss_reg.item())
+                    # print('Gradient matching loss:', loss.item())
+                    break
 
                 feat_syn_inner = feat_syn.detach()
                 adj_syn_inner = pge.inference(feat_syn_inner)
@@ -139,13 +164,13 @@ class SGDD(GCondBase):
                     optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and (it + 1) % 10 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
+            if verbose and it % 10 == 0:
+                print('Epoch {}, loss_avg: {}'.format(it, loss_avg))
 
-            # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
+            eval_epochs = [50, 100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
             # if it == 0:
 
-            if it + 1 in args.checkpoints:
+            if it in eval_epochs:
                 # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
                 res = []
@@ -163,3 +188,54 @@ class SGDD(GCondBase):
                     save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data
+
+    def sampling(self, ids_per_cls_train, budget, vecs, d, using_half=True):
+        budget_dist_compute = 1000
+        '''
+        if using_half:
+            vecs = vecs.half()
+        '''
+        if isinstance(vecs, np.ndarray):
+            vecs = torch.from_numpy(vecs)
+        vecs = vecs.half()
+        ids_selected = []
+        for i, ids in enumerate(ids_per_cls_train):
+            class_ = list(budget.keys())[i]
+            other_cls_ids = list(range(len(ids_per_cls_train)))
+            other_cls_ids.pop(i)
+            ids_selected0 = ids_per_cls_train[i] if len(ids_per_cls_train[i]) < budget_dist_compute else random.choices(
+                ids_per_cls_train[i], k=budget_dist_compute)
+
+            dist = []
+            vecs_0 = vecs[ids_selected0]
+            for j in other_cls_ids:
+                chosen_ids = random.choices(ids_per_cls_train[j], k=min(budget_dist_compute, len(ids_per_cls_train[j])))
+                vecs_1 = vecs[chosen_ids]
+                if len(chosen_ids) < 26 or len(ids_selected0) < 26:
+                    # torch.cdist throws error for tensor smaller than 26
+                    dist.append(torch.cdist(vecs_0.float(), vecs_1.float()).half())
+                else:
+                    dist.append(torch.cdist(vecs_0, vecs_1))
+
+            # dist = [torch.cdist(vecs[ids_selected0], vecs[random.choices(ids_per_cls_train[j], k=min(budget_dist_compute,len(ids_per_cls_train[j])))]) for j in other_cls_ids]
+            dist_ = torch.cat(dist, dim=-1)  # include distance to all the other classes
+            n_selected = (dist_ < d).sum(dim=-1)
+            rank = n_selected.sort()[1].tolist()
+            current_ids_selected = rank[:budget[class_]] if len(rank) > budget[class_] else random.choices(rank,
+                                                                                                           k=budget[
+                                                                                                               class_])
+            ids_selected.extend([ids_per_cls_train[i][j] for j in current_ids_selected])
+        return ids_selected
+
+    def get_sub_adj_feat(self, features):
+        data = self.data
+        args = self.args
+        idx_selected = []
+
+        counter = Counter(self.data.labels_syn)
+        labels_train = self.data.labels_train.squeeze().tolist()  # important
+        ids_per_cls_train = [(labels_train == c).nonzero()[0] for c in counter.keys()]
+        idx_selected = self.sampling(ids_per_cls_train, counter, features, 0.5, counter)
+        features = features[idx_selected]
+
+        return features, None

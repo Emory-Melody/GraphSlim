@@ -28,7 +28,7 @@ class GCond(GCondBase):
 
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.feat_syn.data.copy_(torch.from_numpy(feat_sub))
+        self.feat_syn.data.copy_(feat_sub)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
