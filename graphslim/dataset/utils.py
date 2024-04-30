@@ -45,23 +45,30 @@ def splits(data, exp):
     return data
 
 
-def save_reduced(adj_syn, feat_syn, labels_syn, args):
+def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
     save_path = '../output'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    torch.save(adj_syn, f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    torch.save(feat_syn, f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    torch.save(labels_syn, f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    torch.save(adj_syn,
+               f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    torch.save(feat_syn,
+               f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    torch.save(labels_syn,
+               f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    args.valid_result = valid_result
     if args.verbose:
         print("Saved reduced data")
 
 
-def load_reduced(args):
+def load_reduced(args, valid_result=0):
     save_path = '../output'
-    adj_syn = torch.load(f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    feat_syn = torch.load(f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    labels_syn = torch.load(f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    # print("Loaded reduced data")
+    adj_syn = torch.load(
+        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    feat_syn = torch.load(
+        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    labels_syn = torch.load(
+        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+    print("Loaded reduced data")
     return adj_syn, feat_syn, labels_syn
 
 # =============from graphsaint================#

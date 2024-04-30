@@ -24,7 +24,7 @@ def setting_config(args):
         args.setting = 'ind'
     args.epochs = 1000
     args.hidden = 256
-    args.checkpoints = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    args.checkpoints = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
     args.eval_hidden = 256
     args.eval_epochs = 600
     return args
@@ -50,8 +50,8 @@ def method_config(args):
         if args.method in ['doscond', 'doscondx']:
             args.pre_norm = False
             args.dis_metric = 'mse'
-            args.lr_feat = 1e-2
-            args.lr_adj = 1e-2
+            args.lr_feat = 0.02
+            args.lr_adj = 0.01
             if args.dataset in ['flickr']:
                 args.lr_feat = 0.05
                 args.lr_adj = 0.05
@@ -140,7 +140,7 @@ def method_config(args):
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
-@click.option('--lr_feat', default=1e-4, show_default=True)
+@click.option('--lr_feat', default=2e-4, show_default=True)
 @click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 # @click.option('--one_step', is_flag=True, show_default=True)

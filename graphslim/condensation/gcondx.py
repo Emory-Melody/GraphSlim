@@ -96,6 +96,6 @@ class GCondX(GCondBase):
 
                 if current_val > best_val:
                     best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
 
         return data

@@ -74,9 +74,6 @@ class DosCond(GCondBase):
                 self.optimizer_feat.step()
                 self.optimizer_pge.step()
 
-                feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = pge.inference(feat_syn_inner)
-
             loss_avg /= (data.nclass * outer_loop)
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
@@ -87,7 +84,7 @@ class DosCond(GCondBase):
 
             if it + 1 in args.checkpoints:
                 # if verbose and (it+1) % 50 == 0:
-                data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
+                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):
                     res.append(self.test_with_val(verbose=verbose, setting=args.setting))
@@ -100,6 +97,6 @@ class DosCond(GCondBase):
 
                 if current_val > best_val:
                     best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
 
         return data

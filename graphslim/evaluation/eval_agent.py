@@ -116,7 +116,7 @@ class Evaluator:
     def get_syn_data(self, model_type=None, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args)
+        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
 
@@ -126,7 +126,7 @@ class Evaluator:
         if verbose:
             # print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
 
-        # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
+            # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
             if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
                 print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
                 args.epsilon = 0.001
@@ -162,11 +162,9 @@ class Evaluator:
         #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
-        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
-                           verbose=verbose,
+        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
                            reduced=reduced)
-
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
