@@ -1,5 +1,4 @@
 from graphslim.condensation.gcond_base import GCondBase
-from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import *
@@ -15,8 +14,11 @@ class DosCond(GCondBase):
 
         args = self.args
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
-
+        if args.setting == 'trans':
+            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        else:
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
+                                              device=self.device)
         syn_class_indices = self.syn_class_indices
 
         # initialization the features
@@ -51,32 +53,11 @@ class DosCond(GCondBase):
 
             for ol in range(outer_loop):
                 adj_syn = pge(self.feat_syn)
-                adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                self.adj_syn = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
                 model = self.check_bn(model)
 
-                loss = torch.tensor(0.0).to(self.device)
-                for c in range(data.nclass):
-                    batch_size, n_id, adjs = data.retrieve_class_sampler(
-                        c, adj, args)
-                    if args.nlayers == 1:
-                        adjs = [adjs]
-
-                    adjs = [adj.to(self.device) for adj in adjs]
-                    output = model.forward_sampler(features[n_id], adjs)
-                    loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-
-                    gw_real = torch.autograd.grad(loss_real, model_parameters)
-                    gw_real = list((_.detach().clone() for _ in gw_real))
-                    output_syn = model.forward(feat_syn, adj_syn_norm)
-
-                    ind = syn_class_indices[c]
-                    loss_syn = F.nll_loss(
-                        output_syn[ind[0]: ind[1]],
-                        labels_syn[ind[0]: ind[1]])
-                    gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
-                    coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
-                    loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
+                loss = self.train_class(model, adj, features, labels, labels_syn, args)
 
                 loss_avg += loss.item()
                 # if args.alpha > 0:

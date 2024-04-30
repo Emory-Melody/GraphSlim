@@ -2,6 +2,7 @@ from collections import Counter
 
 import torch.nn as nn
 
+from graphslim.condensation.utils import *
 from graphslim.evaluation import Evaluator
 from graphslim.models import *
 from graphslim.utils import *
@@ -69,6 +70,47 @@ class GCondBase:
         agent = Evaluator(data, args, device='cuda')
         agent.train_cross()
 
+    def train_class(self, model, adj, features, labels, labels_syn, args):
+        data = self.data
+        feat_syn = self.feat_syn
+        adj_syn_norm = self.adj_syn
+        syn_class_indices = self.syn_class_indices
+        model_parameters = list(model.parameters())
+        loss = torch.tensor(0.0).to(self.device)
+        for c in range(data.nclass):
+            batch_size, n_id, adjs = data.retrieve_class_sampler(
+                c, adj, args)
+            if args.nlayers == 1:
+                adjs = [adjs]
+
+            adjs = [adj.to(self.device) for adj in adjs]
+            output = model.forward_sampler(features[n_id], adjs)
+            loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
+            gw_real = torch.autograd.grad(loss_real, model_parameters)
+            gw_real = list((_.detach().clone() for _ in gw_real))
+            if args.setting == 'ind':
+                ind = syn_class_indices[c]
+                if args.nlayers == 1:
+                    adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
+                else:
+                    adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
+                                        [adj_syn_norm[ind[0]: ind[1]]]
+
+                output_syn = model.forward_syn(feat_syn, adj_syn_norm_list)
+                loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
+            else:
+                output_syn = model.forward(feat_syn, adj_syn_norm)
+                ind = syn_class_indices[c]
+                loss_syn = F.nll_loss(
+                    output_syn[ind[0]: ind[1]],
+                    labels_syn[ind[0]: ind[1]])
+
+            gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
+            coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
+            loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
+
+        return loss
+
     def get_sub_adj_feat(self):
         data = self.data
         args = self.args
@@ -123,7 +165,7 @@ class GCondBase:
             if args.dataset in ['flickr', 'reddit']:
                 return 10, 1
             if args.dataset in ['ogbn-arxiv', 'cora', 'citeseer']:
-                return 20, 3
+                return 20, 15
         return 10, 1
 
     def check_bn(self, model):
@@ -157,7 +199,7 @@ class GCondBase:
         #     adj_syn = torch.zeros((n, n))
         # same for ind and trans when reduced
         acc_val = model.fit_with_val(data,
-                                     train_iters=600, normadj=True, normfeat=args.normalize_features, verbose=False,
+                                     train_iters=600, normadj=True, verbose=False,
                                      setting=setting, reduced=True)
         # model.eval()
         # labels_test = data.labels_test.long().to(args.device)

@@ -84,6 +84,20 @@ class BaseGNN(nn.Module):
         else:
             return F.log_softmax(x, dim=1)
 
+    def forward_syn(self, x, adjs):
+        for ix, (adj) in enumerate(adjs):
+            x = self.layers[ix](x, adj)
+            if ix != len(self.layers) - 1:
+                x = self.bns[ix](x) if self.with_bn else x
+                if self.with_relu:
+                    x = F.relu(x)
+                x = F.dropout(x, self.dropout, training=self.training)
+
+        if self.multi_label:
+            return torch.sigmoid(x)
+        else:
+            return F.log_softmax(x, dim=1)
+
     def fit_with_val(self, data, train_iters=200, verbose=False,
                      normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
@@ -103,8 +117,7 @@ class BaseGNN(nn.Module):
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
-        if normfeat:
-            features = F.normalize(features, p=1, dim=1)
+        # features = F.normalize(features, p=2, dim=1)
 
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
@@ -135,9 +148,9 @@ class BaseGNN(nn.Module):
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
-        if normfeat:
-            feat_full = F.normalize(feat_full, p=1, dim=1)
 
+        # feat_full = F.normalize(feat_full, p=2, dim=0)
+        #
         self.train()
         for i in range(train_iters):
             if i == train_iters // 2:

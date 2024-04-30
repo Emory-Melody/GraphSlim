@@ -32,29 +32,29 @@ class Evaluator:
         # self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
-    def generate_labels_syn(self, data):
-        counter = Counter(data.labels_train.tolist())
-        num_class_dict = {}
-        n = len(data.labels_train)
-
-        sorted_counter = sorted(counter.items(), key=lambda x: x[1])
-        sum_ = 0
-        labels_syn = []
-        self.syn_class_indices = {}
-        for ix, (c, num) in enumerate(sorted_counter):
-            if ix == len(sorted_counter) - 1:
-                num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
-                # print(num_class_dict[c])
-                self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-                labels_syn += [c] * num_class_dict[c]
-            else:
-                num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
-                sum_ += num_class_dict[c]
-                self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-                labels_syn += [c] * num_class_dict[c]
-
-        self.num_class_dict = num_class_dict
-        return labels_syn
+    # def generate_labels_syn(self, data):
+    #     counter = Counter(data.labels_train.tolist())
+    #     num_class_dict = {}
+    #     n = len(data.labels_train)
+    #
+    #     sorted_counter = sorted(counter.items(), key=lambda x: x[1])
+    #     sum_ = 0
+    #     labels_syn = []
+    #     self.syn_class_indices = {}
+    #     for ix, (c, num) in enumerate(sorted_counter):
+    #         if ix == len(sorted_counter) - 1:
+    #             num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
+    #             # print(num_class_dict[c])
+    #             self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
+    #             labels_syn += [c] * num_class_dict[c]
+    #         else:
+    #             num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
+    #             sum_ += num_class_dict[c]
+    #             self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
+    #             labels_syn += [c] * num_class_dict[c]
+    #
+    #     self.num_class_dict = num_class_dict
+    #     return labels_syn
 
     def test_gat(self, nlayers, model_type, verbose=False):
         res = []
@@ -131,10 +131,7 @@ class Evaluator:
         # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
             if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
                 print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-                if args.dataset in ['cora', 'citeseer']:
-                    args.epsilon = 0.005
-                else:
-                    args.epsilon = 0.01
+                args.epsilon = 0.001
                 if args.epsilon > 0:
                     adj_syn[adj_syn < args.epsilon] = 0
                     if verbose:
@@ -167,15 +164,11 @@ class Evaluator:
         #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
         #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
         #                         nclass=data.nclass, device=self.device).to(self.device)
-        if reduced:
-            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
-                               verbose=verbose,
-                               setting=args.setting,
-                               reduced=True)
-        else:
-            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
-                               verbose=verbose,
-                               setting=args.setting)
+        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, normfeat=args.normalize_features,
+                           verbose=verbose,
+                           setting=args.setting,
+                           reduced=reduced)
+
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)

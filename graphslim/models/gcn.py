@@ -28,7 +28,7 @@ class GCN(BaseGNN):
                     self.bns.append(nn.BatchNorm1d(nhid))
             self.layers.append(GraphConvolution(nhid, nclass, with_bias=with_bias))
 
-    # def forward_sampler_syn(self, x, adjs):
+    # def forward_syn(self, x, adjs):
     #     for ix, (adj) in enumerate(adjs):
     #         x = self.layers[ix](x, adj)
     #         if ix != len(self.layers) - 1:

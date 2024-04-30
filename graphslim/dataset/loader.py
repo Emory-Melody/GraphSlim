@@ -7,8 +7,8 @@ import torch.nn.functional as F
 from ogb.nodeproppred import PygNodePropPredDataset
 from sklearn.preprocessing import StandardScaler
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit
-from torch_geometric.utils import to_undirected
 from torch_geometric.loader import NeighborSampler
+from torch_geometric.utils import to_undirected
 from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import ei2csr, csr2ei
@@ -47,14 +47,14 @@ def get_dataset(name, args):
     data = dataset[0]
     data = splits(data, args.split)
 
-    data = TransAndInd(data, name)
+    data = TransAndInd(data, name, args.pre_norm)
 
     return data
 
 
 class TransAndInd:
 
-    def __init__(self, data, dataset):
+    def __init__(self, data, dataset, norm=True):
         self.class_dict = None  # sample the training data per class when initializing synthetic graph
         self.samplers = None
         self.class_dict2 = None  # sample from the same class when training
@@ -64,14 +64,18 @@ class TransAndInd:
         self.labels_full = None
         self.train_mask, self.val_mask, self.test_mask = data.train_mask, data.val_mask, data.test_mask
         self.pyg_saint(data)
-        if dataset not in ['ogbn-arxiv', 'flickr', 'reddit']:
-            self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
-        else:
-            self.edge_index = to_undirected(data.edge_index, data.num_nodes)
-            feat_train = data.x[data.idx_train]
-            scaler = StandardScaler()
-            scaler.fit(feat_train)
-            self.feat_full = scaler.transform(data.x)
+        if norm:
+            if dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
+                self.edge_index = to_undirected(data.edge_index, data.num_nodes)
+                feat_train = data.x[data.idx_train]
+                scaler = StandardScaler()
+                scaler.fit(feat_train)
+                self.feat_full = scaler.transform(data.x)
+                self.feat_full = torch.from_numpy(self.feat_full).float()
+            else:
+                # very important for doscondx and gcondx
+                # remove this line will cause high performance in doscond,gcond
+                self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
         self.idx_train, self.idx_val, self.idx_test = data.idx_train, data.idx_val, data.idx_test
         self.nclass = max(self.labels_full) + 1
 
