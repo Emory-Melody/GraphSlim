@@ -1,0 +1,6 @@
+{
+  "lr_feat": 0.0001,
+  "lr_adj": 0.0001,
+  "pre_norm_planetoid": true,
+  "dis_metric": "ours"
+}

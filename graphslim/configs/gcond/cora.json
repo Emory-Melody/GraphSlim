@@ -1,0 +1,5 @@
+{
+  "lr_feat": 0.01,
+  "lr_adj": 0.01,
+  "pre_norm_planetoid": true
+}

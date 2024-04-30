@@ -46,7 +46,7 @@ def splits(data, exp):
 
 
 def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
-    save_path = '../output'
+    save_path = 'dataset/output'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     torch.save(adj_syn,
@@ -61,7 +61,7 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
 
 
 def load_reduced(args, valid_result=0):
-    save_path = '../output'
+    save_path = 'dataset/output'
     adj_syn = torch.load(
         f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
     feat_syn = torch.load(

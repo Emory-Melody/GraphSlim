@@ -1,0 +1,5 @@
+{
+  "lr_feat": 0.005,
+  "lr_adj": 0.005,
+  "outer_loop": 5
+}

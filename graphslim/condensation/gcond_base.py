@@ -32,13 +32,13 @@ class GCondBase:
         self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
         self.adj_syn = None
 
-        self.reset_parameters()
+        # self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
         print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
-        self.pge.reset_parameters()
+        self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     def generate_labels_syn(self, data):
         counter = Counter(data.labels_train.tolist())
@@ -146,10 +146,7 @@ class GCondBase:
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
 
-        if args.method in ['doscond', 'doscondx']:
-            if args.dataset == 'ogbn-arxiv':
-                return 5, 0
-            return 1, 0
+        return args.outer_loop, args.inner_loop
         if args.method == 'sgdd':
             if args.dataset in ['ogbn-arxiv']:
                 return 20, 3
@@ -161,12 +158,6 @@ class GCondBase:
                 return 20, 10
             else:
                 return 20, 10
-        if args.method in ['gcond', 'gcondx']:
-            if args.dataset in ['flickr', 'reddit']:
-                return 10, 1
-            if args.dataset in ['ogbn-arxiv', 'cora', 'citeseer']:
-                return 20, 15
-        return 10, 1
 
     def check_bn(self, model):
         BN_flag = False

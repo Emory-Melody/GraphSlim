@@ -67,6 +67,7 @@ def feature_smoothing(adj, X):
 
 
 def row_normalize_tensor(mx):
+    mx -= mx.min()
     rowsum = mx.sum(1)
     r_inv = rowsum.pow(-1).flatten()
     # r_inv[torch.isinf(r_inv)] = 0.

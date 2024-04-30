@@ -99,7 +99,7 @@ class BaseGNN(nn.Module):
             return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
-                     normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
+                     normadj=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 
         self.initialize()
@@ -108,6 +108,7 @@ class BaseGNN(nn.Module):
             adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
                                                           label2=data.labels_val,
                                                           device=self.device)
+
         elif setting == 'trans':
             adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, label=data.labels_train,
                                                           label2=data.labels_val, device=self.device)
@@ -149,8 +150,6 @@ class BaseGNN(nn.Module):
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
 
-        # feat_full = F.normalize(feat_full, p=2, dim=0)
-        #
         self.train()
         for i in range(train_iters):
             if i == train_iters // 2:

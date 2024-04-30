@@ -15,17 +15,18 @@ class DosCond(GCondBase):
     def reduce(self, data, verbose=True):
 
         args = self.args
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        pge = self.pge
+        feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
-        syn_class_indices = self.syn_class_indices
 
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
         self.feat_syn.data.copy_(feat_sub)
+        adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
         # self.sparsity = self.adj_syn.mean().item()
         # self.adj_syn.data.copy_(self.adj_syn * 10 - 5)  # max:5; min:-5
 
@@ -34,6 +35,8 @@ class DosCond(GCondBase):
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         best_val = 0
+
+        # seed_everything(args.seed + it)
         if args.dataset in ['ogbn-arxiv']:
             model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
                             dropout=0.0, with_bn=False,
@@ -44,9 +47,7 @@ class DosCond(GCondBase):
             model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
                         nclass=data.nclass, dropout=0, nlayers=args.nlayers,
                         device=self.device).to(self.device)
-
         for it in trange(args.epochs):
-            # seed_everything(args.seed + it)
 
             model.initialize()
             # model_parameters = list(model.parameters())
@@ -73,8 +74,8 @@ class DosCond(GCondBase):
                 self.optimizer_feat.zero_grad()
                 self.optimizer_pge.zero_grad()
                 loss.backward()
-                self.optimizer_feat.step()
                 self.optimizer_pge.step()
+                self.optimizer_feat.step()
 
             loss_avg /= (data.nclass * outer_loop)
             if verbose and (it + 1) % 100 == 0:

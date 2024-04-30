@@ -16,6 +16,11 @@ def dict2obj(d):
     return json.loads(json.dumps(d), object_hook=Obj)
 
 
+def update_from_dict(obj, updates):
+    for key, value in updates.items():
+        setattr(obj, key, value)
+
+
 # fix setting here
 def setting_config(args):
     if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv']:
@@ -24,59 +29,35 @@ def setting_config(args):
         args.setting = 'ind'
     args.epochs = 1000
     args.hidden = 256
-    args.checkpoints = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+    args.checkpoints = range(0, args.epochs, 100)
     args.eval_hidden = 256
     args.eval_epochs = 600
+    args.lr_test = 1e-2
     return args
 
 
 # recommend hyperparameters here
 def method_config(args):
-    if args.method in ['gcond', 'gcondx', 'doscond', 'doscondx', 'sgdd']:
-
-        if args.dataset in ['ogbn-arxiv']:
-            args.weight_decay = 0
-            args.dropout = 0
-        if args.method in ['gcond', 'gcondx']:
-            args.pre_norm = True
-            args.dis_metric = 'ours'
-            if args.dataset in ['flickr']:
-                args.lr_feat = 0.005
-                args.lr_adj = 0.005
-
-            if args.dataset in ['reddit']:
-                args.lr_feat = 0.1
-                args.lr_adj = 0.1
-        if args.method in ['doscond', 'doscondx']:
-            args.pre_norm = False
-            args.dis_metric = 'mse'
+    conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
+    update_from_dict(args, conf_dt)
+    if args.method in ['sgdd']:
+        args.pre_norm = False
+        args.mx_size = 100
+        args.dis_metric = 'ours'
+        args.lr = 0.01
+        args.lr_feat = 1e-4
+        args.lr_adj = 1e-4
+        args.alpha = 0
+        args.opt_scale = 1e-11
+        args.ep_ratio = 0.5
+        args.sinkhorn_iter = 10
+        args.beta = 0.5
+        args.weight_decay = 0
+        if args.dataset in ['ogbn-arxiv', 'reddit']:
             args.lr_feat = 0.01
-            args.lr_adj = 0.01
-            if args.dataset in ['flickr']:
-                args.lr_feat = 0.05
-                args.lr_adj = 0.05
-
-            if args.dataset in ['reddit']:
-                args.lr_feat = 0.1
-                args.lr_adj = 0.1
-        if args.method in ['sgdd']:
-            args.pre_norm = False
-            args.mx_size = 100
-            args.dis_metric = 'ours'
-            args.lr = 0.01
-            args.lr_feat = 1e-4
-            args.lr_adj = 1e-4
-            args.alpha = 0
-            args.opt_scale = 1e-11
-            args.ep_ratio = 0.5
-            args.sinkhorn_iter = 10
-            args.beta = 0.5
-            args.weight_decay = 0
-            if args.dataset in ['ogbn-arxiv', 'reddit']:
-                args.lr_feat = 0.01
-                args.opt_scale = 1e-12
-            elif args.dataset in ['citeseer']:
-                args.opt_scale = 1e-9
+            args.opt_scale = 1e-12
+        elif args.dataset in ['citeseer']:
+            args.opt_scale = 1e-9
 
     if args.method in ['gcsntk']:
         args.adj = False
@@ -121,8 +102,10 @@ def method_config(args):
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
-@click.option('--normalize_features', is_flag=True, show_default=True)
-@click.option('--pre_norm', is_flag=True, show_default=True)
+# @click.option('--normalize_features', is_flag=True, show_default=True)
+# @click.option('--pre_norm_planetoid', is_flag=True, show_default=True)
+@click.option('--outer_loop', default=10, show_default=True)
+@click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
 @click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
