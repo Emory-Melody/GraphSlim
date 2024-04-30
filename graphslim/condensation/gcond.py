@@ -32,20 +32,19 @@ class GCond(GCondBase):
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         best_val = 0
-
-        for it in trange(args.epochs):
-            # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv', 'flickr']:
-                model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                                dropout=0, with_bn=False,
-                                weight_decay=0, nlayers=args.nlayers,
-                                nclass=data.nclass, ntrans=2,
-                                device=self.device).to(self.device)
-            else:
-                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=0, weight_decay=0,
-                            nlayers=args.nlayers, with_bn=False,
+        # seed_everything(args.seed + it)
+        if args.dataset in ['ogbn-arxiv', 'flickr']:
+            model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                            dropout=0, with_bn=False,
+                            weight_decay=0, nlayers=args.nlayers,
+                            nclass=data.nclass, ntrans=2,
                             device=self.device).to(self.device)
+        else:
+            model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                        nclass=data.nclass, dropout=0, weight_decay=0,
+                        nlayers=args.nlayers, with_bn=False,
+                        device=self.device).to(self.device)
+        for it in trange(args.epochs):
 
             model.initialize()
             model_parameters = list(model.parameters())

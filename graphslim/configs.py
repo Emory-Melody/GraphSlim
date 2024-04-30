@@ -50,7 +50,7 @@ def method_config(args):
         if args.method in ['doscond', 'doscondx']:
             args.pre_norm = False
             args.dis_metric = 'mse'
-            args.lr_feat = 0.02
+            args.lr_feat = 0.01
             args.lr_adj = 0.01
             if args.dataset in ['flickr']:
                 args.lr_feat = 0.05
@@ -140,7 +140,7 @@ def method_config(args):
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
-@click.option('--lr_feat', default=2e-4, show_default=True)
+@click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 # @click.option('--one_step', is_flag=True, show_default=True)

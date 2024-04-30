@@ -1,3 +1,5 @@
+from tqdm import trange
+
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
@@ -32,23 +34,23 @@ class DosCond(GCondBase):
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         best_val = 0
-
-        for it in range(args.epochs):
-            # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv']:
-                model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                                dropout=0.0, with_bn=False,
-                                weight_decay=0e-4, nlayers=args.nlayers,
-                                nclass=data.nclass,
-                                device=self.device).to(self.device)
-            else:
-                model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
-                            nclass=data.nclass, dropout=0, nlayers=args.nlayers,
+        if args.dataset in ['ogbn-arxiv']:
+            model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
+                            dropout=0.0, with_bn=False,
+                            weight_decay=0e-4, nlayers=args.nlayers,
+                            nclass=data.nclass,
                             device=self.device).to(self.device)
+        else:
+            model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
+                        nclass=data.nclass, dropout=0, nlayers=args.nlayers,
+                        device=self.device).to(self.device)
+
+        for it in trange(args.epochs):
+            # seed_everything(args.seed + it)
 
             model.initialize()
-            model_parameters = list(model.parameters())
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
+            # model_parameters = list(model.parameters())
+            # optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
 
             for ol in range(outer_loop):
@@ -84,6 +86,7 @@ class DosCond(GCondBase):
 
             if it + 1 in args.checkpoints:
                 # if verbose and (it+1) % 50 == 0:
+                self.adj_syn = pge.inference(self.feat_syn.detach())
                 data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):
