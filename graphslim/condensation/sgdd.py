@@ -47,7 +47,11 @@ class SGDD(GCondBase):
             data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
 
         feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        if args.setting == 'trans':
+            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        else:
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
+                                              device=self.device)
 
         syn_class_indices = self.syn_class_indices
 

@@ -41,7 +41,6 @@ def mx_inv_sqrt(mx):
     # D_1 = 1 / D.clamp(min=0.005).sqrt()
     return U @ D_1.sqrt().diag() @ V.t(), U @ D_1.diag() @ V.t()
 
-
 def mx_tr(mx):
     return mx.diag().sum()
 

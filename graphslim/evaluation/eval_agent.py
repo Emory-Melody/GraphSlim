@@ -1,5 +1,3 @@
-from collections import Counter
-
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -279,7 +277,7 @@ class Evaluator:
                 model = model_class(nfeat=data.x.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
                                     nlayers=args.nlayers,
                                     dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
-                                    activation=args.activation).to(self.device)
+                                    activation=args.activation, alpha=args.alpha).to(self.device)
 
                 best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
                                                   normfeat=args.normalize_features,
@@ -290,7 +288,7 @@ class Evaluator:
                 model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
                                     nlayers=args.nlayers,
                                     dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
-                                    activation=args.activation).to(self.device)
+                                    activation=args.activation, alpha=args.alpha).to(self.device)
 
                 best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
                                                   normfeat=args.normalize_features,
