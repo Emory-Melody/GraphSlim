@@ -181,7 +181,7 @@ class GCondBase:
         args, data, device = self.args, self.data, self.device
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=args.hidden, dropout=args.dropout,
+        model = GCN(nfeat=data.feat_syn.shape[1], nhid=args.hidden, dropout=0,
                     weight_decay=args.weight_decay, nlayers=2,
                     nclass=data.nclass, device=device).to(device)
 

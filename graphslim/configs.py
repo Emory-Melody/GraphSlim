@@ -29,7 +29,7 @@ def setting_config(args):
         args.setting = 'ind'
     args.epochs = 1000
     args.hidden = 256
-    args.checkpoints = range(0, args.epochs, 100)
+    args.checkpoints = range(0, args.epochs + 1, 100)
     args.eval_hidden = 256
     args.eval_epochs = 600
     args.lr_test = 1e-2
@@ -40,6 +40,9 @@ def setting_config(args):
 def method_config(args):
     conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
     update_from_dict(args, conf_dt)
+    # little patch for configs
+    if args.method in ['doscond'] and args.reduction_rate == 0.1:
+        args.outer_loop = 3
     if args.method in ['sgdd']:
         args.pre_norm = False
         args.mx_size = 100
@@ -103,7 +106,7 @@ def method_config(args):
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
 # @click.option('--normalize_features', is_flag=True, show_default=True)
-# @click.option('--pre_norm_planetoid', is_flag=True, show_default=True)
+@click.option('--pre_norm', is_flag=True, show_default=True)
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')

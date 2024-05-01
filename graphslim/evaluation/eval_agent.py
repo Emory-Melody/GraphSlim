@@ -155,7 +155,7 @@ class Evaluator:
             model_class = eval(model_type)
 
         model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass, nlayers=args.nlayers,
-                            dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device).to(self.device)
+                            dropout=0.0, lr=args.lr_test, weight_decay=5e-4, device=self.device).to(self.device)
 
         # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
         # if self.args.dataset in ['ogbn-arxiv', 'arxiv']:

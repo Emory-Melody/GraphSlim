@@ -47,7 +47,7 @@ def get_dataset(name, args):
     data = dataset[0]
     data = splits(data, args.split)
 
-    data = TransAndInd(data, name)
+    data = TransAndInd(data, name, args.pre_norm)
 
     return data
 
@@ -71,7 +71,7 @@ class TransAndInd:
             scaler.fit(feat_train)
             self.feat_full = scaler.transform(data.x)
             self.feat_full = torch.from_numpy(self.feat_full).float()
-        if dataset in ['cora', 'citeseer', 'pubmed']:
+        if norm and dataset in ['cora', 'citeseer', 'pubmed']:
             self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
         self.idx_train, self.idx_val, self.idx_test = data.idx_train, data.idx_val, data.idx_test
         self.nclass = max(self.labels_full) + 1

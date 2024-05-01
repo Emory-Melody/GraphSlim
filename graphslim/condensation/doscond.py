@@ -30,7 +30,6 @@ class DosCond(GCondBase):
         # self.sparsity = self.adj_syn.mean().item()
         # self.adj_syn.data.copy_(self.adj_syn * 10 - 5)  # max:5; min:-5
 
-        adj = normalize_adj_tensor(adj, sparse=True)
 
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
