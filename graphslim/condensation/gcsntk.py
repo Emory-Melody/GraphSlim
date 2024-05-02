@@ -117,13 +117,13 @@ class GCSNTK:
         print(f"Classes       :{n_class}")
         print(f"Dim           :{dim}")
         print(f"Number        :{n}")
-        print(f"Epochs        :{self.args.epochs_train}")
+        print(f"Epochs        :{self.args.epochs}")
         print(f"Learning rate :{self.args.lr}")
         print(f"Conden ratio  :{self.args.reduction_rate}")
         print(f"Ridge         :{self.ridge}")
 
-        Acc = torch.zeros(self.args.epochs_train, self.args.iter).to(self.device)
-        for iter in range(self.args.iter):
+        Acc = torch.zeros(self.args.epochs, self.args.runs).to(self.device)
+        for iter in range(self.args.runs):
             print('--------------------------------------------------')
             print('The ' + str(iter + 1) + 'th Iteration:')
             print('--------------------------------------------------')
@@ -141,7 +141,7 @@ class GCSNTK:
             y_s.requires_grad = True
             optimizer = torch.optim.Adam([x_s, y_s], lr=self.args.lr)
 
-            for epoch in range(self.args.epochs_train):
+            for epoch in range(self.args.epochs):
                 print(f"Epoch {epoch + 1}", end=" ")
                 x_s, y_s, training_loss, training_acc = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, E_train,
                                                                    E_s, MSEloss, optimizer)
@@ -194,10 +194,10 @@ class GCSNTK:
         print(f"Conden size   :{Cond_size}")
         print(f"Ridge         :{self.ridge}")
         print(f"Num of batches:{TRAIN_K}")
-        print(f"Iterations    :{self.args.iter}")
+        print(f"Iterations    :{self.args.runs}")
 
-        results = torch.zeros(self.args.epochs_train, self.args.iter)
-        for iter in range(self.args.iter):
+        results = torch.zeros(self.args.epochs_train, self.args.runs)
+        for iter in range(self.args.runs):
             print(f"The  {iter + 1}-th iteration")
             x_s = torch.rand(round(Cond_size), dim)
             y_s = torch.rand(round(Cond_size), n_class)
