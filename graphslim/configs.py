@@ -27,7 +27,6 @@ def setting_config(args):
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
-    args.epochs = 1000
     args.hidden = 256
     args.checkpoints = range(0, args.epochs + 1, 100)
     args.eval_hidden = 256
@@ -43,50 +42,6 @@ def method_config(args):
     # little patch for configs
     if args.method in ['doscond'] and args.reduction_rate == 0.1:
         args.outer_loop = 3
-    if args.method in ['sgdd']:
-        args.pre_norm = False
-        args.mx_size = 100
-        args.dis_metric = 'ours'
-        args.lr = 0.01
-        args.lr_feat = 1e-4
-        args.lr_adj = 1e-4
-        args.alpha = 0
-        args.opt_scale = 1e-11
-        args.ep_ratio = 0.5
-        args.sinkhorn_iter = 10
-        args.beta = 0.5
-        args.weight_decay = 0
-        if args.dataset in ['ogbn-arxiv', 'reddit']:
-            args.lr_feat = 0.01
-            args.opt_scale = 1e-12
-        elif args.dataset in ['citeseer']:
-            args.opt_scale = 1e-9
-
-    if args.method in ['gcsntk']:
-        args.adj = False
-        args.iter = 3
-        args.epochs_train = 200
-        if args.dataset in ['cora', 'citeseer', 'pubmed']:
-            args.k = 2
-            args.K = 2
-            args.L = 2
-            args.lr = 0.01
-            args.scale = 'average'
-            if args.dataset in ['cora', 'citeseer']:
-                args.ridge = 1e0
-            if args.dataset in ['pubmed']:
-                args.ridge = 1e-3
-        if args.dataset in ['ogbn-arxiv', 'flickr']:
-            args.k = 1
-            args.K = 1
-            args.L = 1
-            args.lr = 0.001
-            args.ridge = 1e-5
-            args.accumulate_steps = 10
-            args.scale = 'add'
-            if args.dataset in ['flickr']:
-                args.batch_size = 2000
-                args.adj = True
 
     return args
 
@@ -131,6 +86,7 @@ def method_config(args):
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 # @click.option('--one_step', is_flag=True, show_default=True)
 @click.option('--dropout', default=0.0, show_default=True)
+@click.option('--ntrans', default=2, show_default=True)
 # model specific args
 @click.option('--alpha', default=0, help='for appnp', show_default=True)
 @click.pass_context

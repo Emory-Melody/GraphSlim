@@ -1,0 +1,11 @@
+{
+  "lr": 0.01,
+  "ridge": 1e0,
+  "epochs": 200,
+  "K": 2,
+  "L": 2,
+  "epochs": 200,
+  "adj": false,
+  "k": 2,
+  "scale": "average"
+}

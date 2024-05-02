@@ -1,0 +1,10 @@
+{
+  "lr": 0.001,
+  "ridge": 1e-5,
+  "epochs": 200,
+  "K": 1,
+  "L": 1,
+  "k": 1,
+  "adj": true,
+  "scale": "add"
+}

@@ -4,7 +4,7 @@ from tqdm import trange
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
-from graphslim.models import SGC
+from graphslim.models import SGCRich
 from graphslim.utils import *
 
 
@@ -17,7 +17,7 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
         self.x_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
-        self.batch_size = 16  # just for test
+        self.batch_size = 1  # just for test
         self.n_classes = data.nclass
         self.device = args.device
 
@@ -39,12 +39,13 @@ class MSGC(GCondBase):
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
-        y_syn = self.y_syn.repeat(self.batch_size, 1)
+        # y_syn = self.y_syn.repeat(self.batch_size, 1)
+        y_syn = self.y_syn
         # n_each_y = data.n_each_y
-        basic_model = SGC(nfeat=self.x_syn.shape[1], nhid=args.hidden,
-                          nclass=data.nclass, dropout=0, weight_decay=0,
-                          nlayers=args.nlayers, with_bn=False,
-                          device=self.device).to(args.device)
+        basic_model = SGCRich(nfeat=self.x_syn.shape[1], nhid=args.hidden,
+                              nclass=data.nclass, dropout=0, weight_decay=0,
+                              nlayers=args.nlayers, ntrans=args.ntrans, with_bn=False,
+                              device=self.device).to(args.device)
 
         self.reset_adj_batch()
         # initialization the features
@@ -55,7 +56,7 @@ class MSGC(GCondBase):
         optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)
         # smallest_loss = 99999.
         best_val = 0
-        args.window = args.patience
+        args.window = args.patience = 20
         losses = FixLenList(args.window)
         x_syns = FixLenList(args.window)
         adj_t_syns = FixLenList(args.window)
@@ -68,7 +69,7 @@ class MSGC(GCondBase):
                 basic_model = self.check_bn(basic_model)
                 basic_model.eval()  # fix basic_model while optimizing graphsyner
                 ######################graph optimization#####################################
-                adj_t_syn = self.get_adj_t_syn()
+                adj_t_syn = self.get_adj_t_syn()[0]
                 x_syn = self.x_syn
                 loss = 0.
                 for c in range(data.nclass):
@@ -83,10 +84,8 @@ class MSGC(GCondBase):
                     gw_reals = list((_.detach().clone() for _ in gw_reals))
                     # ------------------------------------------------------------------
                     output_syn = basic_model(x_syn, adj_t_syn)
-                    ind = self.syn_class_indices[c]
-                    loss_syn = F.nll_loss(
-                        output_syn[:, ind[0]: ind[1]].transpose(1, 2),
-                        y_syn[:, ind[0]: ind[1]])
+                    # ind = self.syn_class_indices[c]
+                    loss_syn = F.nll_loss(output_syn[y_syn == c], y_syn[y_syn == c])
                     gw_syns = torch.autograd.grad(loss_syn, basic_model.parameters(), create_graph=True)
                     # ------------------------------------------------------------------
                     coeff = self.num_class_dict[c] / self.n_syn
@@ -102,14 +101,14 @@ class MSGC(GCondBase):
                     optimizer_x.step()
 
                 x_syn = x_syn.detach()
-                adj_t_syn = self.get_adj_t_syn().detach()
+                adj_t_syn = self.get_adj_t_syn().detach()[0]
                 #################################################
                 losses = []
                 for i in range(1):
                     optimizer_basic_model.zero_grad()
                     logits = basic_model(x_syn, adj_t_syn)
                     # (B,N,C) & (B,C)
-                    loss = F.nll_loss(logits.transpose(1, 2), y_syn)
+                    loss = F.nll_loss(logits, y_syn)
 
                     loss.backward()
                     optimizer_basic_model.step()
@@ -125,7 +124,8 @@ class MSGC(GCondBase):
                 # smallest_loss = loss_window
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 # add batch sum
-                best_adj_t_syn = torch.mean(sum(adj_t_syns.data) / len(adj_t_syns.data), dim=0)
+                # best_adj_t_syn = torch.mean(sum(adj_t_syns.data) / len(adj_t_syns.data), dim=0)
+                best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
                 # print(
                 #     f'{it} loss:{smallest_loss:.4f}')
                 # else:

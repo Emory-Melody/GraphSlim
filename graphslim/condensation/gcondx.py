@@ -1,9 +1,10 @@
+from tqdm import trange
+
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import *
 from graphslim.utils import *
-from tqdm import trange
 
 
 class GCondX(GCondBase):
@@ -20,7 +21,6 @@ class GCondX(GCondBase):
         else:
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
-        syn_class_indices = self.syn_class_indices
 
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()
@@ -44,9 +44,8 @@ class GCondX(GCondBase):
                         nclass=data.nclass, dropout=0, weight_decay=0,
                         nlayers=args.nlayers, with_bn=False,
                         device=self.device).to(self.device)
-        for it in range(args.epochs):
+        for it in trange(args.epochs):
             # seed_everything(args.seed + it)
-
 
             model.initialize()
             # model_parameters = list(model.parameters())

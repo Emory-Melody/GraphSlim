@@ -171,9 +171,9 @@ class Evaluator:
 
         # if model_type == 'MLP':
         #     output = model.predict(data.feat_test, sp.eye(len(data.feat_test),normadj))
-        output = model.predict(data.feat_test, data.adj_test)
 
         if args.setting == 'ind':
+            output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())

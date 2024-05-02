@@ -147,17 +147,6 @@ class GCondBase:
         # The following values are empirically good.
 
         return args.outer_loop, args.inner_loop
-        if args.method == 'sgdd':
-            if args.dataset in ['ogbn-arxiv']:
-                return 20, 3
-            if args.dataset in ['cora']:
-                return 20, 15
-            if args.dataset in ['citeseer']:
-                return 20, 15
-            if args.dataset in ['physics']:
-                return 20, 10
-            else:
-                return 20, 10
 
     def check_bn(self, model):
         BN_flag = False
