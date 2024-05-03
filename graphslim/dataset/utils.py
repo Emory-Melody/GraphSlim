@@ -68,7 +68,8 @@ def load_reduced(args, valid_result=0):
         f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
     labels_syn = torch.load(
         f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    print("Loaded reduced data")
+    if args.verbose:
+        print("Loaded reduced data")
     return adj_syn, feat_syn, labels_syn
 
 # =============from graphsaint================#

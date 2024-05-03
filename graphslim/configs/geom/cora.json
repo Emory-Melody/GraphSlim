@@ -1,0 +1,13 @@
+{
+  "buffer_model_type": "GCN",
+  "teacher_hidden": 256,
+  "teacher_dropout": 0.0,
+  "teacher_nlayers": 2,
+  "lr_teacher": 0.01,
+  "mom_teacher": 0,
+  "wd_teacher": 0,
+  "teacher_epochs": 1000,
+  "lam": 0.70,
+  "T": 200,
+  "scheduler": 'root'
+}

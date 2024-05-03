@@ -122,8 +122,8 @@ class GCSNTK:
         print(f"Conden ratio  :{self.args.reduction_rate}")
         print(f"Ridge         :{self.ridge}")
 
-        Acc = torch.zeros(self.args.epochs, self.args.runs).to(self.device)
-        for iter in range(self.args.runs):
+        Acc = torch.zeros(self.args.epochs, 1).to(self.device)
+        for iter in range(1):
             print('--------------------------------------------------')
             print('The ' + str(iter + 1) + 'th Iteration:')
             print('--------------------------------------------------')
@@ -194,10 +194,10 @@ class GCSNTK:
         print(f"Conden size   :{Cond_size}")
         print(f"Ridge         :{self.ridge}")
         print(f"Num of batches:{TRAIN_K}")
-        print(f"Iterations    :{self.args.runs}")
+        print(f"Iterations    :{1}")
 
-        results = torch.zeros(self.args.epochs_train, self.args.runs)
-        for iter in range(self.args.runs):
+        results = torch.zeros(self.args.epochs_train, 1)
+        for iter in range(1):
             print(f"The  {iter + 1}-th iteration")
             x_s = torch.rand(round(Cond_size), dim)
             y_s = torch.rand(round(Cond_size), n_class)

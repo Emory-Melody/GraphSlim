@@ -15,7 +15,7 @@ class Evaluator:
         # self.data = data
         self.args = args
         self.device = args.device
-        # self.args.runs = 10
+        # self.args.run_evaluation = 10
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
         # d = data.feat_train.shape[1]
         # self.nnodes_syn = n
@@ -116,7 +116,7 @@ class Evaluator:
     def get_syn_data(self, model_type=None, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
+        adj_syn, feat_syn, labels_syn = load_reduced(args)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
 
@@ -214,7 +214,7 @@ class Evaluator:
 
         for model_type in ['GCN', 'GraphSage', 'SGCRich', 'MLP', 'APPNPRich', 'Cheby']:
             res = []
-            for i in range(args.runs):
+            for i in range(args.run_evaluation):
                 res.append(self.test(model_type=model_type, verbose=False))
             res = np.array(res)
             print('Test/Train Mean Accuracy:',
@@ -243,10 +243,10 @@ class Evaluator:
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
 
         if verbose:
-            runs = trange(args.runs)
+            run_evaluation = trange(args.run_evaluation)
         else:
-            runs = range(args.runs)
-        for i in runs:
+            run_evaluation = range(args.run_evaluation)
+        for i in run_evaluation:
             seed_everything(args.seed + i)
             res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced))
         res = np.array(res)
@@ -260,10 +260,10 @@ class Evaluator:
         res = []
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
         if verbose:
-            runs = trange(args.runs)
+            run_evaluation = trange(args.run_evaluation)
         else:
-            runs = range(args.runs)
-        for i in runs:
+            run_evaluation = range(args.run_evaluation)
+        for i in run_evaluation:
             seed_everything(args.seed + i)
             if verbose:
                 print('======= testing %s' % model_type)
@@ -278,7 +278,6 @@ class Evaluator:
                                     activation=args.activation, alpha=args.alpha).to(self.device)
 
                 best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
-                                                  normfeat=args.normalize_features,
                                                   verbose=verbose,
                                                   setting=args.setting,
                                                   reduced=True)
@@ -289,7 +288,6 @@ class Evaluator:
                                     activation=args.activation, alpha=args.alpha).to(self.device)
 
                 best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
-                                                  normfeat=args.normalize_features,
                                                   verbose=verbose,
                                                   setting=args.setting)
             res.append(best_acc_val.item())

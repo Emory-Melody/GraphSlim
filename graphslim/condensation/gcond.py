@@ -2,8 +2,8 @@ from tqdm import trange
 
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.dataset.utils import save_reduced
-from graphslim.models import *
 from graphslim.evaluation.utils import verbose_time_memory
+from graphslim.models import *
 from graphslim.utils import *
 
 
@@ -101,6 +101,6 @@ class GCond(GCondBase):
 
                 if current_val > best_val:
                     best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
+                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data

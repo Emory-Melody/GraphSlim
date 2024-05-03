@@ -51,7 +51,7 @@ def method_config(args):
 @click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
-@click.option('--runs', default=1, show_default=True)
+@click.option('--run_evaluation', default=10, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)

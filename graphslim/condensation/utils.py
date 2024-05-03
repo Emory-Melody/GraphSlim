@@ -1,5 +1,4 @@
-import torch
-
+from graphslim.utils import *
 
 def match_loss(gw_syn, gw_real, args, device):
     dis = torch.tensor(0.0).to(device)
@@ -150,3 +149,55 @@ def GCF(adj, x, k=1):
     for i in range(k):
         x = torch.matmul(filter, x)
     return x
+
+
+# geom
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+def neighborhood_difficulty_measurer(data, adj, label):
+    edge_index = adj.coalesce().indices()
+    edge_value = adj.coalesce().values()
+
+    neighbor_label, _ = add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
+
+    neighbor_label[1] = label[neighbor_label[1]]  # [[1, 1, 1, 1],[40, 20, 19, 21]]
+
+    neighbor_label = torch.transpose(neighbor_label, 0, 1)  # [[1, 40], [1, 20], [1, 19], [1, 21]]
+
+    index, count = torch.unique(neighbor_label, sorted=True, return_counts=True, dim=0)
+
+    neighbor_class = torch.sparse_coo_tensor(index.T, count)
+    neighbor_class = neighbor_class.to_dense().float()
+
+    neighbor_class = neighbor_class[data.idx_train]
+    neighbor_class = F.normalize(neighbor_class, 1.0, 1)
+    neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
+    local_difficulty = neighbor_entropy.sum(1)
+
+    return local_difficulty.to(device)
+
+
+def difficulty_measurer(data, adj, label):
+    local_difficulty = neighborhood_difficulty_measurer(data, adj, label)
+    # global_difficulty = feature_difficulty_measurer(data, label, embedding)
+    node_difficulty = local_difficulty
+    return node_difficulty
+
+
+def sort_training_nodes(data, adj, label):
+    node_difficulty = difficulty_measurer(data, adj, label)
+    _, indices = torch.sort(node_difficulty)
+    indices = indices.cpu().numpy()
+
+    sorted_trainset = data.idx_train[indices]
+    return sorted_trainset
+
+
+def training_scheduler(lam, t, T, scheduler='geom'):
+    if scheduler == 'linear':
+        return min(1, lam + (1 - lam) * t / T)
+    elif scheduler == 'root':
+        return min(1, math.sqrt(lam ** 2 + (1 - lam ** 2) * t / T))
+    elif scheduler == 'geom':
+        return min(1, 2 ** (math.log2(lam) - math.log2(lam) * t / T))

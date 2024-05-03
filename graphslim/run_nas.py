@@ -6,17 +6,11 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     data = get_dataset(args.dataset, args)
 
-    if args.dataset in ['cora', 'citeseer']:
-        args.epsilon = 0.005
-    else:
-        args.epsilon = 0.01
-
     NasEvaluator = NasEvaluator(args)
 
-    NasEvaluator.evaluate_ori(data)
-    NasEvaluator.test_params_ori(data)
+    # NasEvaluator.evaluate_ori(data)
+    # NasEvaluator.test_params_ori(data)
 
     NasEvaluator.evaluate_syn(data)
     NasEvaluator.test_params_syn(data)
-
     NasEvaluator.cal_pearson()

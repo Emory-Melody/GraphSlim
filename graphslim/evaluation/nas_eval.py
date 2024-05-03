@@ -1,4 +1,5 @@
 import csv
+import pickle as pkl
 from itertools import product
 from pathlib import Path
 
@@ -8,18 +9,28 @@ from tqdm import tqdm
 from graphslim.evaluation.eval_agent import Evaluator
 
 
-def csv_writer(file_path, num):
+def save_csv(file_path, num):
     with file_path.open(mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(num)
 
 
-def csv_reader(file_path):
+def load_csv(file_path):
     with file_path.open(mode='r', newline='') as file:
         reader = csv.reader(file)
         data = list(reader)
     return data
 
+
+def save_pkl(file_path, data):
+    with open(file_path, 'wb') as f:
+        pkl.dump(data, f)
+
+
+def load_pkl(file_path):
+    with open(file_path, 'rb') as f:
+        data = pkl.load(f)
+    return data
 
 class NasEvaluator:
     def __init__(self, args):
@@ -34,6 +45,7 @@ class NasEvaluator:
         activations = ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6',
                        'elu']  # ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']  #
         self.parameter_combinations = list(product(ks, nhids, alphas, activations))
+
 
     def evaluate_ori(self, data):
         # train and eval model architecture
@@ -53,7 +65,9 @@ class NasEvaluator:
 
         # save the eval result
         file_path = Path(f'{self.args.dataset}_results_ori.csv')
-        csv_writer(file_path, self.results_ori)
+        save_csv(file_path, self.results_ori)
+        file_path = Path(f'{self.args.dataset}_best_params_ori.pkl')
+        save_pkl(file_path, self.best_params_ori)
 
         # self.cal_pearson()
         # self.test_params_ori(data)
@@ -74,26 +88,33 @@ class NasEvaluator:
                 best_acc_val_syn = acc_val_syn
                 self.best_params_syn = params
 
-        # save the eval result
-        file_path = Path(f'{self.args.dataset}_{self.args.method}_{self.args.reduction_rate}_results_syn.csv')
-        csv_writer(file_path, self.results_syn)
+        file_path = Path(f'{self.args.dataset}_{self.args.method}_results_syn.csv')
+        save_csv(file_path, self.results_syn)
+        file_path = Path(f'{self.args.dataset}_{self.args.method}_best_params_syn.pkl')
+        save_pkl(file_path, self.best_params_syn)
 
     def test_params_ori(self, data):
+        if self.best_params_ori is None:
+            file_path = Path(f'{self.args.dataset}_best_params_ori.pkl')
+            self.best_params_ori = load_pkl(file_path)
         print("best_params_ori", self.best_params_ori)
         args = self.args
-        args.runs = 1
+        args.runs = 10
         args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_ori
         evaluator = Evaluator(args)
         acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNPRich', reduced=False, verbose=False)
         print("NAS: test accuracy on ori graph:", acc_test_ori)
 
     def test_params_syn(self, data):
+        if self.best_params_syn is None:
+            file_path = Path(f'{self.args.dataset}_{self.args.method}_best_params_syn.pkl')
+            self.best_params_syn = load_pkl(file_path)
         print("best_params_syn", self.best_params_syn)
         args = self.args
-        args.runs = 1
+        args.runs = 10
         args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_syn
         evaluator = Evaluator(args)
-        acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNPRich', reduced=True, verbose=False)
+        acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNPRich', reduced=False, verbose=False)
         print("NAS: test accuracy on syn graph:", acc_test_syn)
 
     def get_rank(self, results):
@@ -113,10 +134,10 @@ class NasEvaluator:
         return ranks
 
     def cal_pearson(self):
-        if len(self.results_syn) == 0:
-            self.results_syn = [float(x) for x in csv_reader(
-                Path(f'{self.args.dataset}_{self.args.method}_{self.args.reduction_rate}_results_syn.csv'))[0]]
-            self.results_ori = [float(x) for x in csv_reader(Path(f'{self.args.dataset}_results_ori.csv'))[0]]
+        if len(self.results_syn) == 0 or len(self.results_ori) == 0:
+            self.results_syn = [float(x) for x in load_csv(
+                Path(f'{self.args.dataset}_{self.args.method}_results_syn.csv'))[0]]
+            self.results_ori = [float(x) for x in load_csv(Path(f'{self.args.dataset}_results_ori.csv'))[0]]
         print("ori acc:", self.results_ori)
         print("syn acc:", self.results_syn)
         pearson_corr, p_value = pearsonr(self.results_syn, self.results_ori)
