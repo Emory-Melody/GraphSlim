@@ -16,7 +16,9 @@ class BaseGNN(nn.Module):
         assert device is not None, "Please specify 'device'!"
         self.device = device
         self.nfeat = nfeat
+        self.nhid = nhid
         self.nclass = nclass
+        self.nlayers = nlayers
         self.layers = nn.ModuleList([])
         self.loss = None
 

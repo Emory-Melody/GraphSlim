@@ -10,12 +10,13 @@ class Cheby(BaseGNN):
     def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
                  with_relu=True, with_bias=True, with_bn=False, device=None):
 
-        super(Cheby, self).__init__()
+        super(Cheby, self).__init__(nfeat, nhid, nclass, nlayers, dropout, lr, weight_decay,
+                                    with_relu, with_bias, with_bn, device=device)
 
         assert device is not None, "Please specify 'device'!"
-        self.device = device
-        self.nfeat = nfeat
-        self.nclass = nclass
+        # self.device = device
+        # self.nfeat = nfeat
+        # self.nclass = nclass
 
         self.layers = nn.ModuleList([])
 

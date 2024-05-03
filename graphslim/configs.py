@@ -37,8 +37,11 @@ def setting_config(args):
 
 # recommend hyperparameters here
 def method_config(args):
-    conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
-    update_from_dict(args, conf_dt)
+    try:
+        conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
+        update_from_dict(args, conf_dt)
+    except:
+        print('No config file found')
     # little patch for configs
     if args.method in ['doscond'] and args.reduction_rate == 0.1:
         args.outer_loop = 3

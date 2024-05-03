@@ -9,12 +9,12 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     graph = get_dataset(args.dataset, args)
     all_res = []
-    args.run_reduction = 1
+    args.run_reduction = 3
     for i in range(args.run_reduction):
         seed_everything(args.seed + i)
         if args.method == 'vng':
             agent = VNG(setting=args.setting, data=graph, args=args)
-        elif args.method == 'coarsen':
+        elif args.method == 'variation_neighborhoods':
             agent = Coarsen(setting=args.setting, data=graph, args=args)
         elif args.method == 'clustering':
             agent = Cluster(setting=args.setting, data=graph, args=args)

@@ -5,7 +5,7 @@ from tqdm import trange
 
 from graphslim import utils
 from graphslim.dataset import *
-from graphslim.models import GCN, GAT
+from graphslim.models import *
 from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
 
 
@@ -124,18 +124,18 @@ class Evaluator:
             adj_syn = adj_syn - adj_syn
 
         if verbose:
-            # print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
+            print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
 
-            # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-            if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
-                print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-                args.epsilon = 0.001
-                if args.epsilon > 0:
-                    adj_syn[adj_syn < args.epsilon] = 0
-                    if verbose:
-                        print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-            else:
-                print("structure free methods do not need to truncate the adjacency matrix")
+        # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
+        # if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
+        #     print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+        #     args.epsilon = 0.001
+        #     if args.epsilon > 0:
+        #         adj_syn[adj_syn < args.epsilon] = 0
+        #         if verbose:
+        #             print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+        # else:
+        #     print("structure free methods do not need to truncate the adjacency matrix")
 
         # edge_index = adj_syn.nonzero().T
         # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
@@ -147,9 +147,11 @@ class Evaluator:
         args = self.args
         res = []
         feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
+
         if verbose:
             print('======= testing %s' % model_type)
         if model_type == 'MLP':
+            data.adj_syn = data.adj_syn - data.adj_syn
             model_class = GCN
         else:
             model_class = eval(model_type)
@@ -205,21 +207,24 @@ class Evaluator:
             # res.append(acc_train.item())
         return res
 
-    def train_cross(self, verbose=True):
+    def train_cross(self, data):
         args = self.args
-        data = self.data
         data.nclass = data.nclass.item()
 
-        final_res = {}
-
-        for model_type in ['GCN', 'GraphSage', 'SGCRich', 'MLP', 'APPNPRich', 'Cheby']:
+        for model_type in ['MLP', 'GCN', 'SGCRich', 'APPNPRich', 'Cheby']:  # 'GraphSage'
+            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                             verbose=args.verbose)
             res = []
-            for i in range(args.run_evaluation):
-                res.append(self.test(model_type=model_type, verbose=False))
+            if args.verbose:
+                run_evaluation = trange(args.run_evaluation)
+            else:
+                run_evaluation = range(args.run_evaluation)
+            for i in run_evaluation:
+                seed_everything(args.seed + i)
+                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True))
             res = np.array(res)
-            print('Test/Train Mean Accuracy:',
-                  repr([res.mean(0), res.std(0)]))
-            final_res[model_type] = [res.mean(0), res.std(0)]
+            res_mean, res_std = res.mean(), res.std()
+            print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
         # print('=== testing GAT')
         # res = []
@@ -232,7 +237,7 @@ class Evaluator:
         #         repr([res.mean(0), res.std(0)]))
         # final_res['GAT'] = [res.mean(0), res.std(0)]
 
-        print('Final result:', final_res)
+        # print('Final result:', final_res)
 
     def evaluate(self, data, model_type, verbose=True, reduced=True):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']

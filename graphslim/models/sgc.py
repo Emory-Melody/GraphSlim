@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch_sparse
+from torch_sparse import SparseTensor, matmul
 
 from graphslim.models.base import BaseGNN
 from graphslim.models.layers import GraphConvolution, MyLinear
@@ -115,7 +116,10 @@ class SGCRich(BaseGNN):
                 x = F.dropout(x, self.dropout, training=self.training)
 
         for i in range(self.nlayers):
-            x = torch.spmm(adj, x)
+            if isinstance(adj, SparseTensor):
+                x = matmul(adj, x)
+            else:
+                x = torch.spmm(adj, x)
 
         if self.multi_label:
             return torch.sigmoid(x)

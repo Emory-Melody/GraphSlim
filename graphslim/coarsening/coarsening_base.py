@@ -217,6 +217,7 @@ class Coarsen:
                     coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
                     coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
                 coarsen_node += Gc.W.shape[0]
+                print(coarsen_node)
 
             # elif torch.sum(H_train_mask) > 0:
             #

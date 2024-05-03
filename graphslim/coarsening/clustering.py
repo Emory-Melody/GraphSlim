@@ -7,6 +7,7 @@ from torch_scatter import scatter_mean
 
 from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.dataset.utils import save_reduced
+from graphslim.evaluation.utils import verbose_time_memory
 
 
 class Cluster(Coarsen):
@@ -16,6 +17,7 @@ class Cluster(Coarsen):
     def __init__(self, setting, data, args, **kwargs):
         super(Cluster, self).__init__(setting, data, args, **kwargs)
 
+    @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
         n_classes = data.nclass

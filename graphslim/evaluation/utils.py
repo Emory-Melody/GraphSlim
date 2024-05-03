@@ -3,6 +3,7 @@ from functools import wraps
 
 import numpy as np
 import scipy.sparse as sp
+import torch
 import torch.nn.functional as F
 from sklearn.metrics import accuracy_score, f1_score
 from torch_sparse import SparseTensor
@@ -22,7 +23,11 @@ def getsize_mb(elements):
             e = csr2ei(e)
             size += e.element_size() * e.nelement()
         else:
-            size += e.element_size() * e.nelement()
+            try:
+                size += e.element_size() * e.nelement()
+            except:
+                e = torch.from_numpy(e)
+                size += e.element_size() * e.nelement()
     return size / 1024 / 1024
 
 
