@@ -1,6 +1,7 @@
 from torch import nn
 from tqdm import trange
 
+from graphslim.coarsening import Cluster
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
@@ -17,7 +18,7 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
         self.x_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
-        self.batch_size = 1  # just for test
+        self.batch_size = 16  # just for test
         self.n_classes = data.nclass
         self.device = args.device
 
@@ -39,8 +40,8 @@ class MSGC(GCondBase):
         features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
-        # y_syn = self.y_syn.repeat(self.batch_size, 1)
-        y_syn = self.y_syn
+        y_syn = self.y_syn.repeat(self.batch_size)
+        # y_syn = self.y_syn
         # n_each_y = data.n_each_y
         basic_model = SGCRich(nfeat=self.x_syn.shape[1], nhid=args.hidden,
                               nclass=data.nclass, dropout=0, weight_decay=0,
@@ -49,8 +50,10 @@ class MSGC(GCondBase):
 
         self.reset_adj_batch()
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.x_syn.data.copy_(feat_sub)
+        # feat_sub, adj_sub = self.get_sub_adj_feat()
+        agent = Cluster(setting=args.setting, data=self.data, args=args)
+        reduced_data = agent.reduce(self.data)
+        self.x_syn.data.copy_(reduced_data.feat_syn)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
         optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)
@@ -69,7 +72,7 @@ class MSGC(GCondBase):
                 basic_model = self.check_bn(basic_model)
                 basic_model.eval()  # fix basic_model while optimizing graphsyner
                 ######################graph optimization#####################################
-                adj_t_syn = self.get_adj_t_syn()[0]
+                adj_t_syn = self.get_adj_t_syn()
                 x_syn = self.x_syn
                 loss = 0.
                 for c in range(data.nclass):
@@ -101,7 +104,7 @@ class MSGC(GCondBase):
                     optimizer_x.step()
 
                 x_syn = x_syn.detach()
-                adj_t_syn = self.get_adj_t_syn().detach()[0]
+                adj_t_syn = self.get_adj_t_syn().detach()
                 #################################################
                 losses = []
                 for i in range(1):
@@ -132,7 +135,7 @@ class MSGC(GCondBase):
                 #     patience += 1
                 #     if patience >= args.patience:
                 #         break
-                data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, self.y_syn
+                data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
                 res = []
                 for i in range(3):
                     res.append(self.test_with_val(verbose=verbose, setting=args.setting))

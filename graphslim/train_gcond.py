@@ -8,11 +8,11 @@ args = cli(standalone_mode=False)
 graph = get_dataset(args.dataset, args)
 if args.method == 'gcond':
     agent = GCond(setting=args.setting, data=graph, args=args)
-elif args.method == 'gcondx':
-    agent = GCondX(setting=args.setting, data=graph, args=args)
+# elif args.method == 'gcondx':
+#     agent = GCondX(setting=args.setting, data=graph, args=args)
 elif args.method == 'doscond':
     agent = DosCond(setting=args.setting, data=graph, args=args)
-elif args.method == 'doscondx':
+elif args.method in ['doscondx', 'gcondx']:
     agent = DosCondX(setting=args.setting, data=graph, args=args)
 elif args.method == 'sfgc':
     agent = SFGC(setting=args.setting, data=graph, args=args)

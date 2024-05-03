@@ -58,17 +58,17 @@ class GCondBase:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    def cross_architecture_eval(self):
-        args = self.args
-        data = self.data
-
-        if args.dataset in ['cora', 'citeseer']:
-            args.epsilon = 0.05
-        else:
-            args.epsilon = 0.01
-
-        agent = Evaluator(data, args, device='cuda')
-        agent.train_cross()
+    # def cross_architecture_eval(self):
+    #     args = self.args
+    #     data = self.data
+    #
+    #     if args.dataset in ['cora', 'citeseer']:
+    #         args.epsilon = 0.05
+    #     else:
+    #         args.epsilon = 0.01
+    #
+    #     agent = Evaluator(data, args, device='cuda')
+    #     agent.train_cross()
 
     def train_class(self, model, adj, features, labels, labels_syn, args):
         data = self.data

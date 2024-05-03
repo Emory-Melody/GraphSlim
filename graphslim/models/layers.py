@@ -31,21 +31,22 @@ class GraphConvolution(torch.nn.Module):
         if self.bias is not None:
             self.bias.data.uniform_(-stdv, stdv)
 
-    def forward(self, input, adj):
+    def forward(self, x, adj):
         """ Graph Convolutional Layer forward function
         """
-        if input.data.is_sparse:
-            support = torch.spmm(input, self.weight)
-        else:
-            support = torch.mm(input, self.weight)
         if isinstance(adj, SparseTensor):
-            output = matmul(adj, support)
+            x = torch.mm(x, self.weight)
+            x = matmul(adj, x)
         else:
-            output = torch.spmm(adj, support)
+            x = x.reshape(-1, x.shape[-1])
+            x = torch.mm(x, self.weight)
+            x = x.reshape(-1, adj.shape[1], x.shape[-1])
+            x = adj @ x
+            x = x.reshape(-1, x.shape[-1])
         if self.bias is not None:
-            return output + self.bias
+            return x + self.bias
         else:
-            return output
+            return x
 
     def __repr__(self):
         return self.__class__.__name__ + ' (' \

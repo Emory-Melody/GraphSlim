@@ -152,10 +152,9 @@ def GCF(adj, x, k=1):
 
 
 # geom
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
-def neighborhood_difficulty_measurer(data, adj, label):
+def neighborhood_difficulty_measurer(data, adj, label, args):
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
@@ -175,18 +174,18 @@ def neighborhood_difficulty_measurer(data, adj, label):
     neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
     local_difficulty = neighbor_entropy.sum(1)
 
-    return local_difficulty.to(device)
+    return local_difficulty.to(args.device)
 
 
-def difficulty_measurer(data, adj, label):
-    local_difficulty = neighborhood_difficulty_measurer(data, adj, label)
+def difficulty_measurer(data, adj, label, args):
+    local_difficulty = neighborhood_difficulty_measurer(data, adj, label, args)
     # global_difficulty = feature_difficulty_measurer(data, label, embedding)
     node_difficulty = local_difficulty
     return node_difficulty
 
 
-def sort_training_nodes(data, adj, label):
-    node_difficulty = difficulty_measurer(data, adj, label)
+def sort_training_nodes(data, adj, label, args):
+    node_difficulty = difficulty_measurer(data, adj, label, args)
     _, indices = torch.sort(node_difficulty)
     indices = indices.cpu().numpy()
 

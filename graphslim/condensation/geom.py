@@ -45,9 +45,6 @@ class GEOM:
         self.labels_syn = labels_init
         self.adj_syn_init = adj_init
 
-
-
-
     def buffer_cl(self, data):
         args = self.args
         if args.setting == 'trans':
@@ -61,7 +58,7 @@ class GEOM:
         trajectories = []
 
         model_type = args.buffer_model_type
-        sorted_trainset = sort_training_nodes(data, adj, labels)
+        sorted_trainset = sort_training_nodes(data, adj, labels, args)
 
         for it in range(0, args.num_experts):
             print(

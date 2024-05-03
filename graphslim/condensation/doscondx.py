@@ -15,14 +15,13 @@ class DosCondX(GCondBase):
     def reduce(self, data, verbose=True):
 
         args = self.args
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
-        syn_class_indices = self.syn_class_indices
 
         # initialization the features
         feat_sub, adj_sub = self.get_sub_adj_feat()

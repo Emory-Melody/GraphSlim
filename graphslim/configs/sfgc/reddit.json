@@ -3,6 +3,5 @@
   "lr_adj": 0.1,
   "outer_loop": 10,
   "inner_loop": 1,
-  "dis_metric": "ours",
-  "threshold": 0.01
+  "dis_metric": "ours"
 }

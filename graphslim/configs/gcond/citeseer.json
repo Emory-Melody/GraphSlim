@@ -4,5 +4,7 @@
   "pre_norm": true,
   "dis_metric": "ours",
   "outer_loop": 20,
-  "inner_loop": 3
+  "inner_loop": 15,
+  "threshold": 0.05,
+  "epochs": 1000
 }

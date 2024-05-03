@@ -4,4 +4,5 @@
   "outer_loop": 20,
   "inner_loop": 3,
   "dis_metric": "ours",
+  "threshold": 0.01
 }

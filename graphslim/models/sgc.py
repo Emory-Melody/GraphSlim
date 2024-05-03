@@ -116,15 +116,10 @@ class SGCRich(BaseGNN):
                 x = F.dropout(x, self.dropout, training=self.training)
 
         for i in range(self.nlayers):
-            if isinstance(adj, SparseTensor):
-                x = matmul(adj, x)
-            else:
-                x = torch.spmm(adj, x)
+            x = adj @ x
 
-        if self.multi_label:
-            return torch.sigmoid(x)
-        else:
-            return F.log_softmax(x, dim=1)
+        x = x.reshape(-1, x.shape[-1])
+        return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):
         for ix, layer in enumerate(self.layers):

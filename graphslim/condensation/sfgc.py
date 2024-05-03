@@ -1,4 +1,3 @@
-import datetime
 import os
 from copy import deepcopy
 
@@ -12,6 +11,7 @@ from graphslim.models.gntk import GNTK
 from graphslim.models.reparam_module import ReparamModule
 from graphslim.sparsification import *
 from graphslim.utils import *
+from tqdm import trange
 
 
 class SFGC(GCondBase):
@@ -21,116 +21,116 @@ class SFGC(GCondBase):
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
-        # =============stage 1 trajectory save==================#
-        log_dir = './SFGC_Buffer/{}-{}'.format(args.dataset, datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f"))
-
-        if args.setting == 'ind':
-            features = data.feat_train
-            adj = data.adj_train
-            labels = data.labels_train
-        else:
-            features = data.feat_full
-            adj = data.adj_full
-            labels = data.labels_full
-
-        features, adj, label = to_tensor(features, adj, label=labels, device=self.device)
-        device = args.device
-
-        trajectories = []
-
-        model_type = 'GCN'
-
-        for it in range(200):
-
-            model_class = eval(model_type)
-
-            model = model_class(nfeat=features.shape[1], nhid=args.hidden, dropout=args.dropout,
-                                nlayers=args.nlayers,
-                                nclass=data.nclass, device=device).to(device)
-            # print(model)
-
-            model.initialize()
-
-            model_parameters = list(model.parameters())
-
-            optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr, weight_decay=args.weight_decay)
-
-            timestamps = []
-
-            timestamps.append([p.detach().cpu() for p in model.parameters()])
-
-            best_val_acc = best_test_acc = best_it = 0
-
-            # lr_schedule = [args.teacher_epochs // 2 + 1]
-            #
-            # lr = args.lr
-            for e in range(args.epochs):
-                model.train()
-                optimizer_model.zero_grad()
-                _, output = model.forward(features, adj)
-                if args.setting == 'ind':
-                    loss_buffer = F.nll_loss(output, labels)
-                else:
-                    loss_buffer = F.nll_loss(output[data.idx_train], labels[data.idx_train])
-                loss_buffer.backward()
-                optimizer_model.step()
-
-                # if e in lr_schedule and args.decay:
-                #     lr = lr * args.decay_factor
-                #     optimizer_model = torch.optim.Adam(model_parameters, lr=lr,
-                #                                        weight_decay=args.wd_teacher)
-
-                optimizer_model.zero_grad()
-
-                if e % 10 == 0 and e > 1:
-                    timestamps.append([p.detach().cpu() for p in model.parameters()])
-                    # p_current = timestamps[-1]
-                    # p_0 = timestamps[0]
-                    # target_params = torch.cat([p_c.data.reshape(-1) for p_c in p_current], 0)
-                    # starting_params = torch.cat([p0.data.reshape(-1) for p0 in p_0], 0)
-                    # param_dist1 = torch.nn.functional.mse_loss(starting_params, target_params, reduction="sum")
-
-            trajectories.append(timestamps)
-
-            if len(trajectories) == args.traj_save_interval:
-                n = 0
-                while os.path.exists(os.path.join(log_dir, "replay_buffer_{}.pt".format(n))):
-                    n += 1
-                print("Saving {}".format(os.path.join(log_dir, "replay_buffer_{}.pt".format(n))))
-                # torch.save(trajectories, os.path.join(log_dir, "replay_buffer_{}.pt".format(n)))
-                trajectories = []
+        # =============stage 1 trajectory save and load==================#
+        # can skip to save time
+        buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
+        args.expert_epochs = 1000
+        args.num_experts = 20
+        # if not os.path.exists(buf_dir):
+        #     os.mkdir(buf_dir)
+        #
+        # if args.setting == 'ind':
+        #     features = data.feat_train
+        #     adj = data.adj_train
+        #     labels = data.labels_train
+        # else:
+        #     features = data.feat_full
+        #     adj = data.adj_full
+        #     labels = data.labels_full
+        #
+        # features, adj, labels = to_tensor(features, adj, label=labels, device=self.device)
+        # adj = normalize_adj_tensor(adj, sparse=True)
+        # device = args.device
+        #
+        # trajectories = []
+        #
+        # for it in trange(args.num_experts):
+        #
+        #     model = GCN(nfeat=features.shape[1], nhid=args.hidden, dropout=args.dropout,
+        #                 nlayers=args.nlayers,
+        #                 nclass=data.nclass, device=device).to(device)
+        #     # print(model)
+        #
+        #     model.initialize()
+        #
+        #     model_parameters = list(model.parameters())
+        #
+        #     optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr, weight_decay=args.weight_decay)
+        #
+        #     timestamps = []
+        #
+        #     timestamps.append([p.detach().cpu() for p in model.parameters()])
+        #
+        #     best_val_acc = best_test_acc = best_it = 0
+        #
+        #     # lr_schedule = [args.teacher_epochs // 2 + 1]
+        #     #
+        #     # lr = args.lr
+        #     for e in range(args.expert_epochs):
+        #         model.train()
+        #         optimizer_model.zero_grad()
+        #         output = model.forward(features, adj)
+        #         if args.setting == 'ind':
+        #             loss_buffer = F.nll_loss(output, labels)
+        #         else:
+        #             loss_buffer = F.nll_loss(output[data.idx_train], labels[data.idx_train])
+        #         loss_buffer.backward()
+        #         optimizer_model.step()
+        #
+        #         # if e in lr_schedule and args.decay:
+        #         #     lr = lr * args.decay_factor
+        #         #     optimizer_model = torch.optim.Adam(model_parameters, lr=lr,
+        #         #                                        weight_decay=args.wd_teacher)
+        #
+        #         optimizer_model.zero_grad()
+        #
+        #         if e % 10 == 0 and e > 1:
+        #             timestamps.append([p.detach().cpu() for p in model.parameters()])
+        #             # p_current = timestamps[-1]
+        #             # p_0 = timestamps[0]
+        #             # target_params = torch.cat([p_c.data.reshape(-1) for p_c in p_current], 0)
+        #             # starting_params = torch.cat([p0.data.reshape(-1) for p0 in p_0], 0)
+        #             # param_dist1 = torch.nn.functional.mse_loss(starting_params, target_params, reduction="sum")
+        #
+        #     trajectories.append(timestamps)
+        #
+        #     # need too many space to save,change 10->100
+        #     if len(trajectories) == 10:
+        #         n = 0
+        #         while os.path.exists(os.path.join(buf_dir, "replay_buffer_{}.pt".format(n))):
+        #             n += 1
+        #         print("Saving {}".format(os.path.join(buf_dir, "replay_buffer_{}.pt".format(n))))
+        #         torch.save(trajectories, os.path.join(buf_dir, "replay_buffer_{}.pt".format(n)))
+        #         trajectories = []
         # =============stage 2 coreset init==================#
         agent = KCenter(setting=args.setting, data=data, args=args)
-        init_data = agent.reduce(data, verbose=args.verbose)
+        init_data = agent.reduce(data, verbose=False)
         # =============stage 3 trajectory alignment and GNTK evaluation==================#
 
         feat_init, adj_init, labels_init = to_tensor(init_data.feat_syn, init_data.adj_syn, init_data.labels_syn,
                                                      device=self.device)
-        if args.setting == 'ind':
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, data.labels_train, device=self.device)
-        else:
-            features, adj, labels = to_tensor(data.feat_full, data.adj_full, data.labels_full, device=self.device)
-        adj_tensor_norm = normalize_adj_tensor(adj, sparse=True)
+
         self.feat_syn.data.copy_(feat_init)
         self.labels_syn = labels_init
         self.adj_syn_init = adj_init
 
-        file_idx, expert_idx, expert_files = self.expert_load()
+        file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
-        syn_lr = torch.tensor(args.lr_student).to(self.device)
+        # args.lr_student
+        syn_lr = torch.tensor(0.5).to(self.device)
 
-        if args.optim_lr == 1:
+        if args.lr == 1:
             syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
-            optimizer_lr = torch.optim.Adam([syn_lr], lr=args.lr_lr)
+            optimizer_lr = torch.optim.Adam([syn_lr], lr=1e-6)
 
-        args.eval_type = 'GCN'
-        model_eval_pool = self.get_eval_pool(args.eval_type, args.condense_model, args.eval_model)
-        accs_all_exps = dict()  # record performances of all experiments
+        # args.eval_type = 'GCN'
+        # model_eval_pool = self.get_eval_pool(args.eval_type, args.condense_model, args.eval_model)
+        # accs_all_exps = dict()  # record performances of all experiments
 
-        best_ntk_score_eval = {m: 10 for m in model_eval_pool}
-        best_ntk_score_eval_iter = {m: 0 for m in model_eval_pool}
-        best_ntk_accs_eval = {m: 0 for m in model_eval_pool}
-        best_ntk_accs_eval_iter = {m: 0 for m in model_eval_pool}
+        # best_ntk_score_eval = {m: 10 for m in model_eval_pool}
+        # best_ntk_score_eval_iter = {m: 0 for m in model_eval_pool}
+        # best_ntk_accs_eval = {m: 0 for m in model_eval_pool}
+        # best_ntk_accs_eval_iter = {m: 0 for m in model_eval_pool}
 
         # best_model_acc_eval = {m: 0 for m in model_eval_pool}
         # best_model_acc_eval_iter = {m: 0 for m in model_eval_pool}
@@ -141,25 +141,17 @@ class SFGC(GCondBase):
         # best_model_std_test = {m: 0 for m in model_eval_pool}
 
         best_loss = 1.0
+        best_val = 0
         # best_loss_it = 0
         # adj_syn_norm_key = {'0': 0}
-
+        args.rand_start = 1
+        args.start_epoch = 30
+        args.interval_buffer = 1
         for it in range(args.epochs):
             # logging.info(adj_syn_norm_key['0'])
-            if args.dataset in ['ogbn-arxiv']:
-                model = GCN(nfeat=data.feat_train.shape[1], nhid=args.student_hidden,
-                            nclass=data.nclass, dropout=args.student_dropout, nlayers=args.student_nlayers,
-                            device=self.device).to(self.device)
-            else:
-                if args.condense_model == 'SGC':
-                    model = SGC(nfeat=data.feat_train.shape[1], nhid=args.student_hidden,
-                                nclass=data.nclass, dropout=args.student_dropout,
-                                nlayers=args.student_nlayers, with_bn=False,
-                                device=self.device).to(self.device)
-                elif args.condense_model == 'GCN':
-                    model = GCN(nfeat=data.feat_train.shape[1], nhid=args.student_hidden,
-                                nclass=data.nclass, dropout=args.student_dropout, nlayers=args.student_nlayers,
-                                device=self.device).to(self.device)
+            model = GCN(nfeat=data.feat_train.shape[1], nhid=args.hidden,
+                        nclass=data.nclass, dropout=args.dropout, nlayers=args.nlayers,
+                        device=self.device).to(self.device)
 
             model = ReparamModule(model)
 
@@ -167,24 +159,24 @@ class SFGC(GCondBase):
 
             num_params = sum([np.prod(p.size()) for p in (model.parameters())])
 
-            if args.load_all:
-                expert_trajectory = self.buffer[np.random.randint(0, len(self.buffer))]
-            else:
-                expert_trajectory = self.buffer[expert_idx]
-                expert_idx += 1
-                if expert_idx == len(self.buffer):
-                    expert_idx = 0
-                    file_idx += 1
-                    if file_idx == len(expert_files):
-                        file_idx = 0
-                        random.shuffle(expert_files)
-                    print("loading file {}".format(expert_files[file_idx]))
-                    if args.max_files != 1:
-                        del self.buffer
-                        self.buffer = torch.load(expert_files[file_idx])
-                    if args.max_experts is not None:
-                        self.buffer = self.buffer[:args.max_experts]
-                    random.shuffle(self.buffer)
+            # if args.load_all:
+            #     expert_trajectory = self.buffer[np.random.randint(0, len(self.buffer))]
+            # else:
+            expert_trajectory = self.buffer[expert_idx]
+            expert_idx += 1
+            if expert_idx == len(self.buffer):
+                expert_idx = 0
+                file_idx += 1
+                if file_idx == len(expert_files):
+                    file_idx = 0
+                    random.shuffle(expert_files)
+                print("loading file {}".format(expert_files[file_idx]))
+                if args.max_files != 1:
+                    del self.buffer
+                    self.buffer = torch.load(expert_files[file_idx])
+                if args.max_experts is not None:
+                    self.buffer = self.buffer[:args.max_experts]
+                random.shuffle(self.buffer)
 
             if args.rand_start == 1:
                 if args.interval_buffer == 1:
@@ -230,7 +222,7 @@ class SFGC(GCondBase):
                 feat_out, output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
                 loss_syn = F.nll_loss(output_syn, self.labels_syn)
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
-                acc_syn = accuracy(output_syn, self.labels_syn)
+                # acc_syn = accuracy(output_syn, self.labels_syn)
                 student_params.append(student_params[-1] - syn_lr * grad)
                 # if step % 500 == 0:
                 #     _, output_test = model.forward(features, adj_tensor_norm, flat_param=student_params[-1])
@@ -260,7 +252,7 @@ class SFGC(GCondBase):
             total_loss = grand_loss
             self.optimizer_feat.zero_grad()
 
-            if args.optim_lr == 1:
+            if args.lr == 1:
                 optimizer_lr.zero_grad()
 
             # grand_loss.backward()
@@ -278,79 +270,97 @@ class SFGC(GCondBase):
                         start_epoch,
                         syn_lr.item()))
 
-            if it in args.checkpoints:
-                for model_eval in model_eval_pool:
-                    print('Evaluation: model_train = {}, model_eval = {}, iteration = {}'.format(args.condense_model,
-                                                                                                 model_eval,
-                                                                                                 it))
-                    ntk_score_eval = []
-                    ntk_accs_eval = []
+            if verbose and (it + 1) % 100 == 0:
+                print('Epoch {}, loss_avg: {}'.format(it + 1, total_loss.item()))
 
-                    ntk_score_eval_o, ntk_acc_test_o, ntk_feat_syn_save, ntk_adj_syn_save, ntk_label_syn_save = self.evaluate_synset_ntk()
-                    ntk_score_eval.append(ntk_score_eval_o)
-                    ntk_accs_eval.append(ntk_acc_test_o)
+            if it + 1 in args.checkpoints:
+                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), feat_syn.detach(), self.labels_syn.detach()
+                res = []
+                for i in range(3):
+                    res.append(self.test_with_val(verbose=False, setting=args.setting))
 
-                    print(
-                        'This is learned adj_syn INFO with {}-th iters: Shape: {}, Sum: {}, Avg_value: {}, Sparsity :{}'
-                        .format(it, ntk_adj_syn_save.shape, ntk_adj_syn_save.sum(),
-                                ntk_adj_syn_save.sum() / (ntk_adj_syn_save.shape[0] ** 2),
-                                ntk_adj_syn_save.nonzero().shape[0] / (ntk_adj_syn_save.shape[0] ** 2)))
+                res = np.array(res)
+                current_val = res.mean()
+                if verbose:
+                    print('Val Accuracy and Std:',
+                          repr([current_val, res.std()]))
 
-                    ntk_score_eval = np.array(ntk_score_eval)
-                    ntk_accs_eval = np.array(ntk_accs_eval)
-
-                    ntk_accs_eval_mean = np.mean(ntk_accs_eval)
-                    # acc_test_std = np.std(accs_test)
-
-                    ntk_score_eval_mean = np.mean(ntk_score_eval)
-                    # score_test_std = np.std(score_test)
-
-                    if ntk_score_eval_mean < best_ntk_score_eval[model_eval]:
-                        best_ntk_score_eval[model_eval] = ntk_score_eval_mean
-                        best_ntk_score_eval_iter[model_eval] = it
-                        save_reduced(ntk_adj_syn_save, ntk_feat_syn_save, ntk_label_syn_save, args)
-
-                    print('Evaluate ntk {}, score_mean = {:.4f}, acc_mean = {:.2f}'.format(model_eval,
-                                                                                           ntk_score_eval_mean,
-                                                                                           ntk_accs_eval_mean * 100.0))
+                if current_val > best_val:
+                    best_val = current_val
+                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+            # if it in args.checkpoints:
+            # for model_eval in model_eval_pool:
+            #     print('Evaluation: model_train = {}, model_eval = {}, iteration = {}'.format("GCN",
+            #                                                                                  model_eval,
+            #                                                                                  it))
+            #     ntk_score_eval = []
+            #     ntk_accs_eval = []
+            #
+            #     ntk_score_eval_o, ntk_acc_test_o, ntk_feat_syn_save, ntk_adj_syn_save, ntk_label_syn_save = self.evaluate_synset_ntk()
+            #     ntk_score_eval.append(ntk_score_eval_o)
+            #     ntk_accs_eval.append(ntk_acc_test_o)
+            #
+            #     print(
+            #         'This is learned adj_syn INFO with {}-th iters: Shape: {}, Sum: {}, Avg_value: {}, Sparsity :{}'
+            #         .format(it, ntk_adj_syn_save.shape, ntk_adj_syn_save.sum(),
+            #                 ntk_adj_syn_save.sum() / (ntk_adj_syn_save.shape[0] ** 2),
+            #                 ntk_adj_syn_save.nonzero().shape[0] / (ntk_adj_syn_save.shape[0] ** 2)))
+            #
+            #     ntk_score_eval = np.array(ntk_score_eval)
+            #     ntk_accs_eval = np.array(ntk_accs_eval)
+            #
+            #     ntk_accs_eval_mean = np.mean(ntk_accs_eval)
+            #     # acc_test_std = np.std(accs_test)
+            #
+            #     ntk_score_eval_mean = np.mean(ntk_score_eval)
+            #     # score_test_std = np.std(score_test)
+            #
+            #     if ntk_score_eval_mean < best_ntk_score_eval[model_eval]:
+            #         best_ntk_score_eval[model_eval] = ntk_score_eval_mean
+            #         best_ntk_score_eval_iter[model_eval] = it
+            #         save_reduced(ntk_adj_syn_save, ntk_feat_syn_save, ntk_label_syn_save, args)
+            #
+            #     print('Evaluate ntk {}, score_mean = {:.4f}, acc_mean = {:.2f}'.format(model_eval,
+            #                                                                            ntk_score_eval_mean,
+            #                                                                            ntk_accs_eval_mean * 100.0))
 
             for _ in student_params:
                 del _
 
         return data
 
-    def expert_load(self):
+    def expert_load(self, expert_dir):
         args = self.args
-        expert_dir = args.buffer_path
+        expert_dir = expert_dir
 
-        if args.load_all:
-            buffer = []
-            n = 0
-            while os.path.exists(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n))):
-                buffer = buffer + torch.load(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n)))
-                n += 1
-            if n == 0:
-                raise AssertionError("No buffers detected at {}".format(expert_dir))
-
-        else:
-            expert_files = []
-            n = 0
-            while os.path.exists(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n))):
-                expert_files.append(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n)))
-                n += 1
-            if n == 0:
-                raise AssertionError("No buffers detected at {}".format(expert_dir))
-            file_idx = 0
-            expert_idx = 0
-            random.shuffle(expert_files)
-            if args.max_files is not None:
-                expert_files = expert_files[:args.max_files]
-            print("loading file {}".format(expert_files[file_idx]))
-            buffer = torch.load(expert_files[file_idx])
-            if args.max_experts is not None:
-                buffer = buffer[:args.max_experts]
-            random.shuffle(buffer)
-            self.buffer = buffer
+        # if args.load_all:
+        #     buffer = []
+        #     n = 0
+        #     while os.path.exists(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n))):
+        #         buffer = buffer + torch.load(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n)))
+        #         n += 1
+        #     if n == 0:
+        #         raise AssertionError("No buffers detected at {}".format(expert_dir))
+        #
+        # else:
+        expert_files = []
+        n = 0
+        while os.path.exists(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n))):
+            expert_files.append(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n)))
+            n += 1
+        if n == 0:
+            raise AssertionError("No buffers detected at {}".format(expert_dir))
+        file_idx = 0
+        expert_idx = 0
+        random.shuffle(expert_files)
+        # if args.max_files is not None:
+        # expert_files = expert_files[:args.max_files]
+        print("loading file {}".format(expert_files[file_idx]))
+        buffer = torch.load(expert_files[file_idx])
+        # if args.max_experts is not None:
+        #     buffer = buffer[:args.max_experts]
+        random.shuffle(buffer)
+        self.buffer = buffer
 
         return file_idx, expert_idx, expert_files
 

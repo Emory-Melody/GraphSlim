@@ -64,8 +64,6 @@ class BaseGNN(nn.Module):
         if output_layer_features:
             return outputs
 
-        if self.multi_label:
-            return torch.sigmoid(x)
         if self.float_label:
             return F.softmax(x, dim=1)
         else:
@@ -159,7 +157,7 @@ class BaseGNN(nn.Module):
                 lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
-            optimizer.zero_grad()
+                optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
 
@@ -179,7 +177,6 @@ class BaseGNN(nn.Module):
                 else:
                     # loss_val = F.nll_loss(output[data.idx_val], labels_val)
                     acc_val = accuracy(output[data.idx_val], labels_val)
-
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val
                     # self.output = output

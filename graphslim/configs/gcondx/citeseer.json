@@ -1,9 +1,8 @@
 {
   "lr_feat": 0.0001,
-  "lr_adj": 0.0001,
   "epochs": 1000,
   "pre_norm": true,
   "dis_metric": "ours",
-  "outer_loop": 5,
-  "inner_loop": 1
+  "outer_loop": 10,
+  "inner_loop": 3
 }

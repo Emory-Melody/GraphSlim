@@ -79,7 +79,7 @@ class Evaluator:
                   train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
 
         model.eval()
-        labels_test = torch.LongTensor(data.labels_test).cuda()
+        labels_test = torch.LongTensor(data.labels_test).to(args.device)
 
         if args.dataset in ['reddit', 'flickr']:
             output = model.predict(data.feat_test, data.adj_test)
@@ -102,7 +102,7 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-        labels_train = torch.LongTensor(data.labels_train).cuda()
+        labels_train = torch.LongTensor(data.labels_train).to(args.device)
         output = model.predict(data.feat_train, data.adj_train)
         loss_train = F.nll_loss(output, labels_train)
         acc_train = utils.accuracy(output, labels_train)
@@ -116,7 +116,7 @@ class Evaluator:
     def get_syn_data(self, model_type=None, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args)
+        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
 
@@ -125,22 +125,16 @@ class Evaluator:
 
         if verbose:
             print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
+        # setting threshold to sparsify synthetic graph
+        if args.method in ['gcond', 'doscond']:
+            print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+            if args.threshold > 0:
+                adj_syn[adj_syn < args.threshold] = 0
+                if verbose:
+                    print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+        else:
+            print("structure free methods do not need to truncate the adjacency matrix")
 
-        # Following GCond, when the method is condensation, we use a threshold to sparse the adjacency matrix
-        # if args.method in ['gcond', 'doscond', 'sfgc', 'msgc', 'gcsntk', 'disco']:
-        #     print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-        #     args.epsilon = 0.001
-        #     if args.epsilon > 0:
-        #         adj_syn[adj_syn < args.epsilon] = 0
-        #         if verbose:
-        #             print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-        # else:
-        #     print("structure free methods do not need to truncate the adjacency matrix")
-
-        # edge_index = adj_syn.nonzero().T
-        # adj_syn = torch.sparse.FloatTensor(edge_index,  adj_syn[edge_index[0], edge_index[1]], adj_syn.size())
-
-        # return feat_syn.detach(), adj_syn.detach(), labels_syn.detach()
         return feat_syn, adj_syn, labels_syn
 
     def test(self, data, model_type, verbose=True, reduced=True):

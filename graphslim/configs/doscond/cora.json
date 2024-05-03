@@ -3,5 +3,6 @@
   "lr_adj": 0.01,
   "dis_metric": "mse",
   "pre_norm": false,
-  "outer_loop": 2
+  "outer_loop": 2,
+  "threshold": 0.05
 }
