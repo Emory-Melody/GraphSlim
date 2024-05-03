@@ -3,11 +3,18 @@
   "teacher_hidden": 256,
   "teacher_dropout": 0.0,
   "teacher_nlayers": 2,
-  "lr_teacher": 0.01,
+  "lr_teacher": 0.4,
   "mom_teacher": 0,
   "wd_teacher": 0,
-  "teacher_epochs": 1000,
-  "lam": 0.70,
-  "T": 200,
-  "scheduler": 'root'
+  "teacher_epochs": 3000,
+  "lam": 0.75,
+  "T": 1500,
+  "scheduler": "geom",
+  "num_experts": 200,
+  "optim": "SGD",
+  "decay": 0,
+  "decay_factor": 0.1,
+  "param_save_interval": 10,
+  "traj_save_interval": 10,
+  "init_coreset_method": "kcenter"
 }

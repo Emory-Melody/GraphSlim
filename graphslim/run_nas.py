@@ -8,9 +8,9 @@ if __name__ == '__main__':
 
     NasEvaluator = NasEvaluator(args)
 
-    # NasEvaluator.evaluate_ori(data)
-    # NasEvaluator.test_params_ori(data)
+    NasEvaluator.evaluate_ori(data)
+    NasEvaluator.test_params_ori(data)
 
-    NasEvaluator.evaluate_syn(data)
-    NasEvaluator.test_params_syn(data)
-    NasEvaluator.cal_pearson()
+    # NasEvaluator.evaluate_syn(data)
+    # NasEvaluator.test_params_syn(data)
+    # NasEvaluator.cal_pearson()

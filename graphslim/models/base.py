@@ -124,13 +124,14 @@ class BaseGNN(nn.Module):
             self.multi_label = True
             self.loss = torch.nn.BCELoss()
         elif len(labels.shape) > 1:  # for GCSNTK, use MSE for training
+            print("MSE loss")
             self.float_label = True
             self.loss = torch.nn.MSELoss()
         else:
             self.multi_label = False
             self.loss = F.nll_loss
 
-        if reduced:
+        if reduced or setting == 'ind':
             reindex = True
 
         if verbose:

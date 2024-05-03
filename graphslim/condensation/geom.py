@@ -1,3 +1,7 @@
+import os
+
+import torch.nn as nn
+
 from graphslim.condensation.utils import sort_training_nodes, training_scheduler
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.utils import *
@@ -10,9 +14,39 @@ class GEOM:
         self.setting = setting
         self.device = args.device
 
+        n = int(data.feat_train.shape[0] * args.reduction_rate)
+        d = data.feat_train.shape[1]
+        self.nnodes_syn = n
+        self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(self.device))
+
+        if args.optimizer_con == 'Adam':
+            self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
+        elif args.optimizer_con == 'SGD':
+            self.optimizer_feat = torch.optim.SGD([self.feat_syn], lr=args.lr_feat, momentum=0.9)
+
+        print('adj_syn: {}, feat_syn: {}'.format((n, n), self.feat_syn.shape))
+
     @verbose_time_memory
     def reduce(self, data, verbose=True):
-        self.buffer_cl(data)
+        args = self.args
+        data = self.data
+        if not os.path.exists(f"./output/geom_buffer/{args.dataset}"):
+            self.buffer_cl(data)
+
+        features, adj, labels = data.feat_full, data.adj_full, data.labels_full
+        features_tensor, adj_tensor, labels_tensor = to_tensor(features, adj, label=labels, device=self.device)
+
+        feat_init, adj_init, labels_init = self.get_coreset_init()
+        feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init, label=labels_init, device=self.device)
+
+        adj_tensor_norm = normalize_adj_tensor(adj_tensor, sparse=is_sparse_tensor(adj))
+
+        self.feat_syn.data.copy_(feat_init)
+        self.labels_syn = labels_init
+        self.adj_syn_init = adj_init
+
+
+
 
     def buffer_cl(self, data):
         args = self.args
@@ -89,7 +123,7 @@ class GEOM:
 
                 if e in lr_schedule and args.decay:
                     lr = lr * args.decay_factor
-                    logging.info('NOTE! Decaying lr to :{}'.format(lr))
+                    # logging.info('NOTE! Decaying lr to :{}'.format(lr))
                     if args.optim == 'SGD':
                         optimizer_model = torch.optim.SGD(model_parameters, lr=lr, momentum=args.mom_teacher,
                                                           weight_decay=args.wd_teacher)
@@ -100,24 +134,18 @@ class GEOM:
                     optimizer_model.zero_grad()
 
                 if e % 20 == 0:
-                    logging.info("Epochs: {} : Train set training:, loss= {:.4f}".format(e, loss_buffer.item()))
+                    print("Epochs: {} : Train set training:, loss= {:.4f}".format(e, loss_buffer.item()))
                     model.eval()
-                    labels_val = torch.LongTensor(data.labels_val).to(device)
-                    labels_test = torch.LongTensor(data.labels_test).to(device)
+                    labels_val = torch.LongTensor(data.labels_val).to(self.device)
+                    labels_test = torch.LongTensor(data.labels_test).to(self.device)
 
                     # Full graph
                     _, output = model.predict(data.feat_full, data.adj_full)
                     loss_val = F.nll_loss(output[data.idx_val], labels_val)
                     loss_test = F.nll_loss(output[data.idx_test], labels_test)
 
-                    acc_val = utils.accuracy(output[data.idx_val], labels_val)
-                    acc_test = utils.accuracy(output[data.idx_test], labels_test)
-
-                    writer.add_scalar('val_set_loss_curve', loss_val.item(), e)
-                    writer.add_scalar('val_set_acc_curve', acc_val.item(), e)
-
-                    writer.add_scalar('test_set_loss_curve', loss_test.item(), e)
-                    writer.add_scalar('test_set_acc_curve', acc_test.item(), e)
+                    acc_val = accuracy(output[data.idx_val], labels_val)
+                    acc_test = accuracy(output[data.idx_test], labels_test)
 
                     if acc_val > best_val_acc:
                         best_val_acc = acc_val
@@ -131,21 +159,42 @@ class GEOM:
                     target_params = torch.cat([p_c.data.reshape(-1) for p_c in p_current], 0)
                     starting_params = torch.cat([p0.data.reshape(-1) for p0 in p_0], 0)
                     param_dist1 = torch.nn.functional.mse_loss(starting_params, target_params, reduction="sum")
-                    writer.add_scalar('param_change', param_dist1.item(), e)
-                    logging.info(
+                    print(
                         '==============================={}-th iter with length of {}-th tsp'.format(e, len(timestamps)))
 
-            logging.info("Valid set best results: accuracy= {:.4f}".format(best_val_acc.item()))
-            logging.info(
+            print("Valid set best results: accuracy= {:.4f}".format(best_val_acc.item()))
+            print(
                 "Test set best results: accuracy= {:.4f} within best iteration = {}".format(best_test_acc.item(),
                                                                                             best_it))
 
             trajectories.append(timestamps)
 
+            log_dir = f"./output/geom_buffer/{args.dataset}"
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+
             if len(trajectories) == args.traj_save_interval:
                 n = 0
                 while os.path.exists(os.path.join(log_dir, "replay_buffer_{}.pt".format(n))):
                     n += 1
-                logging.info("Saving {}".format(os.path.join(log_dir, "replay_buffer_{}.pt".format(n))))
+                print("Saving {}".format(os.path.join(log_dir, "replay_buffer_{}.pt".format(n))))
                 torch.save(trajectories, os.path.join(log_dir, "replay_buffer_{}.pt".format(n)))
                 trajectories = []
+
+    def get_coreset_init(self, valid_result=0):
+        args = self.args
+
+        save_path = 'dataset/output'
+        adj_syn = torch.load(
+            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.init_coreset_method}_{args.seed}_{valid_result}.pt')
+        feat_syn = torch.load(
+            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.init_coreset_method}_{args.seed}_{valid_result}.pt')
+        labels_syn = torch.load(
+            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.init_coreset_method}_{args.seed}_{valid_result}.pt')
+        if args.verbose:
+            print("Loaded reduced data")
+
+        if is_sparse_tensor(adj_syn):
+            adj_syn = adj_syn.to_dense()
+
+        return feat_syn, adj_syn, labels_syn
