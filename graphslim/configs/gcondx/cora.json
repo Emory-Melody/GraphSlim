@@ -1,8 +1,8 @@
 {
-  "lr_feat": 0.0001,
-  "epochs": 1000,
+  "lr_feat": 0.01,
+  "lr_adj": 0.01,
+  "dis_metric": "mse",
   "pre_norm": true,
-  "dis_metric": "ours",
   "outer_loop": 10,
-  "inner_loop": 1
+  "condense_model": "GCN"
 }

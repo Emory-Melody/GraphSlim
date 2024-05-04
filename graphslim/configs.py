@@ -27,10 +27,12 @@ def setting_config(args):
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
+    args.pre_norm = True
     args.hidden = 256
     args.checkpoints = range(0, args.epochs + 1, 100)
     args.eval_hidden = 256
     args.eval_epochs = 600
+    args.eval_model = 'GCN'
     args.lr_test = 1e-2
     return args
 
@@ -59,6 +61,8 @@ def method_config(args):
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
+@click.option('--eval_model', '--em', default='GCN', show_default=True)
+@click.option('--condense_model', '--cm', default='SGC', show_default=True)
 @click.option('--epochs', '--eps', default=1000, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
@@ -92,7 +96,7 @@ def method_config(args):
 @click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
-@click.option('--ntrans', default=1, show_default=True)
+@click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')
 @click.option('--with_bn', is_flag=True, show_default=True)
 @click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
