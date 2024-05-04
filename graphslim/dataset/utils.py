@@ -14,7 +14,7 @@ def splits(data, exp):
     if hasattr(data, 'y'):
         num_classes = max(data.y) + 1
     else:
-        num_classes = max(data.labels_full) + 1
+        num_classes = max(data.labels_full).item() + 1
     if not hasattr(data, 'train_mask'):
         indices = []
         for i in range(num_classes):

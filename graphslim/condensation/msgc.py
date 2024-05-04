@@ -4,7 +4,7 @@ from tqdm import trange
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
-from graphslim.models import SGCRich
+from graphslim.models import *
 from graphslim.utils import *
 
 
@@ -40,18 +40,12 @@ class MSGC(GCondBase):
 
         adj = normalize_adj_tensor(adj, sparse=True)
         y_syn = self.y_syn.repeat(self.batch_size)
-        # y_syn = self.y_syn
-        # n_each_y = data.n_each_y
-        basic_model = SGCRich(nfeat=self.x_syn.shape[1], nhid=args.hidden,
-                              nclass=data.nclass, dropout=0, weight_decay=0,
-                              nlayers=args.nlayers, ntrans=args.ntrans, with_bn=False,
-                              device=self.device).to(args.device)
+        basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
         self.reset_adj_batch()
         # initialization the features
         # feat_sub, adj_sub = self.get_sub_adj_feat()
         feat_init = self.init_feat()
-
         self.x_syn.data.copy_(feat_init)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)

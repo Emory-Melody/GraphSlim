@@ -33,17 +33,7 @@ class GCondX(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        if args.dataset in ['ogbn-arxiv', 'flickr']:
-            model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            dropout=0.0, with_bn=False,
-                            weight_decay=0e-4, nlayers=args.nlayers,
-                            nclass=data.nclass,
-                            device=self.device).to(self.device)
-        else:
-            model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                        nclass=data.nclass, dropout=0, weight_decay=0,
-                        nlayers=args.nlayers, with_bn=False,
-                        device=self.device).to(self.device)
+        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
         for it in trange(args.epochs):
             # seed_everything(args.seed + it)
 

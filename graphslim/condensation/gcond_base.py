@@ -127,36 +127,36 @@ class GCondBase:
 
         return loss
 
-    def get_sub_adj_feat(self):
-        data = self.data
-        args = self.args
-        idx_selected = []
-
-        counter = Counter(self.data.labels_syn)
-
-        for c in range(data.nclass):
-            tmp = data.retrieve_class(c, num=counter[c])
-            tmp = list(tmp)
-            idx_selected = idx_selected + tmp
-        idx_selected = np.array(idx_selected).reshape(-1)
-        features = data.feat_train[idx_selected]
-        args.knnsamples = 3
-        adj_knn = torch.zeros((self.nnodes_syn, self.nnodes_syn)).to(self.device)
-
-        # for i in range(data.nclass):
-        #     idx = np.arange(i*args.nsamples, i*args.nsamples+args.nsamples)
-        #     adj_knn[np.ix_(idx, idx)] = 1
-
-        # from sklearn.metrics.pairwise import cosine_similarity
-        # # features[features!=0] = 1
-        # k = 2
-        # sims = cosine_similarity(features.cpu().numpy())
-        # sims[(np.arange(len(sims)), np.arange(len(sims)))] = 0
-        # for i in range(len(sims)):
-        #     indices_argsort = np.argsort(sims[i])
-        #     sims[i, indices_argsort[: -k]] = 0
-        # adj_knn = torch.FloatTensor(sims).to(self.device)
-        return features, adj_knn
+    # def get_sub_adj_feat(self):
+    #     data = self.data
+    #     args = self.args
+    #     idx_selected = []
+    #
+    #     counter = Counter(self.data.labels_syn)
+    #
+    #     for c in range(data.nclass):
+    #         tmp = data.retrieve_class(c, num=counter[c])
+    #         tmp = list(tmp)
+    #         idx_selected = idx_selected + tmp
+    #     idx_selected = np.array(idx_selected).reshape(-1)
+    #     features = data.feat_train[idx_selected]
+    #     args.knnsamples = 3
+    #     adj_knn = torch.zeros((self.nnodes_syn, self.nnodes_syn)).to(self.device)
+    #
+    #     # for i in range(data.nclass):
+    #     #     idx = np.arange(i*args.nsamples, i*args.nsamples+args.nsamples)
+    #     #     adj_knn[np.ix_(idx, idx)] = 1
+    #
+    #     # from sklearn.metrics.pairwise import cosine_similarity
+    #     # # features[features!=0] = 1
+    #     # k = 2
+    #     # sims = cosine_similarity(features.cpu().numpy())
+    #     # sims[(np.arange(len(sims)), np.arange(len(sims)))] = 0
+    #     # for i in range(len(sims)):
+    #     #     indices_argsort = np.argsort(sims[i])
+    #     #     sims[i, indices_argsort[: -k]] = 0
+    #     # adj_knn = torch.FloatTensor(sims).to(self.device)
+    #     return features, adj_knn
 
     def get_loops(self, args):
         # Get the two hyper-parameters of outer-loop and inner-loop.
@@ -186,9 +186,7 @@ class GCondBase:
         args, data, device = self.args, self.data, self.device
 
         # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
-        model = GCN(nfeat=data.feat_syn.shape[1], nhid=args.hidden, dropout=0,
-                    weight_decay=args.weight_decay, nlayers=2,
-                    nclass=data.nclass, device=device).to(device)
+        model = GCN(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(device)
 
         # if self.args.lr_adj == 0:
         #     n = len(data.labels_syn)

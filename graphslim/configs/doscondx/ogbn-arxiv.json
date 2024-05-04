@@ -2,5 +2,7 @@
   "lr_feat": 0.1,
   "lr_adj": 0.1,
   "dis_metric": "mse",
-  "outer_loop": 5
+  "outer_loop": 5,
+  "condense_model": "SGC",
+  "ntrans": 2
 }

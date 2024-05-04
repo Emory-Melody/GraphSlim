@@ -62,7 +62,7 @@ def method_config(args):
 @click.option('--epochs', '--eps', default=1000, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
-@click.option('--weight_decay', '--wd', default=5e-4, show_default=True)
+@click.option('--weight_decay', '--wd', default=0, show_default=True)
 # @click.option('--normalize_features', is_flag=True, show_default=True)
 @click.option('--pre_norm', is_flag=True, show_default=True)
 @click.option('--outer_loop', default=10, show_default=True)
@@ -81,6 +81,10 @@ def method_config(args):
                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
                    'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
+@click.option('--activation', default='relu', help='activation function when do NAS',
+              type=click.Choice(
+                  ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']
+              ), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
@@ -88,7 +92,8 @@ def method_config(args):
 @click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
-@click.option('--ntrans', default=2, show_default=True)
+@click.option('--ntrans', default=1, show_default=True)
+@click.option('--with_bn', is_flag=True, show_default=True)
 @click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
 @click.option('--alpha', default=0, help='for appnp', show_default=True)

@@ -22,7 +22,6 @@ class DosCondX(GCondBase):
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
-
         # initialization the features
         feat_init = self.init_feat()
         self.feat_syn.data.copy_(feat_init)
@@ -35,26 +34,11 @@ class DosCondX(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        if args.dataset in ['ogbn-arxiv']:
-            model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            dropout=0.0, with_bn=False,
-                            weight_decay=0e-4, nlayers=args.nlayers,
-                            nclass=data.nclass,
-                            device=self.device).to(self.device)
-        else:
-            # model = GCN(nfeat=feat_syn.shape[1], nhid=args.hidden, weight_decay=0,
-            #             nclass=data.nclass, dropout=0, nlayers=args.nlayers,
-            #             device=self.device).to(self.device)
-            model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                        nclass=data.nclass, dropout=0, weight_decay=0,
-                        nlayers=args.nlayers, with_bn=False,
-                        device=self.device).to(self.device)
+        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
         for it in trange(args.epochs):
             # seed_everything(args.seed + it)
 
             model.initialize()
-            # model_parameters = list(model.parameters())
-            # optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
 
             for ol in range(outer_loop):
@@ -69,9 +53,6 @@ class DosCondX(GCondBase):
             loss_avg /= (data.nclass * outer_loop)
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
-
-            # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # if it == 0:
 
             if it + 1 in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), feat_syn.detach(), labels_syn.detach()

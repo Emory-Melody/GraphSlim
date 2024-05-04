@@ -40,8 +40,9 @@ class MBCoreSet(CoreSet):
             data.adj_syn = data.adj_train[np.ix_(idx_selected, idx_selected)]
             data.labels_syn = data.labels_train[idx_selected]
 
-        print('selected nodes:', idx_selected.shape[0])
-        print('induced edges:', data.adj_syn.sum())
+        if verbose:
+            print('selected nodes:', idx_selected.shape[0])
+            print('induced edges:', data.adj_syn.sum())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
                                                                  device='cpu')
         if save:

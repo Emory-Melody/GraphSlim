@@ -4,5 +4,7 @@
   "lr_adj": 0.01,
   "dis_metric": "ours",
   "ntrans": 2,
-  "batch_adj": 16
+  "batch_adj": 16,
+  "condense_model": "SGC",
+  "threshold": 0.01
 }

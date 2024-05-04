@@ -81,7 +81,7 @@ class TransAndInd:
         if norm and dataset in ['cora', 'citeseer', 'pubmed']:
             self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
         self.idx_train, self.idx_val, self.idx_test = data.idx_train, data.idx_val, data.idx_test
-        self.nclass = max(self.labels_full) + 1
+        self.nclass = max(self.labels_full).item() + 1
 
         self.adj_train = self.adj_full[np.ix_(self.idx_train, self.idx_train)]
         self.adj_val = self.adj_full[np.ix_(self.idx_val, self.idx_val)]

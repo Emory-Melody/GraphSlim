@@ -8,30 +8,29 @@ from graphslim.utils import *
 
 class BaseGNN(nn.Module):
 
-    def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-                 with_relu=True, with_bias=True, with_bn=False, device=None):
+    def __init__(self, nfeat, nhid, nclass, args, mode):
 
         super(BaseGNN, self).__init__()
-
-        assert device is not None, "Please specify 'device'!"
-        self.device = device
-        self.nfeat = nfeat
-        self.nhid = nhid
-        self.nclass = nclass
-        self.nlayers = nlayers
+        self.with_bn = args.with_bn
+        self.with_relu = True
+        self.with_bias = True
+        self.weight_decay = args.weight_decay
+        self.lr = args.lr
+        self.dropout = args.dropout
+        self.alpha = args.alpha
+        self.nlayers = args.nlayers
+        self.ntrans = args.ntrans
+        self.device = args.device
         self.layers = nn.ModuleList([])
-        self.loss = None
 
-        self.dropout = dropout
-        self.lr = lr
-        if not with_relu:
+        if mode == 'eval':
+            self.nlayers = 2
+            self.dropout = 0
+            self.weight_decay = 5e-5
+        if mode == 'cross':
+            self.nlayers = 2
+            self.dropout = 0.5
             self.weight_decay = 0
-        else:
-            self.weight_decay = weight_decay
-
-        self.with_relu = with_relu
-        self.with_bn = with_bn
-        self.with_bias = with_bias
         self.output = None
         self.best_model = None
         self.best_output = None
@@ -63,14 +62,10 @@ class BaseGNN(nn.Module):
 
         if output_layer_features:
             return outputs
-
-        if self.float_label:
-            return F.softmax(x, dim=1)
-        else:
-            return F.log_softmax(x, dim=1)
+        x = x.reshape(-1, x.shape[-1])
+        return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):
-        # for ix, layer in enumerate(self.layers):
         for ix, (adj, _, size) in enumerate(adjs):
             x = self.layers[ix](x, adj)
             if ix != len(self.layers) - 1:
@@ -79,10 +74,8 @@ class BaseGNN(nn.Module):
                     x = F.relu(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
-        if self.multi_label:
-            return torch.sigmoid(x)
-        else:
-            return F.log_softmax(x, dim=1)
+        x.view(-1, x.shape[-1])
+        return F.log_softmax(x, dim=1)
 
     def forward_syn(self, x, adjs):
         for ix, (adj) in enumerate(adjs):
@@ -93,12 +86,10 @@ class BaseGNN(nn.Module):
                     x = F.relu(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
-        if self.multi_label:
-            return torch.sigmoid(x)
-        else:
-            return F.log_softmax(x, dim=1)
+        x = x.reshape(-1, x.shape[-1])
+        return F.log_softmax(x, dim=1)
 
-    def fit_with_val(self, data, train_iters=200, verbose=False,
+    def fit_with_val(self, data, train_iters=600, verbose=False,
                      normadj=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 

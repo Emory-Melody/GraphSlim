@@ -3,8 +3,8 @@ from tqdm import trange
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
-from graphslim.models import *
 from graphslim.utils import *
+from graphslim.models import *
 
 
 class GCond(GCondBase):
@@ -25,8 +25,8 @@ class GCond(GCondBase):
                                               device=self.device)
 
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.feat_syn.data.copy_(feat_sub)
+        feat_init = self.init_feat()
+        self.feat_syn.data.copy_(feat_init)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -34,17 +34,8 @@ class GCond(GCondBase):
         loss_avg = 0
         best_val = 0
         # seed_everything(args.seed + it)
-        if args.dataset in ['ogbn-arxiv', 'flickr']:
-            model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            dropout=0, with_bn=False,
-                            weight_decay=0, nlayers=args.nlayers,
-                            nclass=data.nclass, ntrans=2,
-                            device=self.device).to(self.device)
-        else:
-            model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                        nclass=data.nclass, dropout=0, weight_decay=0,
-                        nlayers=args.nlayers, with_bn=False,
-                        device=self.device).to(self.device)
+        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden,
+                                          data.nclass, args).to(self.device)
         for it in trange(args.epochs):
 
             model.initialize()
@@ -84,11 +75,7 @@ class GCond(GCondBase):
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
-            # eval_epochs = [400, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # if it == 0:
-
             if it + 1 in args.checkpoints:
-                # if verbose and (it+1) % 50 == 0:
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), self.feat_syn.detach(), labels_syn.detach()
                 res = []
                 for i in range(3):

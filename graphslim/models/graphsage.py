@@ -8,30 +8,30 @@ from torch_geometric.data import NeighborSampler
 
 from graphslim.models.base import BaseGNN
 from graphslim.models.layers import SageConvolution
-from graphslim.utils import is_sparse_tensor, normalize_adj_tensor, to_tensor, accuracy, row_normalize_tensor
+from graphslim.utils import is_sparse_tensor, normalize_adj_tensor, to_tensor, accuracy
 
 
 class GraphSage(BaseGNN):
 
-    def __init__(self, nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-                 with_relu=True, with_bias=True, with_bn=False, device=None):
+    def __init__(self, nfeat, nhid, nclass, args, mode='train'):
 
-        super(GraphSage, self).__init__(nfeat, nhid, nclass, nlayers=2, dropout=0.5, lr=0.01, weight_decay=5e-4,
-                                        with_relu=True, with_bias=True, with_bn=False, device=device)
+        super(GraphSage, self).__init__(nfeat, nhid, nclass, args, mode)
+        with_bias = self.with_bias
+        with_bn = self.with_bn
         self.layers = nn.ModuleList([])
 
         if self.nlayers == 1:
-            self.layers.append(SageConvolution(nfeat, nclass, with_bias=with_bias))
+            self.layers.append(SageConvolution(nfeat, nclass))
         else:
             if with_bn:
                 self.bns = torch.nn.ModuleList()
                 self.bns.append(nn.BatchNorm1d(nhid))
-            self.layers.append(SageConvolution(nfeat, nhid, with_bias=with_bias))
-            for i in range(nlayers - 2):
-                self.layers.append(SageConvolution(nhid, nhid, with_bias=with_bias))
+            self.layers.append(SageConvolution(nfeat, nhid))
+            for i in range(self.nlayers - 2):
+                self.layers.append(SageConvolution(nhid, nhid))
                 if with_bn:
                     self.bns.append(nn.BatchNorm1d(nhid))
-            self.layers.append(SageConvolution(nhid, nclass, with_bias=with_bias))
+            self.layers.append(SageConvolution(nhid, nclass))
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
                      normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
@@ -58,7 +58,7 @@ class GraphSage(BaseGNN):
             self.multi_label = False
             self.loss = F.nll_loss
 
-        if reduced:
+        if reduced or setting == 'ind':
             reindex = True
 
         if verbose:

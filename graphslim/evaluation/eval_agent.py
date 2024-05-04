@@ -1,9 +1,7 @@
 import numpy as np
-import torch
 import torch.nn.functional as F
 from tqdm import trange
 
-from graphslim import utils
 from graphslim.dataset import *
 from graphslim.models import *
 from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
@@ -15,13 +13,7 @@ class Evaluator:
         # self.data = data
         self.args = args
         self.device = args.device
-        # self.args.run_evaluation = 10
-        # n = int(data.feat_train.shape[0] * args.reduction_rate)
-        # d = data.feat_train.shape[1]
-        # self.nnodes_syn = n
-        # self.adj_param = nn.Parameter(torch.FloatTensor(n, n).to(device))
-        # self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(device))
-        # self.labels_syn = torch.LongTensor(self.generate_labels_syn(data)).to(device)
+
         self.reset_parameters()
         # print('adj_param:', self.adj_param.shape, 'feat_syn:', self.feat_syn.shape)
 
@@ -30,88 +22,65 @@ class Evaluator:
         # self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
-    # def generate_labels_syn(self, data):
-    #     counter = Counter(data.labels_train.tolist())
-    #     num_class_dict = {}
-    #     n = len(data.labels_train)
     #
-    #     sorted_counter = sorted(counter.items(), key=lambda x: x[1])
-    #     sum_ = 0
-    #     labels_syn = []
-    #     self.syn_class_indices = {}
-    #     for ix, (c, num) in enumerate(sorted_counter):
-    #         if ix == len(sorted_counter) - 1:
-    #             num_class_dict[c] = int(n * self.args.reduction_rate) - sum_
-    #             # print(num_class_dict[c])
-    #             self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-    #             labels_syn += [c] * num_class_dict[c]
-    #         else:
-    #             num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
-    #             sum_ += num_class_dict[c]
-    #             self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-    #             labels_syn += [c] * num_class_dict[c]
+    # def test_gat(self, nlayers, model_type, verbose=False):
+    #     res = []
+    #     args = self.args
     #
-    #     self.num_class_dict = num_class_dict
-    #     return labels_syn
-
-    def test_gat(self, nlayers, model_type, verbose=False):
-        res = []
-        args = self.args
-
-        if args.dataset in ['cora', 'citeseer']:
-            args.epsilon = 0.5  # Make the graph sparser as GAT does not work well on dense graph
-        else:
-            args.epsilon = 0.01
-
-        print('======= testing %s' % model_type)
-        data, device = self.data, self.device
-
-        feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
-        # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
-        with_bn = False
-        if model_type == 'GAT':
-            model = GAT(nfeat=feat_syn.shape[1], nhid=16, heads=16, dropout=0.0,
-                        weight_decay=0e-4, nlayers=self.args.nlayers, lr=0.001,
-                        nclass=data.nclass, device=device, dataset=self.args.dataset).to(device)
-
-        noval = True if args.dataset in ['reddit', 'flickr'] else False
-        model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), noval=noval, data=data,
-                  train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
-
-        model.eval()
-        labels_test = torch.LongTensor(data.labels_test).to(args.device)
-
-        if args.dataset in ['reddit', 'flickr']:
-            output = model.predict(data.feat_test, data.adj_test)
-            loss_test = F.nll_loss(output, labels_test)
-            acc_test = utils.accuracy(output, labels_test)
-            res.append(acc_test.item())
-            if verbose:
-                print("Test set results:",
-                      "loss= {:.4f}".format(loss_test.item()),
-                      "accuracy= {:.4f}".format(acc_test.item()))
-
-        else:
-            # Full graph
-            output = model.predict(data.feat_full, data.adj_full)
-            loss_test = F.nll_loss(output[data.idx_test], labels_test)
-            acc_test = utils.accuracy(output[data.idx_test], labels_test)
-            res.append(acc_test.item())
-            if verbose:
-                print("Test set results:",
-                      "loss= {:.4f}".format(loss_test.item()),
-                      "accuracy= {:.4f}".format(acc_test.item()))
-
-        labels_train = torch.LongTensor(data.labels_train).to(args.device)
-        output = model.predict(data.feat_train, data.adj_train)
-        loss_train = F.nll_loss(output, labels_train)
-        acc_train = utils.accuracy(output, labels_train)
-        if verbose:
-            print("Train set results:",
-                  "loss= {:.4f}".format(loss_train.item()),
-                  "accuracy= {:.4f}".format(acc_train.item()))
-        res.append(acc_train.item())
-        return res
+    #     if args.dataset in ['cora', 'citeseer']:
+    #         args.epsilon = 0.5  # Make the graph sparser as GAT does not work well on dense graph
+    #     else:
+    #         args.epsilon = 0.01
+    #
+    #     print('======= testing %s' % model_type)
+    #     data, device = self.data, self.device
+    #
+    #     feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
+    #     # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
+    #     with_bn = False
+    #     if model_type == 'GAT':
+    #         model = GAT(nfeat=feat_syn.shape[1], nhid=16, heads=16, dropout=0.0,
+    #                     weight_decay=0e-4, nlayers=self.args.nlayers, lr=0.001,
+    #                     nclass=data.nclass, device=device, dataset=self.args.dataset).to(device)
+    #
+    #     noval = True if args.dataset in ['reddit', 'flickr'] else False
+    #     model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), noval=noval, data=data,
+    #               train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
+    #
+    #     model.eval()
+    #     labels_test = torch.LongTensor(data.labels_test).to(args.device)
+    #
+    #     if args.dataset in ['reddit', 'flickr']:
+    #         output = model.predict(data.feat_test, data.adj_test)
+    #         loss_test = F.nll_loss(output, labels_test)
+    #         acc_test = utils.accuracy(output, labels_test)
+    #         res.append(acc_test.item())
+    #         if verbose:
+    #             print("Test set results:",
+    #                   "loss= {:.4f}".format(loss_test.item()),
+    #                   "accuracy= {:.4f}".format(acc_test.item()))
+    #
+    #     else:
+    #         # Full graph
+    #         output = model.predict(data.feat_full, data.adj_full)
+    #         loss_test = F.nll_loss(output[data.idx_test], labels_test)
+    #         acc_test = utils.accuracy(output[data.idx_test], labels_test)
+    #         res.append(acc_test.item())
+    #         if verbose:
+    #             print("Test set results:",
+    #                   "loss= {:.4f}".format(loss_test.item()),
+    #                   "accuracy= {:.4f}".format(acc_test.item()))
+    #
+    #     labels_train = torch.LongTensor(data.labels_train).to(args.device)
+    #     output = model.predict(data.feat_train, data.adj_train)
+    #     loss_train = F.nll_loss(output, labels_train)
+    #     acc_train = utils.accuracy(output, labels_train)
+    #     if verbose:
+    #         print("Train set results:",
+    #               "loss= {:.4f}".format(loss_train.item()),
+    #               "accuracy= {:.4f}".format(acc_train.item()))
+    #     res.append(acc_train.item())
+    #     return res
 
     def get_syn_data(self, model_type=None, verbose=False):
 
@@ -132,8 +101,8 @@ class Evaluator:
                 adj_syn[adj_syn < args.threshold] = 0
                 if verbose:
                     print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-        else:
-            print("structure free methods do not need to truncate the adjacency matrix")
+            # else:
+            #     print("structure free methods do not need to truncate the adjacency matrix")
 
         return feat_syn, adj_syn, labels_syn
 
@@ -144,20 +113,14 @@ class Evaluator:
 
         if verbose:
             print('======= testing %s' % model_type)
-        if model_type == 'MLP':
-            data.adj_syn = data.adj_syn - data.adj_syn
-            model_class = GCN
-        else:
-            model_class = eval(model_type)
+        # if model_type == 'MLP':
+        #     data.adj_syn = data.adj_syn - data.adj_syn
+        #     model_class = GCN
+        # else:
+        #     model_class = eval(model_type)
 
-        model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass, nlayers=args.nlayers,
-                            dropout=0.0, lr=args.lr_test, weight_decay=5e-4, device=self.device).to(self.device)
+        model = eval(model_type)(feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(self.device)
 
-        # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
-        # if self.args.dataset in ['ogbn-arxiv', 'arxiv']:
-        #     model = model_class(nfeat=feat_syn.shape[1], nhid=self.args.hidden, dropout=0.,
-        #                         weight_decay=weight_decay, nlayers=self.args.nlayers, with_bn=False,
-        #                         nclass=data.nclass, device=self.device).to(self.device)
         model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
                            reduced=reduced)
@@ -205,7 +168,7 @@ class Evaluator:
         args = self.args
         data.nclass = data.nclass.item()
 
-        for model_type in ['MLP', 'GCN', 'SGCRich', 'APPNPRich', 'Cheby']:  # 'GraphSage'
+        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby']:  # 'GraphSage'
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
             res = []
