@@ -2,7 +2,7 @@ import numpy as np
 
 from configs import *
 from evaluation.eval_agent import Evaluator
-from graphslim.coarsening import Cluster, Coarsen, VNG
+from graphslim.coarsening import *
 from graphslim.dataset import *
 
 if __name__ == '__main__':
@@ -18,6 +18,8 @@ if __name__ == '__main__':
             agent = Coarsen(setting=args.setting, data=graph, args=args)
         elif args.method == 'clustering':
             agent = Cluster(setting=args.setting, data=graph, args=args)
+        elif args.method == 'averaging':
+            agent = Average(setting=args.setting, data=graph, args=args)
         reduced_graph = agent.reduce(graph, verbose=True)
         if args.setting == 'trans':
             print("real reduction rate", reduced_graph.feat_syn.shape[0] / graph.x.shape[0] * 100, "%")

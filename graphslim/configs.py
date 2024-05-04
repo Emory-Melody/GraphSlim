@@ -78,7 +78,7 @@ def method_config(args):
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
-                   'affinity_GS', 'kron', 'vng', 'clustering',
+                   'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
                    'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
