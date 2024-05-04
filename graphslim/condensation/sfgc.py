@@ -24,7 +24,6 @@ class SFGC(GCondBase):
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
-        args.expert_epochs = 1000
         args.num_experts = 20
         # if not os.path.exists(buf_dir):
         #     os.mkdir(buf_dir)
@@ -66,7 +65,7 @@ class SFGC(GCondBase):
         #     # lr_schedule = [args.teacher_epochs // 2 + 1]
         #     #
         #     # lr = args.lr
-        #     for e in range(args.expert_epochs):
+        #     for e in range(1000):
         #         model.train()
         #         optimizer_model.zero_grad()
         #         output = model.forward(features, adj)
@@ -107,7 +106,7 @@ class SFGC(GCondBase):
         init_data = agent.reduce(data, verbose=False)
         # =============stage 3 trajectory alignment and GNTK evaluation==================#
 
-        feat_init, adj_init, labels_init = to_tensor(init_data.feat_syn, init_data.adj_syn, init_data.labels_syn,
+        feat_init, adj_init, labels_init = to_tensor(init_data.feat_syn, init_data.adj_syn, label=init_data.labels_syn,
                                                      device=self.device)
 
         self.feat_syn.data.copy_(feat_init)
@@ -147,6 +146,7 @@ class SFGC(GCondBase):
         args.rand_start = 1
         args.start_epoch = 30
         args.interval_buffer = 1
+        args.expert_epochs = 500
         for it in range(args.epochs):
             # logging.info(adj_syn_norm_key['0'])
             model = GCN(nfeat=data.feat_train.shape[1], nhid=args.hidden,
@@ -171,11 +171,11 @@ class SFGC(GCondBase):
                     file_idx = 0
                     random.shuffle(expert_files)
                 print("loading file {}".format(expert_files[file_idx]))
-                if args.max_files != 1:
-                    del self.buffer
-                    self.buffer = torch.load(expert_files[file_idx])
-                if args.max_experts is not None:
-                    self.buffer = self.buffer[:args.max_experts]
+                # if args.max_files != 1:
+                #     del self.buffer
+                #     self.buffer = torch.load(expert_files[file_idx])
+                # if args.max_experts is not None:
+                #     self.buffer = self.buffer[:args.max_experts]
                 random.shuffle(self.buffer)
 
             if args.rand_start == 1:
@@ -219,7 +219,7 @@ class SFGC(GCondBase):
                 adj_syn_input = adj_syn_cal_norm
             for step in range(200):
                 forward_params = student_params[-1]
-                feat_out, output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
+                output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
                 loss_syn = F.nll_loss(output_syn, self.labels_syn)
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
                 # acc_syn = accuracy(output_syn, self.labels_syn)
@@ -262,7 +262,7 @@ class SFGC(GCondBase):
             if torch.isnan(total_loss) or torch.isnan(grand_loss):
                 break  # Break out of the loop if either is NaN
             if it % 1 == 0:
-                print.info(
+                print(
                     "Iteration {}: Total_Loss = {:.4f}, Grand_Loss={:.4f}, Start_Epoch= {}, Student_LR = {:6f}".format(
                         it,
                         total_loss.item(),
@@ -274,7 +274,8 @@ class SFGC(GCondBase):
                 print('Epoch {}, loss_avg: {}'.format(it + 1, total_loss.item()))
 
             if it + 1 in args.checkpoints:
-                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), feat_syn.detach(), self.labels_syn.detach()
+                data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
+                    feat_syn.shape[0]), feat_syn.detach(), self.labels_syn.detach()
                 res = []
                 for i in range(3):
                     res.append(self.test_with_val(verbose=False, setting=args.setting))

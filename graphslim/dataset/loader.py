@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from ogb.nodeproppred import PygNodePropPredDataset
 from sklearn.preprocessing import StandardScaler
-from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit
+from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit2
 from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected
 from torch_sparse import SparseTensor
@@ -31,7 +31,7 @@ def get_dataset(name, args):
         if name in ['flickr']:
             dataset = Flickr(root=path + '/flickr')
         elif name in ['reddit']:
-            dataset = Reddit(root=path + '/reddit')
+            dataset = Reddit2(root=path + '/reddit')
         elif name in ['dblp', 'cora_ml', 'cora_full', 'citeseer_full']:
             dataset = CitationFull(root=path, name=name)
         elif name in ['physics', 'cs']:
