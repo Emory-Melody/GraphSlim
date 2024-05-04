@@ -19,7 +19,7 @@ class MBCoreSet(CoreSet):
             model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
                         weight_decay=args.weight_decay).to(args.device)
             model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='trans')
-            # model.test(data, verbose=True)
+            model.test(data, verbose=True)
             embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.select(embeds)

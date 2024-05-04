@@ -432,6 +432,11 @@ class DataGraphSAINT:
         dataset = dataset.replace('-', '_')
         dataset_str = root + '/' + dataset + '/raw/'
         self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
+
+        if dataset == 'ogbn_arxiv':
+            self.adj_full = self.adj_full + self.adj_full.T
+            self.adj_full[self.adj_full > 1] = 1
+
         self.num_nodes = self.adj_full.shape[0]
 
         role = json.load(open(dataset_str + 'role.json', 'r'))

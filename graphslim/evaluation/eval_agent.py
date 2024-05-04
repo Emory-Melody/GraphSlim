@@ -247,7 +247,7 @@ class Evaluator:
             run_evaluation = range(args.run_evaluation)
         for i in run_evaluation:
             seed_everything(args.seed + i)
-            res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced))
+            res.append(self.test(data, model_type=model_type, verbose=verbose, reduced=reduced))
         res = np.array(res)
 
         if verbose:

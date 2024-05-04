@@ -157,7 +157,7 @@ class BaseGNN(nn.Module):
                 lr = self.lr * 0.1
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
-                optimizer.zero_grad()
+            optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
 
