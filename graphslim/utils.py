@@ -364,9 +364,9 @@ def normalize_adj_tensor(adj, sparse=False):
         if len(adj.shape) == 3:
             adjs = []
             for i in range(adj.shape[0]):
-                adj = adj[i]
-                adj = dense_gcn_norm(adj, device)
-                adjs.append(adj)
+                ad = adj[i]
+                ad = dense_gcn_norm(ad, device)
+                adjs.append(ad)
             return torch.stack(adjs)
         else:
             adj = dense_gcn_norm(adj, device)

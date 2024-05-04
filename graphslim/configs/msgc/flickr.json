@@ -1,7 +1,8 @@
 {
-  "init": "clustering",
+  "init": "random",
   "lr_feat": 0.005,
   "lr_adj": 0.005,
   "dis_metric": "ours",
-  "ntrans": 2
+  "ntrans": 2,
+  "batch_adj": 16
 }

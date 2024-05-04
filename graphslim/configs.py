@@ -71,7 +71,7 @@ def method_config(args):
 @click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
-@click.option('--init',
+@click.option('--init', default='random', help='initialization synthetic features',
               type=click.Choice(
                   ['random', 'clustering', 'degree', 'pagerank', 'kcenter', 'herding']
               ), show_default=True)
@@ -87,9 +87,9 @@ def method_config(args):
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
-# @click.option('--one_step', is_flag=True, show_default=True)
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=2, show_default=True)
+@click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
 @click.option('--alpha', default=0, help='for appnp', show_default=True)
 @click.pass_context

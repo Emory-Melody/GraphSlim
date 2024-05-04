@@ -24,9 +24,10 @@ class DosCondX(GCondBase):
 
 
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.feat_syn.data.copy_(feat_sub)
-        self.adj_syn = torch.eye(feat_sub.shape[0], device=self.device)
+        feat_init = self.init_feat()
+        self.feat_syn.data.copy_(feat_init)
+
+        self.adj_syn = torch.eye(feat_init.shape[0], device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 

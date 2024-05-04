@@ -2,8 +2,6 @@ from collections import Counter
 
 import numpy as np
 import torch
-from sklearn.cluster import BisectingKMeans
-from torch_scatter import scatter_mean
 
 from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.dataset.utils import save_reduced
@@ -18,7 +16,7 @@ class Average(Coarsen):
         super(Average, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
-    def reduce(self, data, verbose=True):
+    def reduce(self, data, verbose=True, save=True):
         args = self.args
         n_classes = data.nclass
         y_syn, y_train, x_train = self.prepare_select(data, args)
@@ -28,7 +26,8 @@ class Average(Coarsen):
             x_syn[y_syn == c] = x_c.mean(0)
         data.feat_syn, data.labels_syn = x_syn.to(x_train.device), y_syn
         data.adj_syn = torch.eye(data.feat_syn.shape[0])
-        save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+        if save:
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return data
 
     def prepare_select(self, data, args):

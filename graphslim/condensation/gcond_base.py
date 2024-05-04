@@ -2,9 +2,10 @@ from collections import Counter
 
 import torch.nn as nn
 
+from graphslim.coarsening import *
 from graphslim.condensation.utils import *
-from graphslim.evaluation import Evaluator
 from graphslim.models import *
+from graphslim.sparsification import *
 from graphslim.utils import *
 
 
@@ -69,6 +70,21 @@ class GCondBase:
     #
     #     agent = Evaluator(data, args, device='cuda')
     #     agent.train_cross()
+    def init_feat(self):
+        args = self.args
+        if args.init == 'clustering':
+            agent = Cluster(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'averaging':
+            agent = Average(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'kcenter':
+            agent = Random(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'Herding':
+            agent = Herding(setting=args.setting, data=self.data, args=args)
+        else:
+            agent = Random(setting=args.setting, data=self.data, args=args)
+
+        reduced_data = agent.reduce(self.data, verbose=False, save=False)
+        return reduced_data.feat_syn
 
     def train_class(self, model, adj, features, labels, labels_syn, args):
         data = self.data

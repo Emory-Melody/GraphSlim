@@ -1,7 +1,6 @@
 from torch import nn
 from tqdm import trange
 
-from graphslim.coarsening import Cluster
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
@@ -18,7 +17,7 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
         self.x_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
-        self.batch_size = 16  # just for test
+        self.batch_size = args.batch_adj  # just for test
         self.n_classes = data.nclass
         self.device = args.device
 
@@ -51,9 +50,9 @@ class MSGC(GCondBase):
         self.reset_adj_batch()
         # initialization the features
         # feat_sub, adj_sub = self.get_sub_adj_feat()
-        agent = Cluster(setting=args.setting, data=self.data, args=args)
-        reduced_data = agent.reduce(self.data)
-        self.x_syn.data.copy_(reduced_data.feat_syn)
+        feat_init = self.init_feat()
+
+        self.x_syn.data.copy_(feat_init)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
         optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)

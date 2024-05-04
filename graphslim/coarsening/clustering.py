@@ -18,7 +18,7 @@ class Cluster(Coarsen):
         super(Cluster, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
-    def reduce(self, data, verbose=True):
+    def reduce(self, data, verbose=True, save=True):
         args = self.args
         n_classes = data.nclass
         y_syn, y_train, x_train = self.prepare_select(data, args)
@@ -32,7 +32,8 @@ class Cluster(Coarsen):
             x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0)
         data.feat_syn, data.labels_syn = x_syn.to(x_train.device), y_syn
         data.adj_syn = torch.eye(data.feat_syn.shape[0])
-        save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+        if save:
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return data
 
     def prepare_select(self, data, args):

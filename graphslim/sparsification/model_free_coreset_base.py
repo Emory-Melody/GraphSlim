@@ -13,7 +13,7 @@ class MFCoreSet(CoreSet):
         super(MFCoreSet, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
-    def reduce(self, data, verbose=False):
+    def reduce(self, data, verbose=False, save=True):
 
         args = self.args
         if self.setting == 'trans':
@@ -54,6 +54,7 @@ class MFCoreSet(CoreSet):
         print('induced edges:', data.adj_syn.sum())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
                                                                  device='cpu')
-        save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+        if save:
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data

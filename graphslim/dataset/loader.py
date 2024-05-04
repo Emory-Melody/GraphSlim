@@ -1,10 +1,13 @@
+import json
 import os.path as osp
 
 import numpy as np
+import scipy.sparse as sp
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from ogb.nodeproppred import PygNodePropPredDataset
+from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit2
 from torch_geometric.loader import NeighborSampler
@@ -13,6 +16,7 @@ from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import ei2csr, csr2ei
 from graphslim.dataset.utils import splits
+from graphslim.utils import index_to_mask, to_tensor
 
 
 def get_dataset(name, args):
@@ -40,7 +44,9 @@ def get_dataset(name, args):
             dataset = Planetoid(root=path, name=name)
         elif name in ['photo', 'computers']:
             dataset = Amazon(root=path, name=name)
-        elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv']:
+        elif name in ['ogbn-arxiv']:
+            dataset = DataGraphSAINT(root=path, dataset=name)
+        elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m']:
             dataset = PygNodePropPredDataset(name, root=path)
     else:
         raise ValueError("Dataset name not recognized.")
@@ -62,14 +68,15 @@ class TransAndInd:
         self.adj_full = None
         self.feat_full = None
         self.labels_full = None
+        self.num_nodes = data.num_nodes
         self.train_mask, self.val_mask, self.test_mask = data.train_mask, data.val_mask, data.test_mask
         self.pyg_saint(data)
         if dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
-            self.edge_index = to_undirected(data.edge_index, data.num_nodes)
-            feat_train = data.x[data.idx_train]
+            self.edge_index = to_undirected(self.edge_index, self.num_nodes)
+            feat_train = self.x[data.idx_train]
             scaler = StandardScaler()
             scaler.fit(feat_train)
-            self.feat_full = scaler.transform(data.x)
+            self.feat_full = scaler.transform(self.x)
             self.feat_full = torch.from_numpy(self.feat_full).float()
         if norm and dataset in ['cora', 'citeseer', 'pubmed']:
             self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
@@ -108,7 +115,7 @@ class TransAndInd:
             self.feat_full = data.feat_full
             self.labels_full = data.labels_full
             self.edge_index = csr2ei(data.adj_full)
-            self.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
+            self.sparse_adj = SparseTensor.from_edge_index(self.edge_index)
             self.x = data.feat_full
             self.y = data.labels_full
         return data
@@ -194,9 +201,6 @@ class TransAndInd:
     #     batch = np.random.permutation(self.class_dict2[c])[:num]
     #     out = self.samplers[args.nlayers - 1][c].sample(batch)
     #     return out
-
-
-from sklearn.cluster import KMeans
 
 
 class FlickrDataLoader(nn.Module):
@@ -319,7 +323,7 @@ class OgbDataLoader(nn.Module):
     def __init__(self, dataset_name='ogbn-arxiv', split='train', batch_size=5000, split_method='kmeans'):
         super(OgbDataLoader, self).__init__()
 
-        path = osp.join('../../data')
+        path = osp.join('../data')
         Dataset = PygNodePropPredDataset(dataset_name, root=path)
         self.n, self.dim = Dataset.graph['node_feat'].shape
         split_set = Dataset.get_idx_split()
@@ -421,78 +425,34 @@ class OgbDataLoader(nn.Module):
         return batch_i
 
 
-class GraphData:
-
-    def __init__(self, adj, features, labels, idx_train, idx_val, idx_test):
-        self.adj = adj
-        self.features = features
-        self.labels = labels
-        self.idx_train = idx_train
-        self.idx_val = idx_val
-        self.idx_test = idx_test
-
-
 class DataGraphSAINT:
     '''datasets used in GraphSAINT paper'''
 
-    def __init__(self, dataset, **kwargs):
-        import scipy.sparse as sp
-        import json
-        dataset_str = '../../data/' + dataset + '/raw/'
-        adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
-        self.nnodes = adj_full.shape[0]
-        if dataset == 'ogbn-arxiv':
-            adj_full = adj_full + adj_full.T
-            adj_full[adj_full > 1] = 1
+    def __init__(self, root, dataset, **kwargs):
+        dataset = dataset.replace('-', '_')
+        dataset_str = root + '/' + dataset + '/raw/'
+        self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
+        self.num_nodes = self.adj_full.shape[0]
 
         role = json.load(open(dataset_str + 'role.json', 'r'))
-        idx_train = role['tr']
-        idx_test = role['te']
-        idx_val = role['va']
+        self.idx_train = role['tr']
+        self.idx_test = role['te']
+        self.idx_val = role['va']
+        self.train_mask = index_to_mask(self.idx_train, self.num_nodes)
+        self.test_mask = index_to_mask(self.idx_test, self.num_nodes)
+        self.val_mask = index_to_mask(self.idx_val, self.num_nodes)
 
-        if 'label_rate' in kwargs:
-            label_rate = kwargs['label_rate']
-            if label_rate < 1:
-                idx_train = idx_train[:int(label_rate * len(idx_train))]
-        self.adj_train = adj_full[np.ix_(idx_train, idx_train)]
-        self.adj_val = adj_full[np.ix_(idx_val, idx_val)]
-        self.adj_test = adj_full[np.ix_(idx_test, idx_test)]
-
-        feat = np.load(dataset_str + 'feats.npy')
+        self.feat_full = np.load(dataset_str + 'feats.npy')
         # ---- normalize feat ----
-        feat_train = feat[idx_train]
-        scaler = StandardScaler()
-        scaler.fit(feat_train)
-        feat = scaler.transform(feat)
-
-        self.feat_train = feat[idx_train]
-        self.feat_val = feat[idx_val]
-        self.feat_test = feat[idx_test]
 
         class_map = json.load(open(dataset_str + 'class_map.json', 'r'))
-        labels = self.process_labels(class_map)
-
-        self.labels_train = labels[idx_train]
-        self.labels_val = labels[idx_val]
-        self.labels_test = labels[idx_test]
-
-        self.data_full = GraphData(adj_full, feat, labels, idx_train, idx_val, idx_test)
-        self.class_dict = None
-        self.class_dict2 = None
-
-        self.adj_full = adj_full
-        self.feat_full = feat
-        self.labels_full = labels
-        self.idx_train = np.array(idx_train)
-        self.idx_val = np.array(idx_val)
-        self.idx_test = np.array(idx_test)
-        self.samplers = None
+        self.labels_full = to_tensor(label=self.process_labels(class_map))
 
     def process_labels(self, class_map):
         """
         setup vertex property map for output classests
         """
-        num_vertices = self.nnodes
+        num_vertices = self.num_nodes
         if isinstance(list(class_map.values())[0], list):
             num_classes = len(list(class_map.values())[0])
             self.nclass = num_classes
@@ -507,51 +467,8 @@ class DataGraphSAINT:
             self.nclass = max(class_arr) + 1
         return class_arr
 
-    def retrieve_class(self, c, num=256):
-        if self.class_dict is None:
-            self.class_dict = {}
-            for i in range(self.nclass):
-                self.class_dict['class_%s' % i] = (self.labels_train == i)
-        idx = np.arange(len(self.labels_train))
-        idx = idx[self.class_dict['class_%s' % c]]
-        return np.random.permutation(idx)[:num]
+    def get(self, idx):
+        return self
 
-    def retrieve_class_sampler(self, c, adj, args=None):
-        num = 256
-        if args.nlayers == 1:
-            sizes = [30]
-        if args.nlayers == 2:
-            if args.dataset in ['reddit', 'flickr']:
-
-                sizes = [15, 8]
-
-            else:
-                sizes = [10, 5]
-
-        if self.class_dict2 is None:
-            print(sizes)
-            self.class_dict2 = {}
-            for i in range(self.nclass):
-                if args.setting == 'trans':
-                    idx_train = np.array(self.idx_train)
-                    idx = idx_train[self.labels_train == i]
-                else:
-                    idx = np.arange(len(self.labels_train))[self.labels_train == i]
-                self.class_dict2[i] = idx
-
-        if self.samplers is None:
-            self.samplers = []
-            for i in range(self.nclass):
-                node_idx = torch.LongTensor(self.class_dict2[i])
-                if len(node_idx) == 0:
-                    continue
-
-                self.samplers.append(NeighborSampler(adj,
-                                                     node_idx=node_idx,
-                                                     sizes=sizes, batch_size=num,
-                                                     num_workers=8, return_e_id=False,
-                                                     num_nodes=adj.size(0),
-                                                     shuffle=True))
-        batch = np.random.permutation(self.class_dict2[c])[:num]
-        out = self.samplers[c].sample(batch.astype(np.int64))
-        return out
+    def __getitem__(self, idx):
+        return self.get(idx)
