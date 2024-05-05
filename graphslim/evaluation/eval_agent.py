@@ -1,9 +1,10 @@
 import numpy as np
+import torch
 import torch.nn.functional as F
 from tqdm import trange
 
 from graphslim.dataset import *
-from graphslim.models import *
+from graphslim.dataset.convertor import ei2csr
 from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
 
 
@@ -82,7 +83,7 @@ class Evaluator:
     #     res.append(acc_train.item())
     #     return res
 
-    def get_syn_data(self, model_type=None, verbose=False):
+    def get_syn_data(self, model_type, verbose=False):
 
         args = self.args
         adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
@@ -91,12 +92,14 @@ class Evaluator:
 
         if model_type == 'MLP':
             adj_syn = adj_syn - adj_syn
+            torch.diagonal(adj_syn).fill_(1)
 
         if verbose:
             print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
         # setting threshold to sparsify synthetic graph
         if args.method in ['gcond', 'doscond']:
-            print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
+            if verbose:
+                print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
             if args.threshold > 0:
                 adj_syn[adj_syn < args.threshold] = 0
                 if verbose:
@@ -113,13 +116,17 @@ class Evaluator:
 
         if verbose:
             print('======= testing %s' % model_type)
-        # if model_type == 'MLP':
-        #     data.adj_syn = data.adj_syn - data.adj_syn
-        #     model_class = GCN
-        # else:
-        #     model_class = eval(model_type)
 
-        model = eval(model_type)(feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(self.device)
+        if model_type == 'MLP':
+            adj_test = ei2csr(torch.arange(len(data.feat_test), dtype=torch.long).repeat(2, 1), len(data.feat_test))
+            adj_full = ei2csr(torch.arange(len(data.feat_full), dtype=torch.long).repeat(2, 1), len(data.feat_full))
+            model_type = 'GCN'
+        else:
+            adj_test = data.adj_test
+            adj_full = data.adj_full
+
+        model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+            self.device)
 
         model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
@@ -128,11 +135,8 @@ class Evaluator:
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
 
-        # if model_type == 'MLP':
-        #     output = model.predict(data.feat_test, sp.eye(len(data.feat_test),normadj))
-
         if args.setting == 'ind':
-            output = model.predict(data.feat_test, data.adj_test)
+            output = model.predict(data.feat_test, adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
             res.append(acc_test.item())
@@ -144,7 +148,7 @@ class Evaluator:
         # if not args.dataset in ['reddit', 'flickr']:
         else:
             # Full graph
-            output = model.predict(data.feat_full, data.adj_full)
+            output = model.predict(data.feat_full, adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
             acc_test = accuracy(output[data.idx_test], labels_test)
             res.append(acc_test.item())
@@ -166,9 +170,9 @@ class Evaluator:
 
     def train_cross(self, data):
         args = self.args
-        data.nclass = data.nclass.item()
+        args.valid_result = 0
 
-        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GAT', 'GraphSage']:
+        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GAT']:  # 'GraphSage'
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
             res = []
@@ -183,26 +187,13 @@ class Evaluator:
             res_mean, res_std = res.mean(), res.std()
             print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
-        # print('=== testing GAT')
-        # res = []
-        # nlayer = 2
-        # for i in range(runs):
-        #     res.append(self.test_gat(verbose=True, nlayers=nlayer, model_type='GAT'))
-        # res = np.array(res)
-        # print('Layer:', nlayer)
-        # print('Test/Full Test/Train Mean Accuracy:',
-        #         repr([res.mean(0), res.std(0)]))
-        # final_res['GAT'] = [res.mean(0), res.std(0)]
-
-        # print('Final result:', final_res)
-
     def evaluate(self, data, model_type, verbose=True, reduced=True):
         # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
         # self.data = data
         args = self.args
 
         res = []
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
 
         if verbose:
             run_evaluation = trange(args.run_evaluation)
@@ -210,7 +201,7 @@ class Evaluator:
             run_evaluation = range(args.run_evaluation)
         for i in run_evaluation:
             seed_everything(args.seed + i)
-            res.append(self.test(data, model_type=model_type, verbose=verbose, reduced=reduced))
+            res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced))
         res = np.array(res)
 
         if verbose:
@@ -220,7 +211,7 @@ class Evaluator:
     def nas_evaluate(self, data, model_type, verbose=True, reduced=None):
         args = self.args
         res = []
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type, verbose=args.verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
         if verbose:
             run_evaluation = trange(args.run_evaluation)
         else:

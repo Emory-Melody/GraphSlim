@@ -100,7 +100,7 @@ def method_config(args):
 @click.option('--with_bn', is_flag=True, show_default=True)
 @click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
-@click.option('--alpha', default=0, help='for appnp', show_default=True)
+@click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     try:

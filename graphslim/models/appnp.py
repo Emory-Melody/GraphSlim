@@ -44,7 +44,7 @@ class APPNP(BaseGNN):
         }
         self.activation = activation_functions.get(args.activation)
 
-    def forward(self, x, adj):
+    def forward(self, x, adj, output_layer_features=False):
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:

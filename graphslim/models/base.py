@@ -208,4 +208,4 @@ class BaseGNN(nn.Module):
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
-        return self.forward(features, adj, output_layer_features=output_layer_features)
+        return self.forward(features, adj, output_layer_features=False)
