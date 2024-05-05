@@ -1,9 +1,12 @@
 # from deeprobust.graph.data import Dataset
+from typing import Optional
+
 import numpy as np
 import torch
 from pygsp import graphs
 from scipy.sparse import coo_matrix
 from torch_geometric.utils import to_undirected, to_dense_adj
+from torch_sparse import SparseTensor
 
 
 def pyg2gsp(edge_index):
@@ -24,6 +27,31 @@ def ei2csr(edge_index, num_nodes):
     scoo = coo_matrix((np.ones_like(edge_index[0]), (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes))
     adjacency_matrix_csr = scoo.tocsr()
     return adjacency_matrix_csr
+
+
+def dense2sparsetensor(mat: torch.Tensor, has_value: bool = True):
+    if mat.dim() > 2:
+        index = mat.abs().sum([i for i in range(2, mat.dim())]).nonzero()
+    else:
+        index = mat.nonzero()
+    index = index.t()
+
+    row = index[0]
+    col = index[1]
+
+    value: Optional[torch.Tensor] = None
+    if has_value:
+        value = mat[row, col]
+
+    return SparseTensor(
+        row=row,
+        rowptr=None,
+        col=col,
+        value=value,
+        sparse_sizes=(mat.size(0), mat.size(1)),
+        is_sorted=True,
+        trust_data=True,
+    )
 
 # class Pyg2Dpr(Dataset):
 # def __init__(self, pyg_data, **kwargs):

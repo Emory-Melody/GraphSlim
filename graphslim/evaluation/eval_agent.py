@@ -172,7 +172,7 @@ class Evaluator:
         args = self.args
         args.valid_result = 0
 
-        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GAT']:  # 'GraphSage'
+        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']:  #
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
             res = []

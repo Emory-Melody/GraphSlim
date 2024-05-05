@@ -4,8 +4,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch_geometric.data import NeighborSampler
+from torch_geometric.loader import NeighborSampler
 
+from graphslim.dataset.convertor import dense2sparsetensor
 from graphslim.models.base import BaseGNN
 from graphslim.models.layers import SageConvolution
 from graphslim.utils import is_sparse_tensor, normalize_adj_tensor, to_tensor, accuracy
@@ -40,7 +41,8 @@ class GraphSage(BaseGNN):
         self.initialize()
         # data for training
         if reduced:
-            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn, data.labels_val,
+            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
+                                                          label2=data.labels_val,
                                                           device=self.device)
         elif setting == 'trans':
             adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, data.labels_train,
@@ -74,6 +76,10 @@ class GraphSage(BaseGNN):
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
+
+        # adj -> adj (SparseTensor)
+        adj = dense2sparsetensor(adj)
+
         if adj.density() > 0.5:  # if the weighted graph is too dense, we need a larger neighborhood size
             sizes = [30, 20]
         else:
