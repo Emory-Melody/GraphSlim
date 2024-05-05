@@ -99,35 +99,22 @@ class MSGC(GCondBase):
                 x_syn = x_syn.detach()
                 adj_t_syn = self.get_adj_t_syn().detach()
                 #################################################
-                losses = []
                 for i in range(1):
                     optimizer_basic_model.zero_grad()
                     logits = basic_model(x_syn, adj_t_syn)
-                    # (B,N,C) & (B,C)
-                    loss = F.nll_loss(logits, y_syn)
+                    inner_loss = F.nll_loss(logits, y_syn)
 
-                    loss.backward()
+                    inner_loss.backward()
                     optimizer_basic_model.step()
-                    losses.append(loss.item())
+            loss_avg /= (data.nclass * 20)
+            losses.append(loss_avg)
+            x_syns.append(x_syn.clone())
+            adj_t_syns.append(adj_t_syn.clone())
             if it + 1 in args.checkpoints:
-                loss_avg /= (data.nclass * 20)
-                losses.append(loss_avg)
-                x_syns.append(x_syn.clone())
-                adj_t_syns.append(adj_t_syn.clone())
-                # loss_window = sum(losses) / len(losses)
-                # if loss_window < smallest_loss:
-                # patience = 0
-                # smallest_loss = loss_window
+                loss_window = sum(losses.data) / len(losses.data)
+                print(f'average window loss: {loss_window}')
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
-                # add batch sum
-                # best_adj_t_syn = torch.mean(sum(adj_t_syns.data) / len(adj_t_syns.data), dim=0)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
-                # print(
-                #     f'{it} loss:{smallest_loss:.4f}')
-                # else:
-                #     patience += 1
-                #     if patience >= args.patience:
-                #         break
                 data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
                 res = []
                 for i in range(3):

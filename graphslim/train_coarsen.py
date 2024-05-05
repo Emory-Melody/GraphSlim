@@ -26,7 +26,7 @@ if __name__ == '__main__':
         else:
             print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask) * 100, "%")
         evaluator = Evaluator(args)
-        res_mean, res_std = evaluator.evaluate(reduced_graph, 'GCN')
+        res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
         all_res.append([res_mean, res_std])
     all_res = np.array(all_res)
     print(f'Test Mean Result: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
