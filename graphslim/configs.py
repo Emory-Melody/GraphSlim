@@ -62,6 +62,7 @@ def method_config(args):
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
 @click.option('--eval_model', '--em', default='GCN', show_default=True)
+@click.option('--valid_result', '--vr', default=0, show_default=True)
 @click.option('--condense_model', '--cm', default='SGC', show_default=True)
 @click.option('--epochs', '--eps', default=1000, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc

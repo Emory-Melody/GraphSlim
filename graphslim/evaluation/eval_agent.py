@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from tqdm import trange
 
 from graphslim.dataset import *
+from graphslim.models import *
 from graphslim.dataset.convertor import ei2csr
 from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
 
@@ -217,32 +218,14 @@ class Evaluator:
         else:
             run_evaluation = range(args.run_evaluation)
         for i in run_evaluation:
-            seed_everything(args.seed + i)
-            if verbose:
-                print('======= testing %s' % model_type)
-            model_class = eval(model_type)
-
-            feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
-
-            if reduced:
-                model = model_class(nfeat=data.x.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
-                                    nlayers=args.nlayers,
-                                    dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
-                                    activation=args.activation, alpha=args.alpha).to(self.device)
-
-                best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
-                                                  verbose=verbose,
-                                                  setting=args.setting,
-                                                  reduced=True)
-            else:
-                model = model_class(nfeat=feat_syn.shape[1], nhid=args.eval_hidden, nclass=data.nclass,
-                                    nlayers=args.nlayers,
-                                    dropout=0, lr=args.lr_test, weight_decay=5e-4, device=self.device,
-                                    activation=args.activation, alpha=args.alpha).to(self.device)
-
-                best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True,
-                                                  verbose=verbose,
-                                                  setting=args.setting)
+            model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+                self.device)
+            best_acc_val = model.fit_with_val(data,
+                                              train_iters=args.eval_epochs,
+                                              normadj=True,
+                                              verbose=verbose,
+                                              setting=args.setting,
+                                              reduced=reduced)
             res.append(best_acc_val.item())
         res = np.array(res)
 

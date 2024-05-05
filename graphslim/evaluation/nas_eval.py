@@ -63,7 +63,7 @@ class NasEvaluator:
             args.nlayers, args.eval_hidden, args.alpha, args.activation = params
 
             evaluator = Evaluator(args)
-            acc_val_ori, _ = evaluator.nas_evaluate(data, model_type='APPNPRich', reduced=False, verbose=False)
+            acc_val_ori, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=False, verbose=False)
             self.results_ori.append(acc_val_ori)
             # record best architecture (params) based on val results
             if acc_val_ori > best_acc_val_ori:
@@ -91,7 +91,7 @@ class NasEvaluator:
             args.nlayers, args.eval_hidden, args.alpha, args.activation = params
 
             evaluator = Evaluator(args)
-            acc_val_syn, _ = evaluator.nas_evaluate(data, model_type='APPNPRich', reduced=True, verbose=False)
+            acc_val_syn, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=True, verbose=False)
             self.results_syn.append(acc_val_syn)
             # record best architecture (params) based on val results
             if acc_val_syn > best_acc_val_syn:
@@ -112,7 +112,7 @@ class NasEvaluator:
         args.run_evaluation = 10
         args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_ori
         evaluator = Evaluator(args)
-        acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNPRich', reduced=False, verbose=False)
+        acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         print("NAS: test accuracy on ori graph:", acc_test_ori)
 
     def test_params_syn(self, data):
@@ -124,7 +124,7 @@ class NasEvaluator:
         args.run_evaluation = 10
         args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_syn
         evaluator = Evaluator(args)
-        acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNPRich', reduced=False, verbose=False)
+        acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         print("NAS: test accuracy on syn graph:", acc_test_syn)
 
     def get_rank(self, results):
