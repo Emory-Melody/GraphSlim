@@ -21,12 +21,21 @@ class GAT(BaseGNN):
 
         if mode in ['eval', 'cross']:
             self.nlayers = 2
-            self.dropout = 0
             self.weight_decay = 0
             self.lr = 1e-3
-            self.heads = 16
+            self.heads = 8
             self.output_heads = 1
             nhid //= self.heads
+            if args.dataset in ['reddit']:
+                self.dropout = 0.1
+                self.weight_decay = 5e-4
+            elif args.dataset in ['citeseer']:
+                self.dropout = 0.7
+                self.weight_decay = 5e-4
+            elif args.dataset in ['flickr']:
+                self.dropout = 0.8
+            else:
+                self.dropout = 0.7
         self.conv1 = GATConv(
             nfeat,
             nhid,

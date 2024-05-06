@@ -9,5 +9,5 @@
   "expert_epochs": 1900,
   "syn_steps": 1000,
   "start_epoch": 30,
-  "epochs": 2000
+  "epochs": 1000
 }

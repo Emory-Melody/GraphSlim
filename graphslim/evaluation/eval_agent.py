@@ -94,14 +94,10 @@ class Evaluator:
             adj_test = data.adj_test
             adj_full = data.adj_full
 
-        assert not (model_type == 'GAT' and is_identity(data.adj_syn, args.device))
+        assert not (args.method not in ['msgc'] and model_type == 'GAT' and is_identity(data.adj_syn, args.device))
         model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode=mode).to(
             self.device)
-        #
-        if model_type == 'GAT':
-            eval_epochs = 1000
-        else:
-            eval_epochs = 600
+        eval_epochs = 600
         model.fit_with_val(data, train_iters=eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
                            reduced=reduced)

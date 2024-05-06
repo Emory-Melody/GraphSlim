@@ -1,5 +1,5 @@
 import os
-
+import sys
 from graphslim.dataset.convertor import *
 
 
@@ -52,15 +52,25 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
     save_path = 'dataset/output'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    torch.save(adj_syn,
-               f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    torch.save(feat_syn,
-               f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    torch.save(labels_syn,
-               f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    args.valid_result = valid_result
-    if args.verbose:
-        print("Saved reduced data")
+    if valid_result >= args.valid_result:
+        try:
+            os.remove(
+                f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+            os.remove(
+                f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+            os.remove(
+                f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+        except FileNotFoundError:
+            pass
+        args.valid_result = valid_result
+        torch.save(adj_syn,
+                   f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+        torch.save(feat_syn,
+                   f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+        torch.save(labels_syn,
+                   f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
+        if args.verbose:
+            print("Saved reduced data")
 
 
 def load_reduced(args, valid_result=0):

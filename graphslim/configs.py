@@ -45,20 +45,21 @@ def method_config(args):
     except:
         print('No config file found')
     # little patch for configs
-    if args.method in ['sfgc']:
-        args.epochs = 2000
+    # if args.method in ['sfgc']:
+    #     args.epochs = 2000
     if args.method in ['msgc']:
-        batch_dt = {
-            0.1: 16,
-            0.25: 8,
-            0.5: 1,
-            0.001: 16,
-            0.005: 8,
-            0.01: 1,
-            0.0005: 16,
-            0.002: 1
-        }
-        args.batch_adj = batch_dt[args.reduction_rate]
+        # batch_dt = {
+        #     0.1: 32,
+        #     0.25: 16,
+        #     0.5: 1,
+        #     0.001: 16,
+        #     0.005: 8,
+        #     0.01: 1,
+        #     0.0005: 32,
+        #     0.002: 1
+        # }
+        # args.batch_adj = batch_dt[args.reduction_rate]
+        args.batch_adj = 16
         # add temporary changes here
         # do not modify the config json
 
@@ -75,10 +76,16 @@ def method_config(args):
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
-@click.option('--eval_model', '--em', default='GCN', show_default=True)
-@click.option('--valid_result', '--vr', default=0, show_default=True)
-@click.option('--condense_model', '--cm', default='SGC', show_default=True)
+@click.option('--eval_model', default='GCN',
+              type=click.Choice(
+                  ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
+              ), show_default=True)
+@click.option('--condense_model', default='SGC',
+              type=click.Choice(
+                  ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
+              ), show_default=True)
 @click.option('--epochs', '--eps', default=1000, show_default=True)
+@click.option('--valid_result', '--vr', default=0, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=0, show_default=True)

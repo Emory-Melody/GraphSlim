@@ -77,7 +77,7 @@ class GCondBase:
         elif args.init == 'averaging':
             agent = Average(setting=args.setting, data=self.data, args=args)
         elif args.init == 'kcenter':
-            agent = Random(setting=args.setting, data=self.data, args=args)
+            agent = KCenter(setting=args.setting, data=self.data, args=args)
         elif args.init == 'Herding':
             agent = Herding(setting=args.setting, data=self.data, args=args)
         else:
@@ -185,13 +185,8 @@ class GCondBase:
 
         args, data, device = self.args, self.data, self.device
 
-        # with_bn = True if args.dataset in ['ogbn-arxiv'] else False
         model = GCN(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(device)
 
-        # if self.args.lr_adj == 0:
-        #     n = len(data.labels_syn)
-        #     adj_syn = torch.zeros((n, n))
-        # same for ind and trans when reduced
         acc_val = model.fit_with_val(data,
                                      train_iters=600, normadj=True, verbose=False,
                                      setting=setting, reduced=True)
@@ -213,24 +208,3 @@ class GCondBase:
         #           repr([res.mean(0), res.std(0)]))
         return res
 
-        # print(adj_syn.sum(), adj_syn.sum() / (adj_syn.shape[0] ** 2))
-
-        # if False:
-        #     if self.args.dataset == 'ogbn-arxiv':
-        #         thresh = 0.6
-        #     elif self.args.dataset == 'reddit':
-        #         thresh = 0.91
-        #     else:
-        #         thresh = 0.7
-        #
-        #     labels_train = torch.LongTensor(data.labels_train).cuda()
-        #     output = model.predict(data.feat_train, data.adj_train)
-        #     # loss_train = F.nll_loss(output, labels_train)
-        #     # acc_train = utils.accuracy(output, labels_train)
-        #     loss_train = torch.tensor(0)
-        #     acc_train = torch.tensor(0)
-        #     if verbose:
-        #         print("Train set results:",
-        #               "loss= {:.4f}".format(loss_train.item()),
-        #               "accuracy= {:.4f}".format(acc_train.item()))
-        #     res.append(acc_train.item())

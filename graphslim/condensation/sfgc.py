@@ -23,8 +23,9 @@ class SFGC(GCondBase):
         args = self.args
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
-        assert args.teacher_epochs + args.start_epoch + 4 > args.expert_epochs
+        assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
+        args.init = 'kcenter'
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
@@ -79,17 +80,12 @@ class SFGC(GCondBase):
                     print("Saving {}".format(os.path.join(buf_dir, "replay_buffer_{}.pt".format(n))))
                     torch.save(trajectories, os.path.join(buf_dir, "replay_buffer_{}.pt".format(n)))
                     trajectories = []
-        # =============stage 2 coreset init==================#
-        agent = KCenter(setting=args.setting, data=data, args=args)
-        init_data = agent.reduce(data, verbose=False)
-        # =============stage 3 trajectory alignment and GCN evaluation==================#
-
-        feat_init, adj_init, labels_init = to_tensor(init_data.feat_syn, init_data.adj_syn, label=init_data.labels_syn,
-                                                     device=self.device)
-
+        # =============stage 2 trajectory alignment and GCN evaluation==================#
+        # kcenter select
+        feat_init = self.init_feat()
         self.feat_syn.data.copy_(feat_init)
-        self.labels_syn = labels_init
-        self.adj_syn_init = adj_init
+        self.labels_syn = to_tensor(label=data.labels_syn, device=self.device)
+        # self.adj_syn_init = adj_init
 
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
@@ -100,10 +96,9 @@ class SFGC(GCondBase):
 
         best_val = 0
 
-        model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
         bar = trange(args.epochs)
         for it in bar:
-            model.initialize()
+            model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
 
             model = ReparamModule(model)
 
@@ -142,15 +137,15 @@ class SFGC(GCondBase):
             param_loss_list = []
             param_dist_list = []
 
-            if it == 0:
-                feat_syn = self.feat_syn
-                adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
-                adj_syn_input = adj_syn_norm
-            else:
-                feat_syn = self.feat_syn
-                adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
-                adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
-                adj_syn_input = adj_syn_cal_norm
+            # if it == 0:
+            #     feat_syn = self.feat_syn
+            #     adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
+            #     adj_syn_input = adj_syn_norm
+            # else:
+            feat_syn = self.feat_syn
+            adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
+            adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
+            adj_syn_input = adj_syn_cal_norm
             for step in range(args.syn_steps):
                 forward_params = student_params[-1]
                 output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
@@ -170,20 +165,18 @@ class SFGC(GCondBase):
             param_dist /= num_params
 
             param_loss /= param_dist
+            total_loss = param_loss
 
-            grand_loss = param_loss
-            # total_loss = grand_loss + ntk_loss
-            total_loss = grand_loss
             self.optimizer_feat.zero_grad()
-
             optimizer_lr.zero_grad()
 
             total_loss.backward()
             self.optimizer_feat.step()
-            if torch.isnan(total_loss) or torch.isnan(grand_loss):
+            optimizer_lr.step()
+            if torch.isnan(total_loss):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(
-                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f}")
+                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {syn_lr.item():.4f}")
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, total_loss.item()))
 
