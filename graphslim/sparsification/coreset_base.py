@@ -12,6 +12,7 @@ class CoreSet:
 
         self.device = args.device
         self.num_class_dict, self.labels_train, self.idx_train = self.prepare_select(data, args)
+        self.condense_model = 'GCN'
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 
     def prepare_select(self, data, args):

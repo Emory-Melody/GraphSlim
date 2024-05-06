@@ -1,7 +1,6 @@
 {
   "lr_feat": 0.0001,
   "lr_adj": 0.0001,
-  "pre_norm": true,
   "dis_metric": "ours",
   "opt_scale": 1e-9,
   "ep_ratio": 0.5,

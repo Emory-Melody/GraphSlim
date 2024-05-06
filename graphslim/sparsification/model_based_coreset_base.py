@@ -15,14 +15,13 @@ class MBCoreSet(CoreSet):
     def reduce(self, data, verbose=False, save=True):
 
         args = self.args
+        model = eval(args.condense_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args).to(
+            self.device)
         if self.setting == 'trans':
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
-                self.device)
-
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                                setting=args.setting, reduced=False)
 
-            model.test(data, setting=args.setting, verbose=True)
+            # model.test(data, setting=self.setting, verbose=True)
             embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.select(embeds)
@@ -32,13 +31,10 @@ class MBCoreSet(CoreSet):
             data.labels_syn = data.labels_full[idx_selected]
 
         if self.setting == 'ind':
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
-                self.device)
-
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                                setting=args.setting, reduced=False, reindex=True)
 
-            model.test(data, setting=args.setting, verbose=True)
+            # model.test(data, setting=self.setting, verbose=True)
 
             model.eval()
 

@@ -27,5 +27,5 @@ elif args.method == 'msgc':
     agent = MSGC(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.reduce(graph, verbose=args.verbose)
 evaluator = Evaluator(args)
-evaluator.evaluate(reduced_graph, model_type='GAT')
+evaluator.evaluate(reduced_graph, model_type='GCN')
 # python -m coarserning.kcenter

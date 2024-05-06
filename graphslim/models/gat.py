@@ -6,7 +6,8 @@ import torch.nn.functional as F
 from torch import nn
 
 from graphslim.models.gcn import BaseGNN
-from torch_geometric.nn import GATConv
+# from torch_geometric.nn import GATConv
+from graphslim.models.layers import GATConv
 
 
 class GAT(BaseGNN):
@@ -24,34 +25,33 @@ class GAT(BaseGNN):
             self.weight_decay = 0
             self.lr = 1e-3
             self.heads = 16
+            self.output_heads = 1
             nhid //= self.heads
         self.conv1 = GATConv(
             nfeat,
             nhid,
             heads=self.heads,
-            dropout=self.dropout)
+            dropout=self.dropout,
+            bias=self.with_bias)
 
         self.conv2 = GATConv(
             nhid * self.heads,
             nclass,
-            heads=1,
-            dropout=self.dropout)
-        self.layers = nn.ModuleList([self.conv1, self.conv2])
+            heads=self.output_heads,
+            concat=False,
+            dropout=self.dropout,
+            bias=self.with_bias)
 
+        self.output = None
+        self.best_model = None
+        self.best_output = None
+        self.initialize()
 
     def forward(self, x, adj, output_layer_features=False):
-        outputs = []
-        for ix, layer in enumerate(self.layers):
-            x = F.dropout(x, self.dropout, training=self.training)
-            if ix != len(self.layers) - 1:
-                x = F.elu(x)
-            x = self.layers[ix](x, adj)
-            if output_layer_features:
-                outputs.append(x)
-
-        if output_layer_features:
-            return outputs
-        x.view(-1, x.shape[-1])
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = F.elu(self.conv1(x, adj))
+        x = F.dropout(x, p=self.dropout, training=self.training)
+        x = self.conv2(x, adj)
         return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):

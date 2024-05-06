@@ -80,7 +80,7 @@ class Evaluator:
 
         return feat_syn, adj_syn, labels_syn
 
-    def test(self, data, model_type, verbose=True, reduced=True):
+    def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
 
         if verbose:
@@ -95,7 +95,7 @@ class Evaluator:
             adj_full = data.adj_full
 
         assert not (model_type == 'GAT' and is_identity(data.adj_syn, args.device))
-        model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+        model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode=mode).to(
             self.device)
         #
         if model_type == 'GAT':
@@ -146,7 +146,7 @@ class Evaluator:
             res = []
             for i in run_evaluation:
                 seed_everything(args.seed + i)
-                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True))
+                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
             res = np.array(res)
             res_mean, res_std = res.mean(), res.std()
             print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
@@ -157,13 +157,15 @@ class Evaluator:
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
 
         if verbose:
+            print(f'evaluate reduced data by {model_type}')
             run_evaluation = trange(args.run_evaluation)
         else:
             run_evaluation = range(args.run_evaluation)
+
         res = []
         for i in run_evaluation:
             seed_everything(args.seed + i)
-            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced)
+            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode='eval')
             res.append(best_val_acc)
             if verbose:
                 run_evaluation.set_postfix(best_val_acc=best_val_acc)

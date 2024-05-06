@@ -19,6 +19,8 @@ class SGC(BaseGNN):
         """nlayers indicates the number of propagations"""
         super(SGC, self).__init__(nfeat, nhid, nclass, args, mode)
 
+        if mode in ['eval', 'cross']:
+            self.ntrans = 1
         if self.ntrans == 1:
             self.layers.append(MyLinear(nfeat, nclass))
         else:

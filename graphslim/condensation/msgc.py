@@ -44,14 +44,11 @@ class MSGC(GCondBase):
         basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
         self.reset_adj_batch()
-        # initialization the features
-        # feat_sub, adj_sub = self.get_sub_adj_feat()
         feat_init = self.init_feat()
         self.x_syn.data.copy_(feat_init)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
         optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)
-        # smallest_loss = 99999.
         best_val = 0
         args.window = args.patience = 20
         losses = FixLenList(args.window)
@@ -149,7 +146,6 @@ class MSGC(GCondBase):
             row = []
             col = []
             for row_id in range(self.n_syn):
-                # for _ in range(2):
                 for c in range(self.n_classes):
                     c_mask = self.y_syn == c
                     c_mask[row_id] = False

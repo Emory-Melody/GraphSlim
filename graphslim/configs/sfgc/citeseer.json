@@ -1,8 +1,12 @@
 {
+  "lr": 1e-3,
+  "lr_teacher": 0.001,
+  "wd_teacher": 5e-4,
+  "lr_student": 1,
   "lr_feat": 0.0001,
-  "lr_adj": 0.0001,
-  "pre_norm": true,
-  "dis_metric": "ours",
-  "outer_loop": 20,
-  "inner_loop": 15
+  "teacher_epochs": 800,
+  "expert_epochs": 500,
+  "syn_steps": 300,
+  "start_epoch": 30,
+  "epochs": 2000
 }

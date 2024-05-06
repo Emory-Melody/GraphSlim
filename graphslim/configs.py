@@ -45,8 +45,22 @@ def method_config(args):
     except:
         print('No config file found')
     # little patch for configs
-    if args.method in ['doscond'] and args.reduction_rate == 0.1:
-        args.outer_loop = 3
+    if args.method in ['sfgc']:
+        args.epochs = 2000
+    if args.method in ['msgc']:
+        batch_dt = {
+            0.1: 16,
+            0.25: 8,
+            0.5: 1,
+            0.001: 16,
+            0.005: 8,
+            0.01: 1,
+            0.0005: 16,
+            0.002: 1
+        }
+        args.batch_adj = batch_dt[args.reduction_rate]
+        # add temporary changes here
+        # do not modify the config json
 
     return args
 
@@ -99,6 +113,7 @@ def method_config(args):
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')
 @click.option('--with_bn', is_flag=True, show_default=True)
+@click.option('--no_buff', is_flag=True, show_default=True, help='skip the buffer in sfgc')
 @click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
