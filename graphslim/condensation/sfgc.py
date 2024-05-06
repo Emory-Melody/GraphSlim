@@ -24,6 +24,7 @@ class SFGC(GCondBase):
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
         assert args.teacher_epochs + args.start_epoch + 4 > args.expert_epochs
+        args.condense_model = 'GCN'
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
@@ -41,9 +42,8 @@ class SFGC(GCondBase):
 
             trajectories = []
 
+            model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
             for it in trange(args.num_experts):
-
-                model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
 
                 model.initialize()
 
@@ -94,16 +94,16 @@ class SFGC(GCondBase):
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
         # args.lr_student
-        syn_lr = torch.tensor(args.lr_student).float().to(self.device)
-
+        syn_lr = torch.tensor(args.lr_student).float()
         syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
         optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
 
         best_val = 0
 
+        model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
         bar = trange(args.epochs)
         for it in bar:
-            model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
+            model.initialize()
 
             model = ReparamModule(model)
 
@@ -183,12 +183,7 @@ class SFGC(GCondBase):
             if torch.isnan(total_loss) or torch.isnan(grand_loss):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(
-                "Iteration {}: File ID = {} Total_Loss = {:.4f},  Start_Epoch= {}, Student_LR = {:6f}".format(
-                    it,
-                    file_idx,
-                    total_loss.item(),
-                    start_epoch,
-                    syn_lr.item()))
+                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f}")
             if verbose and (it + 1) % 100 == 0:
                 print('Epoch {}, loss_avg: {}'.format(it + 1, total_loss.item()))
 
@@ -230,7 +225,7 @@ class SFGC(GCondBase):
         expert_idx = 0
         random.shuffle(expert_files)
 
-        print("loading file {}".format(expert_files[file_idx]))
+        # print("loading file {}".format(expert_files[file_idx]))
         buffer = torch.load(expert_files[file_idx])
 
         random.shuffle(buffer)

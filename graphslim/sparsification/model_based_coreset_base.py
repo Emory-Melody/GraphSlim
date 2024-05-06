@@ -15,7 +15,7 @@ class MBCoreSet(CoreSet):
     def reduce(self, data, verbose=False, save=True):
 
         args = self.args
-        model = eval(args.condense_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args).to(
+        model = eval(self.condense_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args).to(
             self.device)
         if self.setting == 'trans':
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
