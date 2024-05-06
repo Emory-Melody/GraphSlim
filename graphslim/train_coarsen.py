@@ -14,7 +14,6 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     graph = get_dataset(args.dataset, args)
     all_res = []
-    args.run_reduction = 3
     for i in range(args.run_reduction):
         seed_everything(args.seed + i)
         if args.method == 'vng':
@@ -29,7 +28,7 @@ if __name__ == '__main__':
         if args.setting == 'trans':
             print("real reduction rate", reduced_graph.feat_syn.shape[0] / graph.x.shape[0] * 100, "%")
         else:
-            print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask) * 100, "%")
+            print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask).item() * 100, "%")
         evaluator = Evaluator(args)
         res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
         all_res.append([res_mean, res_std])

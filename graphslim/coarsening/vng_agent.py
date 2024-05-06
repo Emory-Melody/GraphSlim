@@ -26,9 +26,10 @@ class VNG:
         cpu_data = copy.deepcopy(data)
 
         if args.setting == 'trans':
-            model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
-                        weight_decay=args.weight_decay).to(args.device)
-            model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='trans')
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+                self.device)
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+                               setting=args.setting, reduced=False)
             embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)
             embeds = [embed[data.train_mask] for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
@@ -36,9 +37,11 @@ class VNG:
             coarsen_edge, coarsen_features, coarsen_labels = self.vng(embeds, data.adj_train, labels)
 
         else:
-            model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
-                        weight_decay=args.weight_decay).to(args.device)
-            model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='ind', reindex=True)
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+                self.device)
+
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+                               setting=args.setting, reduced=False, reindex=True)
             model.eval()
             embeds = model.predict(data.feat_train, data.adj_train, output_layer_features=True)
             embeds = [embed for embed in embeds]

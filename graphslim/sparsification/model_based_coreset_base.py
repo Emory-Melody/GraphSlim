@@ -16,10 +16,13 @@ class MBCoreSet(CoreSet):
 
         args = self.args
         if self.setting == 'trans':
-            model = GCN(nfeat=data.feat_full.shape[1], nhid=args.hidden, nclass=data.nclass, device=args.device,
-                        weight_decay=args.weight_decay).to(args.device)
-            model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='trans')
-            model.test(data, verbose=True)
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+                self.device)
+
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+                               setting=args.setting, reduced=False)
+
+            model.test(data, setting=args.setting, verbose=True)
             embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.select(embeds)
@@ -29,7 +32,13 @@ class MBCoreSet(CoreSet):
             data.labels_syn = data.labels_full[idx_selected]
 
         if self.setting == 'ind':
-            model.fit_with_val(data, train_iters=args.eval_epochs, verbose=verbose, setting='ind', reindex=True)
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+                self.device)
+
+            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+                               setting=args.setting, reduced=False, reindex=True)
+
+            model.test(data, setting=args.setting, verbose=True)
 
             model.eval()
 

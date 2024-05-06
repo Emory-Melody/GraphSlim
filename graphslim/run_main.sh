@@ -2,27 +2,29 @@
 
 # ===================================================Coarsen======================================================
 # VN
+# cora 0.5%
+python train_coarsen.py -D cora -R 0.01 -M variation_neighborhoods
 # cora 1.3%
-python train_coarsen.py -D cora -S trans -R 0.02 -M variation_neighborhoods
+python train_coarsen.py -D cora -R 0.03 -M variation_neighborhoods
 # cora 2.6%
-python train_coarsen.py -D cora -S trans -R 0.055 -M variation_neighborhoods
-# cora 5.2%
-python train_coarsen.py -D cora -S trans -R 1 -M variation_neighborhoods
+python train_coarsen.py -D cora -R 0.07 -M variation_neighborhoods
 # =========================================================
+# citeceer 0.36%
+python train_coarsen.py -D citeseer -R 0.01 -M variation_neighborhoods
+# citeceer 0.9%
+python train_coarsen.py -D citeseer -R 0.04 -M variation_neighborhoods
 # citeceer 1.8%
-python train_coarsen.py -D citeseer -S trans -R 0.025 -M variation_neighborhoods
-# citeceer 3.6%
-python train_coarsen.py -D citeseer -S trans -R 1 -M variation_neighborhoods
+python train_coarsen.py -D citeseer -R 0.1 -M variation_neighborhoods
 # =========================================================
 #  flickr 0.1%
-python train_coarsen.py -D flickr -S ind -R 0.001 -M variation_neighborhoods
+python train_coarsen.py -D flickr -R 0.001 -M variation_neighborhoods
 #  flickr 0.5%
-python train_coarsen.py -D flickr -S ind -R 0.005 -M variation_neighborhoods
+python train_coarsen.py -D flickr -R 0.005 -M variation_neighborhoods
 #  flickr 1%
-python train_coarsen.py -D flickr -S ind -R 0.01 -M variation_neighborhoods
+python train_coarsen.py -D flickr -R 0.01 -M variation_neighborhoods
 # =========================================================
 #  reddit 0.05%
-python train_coarsen.py -D reddit -S ind -R 0.005 -M variation_neighborhoods
+python train_coarsen.py -D reddit -R 0.0005 -M variation_neighborhoods
 #  reddit 0.1%
 
 #  reddit 0.2%
