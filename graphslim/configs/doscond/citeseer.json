@@ -5,5 +5,6 @@
   "outer_loop": 1,
   "pre_norm": true,
   "threshold": 0.05,
-  "condense_model": "GCN"
+  "condense_model": "GCN",
+  "epochs": 2000
 }

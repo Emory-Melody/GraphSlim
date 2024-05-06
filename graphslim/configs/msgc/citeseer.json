@@ -7,5 +7,7 @@
   "pre_norm": true,
   "batch_adj": 8,
   "condense_model": "SGC",
-  "threshold": 0
+  "threshold": 0,
+  "outer_loop": 20,
+  "inner_loop": 15
 }

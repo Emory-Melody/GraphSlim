@@ -17,7 +17,7 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
         self.x_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
-        self.batch_size = args.batch_adj  # just for test
+        self.batch_size = args.batch_adj
         self.n_classes = data.nclass
         self.device = args.device
 
@@ -40,6 +40,7 @@ class MSGC(GCondBase):
 
         adj = normalize_adj_tensor(adj, sparse=True)
         y_syn = self.y_syn.repeat(self.batch_size)
+        assert args.condense_model != 'GAT'
         basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
         self.reset_adj_batch()
@@ -61,7 +62,7 @@ class MSGC(GCondBase):
         for it in trange(args.epochs):
             basic_model.initialize()
             loss_avg = 0
-            for step_syn in range(20):
+            for step_syn in range(args.outer_loop):
                 basic_model = self.check_bn(basic_model)
                 basic_model.eval()  # fix basic_model while optimizing graphsyner
                 ######################graph optimization#####################################
@@ -99,7 +100,7 @@ class MSGC(GCondBase):
                 x_syn = x_syn.detach()
                 adj_t_syn = self.get_adj_t_syn().detach()
                 #################################################
-                for i in range(1):
+                for i in range(args.inner_loop):
                     optimizer_basic_model.zero_grad()
                     logits = basic_model(x_syn, adj_t_syn)
                     inner_loss = F.nll_loss(logits, y_syn)
@@ -108,8 +109,8 @@ class MSGC(GCondBase):
                     optimizer_basic_model.step()
             loss_avg /= (data.nclass * 20)
             losses.append(loss_avg)
-            x_syns.append(x_syn.clone())
-            adj_t_syns.append(adj_t_syn.clone())
+            x_syns.append(x_syn)
+            adj_t_syns.append(adj_t_syn)
             if it + 1 in args.checkpoints:
                 loss_window = sum(losses.data) / len(losses.data)
                 print(f'average window loss: {loss_window}')

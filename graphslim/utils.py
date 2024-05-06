@@ -9,6 +9,18 @@ from torch_sparse import SparseTensor
 
 
 # from deeprobust.graph.utils import *
+def is_identity(mx, device):
+    identity = torch.eye(mx.size(0), device=device)
+    if isinstance(mx, torch.Tensor):
+        if is_sparse_tensor(mx):
+            dense_tensor = mx.to_dense().float()
+        else:
+            dense_tensor = mx.float()
+    elif isinstance(mx, SparseTensor):
+        dense_tensor = mx.to_dense().float()
+    else:
+        raise ValueError("Input must be a torch.Tensor or torch.sparse.FloatTensor or torch_sparse.SparseTensor")
+    return torch.allclose(dense_tensor, identity)
 
 
 def seed_everything(seed):

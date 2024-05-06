@@ -3,10 +3,12 @@ import torch
 import torch.nn.functional as F
 from tqdm import trange
 
+from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
 from graphslim.models import *
+from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
-from graphslim.utils import accuracy, seed_everything, is_sparse_tensor
+from graphslim.utils import accuracy, seed_everything, is_sparse_tensor, is_identity
 
 
 class Evaluator:
@@ -25,64 +27,44 @@ class Evaluator:
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     #
-    # def test_gat(self, nlayers, model_type, verbose=False):
-    #     res = []
-    #     args = self.args
-    #
-    #     if args.dataset in ['cora', 'citeseer']:
-    #         args.epsilon = 0.5  # Make the graph sparser as GAT does not work well on dense graph
-    #     else:
-    #         args.epsilon = 0.01
-    #
-    #     print('======= testing %s' % model_type)
-    #     data, device = self.data, self.device
-    #
-    #     feat_syn, adj_syn, labels_syn = self.get_syn_data(model_type)
-    #     # with_bn = True if self.args.dataset in ['ogbn-arxiv'] else False
-    #     with_bn = False
-    #     if model_type == 'GAT':
-    #         model = GAT(nfeat=feat_syn.shape[1], nhid=16, heads=16, dropout=0.0,
-    #                     weight_decay=0e-4, nlayers=self.args.nlayers, lr=0.001,
-    #                     nclass=data.nclass, device=device, dataset=self.args.dataset).to(device)
-    #
-    #     noval = True if args.dataset in ['reddit', 'flickr'] else False
-    #     model.fit(feat_syn, adj_syn, labels_syn, np.arange(len(feat_syn)), noval=noval, data=data,
-    #               train_iters=10000 if noval else 3000, normalize=True, verbose=verbose)
-    #
-    #     model.eval()
-    #     labels_test = torch.LongTensor(data.labels_test).to(args.device)
-    #
-    #     if args.dataset in ['reddit', 'flickr']:
-    #         output = model.predict(data.feat_test, data.adj_test)
-    #         loss_test = F.nll_loss(output, labels_test)
-    #         acc_test = utils.accuracy(output, labels_test)
-    #         res.append(acc_test.item())
-    #         if verbose:
-    #             print("Test set results:",
-    #                   "loss= {:.4f}".format(loss_test.item()),
-    #                   "accuracy= {:.4f}".format(acc_test.item()))
-    #
-    #     else:
-    #         # Full graph
-    #         output = model.predict(data.feat_full, data.adj_full)
-    #         loss_test = F.nll_loss(output[data.idx_test], labels_test)
-    #         acc_test = utils.accuracy(output[data.idx_test], labels_test)
-    #         res.append(acc_test.item())
-    #         if verbose:
-    #             print("Test set results:",
-    #                   "loss= {:.4f}".format(loss_test.item()),
-    #                   "accuracy= {:.4f}".format(acc_test.item()))
-    #
-    #     labels_train = torch.LongTensor(data.labels_train).to(args.device)
-    #     output = model.predict(data.feat_train, data.adj_train)
-    #     loss_train = F.nll_loss(output, labels_train)
-    #     acc_train = utils.accuracy(output, labels_train)
-    #     if verbose:
-    #         print("Train set results:",
-    #               "loss= {:.4f}".format(loss_train.item()),
-    #               "accuracy= {:.4f}".format(acc_train.item()))
-    #     res.append(acc_train.item())
-    #     return res
+    def sparsify(self, model_type, adj_syn, verbose=True):
+        args = self.args
+        if model_type == 'MLP':
+            adj_syn = adj_syn - adj_syn
+            torch.diagonal(adj_syn).fill_(1)
+        elif model_type == 'GAT':
+            if args.method in ['gcond', 'doscond']:
+                if args.dataset in ['cora', 'citeseer']:
+                    threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
+                else:
+                    threshold = 0.01
+            elif args.method in ['msgc']:
+                threshold = args.threshold
+            else:
+                threshold = 0
+        else:
+            if args.method in ['gcond', 'doscond']:
+                threshold = args.threshold
+            elif args.method in ['msgc']:
+                threshold = 0
+            else:
+                threshold = 0
+        if verbose:
+            print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
+        # setting threshold to sparsify synthetic graph
+        if verbose:
+            print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+        if threshold > 0:
+            adj_syn[adj_syn < threshold] = 0
+            if verbose:
+                print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+            # else:
+            #     print("structure free methods do not need to truncate the adjacency matrix")
+        if model_type == 'GAT':
+            # GATconv only supports sparse tensor
+            return adj_syn.to_sparse_coo()
+        else:
+            return adj_syn
 
     def get_syn_data(self, model_type, verbose=False):
 
@@ -90,30 +72,16 @@ class Evaluator:
         adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
-
-        if model_type == 'MLP':
-            adj_syn = adj_syn - adj_syn
-            torch.diagonal(adj_syn).fill_(1)
-
-        if verbose:
-            print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / (adj_syn.shape[0] ** 2)).item())
-        # setting threshold to sparsify synthetic graph
-        if args.method in ['gcond', 'doscond']:
-            if verbose:
-                print('Sparsity:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-            if args.threshold > 0:
-                adj_syn[adj_syn < args.threshold] = 0
-                if verbose:
-                    print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / (adj_syn.shape[0] ** 2))
-            # else:
-            #     print("structure free methods do not need to truncate the adjacency matrix")
+        elif isinstance(adj_syn, torch.sparse.FloatTensor):
+            adj_syn = adj_syn.to_dense()
+        else:
+            adj_syn = adj_syn
+        adj_syn = self.sparsify(model_type, adj_syn, verbose=verbose)
 
         return feat_syn, adj_syn, labels_syn
 
     def test(self, data, model_type, verbose=True, reduced=True):
         args = self.args
-        res = []
-        feat_syn, adj_syn, labels_syn = data.feat_syn, data.adj_syn, data.labels_syn
 
         if verbose:
             print('======= testing %s' % model_type)
@@ -126,16 +94,22 @@ class Evaluator:
             adj_test = data.adj_test
             adj_full = data.adj_full
 
+        assert not (model_type == 'GAT' and is_identity(data.adj_syn, args.device))
         model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
             self.device)
-
-        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+        #
+        if model_type == 'GAT':
+            eval_epochs = 1000
+        else:
+            eval_epochs = 600
+        model.fit_with_val(data, train_iters=eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
                            reduced=reduced)
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
 
+        res = []
         if args.setting == 'ind':
             output = model.predict(data.feat_test, adj_test)
             loss_test = F.nll_loss(output, labels_test)
@@ -146,7 +120,6 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-        # if not args.dataset in ['reddit', 'flickr']:
         else:
             # Full graph
             output = model.predict(data.feat_full, adj_full)
@@ -158,29 +131,19 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-            # labels_train = torch.LongTensor(data.labels_train).cuda()
-            # output = model.predict(data.feat_train, data.adj_train)
-            # loss_train = F.nll_loss(output, labels_train)
-            # acc_train = accuracy(output, labels_train)
-            # if verbose:
-            #     print("Train set results:",
-            #           "loss= {:.4f}".format(loss_train.item()),
-            #           "accuracy= {:.4f}".format(acc_train.item()))
-            # res.append(acc_train.item())
-        return res
+        return res[0]
 
     def train_cross(self, data):
         args = self.args
         args.valid_result = 0
-
         for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']:  #
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
-            res = []
             if args.verbose:
                 run_evaluation = trange(args.run_evaluation)
             else:
                 run_evaluation = range(args.run_evaluation)
+            res = []
             for i in run_evaluation:
                 seed_everything(args.seed + i)
                 res.append(self.test(data, model_type=model_type, verbose=False, reduced=True))
@@ -189,20 +152,21 @@ class Evaluator:
             print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
     def evaluate(self, data, model_type, verbose=True, reduced=True):
-        # model_type: ['GCN1', 'GraphSage', 'SGC1', 'MLP', 'APPNP1', 'Cheby']
-        # self.data = data
         args = self.args
 
-        res = []
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
 
         if verbose:
             run_evaluation = trange(args.run_evaluation)
         else:
             run_evaluation = range(args.run_evaluation)
+        res = []
         for i in run_evaluation:
             seed_everything(args.seed + i)
-            res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced))
+            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced)
+            res.append(best_val_acc)
+            if verbose:
+                run_evaluation.set_postfix(best_val_acc=best_val_acc)
         res = np.array(res)
 
         if verbose:
@@ -227,6 +191,8 @@ class Evaluator:
                                               setting=args.setting,
                                               reduced=reduced)
             res.append(best_acc_val.item())
+            if verbose:
+                run_evaluation.set_postfix(best_acc_val=best_acc_val.item())
         res = np.array(res)
 
         if verbose:

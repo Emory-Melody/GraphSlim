@@ -26,7 +26,7 @@ class BaseGNN(nn.Module):
         if mode == 'eval':
             self.nlayers = 2
             self.dropout = 0
-            self.weight_decay = 5e-5
+            self.weight_decay = 5e-4
         if mode == 'cross':
             self.nlayers = 2
             self.dropout = 0.5
@@ -40,8 +40,6 @@ class BaseGNN(nn.Module):
         self.float_label = None
 
     def initialize(self):
-        """Initialize parameters of GCN.
-        """
         for layer in self.layers:
             layer.reset_parameters()
         if self.with_bn:
@@ -109,6 +107,7 @@ class BaseGNN(nn.Module):
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
+
         # features = F.normalize(features, p=2, dim=1)
 
         if len(data.labels_full.shape) > 1:
@@ -127,7 +126,6 @@ class BaseGNN(nn.Module):
 
         if verbose:
             print('=== training GNN model ===')
-        optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
         best_acc_val = 0
         # TODO: we can have two strategies:
@@ -142,11 +140,11 @@ class BaseGNN(nn.Module):
         if normadj:
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
 
+        optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
         self.train()
         for i in range(train_iters):
             if i == train_iters // 2:
-                lr = self.lr * 0.1
-                optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
+                optimizer = optim.Adam(self.parameters(), lr=self.lr * 0.1, weight_decay=self.weight_decay)
 
             optimizer.zero_grad()
             output = self.forward(features, adj)
@@ -155,7 +153,7 @@ class BaseGNN(nn.Module):
             loss_train.backward()
             optimizer.step()
 
-            if verbose and i % 100 == 0:
+            if verbose and i + 1 % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
 
             with torch.no_grad():

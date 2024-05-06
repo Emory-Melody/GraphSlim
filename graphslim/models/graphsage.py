@@ -17,9 +17,7 @@ class GraphSage(BaseGNN):
     def __init__(self, nfeat, nhid, nclass, args, mode='train'):
 
         super(GraphSage, self).__init__(nfeat, nhid, nclass, args, mode)
-        with_bias = self.with_bias
         with_bn = self.with_bn
-        self.layers = nn.ModuleList([])
 
         if self.nlayers == 1:
             self.layers.append(SageConvolution(nfeat, nclass))
@@ -35,7 +33,7 @@ class GraphSage(BaseGNN):
             self.layers.append(SageConvolution(nhid, nclass))
 
     def fit_with_val(self, data, train_iters=200, verbose=False,
-                     normadj=True, normfeat=True, setting='trans', reduced=False, reindex=False,
+                     normadj=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
 
         self.initialize()
@@ -105,11 +103,6 @@ class GraphSage(BaseGNN):
                 optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)
 
             self.train()
-            # optimizer.zero_grad()
-            # output = self.forward(self.features, self.adj_norm)
-            # loss_train = self.loss(output, labels)
-            # loss_train.backward()
-            # optimizer.step()
 
             for batch_size, n_id, adjs in train_loader:
                 adjs = [adj.to(self.device) for adj in adjs]
@@ -119,7 +112,7 @@ class GraphSage(BaseGNN):
                 loss_train.backward()
                 optimizer.step()
 
-            if verbose and i % 100 == 0:
+            if verbose and i + 1 % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
 
             with torch.no_grad():

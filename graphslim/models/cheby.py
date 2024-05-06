@@ -12,7 +12,6 @@ class Cheby(BaseGNN):
         super(Cheby, self).__init__(nfeat, nhid, nclass, args, mode)
 
         with_bias = self.with_bias
-        self.layers = nn.ModuleList([])
 
         if self.nlayers == 1:
             self.layers.append(ChebConvolution(nfeat, nclass, with_bias=with_bias))

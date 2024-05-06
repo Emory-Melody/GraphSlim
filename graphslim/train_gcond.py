@@ -1,3 +1,8 @@
+import os
+import sys
+
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
 from configs import *
 from evaluation.eval_agent import Evaluator
 from graphslim.condensation import *
@@ -8,8 +13,6 @@ args = cli(standalone_mode=False)
 graph = get_dataset(args.dataset, args)
 if args.method == 'gcond':
     agent = GCond(setting=args.setting, data=graph, args=args)
-# elif args.method == 'gcondx':
-#     agent = GCondX(setting=args.setting, data=graph, args=args)
 elif args.method == 'doscond':
     agent = DosCond(setting=args.setting, data=graph, args=args)
 elif args.method in ['doscondx', 'gcondx']:
@@ -24,5 +27,5 @@ elif args.method == 'msgc':
     agent = MSGC(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.reduce(graph, verbose=args.verbose)
 evaluator = Evaluator(args)
-evaluator.evaluate(reduced_graph, model_type='GCN')
+evaluator.evaluate(reduced_graph, model_type='GAT')
 # python -m coarserning.kcenter

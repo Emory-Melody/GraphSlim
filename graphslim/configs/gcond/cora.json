@@ -6,6 +6,6 @@
   "outer_loop": 20,
   "inner_loop": 15,
   "threshold": 0.05,
-  "condense_model": "SGC",
+  "condense_model": "GAT",
   "ntrans": 1
 }

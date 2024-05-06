@@ -6,5 +6,7 @@
   "ntrans": 1,
   "batch_adj": 8,
   "condense_model": "SGC",
-  "threshold": 0.01
+  "threshold": 0.01,
+  "outer_loop": 10,
+  "inner_loop": 1
 }

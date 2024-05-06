@@ -25,6 +25,7 @@ class GraphConvolution(torch.nn.Module):
             self.bias = Parameter(torch.zeros(out_features))  # change this line
         else:
             self.bias = None
+        self.reset_parameters()
 
     def reset_parameters(self):
         stdv = 1. / math.sqrt(self.weight.T.size(1))
@@ -54,72 +55,79 @@ class GraphConvolution(torch.nn.Module):
             + str(self.in_features) + ' -> ' \
             + str(self.out_features) + ')'
 
-
-class GATConv(MessagePassing):
-
-    def __init__(self, in_channels, out_channels,
-                 negative_slope=0.2, dropout=0.0,
-                 bias=True):
-        super(GATConv, self).__init__(node_dim=0)
-
-        self.in_channels = in_channels
-        self.out_channels = out_channels
-        self.negative_slope = negative_slope
-        self.dropout = dropout
-
-        self.lin = Linear(in_channels, out_channels, bias=False)
-
-        self.att_l = Parameter(torch.Tensor(1, out_channels))
-        self.att_r = Parameter(torch.Tensor(1, out_channels))
-
-        if bias:
-            self.bias = Parameter(torch.Tensor(out_channels))
-
-        self.reset_parameters()
-        self.edge_weight = None
-
-    def reset_parameters(self):
-        glorot(self.lin.weight)
-        glorot(self.att_l)
-        glorot(self.att_r)
-        zeros(self.bias)
-
-    def set_adj(self, rows, cols, batch=None):
-        self.rows = rows
-        self.cols = cols
-        self.batch = batch
-        if batch is not None:
-            batch_size = batch.max() + 1
-            self.adj_t = torch.zeros(size=(batch_size, self.n_syn, self.n_syn), device=self.device)
-
-    def forward(self, x, adj_t):
-        C = self.out_channels
-        x_l = x_r = self.lin(x).view(-1, C)
-        alpha_l = (x_l * self.att_l).sum(dim=-1)
-        alpha_r = (x_r * self.att_r).sum(dim=-1)
-
-        # propagate_type: (x: OptPairTensor, alpha: OptPairTensor)
-        if isinstance(adj_t, SparseTensor):
-            row, col, _ = adj_t.coo()
-            edge_index = torch.vstack([row, col])
-            out = self.propagate(edge_index, x=(x_l, x_r),
-                                 alpha=(alpha_l, alpha_r))
-        else:
-            edge_index, _ = dense_to_sparse(adj_t)
-            out = self.propagate(edge_index, x=(x_l, x_r),
-                                 alpha=(alpha_l, alpha_r))
-        if self.bias is not None:
-            out += self.bias
-        return out
-
-    def message(self, x_j, alpha_j, alpha_i,
-                index, ptr, size_i) -> Tensor:
-        alpha = alpha_j if alpha_i is None else alpha_j + alpha_i
-        alpha = F.leaky_relu(alpha, self.negative_slope)
-        alpha = softmax(alpha, index, ptr, size_i)
-        alpha = F.dropout(alpha, p=self.dropout, training=self.training)
-
-        return x_j * alpha.unsqueeze(-1)
+    # class GATConv(MessagePassing):
+    #     '''
+    #     simple GAT convolution layer, one head and no edge weight
+    #     '''
+    #     def __init__(self, in_channels, out_channels,
+    #                  negative_slope=0.2, dropout=0.0,
+    #                  bias=True):
+    #         super(GATConv, self).__init__(node_dim=0)
+    #
+    #         self.in_channels = in_channels
+    #         self.out_channels = out_channels
+    #         self.negative_slope = negative_slope
+    #         self.dropout = dropout
+    #
+    #         self.lin = Linear(in_channels, out_channels, bias=False)
+    #
+    #         self.att_l = Parameter(torch.Tensor(1, out_channels))
+    #         self.att_r = Parameter(torch.Tensor(1, out_channels))
+    #
+    #         if bias:
+    #             self.bias = Parameter(torch.Tensor(out_channels))
+    #
+    #         self.reset_parameters()
+    #         self.edge_weight = None
+    #
+    #     def reset_parameters(self):
+    #         glorot(self.lin.weight)
+    #         glorot(self.att_l)
+    #         glorot(self.att_r)
+    #         zeros(self.bias)
+    #
+    #     def set_adj(self, rows, cols, batch=None):
+    #         self.rows = rows
+    #         self.cols = cols
+    #         self.batch = batch
+    #         if batch is not None:
+    #             batch_size = batch.max() + 1
+    #             self.adj_t = torch.zeros(size=(batch_size, self.n_syn, self.n_syn), device=self.device)
+    #
+    #     def forward(self, x, adj_t):
+    #         C = self.out_channels
+    #         x_l = x_r = self.lin(x).view(-1, C)
+    #         alpha_l = (x_l * self.att_l).sum(dim=-1)
+    #         alpha_r = (x_r * self.att_r).sum(dim=-1)
+    #
+    #         # propagate_type: (x: OptPairTensor, alpha: OptPairTensor)
+    #         if isinstance(adj_t, SparseTensor):
+    #             row, col, _ = adj_t.coo()
+    #             edge_index = torch.vstack([row, col])
+    #             out = self.propagate(edge_index, x=(x_l, x_r),
+    #                                  alpha=(alpha_l, alpha_r))
+    #         else:
+    #             if len(adj_t.shape)==3:
+    #                 if x_l.shape[0] != adj_t.shape[0]*adj_t.shape[1]:
+    #                     x_l = x_r = x_r.repeat(adj_t.shape[0],1)
+    #                     alpha_l = alpha_l.repeat(adj_t.shape[0])
+    #                     alpha_r = alpha_r.repeat(adj_t.shape[0])
+    #
+    #             edge_index, _ = dense_to_sparse(adj_t)
+    #             out = self.propagate(edge_index, x=(x_l, x_r),
+    #                                  alpha=(alpha_l, alpha_r))
+    #         if self.bias is not None:
+    #             out += self.bias
+    #         return out
+    #
+    #     def message(self, x_j, alpha_j, alpha_i,
+    #                 index, ptr, size_i) -> Tensor:
+    #         alpha = alpha_j if alpha_i is None else alpha_j + alpha_i
+    #         alpha = F.leaky_relu(alpha, self.negative_slope)
+    #         alpha = softmax(alpha, index, ptr, size_i)
+    #         alpha = F.dropout(alpha, p=self.dropout, training=self.training)
+    #
+    #         return x_j * alpha.unsqueeze(-1)
 
     def __repr__(self):
         return '{}({}, {}, heads={})'.format(self.__class__.__name__,
@@ -140,23 +148,22 @@ class SageConvolution(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        # self.lin_l.reset_parameters()
         self.lin_r.reset_parameters()
 
     def forward(self, x, adj_t):
         if isinstance(adj_t, SparseTensor):
             h = matmul(adj_t, x, reduce='add')
-            out = self.lin_r(h)  ####################
+            out = self.lin_r(h)
             out += self.lin_r(x[:adj_t.size(0)])
         else:
             h1 = self.lin_r(x)
             h1 = h1.reshape(-1, adj_t.shape[1], h1.shape[1])
             h2 = adj_t @ x.reshape(-1, adj_t.shape[1], x.shape[1])
             h2 = h2.reshape(-1, h2.shape[2])
-            h2 = self.lin_r(h2)  ##############################
+            h2 = self.lin_r(h2)
             h2 = h2.reshape(-1, adj_t.shape[1], h2.shape[1])
             out = h1 + h2
-            out = out.reshape(-1, out.shape[2])
+        out.view(-1, out.shape[-1])
         return out
 
     def __repr__(self):

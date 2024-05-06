@@ -86,9 +86,7 @@ class TransAndInd:
         self.adj_train = self.adj_full[np.ix_(self.idx_train, self.idx_train)]
         self.adj_val = self.adj_full[np.ix_(self.idx_val, self.idx_val)]
         self.adj_test = self.adj_full[np.ix_(self.idx_test, self.idx_test)]
-        # if inductive
-        # print('size of adj_train:', self.adj_train.shape)
-        # print('#edges in adj_train:', self.adj_train.sum())
+
 
         self.labels_train = self.labels_full[self.idx_train]
         self.labels_val = self.labels_full[self.idx_val]
@@ -169,38 +167,6 @@ class TransAndInd:
         out = self.samplers[c].sample(batch.astype(np.int64))
         return out
 
-    # def retrieve_class_multi_sampler(self, c, adj, transductive, num=256, args=None):
-    #     if self.class_dict2 is None:
-    #         self.class_dict2 = {}
-    #         for i in range(self.nclass):
-    #             if transductive:
-    #                 idx = self.idx_train[self.labels_train == i]
-    #             else:
-    #                 idx = np.arange(len(self.labels_train))[self.labels_train == i]
-    #             self.class_dict2[i] = idx
-    #
-    #     if self.samplers is None:
-    #         self.samplers = []
-    #         for l in range(args.nlayers):
-    #             layer_samplers = []
-    #             if l == 0:
-    #                 sizes = [15]
-    #             elif l == 1:
-    #                 sizes = [10, 5]
-    #             else:
-    #                 sizes = [10, 5, 5]
-    #             for i in range(self.nclass):
-    #                 node_idx = torch.LongTensor(self.class_dict2[i])
-    #                 layer_samplers.append(NeighborSampler(adj,
-    #                                                       node_idx=node_idx,
-    #                                                       sizes=sizes, batch_size=num,
-    #                                                       num_workers=12, return_e_id=False,
-    #                                                       num_nodes=adj.size(0),
-    #                                                       shuffle=True))
-    #             self.samplers.append(layer_samplers)
-    #     batch = np.random.permutation(self.class_dict2[c])[:num]
-    #     out = self.samplers[args.nlayers - 1][c].sample(batch)
-    #     return out
 
 
 class FlickrDataLoader(nn.Module):
@@ -209,7 +175,7 @@ class FlickrDataLoader(nn.Module):
         if name == 'flickr':
             from torch_geometric.datasets import Flickr as DataSet
         elif name == 'reddit':
-            from torch_geometric.datasets import Reddit as DataSet
+            from torch_geometric.datasets import Reddit2 as DataSet
         path = osp.join('../../data')
 
         Dataset = DataSet(root=path + f'/{name}')
