@@ -8,5 +8,7 @@
   "beta": 0.5,
   "weight_decay": 0,
   "outer_loop": 20,
-  "inner_loop": 3
+  "inner_loop": 3,
+  "condense_model": "SGC",
+  "ntrans": 1
 }

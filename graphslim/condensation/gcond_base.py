@@ -7,6 +7,7 @@ from graphslim.condensation.utils import *
 from graphslim.models import *
 from graphslim.sparsification import *
 from graphslim.utils import *
+from graphslim.dataset.utils import save_reduced
 
 
 class GCondBase:
@@ -14,12 +15,13 @@ class GCondBase:
     def __init__(self, setting, data, args, **kwargs):
         self.data = data
         self.args = args
+        args.epochs -= 1
         self.device = args.device
         self.setting = setting
 
         # n = data.nclass * args.nsamples
 
-        self.data.labels_syn = self.generate_labels_syn(data)
+        self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
         n = self.data.labels_syn.shape[0]
         self.nnodes_syn = n
         d = data.feat_train.shape[1]
@@ -30,13 +32,14 @@ class GCondBase:
         # from collections import Counter; print(Counter(data.labels_train))
 
         self.feat_syn = nn.Parameter(torch.empty(n, d).to(self.device))
-        self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
-        self.adj_syn = None
+        if args.method not in ['sgdd']:
+            self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
+            self.adj_syn = None
 
-        # self.reset_parameters()
-        self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
-        self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
-        print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
+            # self.reset_parameters()
+            self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
+            self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
+            print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
@@ -177,8 +180,26 @@ class GCondBase:
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
-    def intermediate_evaluation(self):
-        pass
+    def intermediate_evaluation(self, best_val, loss_avg):
+        data = self.data
+        args = self.args
+        if args.verbose:
+            print('loss_avg: {}'.format(loss_avg))
+
+        res = []
+        for i in range(3):
+            res.append(self.test_with_val(verbose=False, setting=args.setting))
+
+        res = np.array(res)
+        current_val = res.mean()
+        if args.verbose:
+            print('Val Accuracy and Std:',
+                  repr([current_val, res.std()]))
+
+        if current_val > best_val:
+            best_val = current_val
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+        return best_val
 
     def test_with_val(self, verbose=False, setting='trans'):
         res = []
@@ -207,4 +228,3 @@ class GCondBase:
         #     print('Val Accuracy and Std:',
         #           repr([res.mean(0), res.std(0)]))
         return res
-

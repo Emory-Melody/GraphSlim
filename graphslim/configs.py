@@ -43,7 +43,7 @@ def method_config(args):
         conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
         update_from_dict(args, conf_dt)
     except:
-        print('No config file found')
+        print('No config file found or error in json format.')
     # little patch for configs
     # if args.method in ['sfgc']:
     #     args.epochs = 2000
@@ -116,7 +116,7 @@ def method_config(args):
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--lr_test', default=1e-2, show_default=True)
-@click.option('--epsilon', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
+@click.option('--threshold', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')
 @click.option('--with_bn', is_flag=True, show_default=True)
@@ -124,6 +124,7 @@ def method_config(args):
 @click.option('--batch_adj', default=1, show_default=True, help='batch size for msgc')
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
+@click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     try:

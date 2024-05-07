@@ -49,10 +49,8 @@ class Evaluator:
                 threshold = 0
             else:
                 threshold = 0
-        if verbose:
+        if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom']:
             print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
-        # setting threshold to sparsify synthetic graph
-        if verbose:
             print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
         if threshold > 0:
             adj_syn[adj_syn < threshold] = 0

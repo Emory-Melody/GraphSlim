@@ -6,7 +6,6 @@
   "outer_loop": 20,
   "inner_loop": 15,
   "threshold": 0.05,
-  "epochs": 1000,
   "condense_model": "SGC",
   "ntrans": 1
 }

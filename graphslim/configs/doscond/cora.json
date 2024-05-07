@@ -4,6 +4,5 @@
   "dis_metric": "mse",
   "outer_loop": 5,
   "threshold": 0.05,
-  "condense_model": "GCN",
-  "epochs": 100
+  "condense_model": "GCN"
 }

@@ -29,7 +29,7 @@ class SFGC(GCondBase):
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 100
+            args.num_experts = 100  # 200
             if not os.path.exists(buf_dir):
                 os.mkdir(buf_dir)
 
@@ -84,7 +84,7 @@ class SFGC(GCondBase):
         # kcenter select
         feat_init = self.init_feat()
         self.feat_syn.data.copy_(feat_init)
-        self.labels_syn = to_tensor(label=data.labels_syn, device=self.device)
+        labels_syn = to_tensor(label=data.labels_syn, device=self.device)
         # self.adj_syn_init = adj_init
 
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
@@ -177,25 +177,11 @@ class SFGC(GCondBase):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(
                 f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {syn_lr.item():.4f}")
-            if verbose and (it + 1) % 100 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it + 1, total_loss.item()))
 
             if it + 1 in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
-                    feat_syn.shape[0]), feat_syn.detach(), self.labels_syn.detach()
-                res = []
-                for i in range(3):
-                    res.append(self.test_with_val(verbose=False, setting=args.setting))
-
-                res = np.array(res)
-                current_val = res.mean()
-                if verbose:
-                    print('Val Accuracy and Std:',
-                          repr([current_val, res.std()]))
-
-                if current_val > best_val:
-                    best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+                    feat_syn.shape[0]), feat_syn.detach(), labels_syn.detach()
+                best_val = self.intermediate_evaluation(best_val, total_loss.item())
 
             for _ in student_params:
                 del _

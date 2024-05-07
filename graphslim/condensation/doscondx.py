@@ -51,23 +51,9 @@ class DosCondX(GCondBase):
                 self.optimizer_feat.step()
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and (it + 1) % 100 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
-
             if it + 1 in args.checkpoints:
-                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), feat_syn.detach(), labels_syn.detach()
-                res = []
-                for i in range(3):
-                    res.append(self.test_with_val(verbose=False, setting=args.setting))
-
-                res = np.array(res)
-                current_val = res.mean()
-                if verbose:
-                    print('Val Accuracy and Std:',
-                          repr([current_val, res.std()]))
-
-                if current_val > best_val:
-                    best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+                data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
+                    self.feat_syn.shape[0]).detach(), self.feat_syn.detach(), labels_syn.detach()
+                best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data

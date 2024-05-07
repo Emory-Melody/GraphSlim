@@ -110,23 +110,10 @@ class MSGC(GCondBase):
             adj_t_syns.append(adj_t_syn)
             if it + 1 in args.checkpoints:
                 loss_window = sum(losses.data) / len(losses.data)
-                print(f'average window loss: {loss_window}')
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
                 data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
-                res = []
-                for i in range(3):
-                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
-
-                res = np.array(res)
-                current_val = res.mean()
-                if verbose:
-                    print('Val Accuracy and Std:',
-                          repr([current_val, res.std()]))
-
-                if current_val > best_val:
-                    best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
+                best_val = self.intermediate_evaluation(best_val, loss_window)
 
         return data
 

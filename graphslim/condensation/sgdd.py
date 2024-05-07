@@ -8,34 +8,23 @@ from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation import *
 from graphslim.models import *
 from graphslim.utils import *
+from tqdm import trange
 
 
 class SGDD(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
-        # super(SGDD, self).__init__(setting, data, args, **kwargs)
-        self.data = data
-        self.args = args
-        self.device = args.device
-        self.setting = setting
+        super(SGDD, self).__init__(setting, data, args, **kwargs)
 
-        self.data.labels_syn = self.generate_labels_syn(data)
-        self.nnodes_syn = len(self.data.labels_syn)
-        self.d = data.feat_train.shape[1]
-
-        print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
-        print(f'actual reduced size:{self.nnodes_syn}')
-
-        self.feat_syn = nn.Parameter(torch.FloatTensor(self.nnodes_syn, self.d).to(self.device))
         self.pge = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
                         ).to(self.device)
-        self.reset_parameters()
+        # self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
         print('adj_syn:', (self.nnodes_syn, self.nnodes_syn), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
-        # self.pge.reset_parameters()
+        self.pge.reset_parameters()
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -46,18 +35,16 @@ class SGDD(GCondBase):
         else:
             data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
 
-        feat_syn, pge, labels_syn = to_tensor(self.feat_syn, self.pge, label=data.labels_syn, device=self.device)
+        feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
-        syn_class_indices = self.syn_class_indices
-
         # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat(features)
-        self.feat_syn.data.copy_(feat_sub)
+        feat_init = self.init_feat()
+        self.feat_syn.data.copy_(feat_init)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -65,19 +52,9 @@ class SGDD(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        for it in range(args.epochs + 1):
-            # seed_everything(args.seed + it)
-            if args.dataset in ['ogbn-arxiv', 'flickr']:
-                model = SGCRich(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                                dropout=0.0, with_bn=False,
-                                weight_decay=0e-4, nlayers=args.nlayers,
-                                nclass=data.nclass,
-                                device=self.device).to(self.device)
-            else:
-                model = SGC(nfeat=feat_syn.shape[1], nhid=args.hidden,
-                            nclass=data.nclass, dropout=0, weight_decay=0,
-                            nlayers=args.nlayers, with_bn=False,
-                            device=self.device).to(self.device)
+        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden,
+                                          data.nclass, args).to(self.device)
+        for it in trange(args.epochs):
 
             model.initialize()
             model_parameters = list(model.parameters())
@@ -87,36 +64,11 @@ class SGDD(GCondBase):
             for ol in range(outer_loop):
                 adj_syn, opt_loss = self.pge(self.feat_syn, Lx=data.adj_mx)
 
-                adj_syn_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                self.adj_syn = normalize_adj_tensor(adj_syn, sparse=False)
                 # feat_syn_norm = feat_syn
 
                 model = self.check_bn(model)
-
-                loss = torch.tensor(0.0).to(self.device)
-                for c in range(data.nclass):
-                    batch_size, n_id, adjs = data.retrieve_class_sampler(
-                        c, adj, args)
-
-                    if args.nlayers == 1:
-                        adjs = [adjs]
-
-                    adjs = [adj.to(self.device) for adj in adjs]
-                    output = model.forward_sampler(features[n_id], adjs)
-                    loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-
-                    gw_real = torch.autograd.grad(loss_real, model_parameters)
-                    gw_real = list((_.detach().clone() for _ in gw_real))
-                    output_syn = model.forward(feat_syn, adj_syn_norm)
-
-                    ind = syn_class_indices[c]
-                    loss_syn = F.nll_loss(
-                        output_syn[ind[0]: ind[1]],
-                        labels_syn[ind[0]: ind[1]])
-                    gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
-                    coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
-                    loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
-
-                loss_avg += loss.item()
+                loss = self.train_class(model, adj, features, labels, labels_syn, args)
 
                 if args.alpha > 0:
                     loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
@@ -129,6 +81,7 @@ class SGDD(GCondBase):
                     loss_opt = torch.tensor(0)
 
                 loss = loss + loss_reg + loss_opt
+                loss_avg += loss.item()
 
                 # update sythetic graph
                 self.optimizer_feat.zero_grad()
@@ -139,55 +92,23 @@ class SGDD(GCondBase):
                     self.optimizer_pge.step()
                 else:
                     self.optimizer_feat.step()
-                # else:
-                #     if ol < outer_loop // 5:
-                #         self.optimizer_pge.step()
-                #     else:
-                #         self.optimizer_feat.step()
-
-                # if verbose and ol % 5 == 0:
-                #     print('Gradient matching loss:', loss.item())
-                if ol == outer_loop - 1:
-                    # print('loss_reg:', loss_reg.item())
-                    # print('Gradient matching loss:', loss.item())
-                    break
-
-                feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = pge.inference(feat_syn_inner)
+                feat_syn_inner = self.feat_syn.detach()
+                adj_syn_inner = self.pge.inference(feat_syn_inner)
                 adj_syn_inner_norm = normalize_adj_tensor(adj_syn_inner, sparse=False)
-
                 feat_syn_inner_norm = feat_syn_inner
                 for j in range(inner_loop):
                     optimizer_model.zero_grad()
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
                     loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
                     loss_syn_inner.backward()
-                    # print(loss_syn_inner.item())
-                    optimizer_model.step()  # update gnn param
+                    optimizer_model.step()
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and it % 10 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it, loss_avg))
 
-            eval_epochs = [50, 100, 200, 300, 400, 500, 600, 800, 1000, 1200, 1600, 2000, 3000, 4000, 5000]
-            # if it == 0:
-
-            if it in eval_epochs:
-                # if verbose and (it+1) % 50 == 0:
-                data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), feat_syn_inner.detach(), labels_syn.detach()
-                res = []
-                for i in range(3):
-                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
-
-                res = np.array(res)
-                current_val = res.mean()
-                if verbose:
-                    print('Val Accuracy and Std:',
-                          repr([current_val, res.std()]))
-
-                if current_val > best_val:
-                    best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
+            if it + 1 in args.checkpoints:
+                self.adj_syn = adj_syn_inner
+                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
+                best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data
 

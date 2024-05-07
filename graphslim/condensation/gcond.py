@@ -68,27 +68,13 @@ class GCond(GCondBase):
                     output_syn_inner = model.forward(feat_syn_inner_norm, adj_syn_inner_norm)
                     loss_syn_inner = F.nll_loss(output_syn_inner, labels_syn)
                     loss_syn_inner.backward()
-                    # print(loss_syn_inner.item())
-                    optimizer_model.step()  # update gnn param
+                    optimizer_model.step()
 
             loss_avg /= (data.nclass * outer_loop)
-            if verbose and (it + 1) % 100 == 0:
-                print('Epoch {}, loss_avg: {}'.format(it + 1, loss_avg))
 
             if it + 1 in args.checkpoints:
-                data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_inner.detach(), self.feat_syn.detach(), labels_syn.detach()
-                res = []
-                for i in range(3):
-                    res.append(self.test_with_val(verbose=verbose, setting=args.setting))
-
-                res = np.array(res)
-                current_val = res.mean()
-                if verbose:
-                    print('Val Accuracy and Std:',
-                          repr([current_val, res.std()]))
-
-                if current_val > best_val:
-                    best_val = current_val
-                    save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+                self.adj_syn = adj_syn_inner
+                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
+                best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data
