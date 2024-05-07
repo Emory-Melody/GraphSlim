@@ -1,8 +1,6 @@
 {
-  "lr": 1e-2,
   "lr_student": 0.2,
-  "lr_feat": 0.005,
-  "lr_adj": 0.005,
+  "lr_feat": 0.01,
   "lr_teacher": 0.001,
   "wd_teacher": 0,
   "teacher_epochs": 1000,

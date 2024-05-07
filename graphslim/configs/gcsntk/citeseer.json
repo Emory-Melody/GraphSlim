@@ -1,10 +1,10 @@
 {
-  "lr": 0.01,
+  "lr": 0.001,
   "ridge": 1e0,
-  "epochs": 200,
   "K": 2,
   "L": 2,
   "adj": false,
   "k": 2,
-  "scale": "average"
+  "scale": "average",
+  "epochs": 2000
 }

@@ -7,19 +7,18 @@ from torch.nn import functional as F
 
 from graphslim.condensation.utils import normalize_data, GCF
 from graphslim.condensation.utils import sub_E, update_E
+from graphslim.condensation.gcond_base import GCondBase
 from graphslim.dataset import FlickrDataLoader
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import StructureBasedNeuralTangentKernel, KernelRidgeRegression
+from tqdm import trange
 from graphslim.utils import seed_everything
 
 
-class GCSNTK:
+class GCSNTK(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
-        self.data = data
-        self.args = args
-        self.setting = setting
-        self.device = args.device
+        super(GCSNTK, self).__init__(setting, data, args, **kwargs)
         self.k = args.k
         self.K = args.K
         self.ridge = args.ridge
@@ -52,7 +51,7 @@ class GCSNTK:
 
         loss = loss.item()
 
-        print(f"Training loss: {loss:>7f} Training Acc: {acc:>7f}", end=' ')
+        # print(f"Training loss: {loss:>7f} Training Acc: {acc:>7f}", end=' ')
         return G_s, y_s, loss, acc * 100
 
     def test(self, KRR, G_t, G_s, y_t, y_s, E_t, E_s, loss_fn):
@@ -63,12 +62,12 @@ class GCSNTK:
             test_loss += loss_fn(pred, y_t).item()
             correct += (pred.argmax(1) == y_t.argmax(1)).type(torch.float).sum().item()
         correct /= size
-        print(f"Test Acc: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f}", end='\n')
+        print(f"Val Acc: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f}", end='\n')
         return test_loss, correct * 100
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
-
+        args = self.args
         edge_index = data.edge_index
         n_class = len(torch.unique(data.y))
         n, dim = data.x.shape
@@ -77,32 +76,28 @@ class GCSNTK:
         adj = torch.tensor(adj)
         adj = adj + torch.eye(adj.shape[0])
 
-        idx_train, _, idx_test = data.idx_train, data.idx_val, data.idx_test
-        y_train, _, y_test = data.labels_train, data.labels_val, data.labels_test
+        idx_train, idx_val, idx_test = data.idx_train, data.idx_val, data.idx_test
+        y_train, y_val, y_test = data.labels_train, data.labels_val, data.labels_test
         y_one_hot = F.one_hot(data.y, n_class)
         y_train_one_hot = y_one_hot[data.train_mask]
-        # y_val_one_hot = y_one_hot[data.val_mask]
-        y_test_one_hot = y_one_hot[data.test_mask]
+        y_test_one_hot = y_one_hot[data.val_mask]
+        # y_test_one_hot = y_one_hot[data.test_mask]
         x = normalize_data(data.x)
         x = GCF(adj, x, self.k)
-        x_train, _, x_test = x[data.train_mask], x[data.val_mask], x[data.test_mask]
+        x_train, _, x_test = x[data.train_mask], x[data.val_mask], x[data.val_mask]
 
         n_train = len(y_train)
         Cond_size = round(n_train * self.args.reduction_rate)
         idx_s = torch.tensor(range(Cond_size))
 
-        seed_everything(self.args.seed)
-
         E_train = sub_E(idx_train, adj)
-        E_test = sub_E(idx_test, adj)
+        E_test = sub_E(idx_val, adj)
 
         SNTK = StructureBasedNeuralTangentKernel(K=self.K, L=self.L, scale=self.scale).to(self.device)
         ridge = torch.tensor(self.ridge).to(self.device)
         KRR = KernelRidgeRegression(SNTK.nodes_gram, ridge).to(self.device)
         MSEloss = nn.MSELoss().to(self.device)
 
-        adj = adj.to(self.device)
-        x = x.to(self.device)
         x_train = x_train.to(self.device)
         x_test = x_test.to(self.device)
         E_test = E_test.to(self.device)
@@ -111,55 +106,34 @@ class GCSNTK:
         y_train_one_hot = y_train_one_hot.to(self.device)
         y_test_one_hot = y_test_one_hot.to(self.device)
 
-        print(f"Dataset       :{self.args.dataset}")
-        print(f"Training Set  :{len(y_train)}")
-        print(f"Testing Set   :{len(y_test)}")
-        print(f"Classes       :{n_class}")
-        print(f"Dim           :{dim}")
-        print(f"Number        :{n}")
-        print(f"Epochs        :{self.args.epochs}")
-        print(f"Learning rate :{self.args.lr}")
-        print(f"Conden ratio  :{self.args.reduction_rate}")
-        print(f"Ridge         :{self.ridge}")
+        x_s = torch.rand(Cond_size, dim).to(self.device)
+        y_s = torch.rand(Cond_size, n_class).to(self.device)
+        if self.args.adj:
+            feat = x_s.data
+            E_s = update_E(feat, 4)
+        else:
+            E_s = torch.sparse_coo_tensor(torch.stack([idx_s, idx_s], dim=0), torch.ones(Cond_size),
+                                          torch.Size([Cond_size, Cond_size])).to(x_s.device)
 
-        Acc = torch.zeros(self.args.epochs, 1).to(self.device)
-        for iter in range(1):
-            print('--------------------------------------------------')
-            print('The ' + str(iter + 1) + 'th Iteration:')
-            print('--------------------------------------------------')
+        x_s.requires_grad = True
+        y_s.requires_grad = True
+        optimizer = torch.optim.Adam([x_s, y_s], lr=self.args.lr)
 
-            x_s = torch.rand(Cond_size, dim).to(self.device)
-            y_s = torch.rand(Cond_size, n_class).to(self.device)
-            if self.args.adj:
-                feat = x_s.data
-                E_s = update_E(feat, 4)
-            else:
-                E_s = torch.sparse_coo_tensor(torch.stack([idx_s, idx_s], dim=0), torch.ones(Cond_size),
-                                              torch.Size([Cond_size, Cond_size])).to(x_s.device)
+        best_val = 0
+        for epoch in trange(args.epochs):
+            x_s, y_s, training_loss, training_acc = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, E_train,
+                                                               E_s, MSEloss, optimizer)
 
-            x_s.requires_grad = True
-            y_s.requires_grad = True
-            optimizer = torch.optim.Adam([x_s, y_s], lr=self.args.lr)
-
-            for epoch in range(self.args.epochs):
-                print(f"Epoch {epoch + 1}", end=" ")
-                x_s, y_s, training_loss, training_acc = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, E_train,
-                                                                   E_s, MSEloss, optimizer)
-
-                test_loss, test_acc = self.test(KRR, x_test, x_s, y_test_one_hot, y_s, E_test, E_s, MSEloss)
-                Acc[epoch, iter] = test_acc
-
-        Acc_mean, Acc_std = torch.mean(Acc, dim=1), torch.std(Acc, dim=1)
-
-        print('Mean and std of test data : {:.4f}, {:.4f}'.format(Acc_mean[-1], Acc_std[-1]))
-        print("--------------- Train Done! ----------------")
-
-        # y_s = torch.argmax(y_s, dim=1)
-        data.adj_syn, data.feat_syn, data.labels_syn = E_s.detach().to_dense(), x_s.detach(), y_s.detach()
-
-        save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, self.args)
-
-        print("--------------- Save Done! ----------------")
+            if epoch + 1 in args.checkpoints:
+                # y_long = torch.argmax(y_s, dim=1)
+                data.adj_syn, data.feat_syn, data.labels_syn = E_s.detach().to_dense(), x_s.detach(), y_s.detach()
+                best_val = self.intermediate_evaluation(best_val, training_loss)
+                # val_loss, val_acc = self.test(KRR, x_test, x_s, y_test_one_hot, y_s, E_test, E_s, MSEloss)
+                # if val_acc > best_val:
+                #     best_val = val_acc
+                #     y_long = torch.argmax(y_s, dim=1)
+                #     data.adj_syn, data.feat_syn, data.labels_syn = E_s.detach().to_dense(), x_s.detach(), y_long.detach()
+                #     save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, self.args, best_val)
 
         return data
 
@@ -168,7 +142,7 @@ class GCSNTK:
         print("begin load")
         train_loader = FlickrDataLoader(name=self.args.dataset, split='train', batch_size=self.args.batch_size,
                                         split_method='kmeans')
-        test_loader = FlickrDataLoader(name=self.args.dataset, split='test', batch_size=self.args.batch_size,
+        test_loader = FlickrDataLoader(name=self.args.dataset, split='val', batch_size=self.args.batch_size,
                                        split_method='kmeans')
         TRAIN_K, n_train, n_class, dim, n = train_loader.properties()
         test_k, n_test, _, _, _ = test_loader.properties()
@@ -182,19 +156,6 @@ class GCSNTK:
         ridge = torch.tensor(self.ridge).to(self.device)
         kernel = SNTK.nodes_gram
         KRR = KernelRidgeRegression(kernel, ridge).to(self.device)
-
-        print(f"Dataset       :{self.args.dataset}")
-        print(f"Number        :{n}")
-        print(f"Training Set  :{n_train}")
-        print(f"Testing Set   :{n_test}")
-        print(f"Classes       :{n_class}")
-        print(f"Dim           :{dim}")
-        print(f"Epochs        :{self.args.epochs_train}")
-        print(f"Learning rate :{self.args.lr}")
-        print(f"Conden size   :{Cond_size}")
-        print(f"Ridge         :{self.ridge}")
-        print(f"Num of batches:{TRAIN_K}")
-        print(f"Iterations    :{1}")
 
         results = torch.zeros(self.args.epochs_train, 1)
         for iter in range(1):

@@ -17,19 +17,20 @@ from tqdm import trange
 class SFGC(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
         super(SFGC, self).__init__(setting, data, args, **kwargs)
+        assert args.teacher_epochs + 100 >= args.expert_epochs
+        args.condense_model = 'GCN'
+        args.init = 'kcenter'
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
-        assert args.teacher_epochs + 100 >= args.expert_epochs
-        args.condense_model = 'GCN'
-        args.init = 'kcenter'
+
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 100  # 200
+            args.num_experts = 200  # 200
             if not os.path.exists(buf_dir):
                 os.mkdir(buf_dir)
 
@@ -42,7 +43,6 @@ class SFGC(GCondBase):
             device = args.device
 
             trajectories = []
-
             model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
             for it in trange(args.num_experts):
 
@@ -50,7 +50,7 @@ class SFGC(GCondBase):
 
                 model_parameters = list(model.parameters())
 
-                optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr, weight_decay=args.weight_decay)
+                optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr_teacher, weight_decay=args.wd_teacher)
 
                 timestamps = []
 
@@ -89,7 +89,6 @@ class SFGC(GCondBase):
 
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
-        # args.lr_student
         syn_lr = torch.tensor(args.lr_student).float()
         syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
         optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
@@ -114,7 +113,6 @@ class SFGC(GCondBase):
                 if file_idx == len(expert_files):
                     file_idx = 0
                     random.shuffle(expert_files)
-                # print("loading file {}".format(expert_files[file_idx]))
                 del self.buffer
                 self.buffer = torch.load(expert_files[file_idx])
                 random.shuffle(self.buffer)
@@ -133,7 +131,8 @@ class SFGC(GCondBase):
                 torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
 
             starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
-
+            print('it:{}--feat_max = {:.4f}, feat_min = {:.4f}'.format(it, torch.max(self.feat_syn),
+                                                                       torch.min(self.feat_syn)))
             param_loss_list = []
             param_dist_list = []
 
@@ -149,7 +148,7 @@ class SFGC(GCondBase):
             for step in range(args.syn_steps):
                 forward_params = student_params[-1]
                 output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
-                loss_syn = F.nll_loss(output_syn, self.labels_syn)
+                loss_syn = F.nll_loss(output_syn, labels_syn)
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
                 student_params.append(student_params[-1] - syn_lr * grad)
 
@@ -194,7 +193,7 @@ class SFGC(GCondBase):
         '''
 
         expert_files = []
-        n = 0
+        n = 1
         while os.path.exists(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n))):
             expert_files.append(os.path.join(expert_dir, "replay_buffer_{}.pt".format(n)))
             n += 1

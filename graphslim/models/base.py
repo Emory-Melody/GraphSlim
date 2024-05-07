@@ -114,7 +114,7 @@ class BaseGNN(nn.Module):
             self.multi_label = True
             self.loss = torch.nn.BCELoss()
         elif len(labels.shape) > 1:  # for GCSNTK, use MSE for training
-            print("MSE loss")
+            # print("MSE loss")
             self.float_label = True
             self.loss = torch.nn.MSELoss()
         else:

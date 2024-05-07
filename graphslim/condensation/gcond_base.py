@@ -32,11 +32,11 @@ class GCondBase:
         # from collections import Counter; print(Counter(data.labels_train))
 
         self.feat_syn = nn.Parameter(torch.empty(n, d).to(self.device))
-        if args.method not in ['sgdd']:
+        if args.method not in ['sgdd', 'gcsntk']:
             self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
             self.adj_syn = None
 
-            # self.reset_parameters()
+            self.reset_parameters()
             self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
             self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
             print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
@@ -198,7 +198,7 @@ class GCondBase:
 
         if current_val > best_val:
             best_val = current_val
-            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
         return best_val
 
     def test_with_val(self, verbose=False, setting='trans'):

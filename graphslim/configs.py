@@ -29,7 +29,7 @@ def setting_config(args):
         args.setting = 'ind'
     args.pre_norm = True
     args.hidden = 256
-    args.checkpoints = range(0, args.epochs + 1, 100)
+    args.checkpoints = range(0, args.epochs + 1, 1)
     args.eval_hidden = 256
     args.eval_epochs = 600
     args.eval_model = 'GCN'

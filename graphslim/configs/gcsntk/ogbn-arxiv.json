@@ -6,5 +6,6 @@
   "L": 1,
   "k": 1,
   "adj": false,
-  "scale": "add"
+  "scale": "add",
+  "accumulate_steps": 10
 }
