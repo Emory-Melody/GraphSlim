@@ -23,14 +23,14 @@ class BaseGNN(nn.Module):
         self.device = args.device
         self.layers = nn.ModuleList([])
 
-        if mode == 'eval':
-            self.nlayers = 2
-            self.dropout = 0
-            self.weight_decay = 5e-4
-        if mode == 'cross':
-            self.nlayers = 2
-            self.dropout = 0.5
-            self.weight_decay = 0
+        # if mode == 'eval':
+        #     self.nlayers = 2
+        #     self.dropout = 0
+        #     self.weight_decay = 5e-4
+        # if mode == 'cross':
+        #     self.nlayers = 2
+        #     self.dropout = 0.5
+        #     self.weight_decay = 0
         self.output = None
         self.best_model = None
         self.best_output = None
