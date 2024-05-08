@@ -78,6 +78,22 @@ class GCondBase:
         reduced_data = agent.reduce(self.data, verbose=False, save=False)
         return reduced_data.feat_syn
 
+    def init_by_coreset(self):
+        args = self.args
+        if args.init == 'clustering':
+            agent = Cluster(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'averaging':
+            agent = Average(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'kcenter':
+            agent = KCenter(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'Herding':
+            agent = Herding(setting=args.setting, data=self.data, args=args)
+        else:
+            agent = Random(setting=args.setting, data=self.data, args=args)
+
+        reduced_data = agent.reduce(self.data, verbose=False, save=False)
+        return reduced_data
+
     def train_class(self, model, adj, features, labels, labels_syn, args):
         data = self.data
         feat_syn = self.feat_syn

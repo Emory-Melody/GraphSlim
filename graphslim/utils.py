@@ -361,7 +361,6 @@ def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
 
     return edge_index, edge_weight
 
-
 def normalize_adj_tensor(adj, sparse=False):
     """Normalize adjacency tensor matrix.
     """

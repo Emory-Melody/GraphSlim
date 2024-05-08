@@ -88,7 +88,7 @@ def method_config(args):
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
-                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk',
+                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk', 'geom',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
 @click.option('--activation', default='relu', help='activation function when do NAS',
               type=click.Choice(
@@ -117,6 +117,7 @@ def cli(ctx, **kwargs):
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
         # print("device:", args.device)
+        print("seed: ", args.seed)
         seed_everything(args.seed)
         path = "checkpoints/"
         if not os.path.isdir(path):

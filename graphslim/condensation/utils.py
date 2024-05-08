@@ -1,4 +1,6 @@
 from graphslim.utils import *
+import torch_geometric
+import math
 
 def match_loss(gw_syn, gw_real, args, device):
     dis = torch.tensor(0.0).to(device)
@@ -152,13 +154,11 @@ def GCF(adj, x, k=1):
 
 
 # geom
-
-
-def neighborhood_difficulty_measurer(data, adj, label, args):
+def neighborhood_difficulty_measurer(data, adj, label):
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
-    neighbor_label, _ = add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
+    neighbor_label, _ = torch_geometric.utils.add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
 
     neighbor_label[1] = label[neighbor_label[1]]  # [[1, 1, 1, 1],[40, 20, 19, 21]]
 
@@ -174,24 +174,58 @@ def neighborhood_difficulty_measurer(data, adj, label, args):
     neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
     local_difficulty = neighbor_entropy.sum(1)
 
-    return local_difficulty.to(args.device)
+    return local_difficulty
 
 
-def difficulty_measurer(data, adj, label, args):
-    local_difficulty = neighborhood_difficulty_measurer(data, adj, label, args)
+def difficulty_measurer(data, adj, label):
+    local_difficulty = neighborhood_difficulty_measurer(data, adj, label)
     # global_difficulty = feature_difficulty_measurer(data, label, embedding)
     node_difficulty = local_difficulty
     return node_difficulty
 
 
-def sort_training_nodes(data, adj, label, args):
-    node_difficulty = difficulty_measurer(data, adj, label, args)
+def sort_training_nodes(data, adj, label):
+    node_difficulty = difficulty_measurer(data, adj, label)
     _, indices = torch.sort(node_difficulty)
     indices = indices.cpu().numpy()
-
     sorted_trainset = data.idx_train[indices]
     return sorted_trainset
 
+
+def neighborhood_difficulty_measurer_in(data, adj, label):
+    edge_index = adj.coalesce().indices()
+    edge_value = adj.coalesce().values()
+
+    neighbor_label, _ = torch_geometric.utils.add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
+
+    neighbor_label[1] = label[neighbor_label[1]]  # [[1, 1, 1, 1],[40, 20, 19, 21]]
+
+    neighbor_label = torch.transpose(neighbor_label, 0, 1)  # [[1, 40], [1, 20], [1, 19], [1, 21]]
+
+    index, count = torch.unique(neighbor_label, sorted=True, return_counts=True, dim=0)
+
+    neighbor_class = torch.sparse_coo_tensor(index.T, count)
+    neighbor_class = neighbor_class.to_dense().float()
+
+    neighbor_class = F.normalize(neighbor_class, 1.0, 1)
+    neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
+    local_difficulty = neighbor_entropy.sum(1)
+
+    return local_difficulty
+
+
+def difficulty_measurer_in(data, adj, label):
+    local_difficulty = neighborhood_difficulty_measurer_in(data, adj, label)
+    # global_difficulty = feature_difficulty_measurer(data, label, embedding)
+    node_difficulty = local_difficulty
+    return node_difficulty
+
+
+def sort_training_nodes_in(data, adj, label):
+    node_difficulty = difficulty_measurer_in(data, adj, label)
+    _, indices = torch.sort(node_difficulty)
+    indices = indices.cpu().numpy()
+    return indices
 
 def training_scheduler(lam, t, T, scheduler='geom'):
     if scheduler == 'linear':
