@@ -26,7 +26,7 @@ class VNG:
         cpu_data = copy.deepcopy(data)
 
         if args.setting == 'trans':
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode='eval').to(
                 self.device)
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                                setting=args.setting, reduced=False)
@@ -37,7 +37,7 @@ class VNG:
             coarsen_edge, coarsen_features, coarsen_labels = self.vng(embeds, data.adj_train, labels)
 
         else:
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+            model = eval(args.eval_model)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode='eval').to(
                 self.device)
 
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,

@@ -209,7 +209,7 @@ class GCondBase:
 
         args, data, device = self.args, self.data, self.device
 
-        model = GCN(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(device)
+        model = GCN(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(device)
 
         acc_val = model.fit_with_val(data,
                                      train_iters=600, normadj=True, verbose=False,

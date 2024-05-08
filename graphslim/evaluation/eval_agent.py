@@ -2,6 +2,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from tqdm import trange
+from sklearn.model_selection import ParameterGrid
 
 from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
@@ -29,6 +30,7 @@ class Evaluator:
     #
     def sparsify(self, model_type, adj_syn, verbose=True):
         args = self.args
+        threshold = 0
         if model_type == 'MLP':
             adj_syn = adj_syn - adj_syn
             torch.diagonal(adj_syn).fill_(1)
@@ -78,6 +80,45 @@ class Evaluator:
 
         return feat_syn, adj_syn, labels_syn
 
+    def grid_search(self, data, model_type, param_grid):
+        args = self.args
+        best_result = None
+        best_params = None
+        for params in ParameterGrid(param_grid):
+            for key, value in params.items():
+                setattr(args, key, value)
+
+            res = []
+            for i in range(args.run_evaluation):
+                seed_everything(args.seed + i)
+                res.append(self.test(data, model_type=model_type, verbose=args.verbose, reduced=True, mode='eval'))
+            res = np.array(res)
+            res_mean, res_std = res.mean(), res.std()
+            print(f'{model_type} Test with params {params}: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
+
+            if best_result is None or res_mean > best_result:
+                best_result = res_mean
+                best_params = params
+
+        print(f'Best {model_type} Result: {100 * best_result:.2f} with params {best_params}')
+
+    def train_cross(self, data):
+        args = self.args
+        args.valid_result = 0
+        for model_type in ['GAT']:  #
+            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                             verbose=args.verbose)
+        gs_params = {
+            'GraphSage': {'hidden': [64, 128, 256], 'lr': [0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5, 0.7]},
+            'GAT': {'hidden': [64, 128], 'lr': [0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
+                    'dropout': [0.0, 0.5, 0.7]}
+        }
+
+        for model_type in ['GAT']:
+            print(f'Starting Grid Search for {model_type}')
+        self.grid_search(data, model_type, gs_params[model_type])
+
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
 
@@ -92,8 +133,8 @@ class Evaluator:
             adj_test = data.adj_test
             adj_full = data.adj_full
 
-        assert not (args.method not in ['msgc'] and model_type == 'GAT' and is_identity(data.adj_syn, args.device))
-        model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode=mode).to(
+        # assert not (args.method not in ['msgc'] and model_type == 'GAT')
+        model = eval(model_type)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
         eval_epochs = 600
         model.fit_with_val(data, train_iters=eval_epochs, normadj=True, verbose=verbose,
@@ -127,23 +168,23 @@ class Evaluator:
 
         return res[0]
 
-    def train_cross(self, data):
-        args = self.args
-        args.valid_result = 0
-        for model_type in ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']:  #
-            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
-                                                                             verbose=args.verbose)
-            if args.verbose:
-                run_evaluation = trange(args.run_evaluation)
-            else:
-                run_evaluation = range(args.run_evaluation)
-            res = []
-            for i in run_evaluation:
-                seed_everything(args.seed + i)
-                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
-            res = np.array(res)
-            res_mean, res_std = res.mean(), res.std()
-            print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
+    # def train_cross(self, data):
+    #     args = self.args
+    #     args.valid_result = 0
+    #     for model_type in ['GAT']:  #
+    #         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+    #                                                                          verbose=args.verbose)
+    #         if args.verbose:
+    #             run_evaluation = trange(args.run_evaluation)
+    #         else:
+    #             run_evaluation = range(args.run_evaluation)
+    #         res = []
+    #         for i in run_evaluation:
+    #             seed_everything(args.seed + i)
+    #             res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='eval'))
+    #         res = np.array(res)
+    #         res_mean, res_std = res.mean(), res.std()
+    #         print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
     def evaluate(self, data, model_type, verbose=True, reduced=True):
         args = self.args
@@ -178,7 +219,7 @@ class Evaluator:
         else:
             run_evaluation = range(args.run_evaluation)
         for i in run_evaluation:
-            model = eval(model_type)(data.feat_syn.shape[1], args.eval_hidden, data.nclass, args, mode='eval').to(
+            model = eval(model_type)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(
                 self.device)
             best_acc_val = model.fit_with_val(data,
                                               train_iters=args.eval_epochs,

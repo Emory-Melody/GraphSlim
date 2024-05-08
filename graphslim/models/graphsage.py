@@ -54,6 +54,10 @@ class GraphSage(BaseGNN):
         if len(data.labels_full.shape) > 1:
             self.multi_label = True
             self.loss = torch.nn.BCELoss()
+        elif len(labels.shape) > 1:  # for GCSNTK, use MSE for training
+            # print("MSE loss")
+            self.float_label = True
+            self.loss = torch.nn.MSELoss()
         else:
             self.multi_label = False
             self.loss = F.nll_loss
@@ -105,10 +109,10 @@ class GraphSage(BaseGNN):
             self.train()
 
             for batch_size, n_id, adjs in train_loader:
-                adjs = [adj.to(self.device) for adj in adjs]
+                adjs = [adj[0].to(self.device) for adj in adjs]
                 optimizer.zero_grad()
-                out = self.forward_sampler(features[n_id], adjs)
-                loss_train = F.nll_loss(out, labels[n_id[:batch_size]])
+                out = self.forward(features[n_id], adjs)
+                loss_train = self.loss(out, labels[n_id[:batch_size]])
                 loss_train.backward()
                 optimizer.step()
 

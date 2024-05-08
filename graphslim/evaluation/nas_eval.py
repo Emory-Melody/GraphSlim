@@ -34,6 +34,7 @@ def load_pkl(file_path):
         data = pkl.load(f)
     return data
 
+
 class NasEvaluator:
     def __init__(self, args):
         self.args = args
@@ -53,14 +54,13 @@ class NasEvaluator:
 
         self.parameter_combinations = list(product(ks, nhids, alphas, activations))
 
-
     def evaluate_ori(self, data):
         # train and eval model architecture
         best_acc_val_syn, best_acc_val_ori = 0, 0
         for params in tqdm(self.parameter_combinations):
             args = self.args
             args.run_evaluation = 1
-            args.nlayers, args.eval_hidden, args.alpha, args.activation = params
+            args.nlayers, args.hidden, args.alpha, args.activation = params
 
             evaluator = Evaluator(args)
             acc_val_ori, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=False, verbose=False)
@@ -88,7 +88,7 @@ class NasEvaluator:
         for params in tqdm(self.parameter_combinations):
             args = self.args
             args.run_evaluation = 1
-            args.nlayers, args.eval_hidden, args.alpha, args.activation = params
+            args.nlayers, args.hidden, args.alpha, args.activation = params
 
             evaluator = Evaluator(args)
             acc_val_syn, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=True, verbose=False)
@@ -110,7 +110,7 @@ class NasEvaluator:
         print("best_params_ori", self.best_params_ori)
         args = self.args
         args.run_evaluation = 10
-        args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_ori
+        args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_ori
         evaluator = Evaluator(args)
         acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         print("NAS: test accuracy on ori graph:", acc_test_ori)
@@ -122,7 +122,7 @@ class NasEvaluator:
         print("best_params_syn", self.best_params_syn)
         args = self.args
         args.run_evaluation = 10
-        args.nlayers, args.eval_hidden, args.alpha, args.activation = self.best_params_syn
+        args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_syn
         evaluator = Evaluator(args)
         acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         print("NAS: test accuracy on syn graph:", acc_test_syn)

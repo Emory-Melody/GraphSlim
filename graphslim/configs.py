@@ -30,10 +30,8 @@ def setting_config(args):
     args.pre_norm = True
     args.hidden = 256
     args.checkpoints = range(0, args.epochs + 1, 100)
-    args.eval_hidden = 256
-    args.eval_epochs = 600
+    args.eval_epochs = 1000
     args.eval_model = 'GCN'
-    args.lr_test = 1e-2
     return args
 
 
@@ -57,10 +55,9 @@ def method_config(args):
 @click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
-@click.option('--run_evaluation', default=10, show_default=True)
+@click.option('--run_evaluation', default=3, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
-@click.option('--eval_hidden', '--eh', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=600, show_default=True)
 @click.option('--eval_model', default='GCN',
               type=click.Choice(
@@ -80,7 +77,7 @@ def method_config(args):
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
-@click.option('--seed', default=2, help='Random seed.', show_default=True)
+@click.option('--seed', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--init', default='random', help='initialization synthetic features',
@@ -101,7 +98,6 @@ def method_config(args):
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
-@click.option('--lr_test', default=1e-2, show_default=True)
 @click.option('--threshold', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')
