@@ -95,7 +95,7 @@ class SFGC(GCondBase):
 
         best_val = 0
 
-        bar = trange(args.epochs)
+        bar = trange(args.epochs, ncols=80)
         for it in bar:
             model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
 

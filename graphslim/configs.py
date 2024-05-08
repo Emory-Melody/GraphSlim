@@ -29,7 +29,7 @@ def setting_config(args):
         args.setting = 'ind'
     args.pre_norm = True
     args.hidden = 256
-    args.checkpoints = range(0, args.epochs + 1, 1)
+    args.checkpoints = range(0, args.epochs + 1, 100)
     args.eval_hidden = 256
     args.eval_epochs = 600
     args.eval_model = 'GCN'
@@ -44,21 +44,7 @@ def method_config(args):
         update_from_dict(args, conf_dt)
     except:
         print('No config file found or error in json format.')
-    # little patch for configs
-    # if args.method in ['sfgc']:
-    #     args.epochs = 2000
     if args.method in ['msgc']:
-        # batch_dt = {
-        #     0.1: 32,
-        #     0.25: 16,
-        #     0.5: 1,
-        #     0.001: 16,
-        #     0.005: 8,
-        #     0.01: 1,
-        #     0.0005: 32,
-        #     0.002: 1
-        # }
-        # args.batch_adj = batch_dt[args.reduction_rate]
         args.batch_adj = 16
         # add temporary changes here
         # do not modify the config json
@@ -94,7 +80,7 @@ def method_config(args):
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
-@click.option('--seed', default=1, help='Random seed.', show_default=True)
+@click.option('--seed', default=2, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--init', default='random', help='initialization synthetic features',

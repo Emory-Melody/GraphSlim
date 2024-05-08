@@ -45,10 +45,12 @@ class SGC(BaseGNN):
         for i in range(self.nlayers):
             if type(adj) == torch.Tensor:
                 x = adj @ x
+            elif isinstance(adj, list):
+                x = torch_sparse.matmul(adj[i], x)
             else:
                 x = torch_sparse.matmul(adj, x)
 
-        x = x.reshape(-1, x.shape[-1])
+        x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):

@@ -63,28 +63,6 @@ class GAT(BaseGNN):
         x = self.conv2(x, adj)
         return F.log_softmax(x, dim=1)
 
-    def forward_sampler(self, x, adjs):
-        raise NotImplementedError
-        # for ix, (adj, _, size) in enumerate(adjs):
-        #     x = F.dropout(x, self.dropout, training=self.training)
-        #     if ix != len(self.layers) - 1:
-        #         x = F.elu(x)
-        #     x = self.layers[ix](x, adj)
-        #
-        # x.view(-1, x.shape[-1])
-        # x = x[:adjs[-1][2][1]]
-        # return F.log_softmax(x, dim=1)
-
-    def forward_syn(self, x, adjs):
-        raise NotImplementedError
-        # for ix, (adj) in enumerate(adjs):
-        #     x = F.dropout(x, self.dropout, training=self.training)
-        #     if ix != len(self.layers) - 1:
-        #         x = F.elu(x)
-        #     x = self.layers[ix](x, adj)
-        #
-        # x.view(-1, x.shape[-1])
-        # return F.log_softmax(x, dim=1)
 # def test_gat(self, nlayers, model_type, verbose=False):
 #     res = []
 #     args = self.args

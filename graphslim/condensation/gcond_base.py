@@ -62,17 +62,6 @@ class GCondBase:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    # def cross_architecture_eval(self):
-    #     args = self.args
-    #     data = self.data
-    #
-    #     if args.dataset in ['cora', 'citeseer']:
-    #         args.epsilon = 0.05
-    #     else:
-    #         args.epsilon = 0.01
-    #
-    #     agent = Evaluator(data, args, device='cuda')
-    #     agent.train_cross()
     def init_feat(self):
         args = self.args
         if args.init == 'clustering':
@@ -93,40 +82,54 @@ class GCondBase:
         data = self.data
         feat_syn = self.feat_syn
         adj_syn_norm = self.adj_syn
-        syn_class_indices = self.syn_class_indices
-        model_parameters = list(model.parameters())
         loss = torch.tensor(0.0).to(self.device)
         for c in range(data.nclass):
             batch_size, n_id, adjs = data.retrieve_class_sampler(
                 c, adj, args)
-            if args.nlayers == 1:
-                adjs = [adjs]
-
-            adjs = [adj.to(self.device) for adj in adjs]
-            output = model.forward_sampler(features[n_id], adjs)
+            adjs = [adj[0].to(self.device) for adj in adjs]
+            output = model(features[n_id], adjs)
             loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-            gw_real = torch.autograd.grad(loss_real, model_parameters)
-            gw_real = list((_.detach().clone() for _ in gw_real))
-            if args.setting == 'ind':
-                ind = syn_class_indices[c]
-                if args.nlayers == 1:
-                    adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
-                else:
-                    adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
-                                        [adj_syn_norm[ind[0]: ind[1]]]
-
-                output_syn = model.forward_syn(feat_syn, adj_syn_norm_list)
-                loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
-            else:
-                output_syn = model.forward(feat_syn, adj_syn_norm)
-                ind = syn_class_indices[c]
-                loss_syn = F.nll_loss(
-                    output_syn[ind[0]: ind[1]],
-                    labels_syn[ind[0]: ind[1]])
-
-            gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
-            coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
-            loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
+            gw_reals = torch.autograd.grad(loss_real, model.parameters())
+            gw_reals = list((_.detach().clone() for _ in gw_reals))
+            # ------------------------------------------------------------------
+            output_syn = model(feat_syn, adj_syn_norm)
+            loss_syn = F.nll_loss(output_syn[labels_syn == c], labels_syn[labels_syn == c])
+            gw_syns = torch.autograd.grad(loss_syn, model.parameters(), create_graph=True)
+            # ------------------------------------------------------------------
+            coeff = self.num_class_dict[c] / self.nnodes_syn
+            ml = match_loss(gw_syns, gw_reals, args, device=self.device)
+            loss += coeff * ml
+        # for c in range(data.nclass):
+        #     batch_size, n_id, adjs = data.retrieve_class_sampler(
+        #         c, adj, args)
+        #     if args.nlayers == 1:
+        #         adjs = [adjs]
+        #
+        #     adjs = [adj.to(self.device) for adj in adjs]
+        #     output = model.forward_sampler(features[n_id], adjs)
+        #     loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
+        #     gw_real = torch.autograd.grad(loss_real, model_parameters)
+        #     gw_real = list((_.detach().clone() for _ in gw_real))
+        #     if args.setting == 'ind':
+        #         ind = syn_class_indices[c]
+        #         if args.nlayers == 1:
+        #             adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
+        #         else:
+        #             adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
+        #                                 [adj_syn_norm[ind[0]: ind[1]]]
+        #
+        #         output_syn = model.forward_syn(feat_syn, adj_syn_norm_list)
+        #         loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
+        #     else:
+        #         output_syn = model.forward(feat_syn, adj_syn_norm)
+        #         ind = syn_class_indices[c]
+        #         loss_syn = F.nll_loss(
+        #             output_syn[ind[0]: ind[1]],
+        #             labels_syn[ind[0]: ind[1]])
+        #
+        #     gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
+        #     coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
+        #     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
         return loss
 

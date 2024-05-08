@@ -48,44 +48,53 @@ class BaseGNN(nn.Module):
 
     def forward(self, x, adj, output_layer_features=False):
         outputs = []
-        for ix, layer in enumerate(self.layers):
-            if output_layer_features:
-                outputs.append(x)
-            x = layer(x, adj)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                if self.with_relu:
+
+        if isinstance(adj, list):
+            for i, layer in enumerate(self.layers):
+                x = layer(x, adj[i])
+                if i != self.nlayers - 1:
+                    x = self.bns[i](x) if self.with_bn else x
                     x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
+                    x = F.dropout(x, self.dropout, training=self.training)
+        else:
+            for ix, layer in enumerate(self.layers):
+                if output_layer_features:
+                    outputs.append(x)
+                x = layer(x, adj)
+                if ix != self.nlayers - 1:
+                    x = self.bns[ix](x) if self.with_bn else x
+                    if self.with_relu:
+                        x = F.relu(x)
+                    x = F.dropout(x, self.dropout, training=self.training)
 
         if output_layer_features:
             return outputs
-        x = x.reshape(-1, x.shape[-1])
+        x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
-    def forward_sampler(self, x, adjs):
-        for ix, (adj, _, size) in enumerate(adjs):
-            x = self.layers[ix](x, adj)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                if self.with_relu:
-                    x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
+    # def forward_sampler(self, x, adjs):
+    #     for ix, (adj, _, size) in enumerate(adjs):
+    #         x = self.layers[ix](x, adj)
+    #         if ix != len(self.layers) - 1:
+    #             x = self.bns[ix](x) if self.with_bn else x
+    #             if self.with_relu:
+    #                 x = F.relu(x)
+    #             x = F.dropout(x, self.dropout, training=self.training)
+    #
+    #     x.view(-1, x.shape[-1])
+    #     return F.log_softmax(x, dim=1)
 
-        x.view(-1, x.shape[-1])
-        return F.log_softmax(x, dim=1)
-
-    def forward_syn(self, x, adjs):
-        for ix, (adj) in enumerate(adjs):
-            x = self.layers[ix](x, adj)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                if self.with_relu:
-                    x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
-
-        x = x.reshape(-1, x.shape[-1])
-        return F.log_softmax(x, dim=1)
+    # def forward_syn(self, x, adjs):
+    #     for ix, (adj) in enumerate(adjs):
+    #         x = self.layers[ix](x, adj)
+    #         if ix != len(self.layers) - 1:
+    #             x = self.bns[ix](x) if self.with_bn else x
+    #             if self.with_relu:
+    #                 x = F.relu(x)
+    #             x = F.dropout(x, self.dropout, training=self.training)
+    #
+    #     x = x.reshape(-1, x.shape[-1])
+    #     return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
                      normadj=True, setting='trans', reduced=False, reindex=False,
@@ -106,7 +115,6 @@ class BaseGNN(nn.Module):
                                                           label2=data.labels_val, device=self.device)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
-
 
         # features = F.normalize(features, p=2, dim=1)
 

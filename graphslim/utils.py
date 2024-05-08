@@ -1,5 +1,6 @@
 import random
 
+import os
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -28,6 +29,7 @@ def seed_everything(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
     # torch.backends.cudnn.deterministic = True
 
 
