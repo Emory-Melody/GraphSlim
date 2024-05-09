@@ -6,11 +6,13 @@ import torch.optim as optim
 from graphslim.utils import *
 
 
+
 class BaseGNN(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, args, mode):
 
         super(BaseGNN, self).__init__()
+        self.args = args
         self.with_bn = args.with_bn
         self.with_relu = True
         self.with_bias = True
@@ -23,10 +25,10 @@ class BaseGNN(nn.Module):
         self.device = args.device
         self.layers = nn.ModuleList([])
 
-        # if mode == 'eval':
-        #     self.nlayers = 2
-        #     self.dropout = 0
-        #     self.weight_decay = 5e-4
+        if mode == 'eval':
+            self.nlayers = 2
+            self.dropout = 0
+            self.weight_decay = 5e-4
         # if mode == 'cross':
         #     self.nlayers = 2
         #     self.dropout = 0.5
@@ -68,6 +70,7 @@ class BaseGNN(nn.Module):
                     x = F.dropout(x, self.dropout, training=self.training)
 
         if output_layer_features:
+            outputs.append(x)
             return outputs
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
@@ -118,13 +121,14 @@ class BaseGNN(nn.Module):
 
         # features = F.normalize(features, p=2, dim=1)
 
-        if len(data.labels_full.shape) > 1:
-            self.multi_label = True
-            self.loss = torch.nn.BCELoss()
-        elif len(labels.shape) > 1:  # for GCSNTK, use MSE for training
-            # print("MSE loss")
+        if self.args.method == 'geom' and self.args.soft_label:
+            self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+        elif self.args.method == 'gcsntk':  # for GCSNTK, use MSE for training
             self.float_label = True
             self.loss = torch.nn.MSELoss()
+        elif len(data.labels_full.shape) > 1:
+            self.multi_label = True
+            self.loss = torch.nn.BCELoss()
         else:
             self.multi_label = False
             self.loss = F.nll_loss
@@ -149,11 +153,12 @@ class BaseGNN(nn.Module):
             adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))
 
         optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
-        self.train()
+
         for i in range(train_iters):
-            if i == train_iters // 2:
+            if i == train_iters // 2 and self.args.method not in ['geom']:
                 optimizer = optim.Adam(self.parameters(), lr=self.lr * 0.1, weight_decay=self.weight_decay)
 
+            self.train()  # ?
             optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
@@ -161,7 +166,7 @@ class BaseGNN(nn.Module):
             loss_train.backward()
             optimizer.step()
 
-            if verbose and i + 1 % 100 == 0:
+            if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
 
             with torch.no_grad():

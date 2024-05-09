@@ -206,7 +206,12 @@ class GCondBase:
             print('loss_avg: {}'.format(loss_avg))
 
         res = []
-        for i in range(3):
+        if args.method == 'geom':
+            eval_times = 1
+        else:
+            eval_times = 3
+
+        for i in range(eval_times):
             res.append(self.test_with_val(verbose=False, setting=args.setting))
 
         res = np.array(res)
