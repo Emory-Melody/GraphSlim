@@ -82,8 +82,9 @@ class GCSNTK(GCondBase):
         y_train_one_hot = y_one_hot[data.train_mask]
         y_test_one_hot = y_one_hot[data.val_mask]
         # y_test_one_hot = y_one_hot[data.test_mask]
-        x = normalize_data(data.x)
-        x = GCF(adj, x, self.k)
+        # x = normalize_data(data.x)
+        # x = GCF(adj, x, self.k)
+        x = data.x
         x_train, _, x_test = x[data.train_mask], x[data.val_mask], x[data.val_mask]
 
         n_train = len(y_train)
@@ -91,7 +92,6 @@ class GCSNTK(GCondBase):
         idx_s = torch.tensor(range(Cond_size))
 
         E_train = sub_E(idx_train, adj)
-        E_test = sub_E(idx_val, adj)
 
         SNTK = StructureBasedNeuralTangentKernel(K=self.K, L=self.L, scale=self.scale).to(self.device)
         ridge = torch.tensor(self.ridge).to(self.device)
@@ -99,12 +99,10 @@ class GCSNTK(GCondBase):
         MSEloss = nn.MSELoss().to(self.device)
 
         x_train = x_train.to(self.device)
-        x_test = x_test.to(self.device)
-        E_test = E_test.to(self.device)
+
         E_train = E_train.to(self.device)
 
         y_train_one_hot = y_train_one_hot.to(self.device)
-        y_test_one_hot = y_test_one_hot.to(self.device)
 
         x_s = torch.rand(Cond_size, dim).to(self.device)
         y_s = torch.rand(Cond_size, n_class).to(self.device)
@@ -120,20 +118,14 @@ class GCSNTK(GCondBase):
         optimizer = torch.optim.Adam([x_s, y_s], lr=self.args.lr)
 
         best_val = 0
-        for epoch in trange(args.epochs):
+        for it in trange(args.epochs):
             x_s, y_s, training_loss, training_acc = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, E_train,
                                                                E_s, MSEloss, optimizer)
 
-            if epoch + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 # y_long = torch.argmax(y_s, dim=1)
                 data.adj_syn, data.feat_syn, data.labels_syn = E_s.detach().to_dense(), x_s.detach(), y_s.detach()
                 best_val = self.intermediate_evaluation(best_val, training_loss)
-                # val_loss, val_acc = self.test(KRR, x_test, x_s, y_test_one_hot, y_s, E_test, E_s, MSEloss)
-                # if val_acc > best_val:
-                #     best_val = val_acc
-                #     y_long = torch.argmax(y_s, dim=1)
-                #     data.adj_syn, data.feat_syn, data.labels_syn = E_s.detach().to_dense(), x_s.detach(), y_long.detach()
-                #     save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, self.args, best_val)
 
         return data
 

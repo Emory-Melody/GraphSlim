@@ -3,13 +3,17 @@ import json
 import os
 
 import click
-
+from pprint import pformat
 from graphslim.utils import seed_everything
 
 
 class Obj(object):
     def __init__(self, dict_):
         self.__dict__.update(dict_)
+
+    def __repr__(self):
+        # Use pprint's pformat to print the dictionary in a pretty manner
+        return pformat(self.__dict__, compact=True)
 
 
 def dict2obj(d):
@@ -29,8 +33,9 @@ def setting_config(args):
         args.setting = 'ind'
     args.pre_norm = True
     args.hidden = 256
-    args.checkpoints = range(0, args.epochs + 1, 100)
-    args.eval_epochs = 1000
+    args.eval_interval = 20
+    args.checkpoints = range(-1, args.epochs + 1, args.eval_interval)
+    args.eval_epochs = 200
     args.eval_model = 'GCN'
     return args
 
@@ -55,10 +60,12 @@ def method_config(args):
 @click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
-@click.option('--run_evaluation', default=3, show_default=True)
+@click.option('--run_eval', default=10, show_default=True)
+@click.option('--run_inter_eval', default=3, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
+@click.option('--eval_interval', default=20, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
-@click.option('--eval_epochs', '--ee', default=600, show_default=True)
+@click.option('--eval_epochs', '--ee', default=200, show_default=True)
 @click.option('--eval_model', default='GCN',
               type=click.Choice(
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
@@ -67,7 +74,7 @@ def method_config(args):
               type=click.Choice(
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
               ), show_default=True)
-@click.option('--epochs', '--eps', default=1000, show_default=True)
+@click.option('--epochs', '--eps', default=100, show_default=True)
 @click.option('--valid_result', '--vr', default=0, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
@@ -127,6 +134,7 @@ def cli(ctx, **kwargs):
         args = method_config(args)
         # setting_config has higher priority than methods_config
         args = setting_config(args)
+        print(args)
         return args
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)

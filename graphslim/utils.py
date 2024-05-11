@@ -107,17 +107,17 @@ def calc(gntk, feat1, feat2, diag1, diag2, A1, A2):
     return gntk.gntk(feat1, feat2, diag1, diag2, A1, A2)
 
 
-def loss_acc_fn_train(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
-    # print(k_ss.device, torch.abs(torch.tensor(reg)).to(k_ss.device),torch.trace(k_ss).device, torch.eye(k_ss.shape[0]).device)
-    k_ss_reg = (k_ss + torch.abs(torch.tensor(reg)).to(k_ss.device) * torch.trace(k_ss).to(k_ss.device) * torch.eye(
-        k_ss.shape[0]).to(k_ss.device) / k_ss.shape[0])
-    pred = torch.matmul(k_ts[data.idx_train, :].cuda(), torch.matmul(torch.linalg.inv(k_ss_reg).cuda(),
-                                                                     torch.from_numpy(y_support).to(
-                                                                         torch.float64).cuda()))
-    mse_loss = torch.nn.functional.mse_loss(pred.to(torch.float64).cuda(),
-                                            torch.from_numpy(y_target).to(torch.float64).cuda(), reduction="mean")
-    acc = 0
-    return mse_loss, acc
+# def loss_acc_fn_train(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
+#     # print(k_ss.device, torch.abs(torch.tensor(reg)).to(k_ss.device),torch.trace(k_ss).device, torch.eye(k_ss.shape[0]).device)
+#     k_ss_reg = (k_ss + torch.abs(torch.tensor(reg)).to(k_ss.device) * torch.trace(k_ss).to(k_ss.device) * torch.eye(
+#         k_ss.shape[0]).to(k_ss.device) / k_ss.shape[0])
+#     pred = torch.matmul(k_ts[data.idx_train, :].cuda(), torch.matmul(torch.linalg.inv(k_ss_reg).cuda(),
+#                                                                      torch.from_numpy(y_support).to(
+#                                                                          torch.float64).cuda()))
+#     mse_loss = torch.nn.functional.mse_loss(pred.to(torch.float64).cuda(),
+#                                             torch.from_numpy(y_target).to(torch.float64).cuda(), reduction="mean")
+#     acc = 0
+#     return mse_loss, acc
 
 
 def loss_acc_fn_eval(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
@@ -225,46 +225,6 @@ def tensor2onehot(labels):
     onehot_mx = eye[labels]
     return onehot_mx
 
-
-def preprocess(adj, features, labels, preprocess_adj=False, preprocess_feature=False, sparse=False, device='cpu'):
-    """Convert adj, features, labels from array or sparse matrix to
-    torch Tensor, and normalize the input data.
-
-    Parameters
-    ----------
-    adj : scipy.sparse.csr_matrix
-        the adjacency matrix.
-    features : scipy.sparse.csr_matrix
-        node features
-    labels : numpy.array
-        node labels
-    preprocess_adj : bool
-        whether to normalize the adjacency matrix
-    preprocess_feature : bool
-        whether to normalize the feature matrix
-    sparse : bool
-       whether to return sparse tensor
-    device : str
-        'cpu' or 'cuda'
-    """
-
-    if preprocess_adj:
-        adj = normalize_adj(adj)
-
-    if preprocess_feature:
-        features = normalize_feature(features)
-
-    labels = torch.LongTensor(labels)
-    if sparse:
-        adj = sparse_mx_to_torch_sparse_tensor(adj)
-        features = sparse_mx_to_torch_sparse_tensor(features)
-    else:
-        if sp.issparse(features):
-            features = torch.FloatTensor(np.array(features.todense()))
-        else:
-            features = torch.FloatTensor(features)
-        adj = torch.FloatTensor(adj.todense())
-    return adj.to(device), features.to(device), labels.to(device)
 
 
 def normalize_feature(mx):
@@ -749,60 +709,6 @@ def get_degree_squence(adj):
         return ts.sum(adj, dim=1).to_dense()
 
 
-def likelihood_ratio_filter(node_pairs, modified_adjacency, original_adjacency, d_min, threshold=0.004,
-                            undirected=True):
-    """
-    Filter the input node pairs based on the likelihood ratio test proposed by Zügner et al. 2018, see
-    https://dl.acm.org/citation.cfm?id=3220078. In essence, for each node pair return 1 if adding/removing the edge
-    between the two nodes does not violate the unnoticeability constraint, and return 0 otherwise. Assumes unweighted
-    and undirected graphs.
-    """
-
-    N = int(modified_adjacency.shape[0])
-    # original_degree_sequence = get_degree_squence(original_adjacency)
-    # current_degree_sequence = get_degree_squence(modified_adjacency)
-    original_degree_sequence = original_adjacency.sum(0)
-    current_degree_sequence = modified_adjacency.sum(0)
-
-    concat_degree_sequence = torch.cat((current_degree_sequence, original_degree_sequence))
-
-    # Compute the log likelihood values of the original, modified, and combined degree sequences.
-    ll_orig, alpha_orig, n_orig, sum_log_degrees_original = degree_sequence_log_likelihood(original_degree_sequence,
-                                                                                           d_min)
-    ll_current, alpha_current, n_current, sum_log_degrees_current = degree_sequence_log_likelihood(
-        current_degree_sequence, d_min)
-
-    ll_comb, alpha_comb, n_comb, sum_log_degrees_combined = degree_sequence_log_likelihood(concat_degree_sequence,
-                                                                                           d_min)
-
-    # Compute the log likelihood ratio
-    current_ratio = -2 * ll_comb + 2 * (ll_orig + ll_current)
-
-    # Compute new log likelihood values that would arise if we add/remove the edges corresponding to each node pair.
-    new_lls, new_alphas, new_ns, new_sum_log_degrees = updated_log_likelihood_for_edge_changes(node_pairs,
-                                                                                               modified_adjacency,
-                                                                                               d_min)
-
-    # Combination of the original degree distribution with the distributions corresponding to each node pair.
-    n_combined = n_orig + new_ns
-    new_sum_log_degrees_combined = sum_log_degrees_original + new_sum_log_degrees
-    alpha_combined = compute_alpha(n_combined, new_sum_log_degrees_combined, d_min)
-    new_ll_combined = compute_log_likelihood(n_combined, alpha_combined, new_sum_log_degrees_combined, d_min)
-    new_ratios = -2 * new_ll_combined + 2 * (new_lls + ll_orig)
-
-    # Allowed edges are only those for which the resulting likelihood ratio measure is < than the threshold
-    allowed_edges = new_ratios < threshold
-
-    if allowed_edges.is_cuda:
-        filtered_edges = node_pairs[allowed_edges.cpu().numpy().astype(np.bool)]
-    else:
-        filtered_edges = node_pairs[allowed_edges.numpy().astype(np.bool)]
-
-    allowed_mask = torch.zeros(modified_adjacency.shape)
-    allowed_mask[filtered_edges.T] = 1
-    if undirected:
-        allowed_mask += allowed_mask.t()
-    return allowed_mask, current_ratio
 
 
 def degree_sequence_log_likelihood(degree_sequence, d_min):

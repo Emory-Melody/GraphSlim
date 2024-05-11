@@ -56,7 +56,7 @@ class DosCond(GCondBase):
 
             loss_avg /= (data.nclass * outer_loop)
 
-            if it + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 self.adj_syn = pge.inference(self.feat_syn)
                 data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, loss_avg)

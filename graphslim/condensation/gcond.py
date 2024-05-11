@@ -33,7 +33,6 @@ class GCond(GCondBase):
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         best_val = 0
-        # seed_everything(args.seed + it)
         model = eval(args.condense_model)(feat_syn.shape[1], args.hidden,
                                           data.nclass, args).to(self.device)
         for it in trange(args.epochs):

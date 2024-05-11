@@ -6,7 +6,6 @@ import torch.optim as optim
 from graphslim.utils import *
 
 
-
 class BaseGNN(nn.Module):
 
     def __init__(self, nfeat, nhid, nclass, args, mode):
@@ -28,11 +27,8 @@ class BaseGNN(nn.Module):
         if mode == 'eval':
             self.nlayers = 2
             self.dropout = 0
-            self.weight_decay = 5e-4
-        # if mode == 'cross':
-        #     self.nlayers = 2
-        #     self.dropout = 0.5
-        #     self.weight_decay = 0
+            self.weight_decay = 0
+
         self.output = None
         self.best_model = None
         self.best_output = None
@@ -137,7 +133,7 @@ class BaseGNN(nn.Module):
             reindex = True
 
         if verbose:
-            print('=== training GNN model ===')
+            print('=== training ===')
 
         best_acc_val = 0
         # TODO: we can have two strategies:

@@ -82,6 +82,7 @@ class Evaluator:
 
     def grid_search(self, data, model_type, param_grid):
         args = self.args
+        args.eval_epochs = 100
         best_result = None
         best_params = None
         for params in ParameterGrid(param_grid):
@@ -89,35 +90,44 @@ class Evaluator:
                 setattr(args, key, value)
 
             res = []
-            for i in range(args.run_evaluation):
+            for i in range(args.run_eval):
                 seed_everything(args.seed + i)
-                res.append(self.test(data, model_type=model_type, verbose=args.verbose, reduced=True, mode='eval'))
+                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
             res = np.array(res)
             res_mean, res_std = res.mean(), res.std()
-            print(f'{model_type} Test with params {params}: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
+            if args.verbose:
+                print(f'{model_type} Test with params {params}: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
             if best_result is None or res_mean > best_result:
                 best_result = res_mean
                 best_params = params
 
-        print(f'Best {model_type} Result: {100 * best_result:.2f} with params {best_params}')
+        print(f'Best {model_type} Result: {100 * best_result:.2f} +/- {100 * res_std:.2f} with params {best_params}')
 
     def train_cross(self, data):
         args = self.args
         args.valid_result = 0
-        for model_type in ['GAT']:  #
-            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
-                                                                             verbose=args.verbose)
         gs_params = {
-            'GraphSage': {'hidden': [64, 128, 256], 'lr': [0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
-                          'dropout': [0.0, 0.5, 0.7]},
-            'GAT': {'hidden': [64, 128], 'lr': [0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
+            'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                    'dropout': [0.0, 0.5]},
+            'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                    'dropout': [0.0, 0.5]},
+            'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                    'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
+            'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                      'dropout': [0.0, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+            'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5]},
+            'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                      'dropout': [0.0, 0.5]},
+            'GAT': {'hidden': [64, 128, 256], 'lr': [0.05, 0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5, 0.7]}
         }
-
-        for model_type in ['GAT']:
+        for model_type in gs_params.keys():
+            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                             verbose=args.verbose)
             print(f'Starting Grid Search for {model_type}')
-        self.grid_search(data, model_type, gs_params[model_type])
+            self.grid_search(data, model_type, gs_params[model_type])
 
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
@@ -136,8 +146,7 @@ class Evaluator:
         # assert not (args.method not in ['msgc'] and model_type == 'GAT')
         model = eval(model_type)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
-        eval_epochs = 600
-        model.fit_with_val(data, train_iters=eval_epochs, normadj=True, verbose=verbose,
+        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
                            reduced=reduced)
 
@@ -193,9 +202,9 @@ class Evaluator:
 
         if verbose:
             print(f'evaluate reduced data by {model_type}')
-            run_evaluation = trange(args.run_evaluation)
+            run_evaluation = trange(args.run_eval)
         else:
-            run_evaluation = range(args.run_evaluation)
+            run_evaluation = range(args.run_eval)
 
         res = []
         for i in run_evaluation:

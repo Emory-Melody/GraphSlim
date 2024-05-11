@@ -42,10 +42,10 @@ class GEOM(GCondBase):
 
         # self.init_coreset_select(data)
 
-        random.seed(15)
-        np.random.seed(15)
-        torch.manual_seed(15)
-        torch.cuda.manual_seed(15)
+        # random.seed(15)
+        # np.random.seed(15)
+        # torch.manual_seed(15)
+        # torch.cuda.manual_seed(15)
 
         features, adj, labels = data.feat_full, data.adj_full, data.labels_full
         feat_init, adj_init, labels_init = self.get_coreset_init(features, adj, labels)
@@ -90,7 +90,7 @@ class GEOM(GCondBase):
             self.labels_syn.requires_grad = True
             self.labels_syn = self.labels_syn.to(args.device)
 
-            acc = np.sum(np.equal(np.argmax(label_soft.cpu().data.numpy(), axis=-1), labels_init.cpu().data.numpy()))
+            # acc = np.sum(np.equal(np.argmax(label_soft.cpu().data.numpy(), axis=-1), labels_init.cpu().data.numpy()))
             # print('InitialAcc:{}'.format(acc / len(self.labels_syn)))
 
             self.optimizer_label = torch.optim.SGD([self.labels_syn], lr=args.lr_y, momentum=0.9)
@@ -104,7 +104,7 @@ class GEOM(GCondBase):
             self.syn_lr = self.syn_lr.detach().to(self.device).requires_grad_(True)
             optimizer_lr = torch.optim.SGD([self.syn_lr], lr=1e-6, momentum=0.5)
 
-        eval_it_pool = np.arange(0, args.epochs + 1, args.eval_interval).tolist()
+        # eval_it_pool = np.arange(0, args.epochs + 1, args.eval_interval).tolist()
 
         best_val = 0
 
@@ -183,10 +183,10 @@ class GEOM(GCondBase):
 
                 if args.soft_label:
                     loss_syn = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)(output_syn, self.labels_syn)
-                    acc_syn = accuracy(output_syn, torch.argmax(self.labels_syn, dim=1))
+                    # acc_syn = accuracy(output_syn, torch.argmax(self.labels_syn, dim=1))
                 else:
                     loss_syn = F.nll_loss(output_syn, self.labels_syn)
-                    acc_syn = accuracy(output_syn, self.labels_syn)
+                    # acc_syn = accuracy(output_syn, self.labels_syn)
 
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
 
@@ -251,7 +251,7 @@ class GEOM(GCondBase):
             #         grand_loss.item(),
             #         start_epoch,
             #         self.syn_lr.item()))
-            if it in eval_it_pool and it > 0:
+            if it in args.checkpoints and it > 0:
                 feat_syn_save, adj_syn_save, label_syn_save = self.synset_save()
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_save, feat_syn_save, label_syn_save
                 best_val = self.intermediate_evaluation(best_val, total_loss.item())
@@ -297,7 +297,6 @@ class GEOM(GCondBase):
             sorted_trainset = sort_training_nodes(data, adj_coo, labels)
         else:
             sorted_trainset = sort_training_nodes_in(data, adj_coo, labels)
-
 
         for it in trange(args.num_experts):
             model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)

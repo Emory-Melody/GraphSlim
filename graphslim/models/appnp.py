@@ -15,7 +15,7 @@ class APPNP(BaseGNN):
 
         super(APPNP, self).__init__(nfeat, nhid, nclass, args, mode)
 
-        if mode in ['eval', 'cross']:
+        if mode in ['eval']:
             self.ntrans = 1
         if self.ntrans == 1:
             self.layers.append(MyLinear(nfeat, nclass))

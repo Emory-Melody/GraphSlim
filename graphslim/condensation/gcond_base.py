@@ -206,13 +206,10 @@ class GCondBase:
             print('loss_avg: {}'.format(loss_avg))
 
         res = []
-        if args.method == 'geom':
-            eval_times = 1
-        else:
-            eval_times = 3
 
-        for i in range(eval_times):
-            res.append(self.test_with_val(verbose=False, setting=args.setting))
+        for i in range(args.eval_interval):
+            # small epochs for fast intermediate evaluation
+            res.append(self.test_with_val(verbose=False, setting=args.setting, iters=100))
 
         res = np.array(res)
         current_val = res.mean()
@@ -225,7 +222,7 @@ class GCondBase:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
         return best_val
 
-    def test_with_val(self, verbose=False, setting='trans'):
+    def test_with_val(self, verbose=False, setting='trans', iters=200):
         res = []
 
         args, data, device = self.args, self.data, self.device
@@ -233,7 +230,7 @@ class GCondBase:
         model = GCN(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(device)
 
         acc_val = model.fit_with_val(data,
-                                     train_iters=600, normadj=True, verbose=False,
+                                     train_iters=iters, normadj=True, verbose=False,
                                      setting=setting, reduced=True)
         # model.eval()
         # labels_test = data.labels_test.long().to(args.device)
