@@ -1,6 +1,7 @@
 import os
 import sys
 
+# os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 from configs import *

@@ -40,14 +40,17 @@ class GEOM(GCondBase):
             self.buffer_cl(data)
             print("=================Finish buffer===============")
 
-        # self.init_coreset_select(data)
+        self.init_coreset_select(data)
 
         # random.seed(15)
         # np.random.seed(15)
         # torch.manual_seed(15)
         # torch.cuda.manual_seed(15)
 
-        features, adj, labels = data.feat_full, data.adj_full, data.labels_full
+        if args.setting == 'trans':
+            features, adj, labels = data.feat_full, data.adj_full, data.labels_full
+        else:
+            features, adj, labels = data.feat_train, data.adj_train, data.labels_train
         feat_init, adj_init, labels_init = self.get_coreset_init(features, adj, labels)
         feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init,
                                                      label=labels_init, device=self.device)
@@ -94,6 +97,10 @@ class GEOM(GCondBase):
             # print('InitialAcc:{}'.format(acc / len(self.labels_syn)))
 
             self.optimizer_label = torch.optim.SGD([self.labels_syn], lr=args.lr_y, momentum=0.9)
+
+            if args.setting == 'ind':
+                self.tem = torch.tensor(args.tem).detach().to(self.device).requires_grad_(True)
+                optimizer_tem = torch.optim.Adam([self.tem], lr=args.lr_tem)
             # -------------------------------------softlabel-------------------------------------------------------end-----------------------------------------------------------------#
         else:
             self.labels_syn = labels_init
@@ -104,12 +111,15 @@ class GEOM(GCondBase):
             self.syn_lr = self.syn_lr.detach().to(self.device).requires_grad_(True)
             optimizer_lr = torch.optim.SGD([self.syn_lr], lr=1e-6, momentum=0.5)
 
-        # eval_it_pool = np.arange(0, args.epochs + 1, args.eval_interval).tolist()
-
         best_val = 0
 
         bar = trange(args.epochs + 1)
         for it in bar:
+            if args.setting == 'ind' and args.soft_label:
+                if self.tem > args.maxtem:
+                    self.tem = torch.tensor(args.maxtem).detach().to(self.device).requires_grad_(True)
+                    optimizer_tem.lr = 0.0
+
             model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
             model_4_clom = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(
                 self.device)
@@ -191,9 +201,9 @@ class GEOM(GCondBase):
                 grad = torch.autograd.grad(loss_syn, student_params[-1], create_graph=True)[0]
 
                 student_params[-1] = student_params[-1] - self.syn_lr * grad
-                if step % 500 == 0:
-                    output_test = model.forward(features_tensor, adj_tensor_norm, flat_param=student_params[-1])
-                    acc_test = accuracy(output_test[data.idx_test], labels_tensor[[data.idx_test]])
+                # if step % 500 == 0:
+                #     output_test = model.forward(features_tensor, adj_tensor_norm, flat_param=student_params[-1])
+                #     acc_test = accuracy(output_test[data.idx_test], labels_tensor[[data.idx_test]])
                     # print('loss = {:.4f},acc_syn = {:.4f},acc_test = {:.4f}'.format(loss_syn.item(),
                     #                                                                        acc_syn.item(),
                     #                                                                        acc_test.item()))
@@ -220,7 +230,12 @@ class GEOM(GCondBase):
                 output_clom = model_4_clom.forward(feat_syn, adj_syn_input,
                                                    flat_param=target_params_4_clom)
                 if args.soft_label:
-                    loss_clom = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)(output_clom, self.labels_syn)
+                    if args.setting == "ind":
+                        loss_clom = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)(output_clom / self.tem,
+                                                                                               self.labels_syn / self.tem)
+                    else:
+                        loss_clom = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)(output_clom,
+                                                                                               self.labels_syn)
                 else:
                     loss_clom = F.nll_loss(output_clom, self.labels_syn)
                 total_loss = grand_loss + args.beta * loss_clom
@@ -228,6 +243,8 @@ class GEOM(GCondBase):
             self.optimizer_feat.zero_grad()
             if args.soft_label:
                 self.optimizer_label.zero_grad()
+                if args.setting == "ind":
+                    optimizer_tem.zero_grad()
             if args.optim_lr:
                 optimizer_lr.zero_grad()
 
@@ -236,6 +253,8 @@ class GEOM(GCondBase):
             self.optimizer_feat.step()
             if args.soft_label:
                 self.optimizer_label.step()
+                if args.setting == 'ind':
+                    optimizer_tem.zero_grad()
             # print('torch.sum(self.feat_syn) = {}'.format(torch.sum(self.feat_syn)))
             if args.optim_lr:
                 optimizer_lr.step()
@@ -251,6 +270,8 @@ class GEOM(GCondBase):
             #         grand_loss.item(),
             #         start_epoch,
             #         self.syn_lr.item()))
+
+            # eval_it_pool = np.arange(0, args.epochs + 1, args.eval_interval).tolist()
             if it in args.checkpoints and it > 0:
                 feat_syn_save, adj_syn_save, label_syn_save = self.synset_save()
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_save, feat_syn_save, label_syn_save
@@ -264,11 +285,11 @@ class GEOM(GCondBase):
             #                f'{args.log_dir}/feat_{args.dataset}_{args.reduction_rate}_{it}_{args.seed_student}_ours.pt')
             #     torch.save(label_syn_save,
             #                f'{args.log_dir}/label_{args.dataset}_{args.reduction_rate}_{it}_{args.seed_student}_ours.pt')
-            # for _ in student_params:
-            #     del _
+            for _ in student_params:
+                del _
 
             # writer.add_scalar('grand_loss_curve', grand_loss.item(), it)
-            # torch.cuda.empty_cache()
+            torch.cuda.empty_cache()
 
             # gc.collect()
         return data
@@ -284,7 +305,7 @@ class GEOM(GCondBase):
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, data.labels_train,
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
@@ -391,7 +412,7 @@ class GEOM(GCondBase):
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, data.labels_train,
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
@@ -403,11 +424,14 @@ class GEOM(GCondBase):
 
         optimizer_model = torch.optim.Adam(model.parameters(), lr=args.lr_coreset, weight_decay=5e-4)
 
-        for e in range(args.epochs + 1):
+        for e in range(args.coreset_epochs + 1):
             model.train()
             optimizer_model.zero_grad()
             output = model.forward(features, adj)
-            loss = F.nll_loss(output[idx_train], labels[idx_train])
+            if args.setting == 'trans':
+                loss = F.nll_loss(output[idx_train], labels[idx_train])
+            else:
+                loss = F.nll_loss(output, labels)
 
             loss.backward()
             optimizer_model.step()
@@ -418,7 +442,7 @@ class GEOM(GCondBase):
 
         idx_selected = agent.select(embed_out)
 
-        np.save(f'{self.buf_dir}/idx_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}.npy',
+        np.save(f'{self.buf_dir}/idx_{args.dataset}_{args.reduction_rate}_kcenter_{args.seed}.npy',
                 idx_selected)
         print("Finish corset selection, saved.")
 

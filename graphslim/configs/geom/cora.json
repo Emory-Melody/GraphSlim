@@ -11,7 +11,7 @@
   "lam": 0.75,
   "lr_student": 0.5,
   "lr_coreset": 0.01,
-  "coreset_epochs": 1,
+  "coreset_epochs": 1200,
   "expert_epochs": 1400,
   "soft_label": 1,
   "optim_lr": 1,
