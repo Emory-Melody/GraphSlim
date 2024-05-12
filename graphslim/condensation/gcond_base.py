@@ -207,9 +207,9 @@ class GCondBase:
 
         res = []
 
-        for i in range(args.eval_interval):
+        for i in range(args.run_inter_eval):
             # small epochs for fast intermediate evaluation
-            res.append(self.test_with_val(verbose=False, setting=args.setting, iters=100))
+            res.append(self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs))
 
         res = np.array(res)
         current_val = res.mean()

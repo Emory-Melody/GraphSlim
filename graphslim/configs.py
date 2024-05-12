@@ -33,9 +33,10 @@ def setting_config(args):
         args.setting = 'ind'
     args.pre_norm = True
     args.hidden = 256
-    args.eval_interval = 20
+    args.eval_interval = 100
+    args.run_inter_eval = 3
     args.checkpoints = range(-1, args.epochs + 1, args.eval_interval)
-    args.eval_epochs = 200
+    args.eval_epochs = 300
     args.eval_model = 'GCN'
     return args
 
@@ -61,9 +62,9 @@ def method_config(args):
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--run_eval', default=10, show_default=True)
-@click.option('--run_inter_eval', default=3, show_default=True)
+@click.option('--run_inter_eval', default=5, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
-@click.option('--eval_interval', default=20, show_default=True)
+@click.option('--eval_interval', default=10, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=200, show_default=True)
 @click.option('--eval_model', default='GCN',
@@ -74,7 +75,7 @@ def method_config(args):
               type=click.Choice(
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
               ), show_default=True)
-@click.option('--epochs', '--eps', default=100, show_default=True)
+@click.option('--epochs', '--eps', default=1000, show_default=True)
 @click.option('--valid_result', '--vr', default=0, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
