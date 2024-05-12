@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
-from tqdm import trange
+from tqdm import trange, tqdm
 from sklearn.model_selection import ParameterGrid
 
 from torch_geometric.utils import dense_to_sparse
@@ -85,7 +85,7 @@ class Evaluator:
         args.eval_epochs = 100
         best_result = None
         best_params = None
-        for params in ParameterGrid(param_grid):
+        for params in tqdm(ParameterGrid(param_grid)):
             for key, value in params.items():
                 setattr(args, key, value)
 
@@ -98,15 +98,17 @@ class Evaluator:
             if args.verbose:
                 print(f'{model_type} Test with params {params}: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
-            if best_result is None or res_mean > best_result:
-                best_result = res_mean
+            if best_result is None or res_mean > best_result[0]:
+                best_result = (res_mean, res_std)
                 best_params = params
 
-        print(f'Best {model_type} Result: {100 * best_result:.2f} +/- {100 * res_std:.2f} with params {best_params}')
+        print(
+            f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+        return best_result, best_params
 
     def train_cross(self, data):
         args = self.args
-        args.valid_result = 0
+        gs_results = {}
         gs_params = {
             'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5]},
@@ -116,10 +118,10 @@ class Evaluator:
                     'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
             'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                       'dropout': [0.0, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
-            'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                          'dropout': [0.0, 0.5]},
             'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                       'dropout': [0.0, 0.5]},
+            'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5]},
             'GAT': {'hidden': [64, 128, 256], 'lr': [0.05, 0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5, 0.7]}
         }
@@ -127,7 +129,12 @@ class Evaluator:
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
             print(f'Starting Grid Search for {model_type}')
-            self.grid_search(data, model_type, gs_params[model_type])
+            gs_results[model_type] = self.grid_search(data, model_type, gs_params[model_type])
+
+        for model_type in gs_params.keys():
+            best_result, best_params = gs_results[model_type]
+            print(
+                f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
 
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args

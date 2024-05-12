@@ -27,7 +27,7 @@ class BaseGNN(nn.Module):
         if mode == 'eval':
             self.nlayers = 2
             self.dropout = 0
-            self.weight_decay = 0
+            self.weight_decay = 5e-4
 
         self.output = None
         self.best_model = None

@@ -9,16 +9,16 @@ from graphslim.models.gcn import BaseGNN
 from torch_geometric.nn import GATConv
 
 
-class GAT(nn.Module):
+class GAT(BaseGNN):
     def __init__(self, in_features, hidden_dim, num_classes, args, mode='train'):
-        super(GAT, self).__init__()
+        super(GAT, self).__init__(in_features, hidden_dim, num_classes, args, mode)
         num_heads = 8
         dropout = args.dropout
 
         self.conv1 = GATConv(in_features, hidden_dim, heads=num_heads, dropout=dropout)
         self.conv2 = GATConv(hidden_dim * num_heads, num_classes, heads=1, concat=False, dropout=dropout)
 
-    def forward(self, x, edge_index):
+    def forward(self, x, edge_index, output_layer_features=None):
         x = F.elu(self.conv1(x, edge_index))
         x = self.conv2(x, edge_index)
         return F.softmax(x, dim=1)
