@@ -11,6 +11,5 @@ from graphslim.evaluation import Evaluator
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
     data = get_dataset(args.dataset, args)
-    # args.valid_result = '0.8006666666666667'
     evaluator = Evaluator(args)
     evaluator.train_cross(data)

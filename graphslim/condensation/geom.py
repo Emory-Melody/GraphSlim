@@ -21,12 +21,6 @@ class GEOM(GCondBase):
         args.condense_model = 'GCN'
         args.init = 'kcenter'
 
-        # n = int(data.feat_train.shape[0] * args.reduction_rate)
-        # d = data.feat_train.shape[1]
-        # self.feat_syn = nn.Parameter(torch.FloatTensor(n, d).to(self.device))
-        #
-        # self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
-
         self.buf_dir = '../../data/GEOM_Buffer/{}'.format(args.dataset)
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
@@ -259,8 +253,8 @@ class GEOM(GCondBase):
 
             if torch.isnan(total_loss) or torch.isnan(grand_loss):
                 break  # Break out of the loop if either is NaN
-            # bar.set_postfix_str(
-            #     f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {self.syn_lr.item():.4f}")
+            bar.set_postfix_str(
+                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {self.syn_lr.item():.4f}")
             # print(
             #     "Iteration {}: Total_Loss = {:.4f}, Grand_Loss={:.4f}, Start_Epoch= {}, Student_LR = {:6f}".format(
             #         it,

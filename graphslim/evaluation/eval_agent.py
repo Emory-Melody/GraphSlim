@@ -28,7 +28,7 @@ class Evaluator:
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
     #
-    def sparsify(self, model_type, adj_syn, verbose=True):
+    def sparsify(self, model_type, adj_syn, verbose=False):
         args = self.args
         threshold = 0
         if model_type == 'MLP':
@@ -77,7 +77,6 @@ class Evaluator:
         else:
             adj_syn = adj_syn
         adj_syn = self.sparsify(model_type, adj_syn, verbose=verbose)
-
         return feat_syn, adj_syn, labels_syn
 
     def grid_search(self, data, model_type, param_grid):
@@ -205,7 +204,7 @@ class Evaluator:
     def evaluate(self, data, model_type, verbose=True, reduced=True):
         args = self.args
 
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
 
         if verbose:
             print(f'evaluate reduced data by {model_type}')
@@ -225,10 +224,10 @@ class Evaluator:
         args.logger.info(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
         return res.mean(), res.std()
 
-    def nas_evaluate(self, data, model_type, verbose=True, reduced=None):
+    def nas_evaluate(self, data, model_type, verbose=False, reduced=None):
         args = self.args
         res = []
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=args.verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
         if verbose:
             run_evaluation = trange(args.run_evaluation)
         else:

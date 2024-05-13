@@ -4,7 +4,6 @@
   "lr_teacher": 0.001,
   "teacher_epochs": 1000,
   "wd_teacher": 5e-4,
-  "mom_teacher": 0,
   "optim": "Adam",
   "T": 800,
   "scheduler": "linear",

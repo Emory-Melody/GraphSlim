@@ -28,6 +28,6 @@ elif args.method == 'msgc':
 elif args.method == 'geom':
     agent = GEOM(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.reduce(graph, verbose=args.verbose)
+# reduced_graph = graph
 evaluator = Evaluator(args)
 evaluator.evaluate(reduced_graph, model_type=args.eval_model)
-# python -m coarserning.kcenter
