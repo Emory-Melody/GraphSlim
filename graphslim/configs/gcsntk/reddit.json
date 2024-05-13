@@ -1,10 +1,13 @@
 {
-  "lr": 0.001,
+  "lr": 0.002,
   "ridge": 1e-5,
-  "epochs": 200,
+  "epochs": 500,
   "K": 1,
   "L": 1,
   "k": 1,
   "adj": true,
-  "scale": "add"
+  "batch_size": 2000,
+  "accumulate_steps": 20,
+  "scale": "add",
+  "eval_interval": 20
 }

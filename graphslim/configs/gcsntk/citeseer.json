@@ -1,6 +1,6 @@
 {
   "lr": 0.01,
-  "ridge": 1e1,
+  "ridge": 1e0,
   "K": 2,
   "L": 2,
   "adj": false,

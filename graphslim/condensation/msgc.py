@@ -47,10 +47,9 @@ class MSGC(GCondBase):
         feat_init = self.init()
         self.feat_syn.data.copy_(feat_init)
 
-        optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
-        optimizer_adj = torch.optim.Adam(self.adj_parameters(), lr=args.lr_adj)
+        optimizer_x = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
+        optimizer_adj = torch.optim.Adam(self.adj_mlp.parameters(), lr=args.lr_adj)
         best_val = 0
-        smallest_loss = 1e9
         args.window = args.patience = 20
         losses = FixLenList(args.window)
         x_syns = FixLenList(args.window)
