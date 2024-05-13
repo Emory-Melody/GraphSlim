@@ -143,7 +143,7 @@ def cli(ctx, **kwargs):
         if not os.path.exists(f'{path}/logs/{args.method}'):
             os.mkdir(f'{path}/logs/{args.method}')
         logging.basicConfig(filename=f'{path}/logs/{args.method}/{args.dataset}_{args.reduction_rate}.log',
-                            level=logging.INFO)
+                            level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         args.logger = logging.getLogger(__name__)
         args.logger.addHandler(logging.StreamHandler())
         args.logger.info(args)

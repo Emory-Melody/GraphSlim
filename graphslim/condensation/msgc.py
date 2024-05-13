@@ -59,6 +59,7 @@ class MSGC(GCondBase):
 
         for it in trange(args.epochs):
             basic_model.initialize()
+            basic_model = self.check_bn(basic_model)
             loss_avg = 0
             for step_syn in range(args.outer_loop):
                 basic_model = self.check_bn(basic_model)
@@ -91,21 +92,23 @@ class MSGC(GCondBase):
             adj_t_syns.append(adj_t_syn)
             loss_window = sum(losses.data) / len(losses.data)
             if it in args.checkpoints:
-                data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
-                best_val = self.intermediate_evaluation(best_val, loss_window)
-            if loss_window < smallest_loss:
-                patience = 0
-                smallest_loss = loss_window
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
-                # print(f'loss:{smallest_loss:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
-            else:
-                patience += 1
-                if patience >= args.patience:
-                    break
+                data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
+                best_val = self.intermediate_evaluation(best_val, loss_window)
+            # if loss_window < smallest_loss:
+            #     patience = 0
+            #     smallest_loss = loss_window
+            #     best_x_syn = sum(x_syns.data) / len(x_syns.data)
+            #     best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
+            #     # print(f'loss:{smallest_loss:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
+            # else:
+            #     patience += 1
+            #     if patience >= args.patience:
+            #         break
         # save according to loss
-        data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
-        best_val = self.intermediate_evaluation(0, loss_window)
+        # data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
+        # best_val = self.intermediate_evaluation(0, loss_window)
 
         return data
 
