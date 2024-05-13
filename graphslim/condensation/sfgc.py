@@ -82,10 +82,10 @@ class SFGC(GCondBase):
                     trajectories = []
         # =============stage 2 trajectory alignment and GCN evaluation==================#
         # kcenter select
-        feat_init = self.init_feat()
+        feat_init, adj_init = self.init(with_adj=True)
         self.feat_syn.data.copy_(feat_init)
         labels_syn = to_tensor(label=data.labels_syn, device=self.device)
-        # self.adj_syn_init = adj_init
+        self.adj_syn_init = adj_init
 
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
@@ -136,15 +136,15 @@ class SFGC(GCondBase):
             param_loss_list = []
             param_dist_list = []
 
-            # if it == 0:
-            #     feat_syn = self.feat_syn
-            #     adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
-            #     adj_syn_input = adj_syn_norm
-            # else:
-            feat_syn = self.feat_syn
-            adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
-            adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
-            adj_syn_input = adj_syn_cal_norm
+            if it == 0:
+                feat_syn = self.feat_syn
+                adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
+                adj_syn_input = adj_syn_norm
+            else:
+                feat_syn = self.feat_syn
+                adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
+                adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                adj_syn_input = adj_syn_cal_norm
             for step in range(args.syn_steps):
                 forward_params = student_params[-1]
                 output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
@@ -177,7 +177,7 @@ class SFGC(GCondBase):
             bar.set_postfix_str(
                 f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {syn_lr.item():.4f}")
 
-            if it + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
                     feat_syn.shape[0]), feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, total_loss.item())

@@ -44,7 +44,7 @@ class MSGC(GCondBase):
         basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
         self.reset_adj_batch()
-        feat_init = self.init_feat()
+        feat_init = self.init()
         self.feat_syn.data.copy_(feat_init)
 
         optimizer_x = torch.optim.Adam(self.x_parameters(), lr=args.lr_feat)
@@ -106,7 +106,6 @@ class MSGC(GCondBase):
         # save according to loss
         data.feat_syn, data.adj_syn, data.labels_syn = best_x_syn, best_adj_t_syn, y_syn
         best_val = self.intermediate_evaluation(0, loss_window)
-
 
         return data
 

@@ -80,10 +80,6 @@ class GCSNTK(GCondBase):
         y_train, y_val, y_test = data.labels_train, data.labels_val, data.labels_test
         y_one_hot = F.one_hot(data.y, n_class)
         y_train_one_hot = y_one_hot[data.train_mask]
-        y_test_one_hot = y_one_hot[data.val_mask]
-        # y_test_one_hot = y_one_hot[data.test_mask]
-        # x = normalize_data(data.x)
-        # x = GCF(adj, x, self.k)
         x = data.x
         x_train, _, x_test = x[data.train_mask], x[data.val_mask], x[data.val_mask]
 

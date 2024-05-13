@@ -1,6 +1,7 @@
 '''Configuration'''
 import json
 import os
+import logging
 
 import click
 from pprint import pformat
@@ -127,17 +128,25 @@ def cli(ctx, **kwargs):
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
         # print("device:", args.device)
-        print("seed: ", args.seed)
+        # print("seed: ", args.seed)
         seed_everything(args.seed)
-        path = "checkpoints/"
-        if not os.path.isdir(path):
+        path = "checkpoints"
+        if not os.path.exists(path):
             os.mkdir(path)
         args.path = path
         # for benchmark, we need unified settings and reduce flexibility of args
         args = method_config(args)
         # setting_config has higher priority than methods_config
         args = setting_config(args)
-        print(args)
+        if not os.path.exists(f'{path}/logs'):
+            os.mkdir(f'{path}/logs')
+        if not os.path.exists(f'{path}/logs/{args.method}'):
+            os.mkdir(f'{path}/logs/{args.method}')
+        logging.basicConfig(filename=f'{path}/logs/{args.method}/{args.dataset}_{args.reduction_rate}.log',
+                            level=logging.INFO)
+        args.logger = logging.getLogger(__name__)
+        args.logger.addHandler(logging.StreamHandler())
+        args.logger.info(args)
         return args
     except Exception as e:
         click.echo(f'An error occurred: {e}', err=True)

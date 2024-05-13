@@ -24,7 +24,7 @@ class DosCond(GCondBase):
                                               device=self.device)
 
         # initialization the features
-        feat_init = self.init_feat()
+        feat_init = self.init()
         self.feat_syn.data.copy_(feat_init)
         adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 

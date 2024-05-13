@@ -22,10 +22,11 @@ class GCondX(GCondBase):
             features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
                                               device=self.device)
 
-        # initialization the features
-        feat_sub, adj_sub = self.get_sub_adj_feat()
-        self.feat_syn.data.copy_(feat_sub)
-        self.adj_syn = torch.eye(feat_sub.shape[0], device=self.device)
+            # initialization the features
+        feat_init = self.init()
+        self.feat_syn.data.copy_(feat_init)
+
+        self.adj_syn = torch.eye(feat_init.shape[0], device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
 
@@ -67,7 +68,7 @@ class GCondX(GCondBase):
                     optimizer_model.step()  # update gnn param
 
             loss_avg /= (data.nclass * outer_loop)
-            if it + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
                     self.feat_syn.shape[0]).detach(), self.feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, loss_avg)

@@ -62,7 +62,7 @@ class GCondBase:
         self.num_class_dict = num_class_dict
         return np.array(labels_syn)
 
-    def init_feat(self):
+    def init(self, with_adj=False):
         args = self.args
         if args.init == 'clustering':
             agent = Cluster(setting=args.setting, data=self.data, args=args)
@@ -76,23 +76,26 @@ class GCondBase:
             agent = Random(setting=args.setting, data=self.data, args=args)
 
         reduced_data = agent.reduce(self.data, verbose=False, save=False)
-        return reduced_data.feat_syn
-
-    def init_by_coreset(self):
-        args = self.args
-        if args.init == 'clustering':
-            agent = Cluster(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'averaging':
-            agent = Average(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'kcenter':
-            agent = KCenter(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'Herding':
-            agent = Herding(setting=args.setting, data=self.data, args=args)
+        if with_adj:
+            return reduced_data.feat_syn, reduced_data.adj_syn
         else:
-            agent = Random(setting=args.setting, data=self.data, args=args)
+            return reduced_data.feat_syn
 
-        reduced_data = agent.reduce(self.data, verbose=False, save=False)
-        return reduced_data
+    # def init_by_coreset(self):
+    #     args = self.args
+    #     if args.init == 'clustering':
+    #         agent = Cluster(setting=args.setting, data=self.data, args=args)
+    #     elif args.init == 'averaging':
+    #         agent = Average(setting=args.setting, data=self.data, args=args)
+    #     elif args.init == 'kcenter':
+    #         agent = KCenter(setting=args.setting, data=self.data, args=args)
+    #     elif args.init == 'Herding':
+    #         agent = Herding(setting=args.setting, data=self.data, args=args)
+    #     else:
+    #         agent = Random(setting=args.setting, data=self.data, args=args)
+    #
+    #     reduced_data = agent.reduce(self.data, verbose=False, save=False)
+    #     return reduced_data
 
     def train_class(self, model, adj, features, labels, labels_syn, args):
         data = self.data
@@ -199,7 +202,7 @@ class GCondBase:
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
-    def intermediate_evaluation(self, best_val, loss_avg):
+    def intermediate_evaluation(self, best_val, loss_avg, save=True):
         data = self.data
         args = self.args
         if args.verbose:
@@ -217,7 +220,7 @@ class GCondBase:
             print('Val Accuracy and Std:',
                   repr([current_val, res.std()]))
 
-        if current_val > best_val:
+        if save and current_val > best_val:
             best_val = current_val
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args, best_val)
         return best_val

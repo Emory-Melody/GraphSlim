@@ -23,7 +23,7 @@ class DosCondX(GCondBase):
                                               device=self.device)
 
         # initialization the features
-        feat_init = self.init_feat()
+        feat_init = self.init()
         self.feat_syn.data.copy_(feat_init)
 
         self.adj_syn = torch.eye(feat_init.shape[0], device=self.device)
@@ -51,7 +51,7 @@ class DosCondX(GCondBase):
                 self.optimizer_feat.step()
 
             loss_avg /= (data.nclass * outer_loop)
-            if it + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
                     self.feat_syn.shape[0]).detach(), self.feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, loss_avg)

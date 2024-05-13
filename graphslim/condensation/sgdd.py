@@ -43,7 +43,7 @@ class SGDD(GCondBase):
                                               device=self.device)
 
         # initialization the features
-        feat_init = self.init_feat()
+        feat_init = self.init()
         self.feat_syn.data.copy_(feat_init)
 
         adj = normalize_adj_tensor(adj, sparse=True)
@@ -105,7 +105,7 @@ class SGDD(GCondBase):
 
             loss_avg /= (data.nclass * outer_loop)
 
-            if it + 1 in args.checkpoints:
+            if it in args.checkpoints:
                 self.adj_syn = adj_syn_inner
                 data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, loss_avg)

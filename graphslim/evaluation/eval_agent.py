@@ -69,7 +69,7 @@ class Evaluator:
     def get_syn_data(self, model_type, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result)
+        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result, args.logger)
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
         elif isinstance(adj_syn, torch.sparse.FloatTensor):
@@ -117,13 +117,13 @@ class Evaluator:
             'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
             'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                      'dropout': [0.0, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+                      'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
             'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                       'dropout': [0.0, 0.5]},
             'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                           'dropout': [0.0, 0.5]},
-            'GAT': {'hidden': [64, 128, 256], 'lr': [0.05, 0.01, 0.001, 0.005], 'weight_decay': [0, 5e-4],
-                    'dropout': [0.0, 0.5, 0.7]}
+            'GAT': {'hidden': [64, 128], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                    'dropout': [0.05, 0.5, 0.7]}
         }
         for model_type in gs_params.keys():
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
@@ -133,7 +133,7 @@ class Evaluator:
 
         for model_type in gs_params.keys():
             best_result, best_params = gs_results[model_type]
-            print(
+            args.logger.info(
                 f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
 
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
@@ -222,8 +222,7 @@ class Evaluator:
                 run_evaluation.set_postfix(best_val_acc=best_val_acc)
         res = np.array(res)
 
-        if verbose:
-            print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        args.logger.info(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
         return res.mean(), res.std()
 
     def nas_evaluate(self, data, model_type, verbose=True, reduced=None):

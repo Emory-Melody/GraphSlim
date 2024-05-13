@@ -1,13 +1,12 @@
 import os
 import sys
-
-# os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 from configs import *
 from evaluation.eval_agent import Evaluator
 from graphslim.condensation import *
 from graphslim.dataset import *
+import logging
 
 args = cli(standalone_mode=False)
 

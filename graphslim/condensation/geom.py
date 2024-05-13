@@ -40,24 +40,22 @@ class GEOM(GCondBase):
             self.buffer_cl(data)
             print("=================Finish buffer===============")
 
-        self.init_coreset_select(data)
+        # self.init_coreset_select(data)
+        #
+        #
+        # if args.setting == 'trans':
+        #     features, adj, labels = data.feat_full, data.adj_full, data.labels_full
+        # else:
+        #     features, adj, labels = data.feat_train, data.adj_train, data.labels_train
+        # feat_init, adj_init, labels_init = self.get_coreset_init(features, adj, labels)
+        # feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init,
+        #                                              label=labels_init, device=self.device)
 
-        # random.seed(15)
-        # np.random.seed(15)
-        # torch.manual_seed(15)
-        # torch.cuda.manual_seed(15)
+        # features_tensor, adj_tensor, labels_tensor = to_tensor(features, adj, label=labels, device=self.device)
+        feat_init, adj_init = self.init(with_adj=True)
+        labels_init = to_tensor(label=self.labels_syn)
+        # adj_tensor_norm = normalize_adj_tensor(adj_tensor, sparse=True)
 
-        if args.setting == 'trans':
-            features, adj, labels = data.feat_full, data.adj_full, data.labels_full
-        else:
-            features, adj, labels = data.feat_train, data.adj_train, data.labels_train
-        feat_init, adj_init, labels_init = self.get_coreset_init(features, adj, labels)
-        feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init,
-                                                     label=labels_init, device=self.device)
-        features_tensor, adj_tensor, labels_tensor = to_tensor(features, adj, label=labels, device=self.device)
-        adj_tensor_norm = normalize_adj_tensor(adj_tensor, sparse=True)
-
-        self.feat_syn.data.copy_(feat_init)
         self.labels_syn = labels_init
         self.adj_syn_init = adj_init
 
@@ -204,9 +202,9 @@ class GEOM(GCondBase):
                 # if step % 500 == 0:
                 #     output_test = model.forward(features_tensor, adj_tensor_norm, flat_param=student_params[-1])
                 #     acc_test = accuracy(output_test[data.idx_test], labels_tensor[[data.idx_test]])
-                    # print('loss = {:.4f},acc_syn = {:.4f},acc_test = {:.4f}'.format(loss_syn.item(),
-                    #                                                                        acc_syn.item(),
-                    #                                                                        acc_test.item()))
+                # print('loss = {:.4f},acc_syn = {:.4f},acc_test = {:.4f}'.format(loss_syn.item(),
+                #                                                                        acc_syn.item(),
+                #                                                                        acc_test.item()))
 
             param_loss = torch.tensor(0.0).to(self.device)
             param_dist = torch.tensor(0.0).to(self.device)

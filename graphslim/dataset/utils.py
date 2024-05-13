@@ -1,6 +1,7 @@
 import os
 import sys
 from graphslim.dataset.convertor import *
+import logging
 
 
 def index2mask(index, size):
@@ -69,11 +70,10 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
                    f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
         torch.save(labels_syn,
                    f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-        if args.verbose:
-            print("Saved reduced data")
+        print(f"Saved reduced data with val {args.valid_result}")
 
 
-def load_reduced(args, valid_result=0):
+def load_reduced(args, valid_result=0, logger=None):
     save_path = 'dataset/output'
     adj_syn = torch.load(
         f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
@@ -81,8 +81,7 @@ def load_reduced(args, valid_result=0):
         f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
     labels_syn = torch.load(
         f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    if args.verbose:
-        print(f"Loaded reduced data with val {valid_result}")
+    logger.info(f"Loaded reduced data with val {valid_result}")
     return adj_syn, feat_syn, labels_syn
 
 # =============from graphsaint================#
