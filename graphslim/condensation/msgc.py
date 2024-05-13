@@ -40,7 +40,7 @@ class MSGC(GCondBase):
 
         adj = normalize_adj_tensor(adj, sparse=True)
         y_syn = self.y_syn.repeat(self.batch_size)
-        assert args.condense_model != 'GAT'
+        # assert args.condense_model != 'GAT'
         basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
         self.reset_adj_batch()

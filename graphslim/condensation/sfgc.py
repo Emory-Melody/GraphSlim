@@ -30,7 +30,7 @@ class SFGC(GCondBase):
         buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 200  # 200
+            args.num_experts = 20  # 200
             if not os.path.exists(buf_dir):
                 os.mkdir(buf_dir)
 

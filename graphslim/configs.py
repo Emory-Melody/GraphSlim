@@ -58,7 +58,7 @@ def method_config(args):
 
 @click.command()
 @click.option('--dataset', '-D', default='cora', show_default=True)
-@click.option('--gpu_id', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
+@click.option('--gpu_id', '-G', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--run_eval', default=10, show_default=True)
@@ -120,7 +120,8 @@ def cli(ctx, **kwargs):
     try:
         args = dict2obj(kwargs)
         if args.gpu_id >= 0:
-            args.device = f'cuda:{args.gpu_id}'
+            os.environ["CUDA_VISIBLE_DEVICES"] = f"{args.gpu_id}"
+            args.device = f'cuda:0'
         else:
             # if gpu_id=-1, use cpu
             args.device = 'cpu'
