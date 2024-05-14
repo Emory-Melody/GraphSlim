@@ -15,8 +15,8 @@ class APPNP(BaseGNN):
 
         super(APPNP, self).__init__(nfeat, nhid, nclass, args, mode)
 
-        if mode in ['eval']:
-            self.ntrans = 1
+        # if mode in ['eval']:
+        #     self.ntrans = 1
         if self.ntrans == 1:
             self.layers.append(MyLinear(nfeat, nclass))
         else:
@@ -33,8 +33,8 @@ class APPNP(BaseGNN):
         self.sparse_dropout = SparseDropout(dprob=0)
 
         activation_functions = {
-            'sigmoid': F.sigmoid,
-            'tanh': F.tanh,
+            'sigmoid': torch.sigmoid,
+            'tanh': torch.tanh,
             'relu': F.relu,
             'linear': lambda x: x,
             'softplus': F.softplus,

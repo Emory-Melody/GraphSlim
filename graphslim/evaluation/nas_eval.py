@@ -11,6 +11,7 @@ from graphslim.evaluation.eval_agent import Evaluator
 
 
 def save_csv(file_path, num):
+    file_path = Path(file_path)
     with file_path.open(mode='w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(num)
@@ -18,6 +19,7 @@ def save_csv(file_path, num):
 
 
 def load_csv(file_path):
+    file_path = Path(file_path)
     with file_path.open(mode='r', newline='') as file:
         reader = csv.reader(file)
         data = list(reader)
@@ -25,11 +27,13 @@ def load_csv(file_path):
 
 
 def save_pkl(file_path, data):
+    file_path = Path(file_path)
     with open(file_path, 'wb') as f:
         pkl.dump(data, f)
 
 
 def load_pkl(file_path):
+    file_path = Path(file_path)
     with open(file_path, 'rb') as f:
         data = pkl.load(f)
     return data
@@ -47,11 +51,13 @@ class NasEvaluator:
         alphas = [0.1, 0.2]
         activations = ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6',
                        'elu']
-        # ks = [2]
-        # nhids = [16]
+        # ks = [2, 4, 6]
+        # nhids = [16, 32]
         # alphas = [0.1]
-        # activations = ['sigmoid', 'tanh']
-
+        # activations = ['relu']
+        self.save_path = f'checkpoints/nas/{args.dataset}'
+        if not os.path.exists(self.save_path):
+            os.makedirs(self.save_path)
         self.parameter_combinations = list(product(ks, nhids, alphas, activations))
 
     def evaluate_ori(self, data):
@@ -61,7 +67,8 @@ class NasEvaluator:
             args = self.args
             args.run_evaluation = 1
             args.nlayers, args.hidden, args.alpha, args.activation = params
-
+            args.eval_epochs = 600
+            args.ntrans = 2
             evaluator = Evaluator(args)
             acc_val_ori, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=False, verbose=False)
             self.results_ori.append(acc_val_ori)
@@ -71,16 +78,10 @@ class NasEvaluator:
                 self.best_params_ori = params
 
         # save the eval result
-        save_path = Path(f'./output')
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        file_path = Path(f'./output/{self.args.dataset}_results_ori.csv')
+        file_path = f'{self.save_path}/results_ori.csv'
         save_csv(file_path, self.results_ori)
-        file_path = Path(f'./output/{self.args.dataset}_best_params_ori.pkl')
+        file_path = f'{self.save_path}/best_params_ori.pkl'
         save_pkl(file_path, self.best_params_ori)
-
-        # self.cal_pearson()
-        # self.test_params_ori(data)
 
     def evaluate_syn(self, data):
         # train and eval model architecture
@@ -89,7 +90,7 @@ class NasEvaluator:
             args = self.args
             args.run_evaluation = 1
             args.nlayers, args.hidden, args.alpha, args.activation = params
-
+            args.ntrans = 2
             evaluator = Evaluator(args)
             acc_val_syn, _ = evaluator.nas_evaluate(data, model_type='APPNP', reduced=True, verbose=False)
             self.results_syn.append(acc_val_syn)
@@ -98,19 +99,21 @@ class NasEvaluator:
                 best_acc_val_syn = acc_val_syn
                 self.best_params_syn = params
 
-        file_path = Path(f'./output/{self.args.dataset}_{self.args.method}_results_syn.csv')
+        file_path = f'{self.save_path}/{self.args.method}_results_syn.csv'
         save_csv(file_path, self.results_syn)
-        file_path = Path(f'./output/{self.args.dataset}_{self.args.method}_best_params_syn.pkl')
+        file_path = f'{self.save_path}/{self.args.method}_best_params_syn.pkl'
         save_pkl(file_path, self.best_params_syn)
 
     def test_params_ori(self, data):
         if self.best_params_ori is None:
-            file_path = Path(f'./output/{self.args.dataset}_best_params_ori.pkl')
+            file_path = f'{self.save_path}/best_params_ori.pkl'
             self.best_params_ori = load_pkl(file_path)
         # print("best_params_ori", self.best_params_ori)
         self.args.logger.info(f"best_params_ori: {self.best_params_ori}")
         args = self.args
-        args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_ori
+        # args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_ori
+        args.eval_epochs = 600
+        args.ntrans = 2
         evaluator = Evaluator(args)
         acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         # print("NAS: test accuracy on ori graph:", acc_test_ori)
@@ -118,12 +121,14 @@ class NasEvaluator:
 
     def test_params_syn(self, data):
         if self.best_params_syn is None:
-            file_path = Path(f'./output/{self.args.dataset}_{self.args.method}_best_params_syn.pkl')
+            file_path = f'{self.save_path}/{self.args.method}_best_params_syn.pkl'
             self.best_params_syn = load_pkl(file_path)
         # print("best_params_syn", self.best_params_syn)
         self.args.logger.info(f"best_params_syn: {self.best_params_syn}")
         args = self.args
         args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_syn
+        args.eval_epochs = 600
+        args.ntrans = 2
         evaluator = Evaluator(args)
         acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
         # print("NAS: test accuracy on syn graph:", acc_test_syn)
@@ -133,14 +138,12 @@ class NasEvaluator:
         sorted_tuples = sorted(enumerate(results), key=lambda x: x[1], reverse=True)
         rank_count = 1
 
-        # 生成排名字典，键为元素值，值为排名
         rank_dict = {}
         for _, value in sorted_tuples:
             if value not in rank_dict:
                 rank_dict[value] = rank_count
             rank_count += 1
 
-        # 使用排名字典获取每个元素的排名
         ranks = [rank_dict[value] for value in results]
 
         return ranks
@@ -148,8 +151,8 @@ class NasEvaluator:
     def cal_pearson(self):
         if len(self.results_syn) == 0 or len(self.results_ori) == 0:
             self.results_syn = [float(x) for x in load_csv(
-                Path(f'./output/{self.args.dataset}_{self.args.method}_results_syn.csv'))[0]]
-            self.results_ori = [float(x) for x in load_csv(Path(f'./output/{self.args.dataset}_results_ori.csv'))[0]]
+                f'{self.save_path}/{self.args.method}_results_syn.csv')[0]]
+            self.results_ori = [float(x) for x in load_csv(f'{self.save_path}/results_ori.csv')[0]]
         # print("ori acc:", self.results_ori)
         # print("syn acc:", self.results_syn)
         self.args.logger.info(f"ori acc:, {self.results_ori}")

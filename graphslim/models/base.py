@@ -25,7 +25,6 @@ class BaseGNN(nn.Module):
         self.layers = nn.ModuleList([])
 
         if mode == 'eval':
-            self.nlayers = 2
             self.dropout = 0
             self.weight_decay = 5e-4
 

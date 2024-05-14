@@ -17,7 +17,8 @@ if __name__ == '__main__':
 
     all_res = []
     for i in range(args.run_reduction):
-        seed_everything(args.seed + i)
+        args.seed = i + 1
+        seed_everything(args.seed)
         if args.method == 'kcenter' and not args.aggpreprocess:
             agent = KCenter(setting=args.setting, data=graph, args=args)
         elif args.method == 'kcenter' and args.aggpreprocess:
@@ -37,4 +38,4 @@ if __name__ == '__main__':
         res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
         all_res.append([res_mean, res_std])
     all_res = np.array(all_res)
-    print(f'Test Mean Result: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
+    args.logger.info(f'Final Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')

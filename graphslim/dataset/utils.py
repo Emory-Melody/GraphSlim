@@ -49,39 +49,28 @@ def splits(data, exp):
     return data
 
 
-def save_reduced(adj_syn, feat_syn, labels_syn, args, valid_result=0):
-    save_path = 'dataset/output'
+def save_reduced(adj_syn, feat_syn, labels_syn, args):
+    save_path = f'checkpoints/reduced_graph/{args.method}'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    if valid_result >= args.valid_result:
-        try:
-            os.remove(
-                f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-            os.remove(
-                f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-            os.remove(
-                f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-        except FileNotFoundError:
-            pass
-        args.valid_result = valid_result
-        torch.save(adj_syn,
-                   f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-        torch.save(feat_syn,
-                   f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-        torch.save(labels_syn,
-                   f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{args.valid_result}.pt')
-        print(f"Saved reduced data with val {args.valid_result}")
+    torch.save(adj_syn,
+               f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    torch.save(feat_syn,
+               f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    torch.save(labels_syn,
+               f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    args.logger.info(f"Saved {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
 
 
-def load_reduced(args, valid_result=0, logger=None):
-    save_path = 'dataset/output'
+def load_reduced(args):
+    save_path = f'checkpoints/reduced_graph/{args.method}'
     adj_syn = torch.load(
-        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     feat_syn = torch.load(
-        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
+        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     labels_syn = torch.load(
-        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.method}_{args.seed}_{valid_result}.pt')
-    # logger.info(f"Loaded reduced data with val {valid_result}")
+        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    # args.logger.info(f"Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
     return adj_syn, feat_syn, labels_syn
 
 # =============from graphsaint================#

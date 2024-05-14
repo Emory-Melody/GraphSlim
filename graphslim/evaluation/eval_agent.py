@@ -69,7 +69,11 @@ class Evaluator:
     def get_syn_data(self, model_type, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args, args.valid_result, args.logger)
+        try:
+            adj_syn, feat_syn, labels_syn = load_reduced(args)
+        except:
+            args.logger.info("Not find reduced graph.")
+            exit()
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
         elif isinstance(adj_syn, torch.sparse.FloatTensor):
@@ -81,7 +85,6 @@ class Evaluator:
 
     def grid_search(self, data, model_type, param_grid):
         args = self.args
-        args.eval_epochs = 100
         best_result = None
         best_params = None
         for params in tqdm(ParameterGrid(param_grid)):
@@ -90,7 +93,7 @@ class Evaluator:
 
             res = []
             for i in range(args.run_eval):
-                seed_everything(args.seed + i)
+                seed_everything(i)
                 res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
             res = np.array(res)
             res_mean, res_std = res.mean(), res.std()
@@ -100,15 +103,19 @@ class Evaluator:
             if best_result is None or res_mean > best_result[0]:
                 best_result = (res_mean, res_std)
                 best_params = params
-
-        print(
-            f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+        if args.verbose:
+            print(
+                f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         return best_result, best_params
 
     def train_cross(self, data):
         args = self.args
         gs_results = {}
         gs_params = {
+            # 'MLP': {'hidden': [64], 'lr': [0.01, 0.001], 'weight_decay': [0],
+            #         'dropout': [0.0]},
+            # 'GCN': {'hidden': [64, 256], 'lr': [0.01], 'weight_decay': [0],
+            #                 'dropout': [0.0]},
             'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5]},
             'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
@@ -127,7 +134,7 @@ class Evaluator:
         for model_type in gs_params.keys():
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
-            print(f'Starting Grid Search for {model_type}')
+            args.logger.info(f'Starting Grid Search for {model_type}')
             gs_results[model_type] = self.grid_search(data, model_type, gs_params[model_type])
 
         for model_type in gs_params.keys():
@@ -201,7 +208,7 @@ class Evaluator:
     #         res_mean, res_std = res.mean(), res.std()
     #         print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
-    def evaluate(self, data, model_type, verbose=True, reduced=True):
+    def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
 
         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
@@ -214,14 +221,14 @@ class Evaluator:
 
         res = []
         for i in run_evaluation:
-            seed_everything(args.seed + i)
-            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode='eval')
+            seed_everything(i)
+            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode=mode)
             res.append(best_val_acc)
             if verbose:
                 run_evaluation.set_postfix(best_val_acc=best_val_acc)
         res = np.array(res)
 
-        args.logger.info(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
         return res.mean(), res.std()
 
     def nas_evaluate(self, data, model_type, verbose=False, reduced=None):

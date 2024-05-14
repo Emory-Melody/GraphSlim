@@ -253,8 +253,8 @@ class GEOM(GCondBase):
 
             if torch.isnan(total_loss) or torch.isnan(grand_loss):
                 break  # Break out of the loop if either is NaN
-            bar.set_postfix_str(
-                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {self.syn_lr.item():.4f}")
+            # bar.set_postfix_str(
+            #     f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {self.syn_lr.item():.4f}")
             # print(
             #     "Iteration {}: Total_Loss = {:.4f}, Grand_Loss={:.4f}, Start_Epoch= {}, Student_LR = {:6f}".format(
             #         it,

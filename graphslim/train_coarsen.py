@@ -15,7 +15,8 @@ if __name__ == '__main__':
     graph = get_dataset(args.dataset, args)
     all_res = []
     for i in range(args.run_reduction):
-        seed_everything(args.seed + i)
+        args.seed = i + 1
+        seed_everything(args.seed)
         if args.method == 'vng':
             agent = VNG(setting=args.setting, data=graph, args=args)
         elif args.method == 'variation_neighborhoods':
