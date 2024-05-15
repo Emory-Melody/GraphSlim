@@ -64,7 +64,7 @@ def method_config(args):
 @click.option('--run_eval', default=10, show_default=True)
 @click.option('--run_inter_eval', default=5, show_default=True)
 @click.option('--run_reduction', default=3, show_default=True)
-@click.option('--eval_interval', default=10, show_default=True)
+@click.option('--eval_interval', default=100, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=300, show_default=True)
 @click.option('--eval_model', default='GCN',
@@ -76,6 +76,7 @@ def method_config(args):
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
               ), show_default=True)
 @click.option('--epochs', '--eps', default=1000, show_default=True)
+# @click.option('--valid_result', '--vr', default=0.0, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=0, show_default=True)
