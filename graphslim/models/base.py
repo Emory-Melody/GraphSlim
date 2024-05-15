@@ -166,7 +166,7 @@ class BaseGNN(nn.Module):
         self.load_state_dict(weights)
         return best_acc_val
 
-    def test(self, data=None, setting='trans', verbose=False):
+    def test(self, data=None, setting='trans', verbose=False, normadj=True):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
@@ -175,19 +175,19 @@ class BaseGNN(nn.Module):
         """
         self.eval()
         idx_test = data.idx_test
-        # whether condensed or not, use the raw graph to test
-        if setting == 'ind':
-            output = self.predict(data.feat_test, data.adj_test)
-        else:
-            output = self.predict(data.feat_full, data.adj_full)
-
-        # output = self.output
         labels_test = torch.LongTensor(data.labels_test).to(self.device)
+        # whether condensed or not, use the raw graph to test
 
         if setting == 'ind':
+            if normadj:
+                adj_test = normalize_adj_tensor(data.adj_test, sparse=is_sparse_tensor(data.adj_test))
+            output = self.predict(data.feat_test, adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
         else:
+            if normadj:
+                adj_full = normalize_adj_tensor(data.adj_test, sparse=is_sparse_tensor(data.adj_test))
+            output = self.predict(data.feat_full, adj_full)
             loss_test = F.nll_loss(output[idx_test], labels_test)
             acc_test = accuracy(output[idx_test], labels_test)
 

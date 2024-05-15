@@ -36,7 +36,11 @@ class MSGC(GCondBase):
     def reduce(self, data, verbose=True):
 
         args = self.args
-        features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        if args.setting == 'trans':
+            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        else:
+            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
+                                              device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
         y_syn = self.y_syn.repeat(self.batch_size)

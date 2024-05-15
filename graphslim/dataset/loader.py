@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit2
 from torch_geometric.loader import NeighborSampler
-from torch_geometric.utils import to_undirected
+from torch_geometric.utils import to_undirected, add_self_loops
 from torch_sparse import SparseTensor
 
 from graphslim.dataset.convertor import ei2csr, csr2ei
@@ -73,6 +73,8 @@ class TransAndInd:
         self.pyg_saint(data)
         if dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
             self.edge_index = to_undirected(self.edge_index, self.num_nodes)
+            if dataset in ['flickr', 'reddit']:
+                self.edge_index = add_self_loops(self.edge_index, num_nodes=self.num_nodes)
             feat_train = self.x[data.idx_train]
             scaler = StandardScaler()
             scaler.fit(feat_train)
