@@ -110,7 +110,6 @@ class Evaluator:
 
     def train_cross(self, data):
         args = self.args
-        gs_results = {}
         gs_params = {
             # 'MLP': {'hidden': [64], 'lr': [0.01, 0.001], 'weight_decay': [0],
             #         'dropout': [0.0]},
@@ -134,11 +133,8 @@ class Evaluator:
         for model_type in gs_params.keys():
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
-            args.logger.info(f'Starting Grid Search for {model_type}')
-            gs_results[model_type] = self.grid_search(data, model_type, gs_params[model_type])
-
-        for model_type in gs_params.keys():
-            best_result, best_params = gs_results[model_type]
+            print(f'Starting Grid Search for {model_type}')
+            best_result, best_params = self.grid_search(data, model_type, gs_params[model_type])
             args.logger.info(
                 f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
 
