@@ -111,10 +111,15 @@ class BaseGNN(nn.Module):
         else:
             adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, label=data.labels_train,
                                                           label2=data.labels_val, device=self.device)
-        if normadj:
-            adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
-
-        # features = F.normalize(features, p=2, dim=1)
+        if self.__class__.__name__ == 'GAT':
+            # gat must use SparseTensor
+            if len(adj.shape) == 3:
+                adj = [normalize_adj_tensor(a.to_sparse(), sparse=True) for a in adj]
+            else:
+                adj = normalize_adj_tensor(adj.to_sparse(), sparse=True)
+        else:
+            # others are forced to be dense tensor
+            adj = normalize_adj_tensor(adj, sparse=False)
 
         if self.args.method == 'geom' and self.args.soft_label:
             self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)

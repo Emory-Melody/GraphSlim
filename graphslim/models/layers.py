@@ -240,6 +240,8 @@ class GATConv(MessagePassing):
         return '{}({}, {}, heads={})'.format(self.__class__.__name__,
                                              self.in_channels,
                                              self.out_channels, self.heads)
+
+
 class SageConvolution(torch.nn.Module):
     def __init__(self, in_channels, out_channels):
         super(SageConvolution, self).__init__()

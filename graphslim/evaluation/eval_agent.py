@@ -60,20 +60,13 @@ class Evaluator:
                 print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
             # else:
             #     print("structure free methods do not need to truncate the adjacency matrix")
-        if model_type == 'GAT':
-            # GATconv only supports sparse tensor
-            return adj_syn.to_sparse_coo()
-        else:
-            return adj_syn
+        return adj_syn
 
     def get_syn_data(self, model_type, verbose=False):
 
         args = self.args
-        try:
-            adj_syn, feat_syn, labels_syn = load_reduced(args)
-        except:
-            args.logger.info("Not find reduced graph.")
-            exit()
+        adj_syn, feat_syn, labels_syn = load_reduced(args)
+
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
         elif isinstance(adj_syn, torch.sparse.FloatTensor):
@@ -111,10 +104,6 @@ class Evaluator:
     def train_cross(self, data):
         args = self.args
         gs_params = {
-            # 'MLP': {'hidden': [64], 'lr': [0.01, 0.001], 'weight_decay': [0],
-            #         'dropout': [0.0]},
-            # 'GCN': {'hidden': [64, 256], 'lr': [0.01], 'weight_decay': [0],
-            #                 'dropout': [0.0]},
             'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5]},
             'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
@@ -185,24 +174,6 @@ class Evaluator:
                       "accuracy= {:.4f}".format(acc_test.item()))
 
         return res[0]
-
-    # def train_cross(self, data):
-    #     args = self.args
-    #     args.valid_result = 0
-    #     for model_type in ['GAT']:  #
-    #         data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
-    #                                                                          verbose=args.verbose)
-    #         if args.verbose:
-    #             run_evaluation = trange(args.run_evaluation)
-    #         else:
-    #             run_evaluation = range(args.run_evaluation)
-    #         res = []
-    #         for i in run_evaluation:
-    #             seed_everything(args.seed + i)
-    #             res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='eval'))
-    #         res = np.array(res)
-    #         res_mean, res_std = res.mean(), res.std()
-    #         print(f'{model_type} Test Mean Result: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
