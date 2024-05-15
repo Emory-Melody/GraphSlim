@@ -93,8 +93,9 @@ class BaseGNN(nn.Module):
                 adj = [normalize_adj_tensor(a.to_sparse(), sparse=True) for a in adj]
             else:
                 adj = normalize_adj_tensor(adj.to_sparse(), sparse=True)
+        elif self.__class__.__name__ == 'GraphSage' and self.args.method == 'msgc':
+            adj = adj
         else:
-            # others are forced to be dense tensor
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         if self.args.method == 'geom' and self.args.soft_label:

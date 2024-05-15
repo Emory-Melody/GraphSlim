@@ -40,9 +40,9 @@ class GraphConvolution(torch.nn.Module):
             x = torch.mm(x, self.weight)
             x = matmul(adj, x)
         else:
-            x = x.reshape(-1, x.shape[-1])
+            x = x.view(-1, x.shape[-1])
             x = torch.mm(x, self.weight)
-            x = x.reshape(-1, adj.shape[1], x.shape[-1])
+            x = x.view(-1, adj.shape[-1], x.shape[-1])
             x = adj @ x
         x.view(-1, x.shape[-1])
         if self.bias is not None:
@@ -264,11 +264,11 @@ class SageConvolution(torch.nn.Module):
             out += self.lin_r(x[:adj_t.size(0)])
         else:
             h1 = self.lin_r(x)
-            h1 = h1.reshape(-1, adj_t.shape[1], h1.shape[1])
-            h2 = adj_t @ x.reshape(-1, adj_t.shape[1], x.shape[1])
-            h2 = h2.reshape(-1, h2.shape[2])
+            h1 = h1.view(-1, adj_t.shape[-1], h1.shape[-1])
+            h2 = adj_t @ x.view(-1, adj_t.shape[-1], x.shape[-1])
+            h2 = h2.view(-1, h2.shape[-1])
             h2 = self.lin_r(h2)
-            h2 = h2.reshape(-1, adj_t.shape[1], h2.shape[1])
+            h2 = h2.view(-1, adj_t.shape[-1], h2.shape[-1])
             out = h1 + h2
         out.view(-1, out.shape[-1])
         return out
