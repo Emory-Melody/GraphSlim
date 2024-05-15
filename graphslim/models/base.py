@@ -70,7 +70,6 @@ class BaseGNN(nn.Module):
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
-
     def fit_with_val(self, data, train_iters=600, verbose=False,
                      normadj=True, setting='trans', reduced=False, reindex=False,
                      **kwargs):
@@ -131,11 +130,11 @@ class BaseGNN(nn.Module):
 
         optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
+        self.train()
         for i in range(train_iters):
-            if i == train_iters // 2 and self.args.method not in ['geom']:
+            if i == train_iters // 2:
                 optimizer = optim.Adam(self.parameters(), lr=self.lr * 0.1, weight_decay=self.weight_decay)
 
-            self.train()  # ?
             optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)

@@ -118,37 +118,6 @@ class GCondBase:
             coeff = self.num_class_dict[c] / self.nnodes_syn
             ml = match_loss(gw_syns, gw_reals, args, device=self.device)
             loss += coeff * ml
-        # for c in range(data.nclass):
-        #     batch_size, n_id, adjs = data.retrieve_class_sampler(
-        #         c, adj, args)
-        #     if args.nlayers == 1:
-        #         adjs = [adjs]
-        #
-        #     adjs = [adj.to(self.device) for adj in adjs]
-        #     output = model.forward_sampler(features[n_id], adjs)
-        #     loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-        #     gw_real = torch.autograd.grad(loss_real, model_parameters)
-        #     gw_real = list((_.detach().clone() for _ in gw_real))
-        #     if args.setting == 'ind':
-        #         ind = syn_class_indices[c]
-        #         if args.nlayers == 1:
-        #             adj_syn_norm_list = [adj_syn_norm[ind[0]: ind[1]]]
-        #         else:
-        #             adj_syn_norm_list = [adj_syn_norm] * (args.nlayers - 1) + \
-        #                                 [adj_syn_norm[ind[0]: ind[1]]]
-        #
-        #         output_syn = model.forward_syn(feat_syn, adj_syn_norm_list)
-        #         loss_syn = F.nll_loss(output_syn, labels_syn[ind[0]: ind[1]])
-        #     else:
-        #         output_syn = model.forward(feat_syn, adj_syn_norm)
-        #         ind = syn_class_indices[c]
-        #         loss_syn = F.nll_loss(
-        #             output_syn[ind[0]: ind[1]],
-        #             labels_syn[ind[0]: ind[1]])
-        #
-        #     gw_syn = torch.autograd.grad(loss_syn, model_parameters, create_graph=True)
-        #     coeff = self.num_class_dict[c] / max(self.num_class_dict.values())
-        #     loss += coeff * match_loss(gw_syn, gw_real, args, device=self.device)
 
         return loss
 
