@@ -60,7 +60,7 @@ class APPNP(BaseGNN):
             if isinstance(adj_drop, SparseTensor):
                 x = torch_sparse.matmul(adj_drop, x)
             else:
-                x = torch.spmm(adj_drop, x)
+                x = adj_drop @ x
             x = x * (1 - self.alpha)
             x = x + self.alpha * h
 

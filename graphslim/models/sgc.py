@@ -45,42 +45,40 @@ class SGC(BaseGNN):
         for i in range(self.nlayers):
             if type(adj) == torch.Tensor:
                 x = adj @ x
-            elif isinstance(adj, list):
-                x = torch_sparse.matmul(adj[i], x)
             else:
-                x = torch_sparse.matmul(adj, x)
+                x = torch_sparse.matmul(adj[i], x)
 
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
-    def forward_sampler(self, x, adjs):
-        for ix, layer in enumerate(self.layers):
-            x = layer(x)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
-
-        for ix, (adj, _, size) in enumerate(adjs):
-            if type(adj) == torch.Tensor:
-                x = adj @ x
-            else:
-                x = torch_sparse.matmul(adj, x)
-
-        return F.log_softmax(x, dim=1)
-
-    def forward_syn(self, x, adjs):
-        for ix, layer in enumerate(self.layers):
-            x = layer(x)
-            if ix != len(self.layers) - 1:
-                x = self.bns[ix](x) if self.with_bn else x
-                x = F.relu(x)
-                x = F.dropout(x, self.dropout, training=self.training)
-
-        for ix, (adj) in enumerate(adjs):
-            if type(adj) == torch.Tensor:
-                x = adj @ x
-            else:
-                x = torch_sparse.matmul(adj, x)
-
-        return F.log_softmax(x, dim=1)
+    # def forward_sampler(self, x, adjs):
+    #     for ix, layer in enumerate(self.layers):
+    #         x = layer(x)
+    #         if ix != len(self.layers) - 1:
+    #             x = self.bns[ix](x) if self.with_bn else x
+    #             x = F.relu(x)
+    #             x = F.dropout(x, self.dropout, training=self.training)
+    #
+    #     for ix, (adj, _, size) in enumerate(adjs):
+    #         if type(adj) == torch.Tensor:
+    #             x = adj @ x
+    #         else:
+    #             x = torch_sparse.matmul(adj, x)
+    #
+    #     return F.log_softmax(x, dim=1)
+    #
+    # def forward_syn(self, x, adjs):
+    #     for ix, layer in enumerate(self.layers):
+    #         x = layer(x)
+    #         if ix != len(self.layers) - 1:
+    #             x = self.bns[ix](x) if self.with_bn else x
+    #             x = F.relu(x)
+    #             x = F.dropout(x, self.dropout, training=self.training)
+    #
+    #     for ix, (adj) in enumerate(adjs):
+    #         if type(adj) == torch.Tensor:
+    #             x = adj @ x
+    #         else:
+    #             x = torch_sparse.matmul(adj, x)
+    #
+    #     return F.log_softmax(x, dim=1)

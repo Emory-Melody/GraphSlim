@@ -70,29 +70,6 @@ class BaseGNN(nn.Module):
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
-    # def forward_sampler(self, x, adjs):
-    #     for ix, (adj, _, size) in enumerate(adjs):
-    #         x = self.layers[ix](x, adj)
-    #         if ix != len(self.layers) - 1:
-    #             x = self.bns[ix](x) if self.with_bn else x
-    #             if self.with_relu:
-    #                 x = F.relu(x)
-    #             x = F.dropout(x, self.dropout, training=self.training)
-    #
-    #     x.view(-1, x.shape[-1])
-    #     return F.log_softmax(x, dim=1)
-
-    # def forward_syn(self, x, adjs):
-    #     for ix, (adj) in enumerate(adjs):
-    #         x = self.layers[ix](x, adj)
-    #         if ix != len(self.layers) - 1:
-    #             x = self.bns[ix](x) if self.with_bn else x
-    #             if self.with_relu:
-    #                 x = F.relu(x)
-    #             x = F.dropout(x, self.dropout, training=self.training)
-    #
-    #     x = x.reshape(-1, x.shape[-1])
-    #     return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
                      normadj=True, setting='trans', reduced=False, reindex=False,
@@ -119,7 +96,7 @@ class BaseGNN(nn.Module):
                 adj = normalize_adj_tensor(adj.to_sparse(), sparse=True)
         else:
             # others are forced to be dense tensor
-            adj = normalize_adj_tensor(adj, sparse=False)
+            adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         if self.args.method == 'geom' and self.args.soft_label:
             self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)

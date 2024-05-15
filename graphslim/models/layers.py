@@ -315,7 +315,7 @@ class ChebConvolution(torch.nn.Module):
             if isinstance(adj, SparseTensor):
                 Tx_1 = matmul(adj, x)
             else:
-                Tx_1 = torch.spmm(adj, x)
+                Tx_1 = adj @ x
 
             if self.single_param:
                 output = output + self.lins[0](Tx_1)
@@ -328,7 +328,7 @@ class ChebConvolution(torch.nn.Module):
             if isinstance(adj, SparseTensor):
                 Tx_2 = matmul(adj, Tx_1)
             else:
-                Tx_2 = torch.spmm(adj, Tx_1)
+                Tx_2 = adj @ Tx_1
             Tx_2 = 2. * Tx_2 - Tx_0
             output = output + lin.forward(Tx_2)
             Tx_0, Tx_1 = Tx_1, Tx_2
@@ -366,10 +366,7 @@ class MyLinear(torch.nn.Module):
             self.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, input):
-        if input.data.is_sparse:
-            support = torch.spmm(input, self.weight)
-        else:
-            support = torch.mm(input, self.weight)
+        support = input @ self.weight
         output = support
         if self.bias is not None:
             return output + self.bias
