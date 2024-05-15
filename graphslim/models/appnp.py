@@ -63,7 +63,7 @@ class APPNP(BaseGNN):
                 x = adj_drop @ x
             x = x * (1 - self.alpha)
             x = x + self.alpha * h
-
+        x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):
