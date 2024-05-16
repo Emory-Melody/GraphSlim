@@ -81,7 +81,7 @@ class MSGC(GCondBase):
                     optimizer_x.step()
 
                 x_syn = self.feat_syn.detach()
-                adj_t_syn = self.adj_syn.detach()
+                adj_t_syn = self.get_adj_t_syn().detach()
                 #################################################
                 for i in range(args.inner_loop):
                     optimizer_basic_model.zero_grad()
@@ -94,6 +94,7 @@ class MSGC(GCondBase):
             x_syns.append(x_syn)
             adj_t_syns.append(adj_t_syn)
             loss_window = sum(losses.data) / len(losses.data)
+            print(f'loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
             if it in args.checkpoints:
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)

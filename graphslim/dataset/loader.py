@@ -73,8 +73,6 @@ class TransAndInd:
         self.pyg_saint(data)
         if dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
             self.edge_index = to_undirected(self.edge_index, self.num_nodes)
-            if dataset in ['flickr', 'reddit']:
-                self.edge_index = add_self_loops(self.edge_index, num_nodes=self.num_nodes)
             feat_train = self.x[data.idx_train]
             scaler = StandardScaler()
             scaler.fit(feat_train)

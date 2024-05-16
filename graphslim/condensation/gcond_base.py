@@ -32,7 +32,7 @@ class GCondBase:
         # from collections import Counter; print(Counter(data.labels_train))
 
         self.feat_syn = nn.Parameter(torch.empty(n, d).to(self.device))
-        if args.method not in ['sgdd', 'gcsntk']:
+        if args.method not in ['sgdd', 'gcsntk', 'msgc']:
             self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
             self.adj_syn = None
 
