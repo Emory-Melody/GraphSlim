@@ -11,7 +11,15 @@ class CoreSet:
         self.setting = setting
 
         self.device = args.device
-        self.num_class_dict, self.labels_train, self.idx_train = self.prepare_select(data, args)
+        if hasattr(data, 'label_syn'):
+            self.num_class_dict = data.num_class_dict
+            self.labels_train = data.labels_train
+            if args.setting == 'ind':
+                self.idx_train = np.arange(len(data.idx_train))
+            else:
+                self.idx_train = data.idx_train
+        else:
+            self.num_class_dict, self.labels_train, self.idx_train = self.prepare_select(data, args)
         self.condense_model = 'GCN'
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 

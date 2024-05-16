@@ -91,8 +91,8 @@ class MSGC(GCondBase):
                     optimizer_basic_model.step()
             loss_avg /= (data.nclass * args.outer_loop)
             losses.append(loss_avg)
-            x_syns.append(x_syn)
-            adj_t_syns.append(adj_t_syn)
+            x_syns.append(x_syn.clone())
+            adj_t_syns.append(adj_t_syn.clone())
             loss_window = sum(losses.data) / len(losses.data)
             print(f'loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
             if it in args.checkpoints:
