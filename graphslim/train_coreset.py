@@ -38,4 +38,4 @@ if __name__ == '__main__':
         res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
         all_res.append([res_mean, res_std])
     all_res = np.array(all_res)
-    args.logger.info(f'Final Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
+    args.logger.info(f'Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')

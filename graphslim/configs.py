@@ -117,37 +117,37 @@ def method_config(args):
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
-    try:
-        args = dict2obj(kwargs)
-        if args.gpu_id >= 0:
-            os.environ["CUDA_VISIBLE_DEVICES"] = f"{args.gpu_id}"
-            args.device = f'cuda:0'
-        else:
-            # if gpu_id=-1, use cpu
-            args.device = 'cpu'
-        # print("device:", args.device)
-        # print("seed: ", args.seed)
-        seed_everything(args.seed)
-        path = "checkpoints"
-        if not os.path.exists(path):
-            os.mkdir(path)
-        args.path = path
-        # for benchmark, we need unified settings and reduce flexibility of args
-        args = method_config(args)
-        # setting_config has higher priority than methods_config
-        args = setting_config(args)
-        if not os.path.exists(f'{path}/logs'):
-            os.mkdir(f'{path}/logs')
-        if not os.path.exists(f'{path}/logs/{args.method}'):
-            os.mkdir(f'{path}/logs/{args.method}')
-        logging.basicConfig(filename=f'{path}/logs/{args.method}/{args.dataset}_{args.reduction_rate}.log',
-                            level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        args.logger = logging.getLogger(__name__)
-        args.logger.addHandler(logging.StreamHandler())
-        args.logger.info(args)
-        return args
-    except Exception as e:
-        click.echo(f'An error occurred: {e}', err=True)
+    # try:
+    args = dict2obj(kwargs)
+    if args.gpu_id >= 0:
+        os.environ["CUDA_VISIBLE_DEVICES"] = f"{args.gpu_id}"
+        args.device = f'cuda:0'
+    else:
+        # if gpu_id=-1, use cpu
+        args.device = 'cpu'
+    # print("device:", args.device)
+    # print("seed: ", args.seed)
+    seed_everything(args.seed)
+    path = "checkpoints"
+    if not os.path.exists(path):
+        os.mkdir(path)
+    args.path = path
+    # for benchmark, we need unified settings and reduce flexibility of args
+    args = method_config(args)
+    # setting_config has higher priority than methods_config
+    args = setting_config(args)
+    if not os.path.exists(f'{path}/logs'):
+        os.mkdir(f'{path}/logs')
+    if not os.path.exists(f'{path}/logs/{args.method}'):
+        os.mkdir(f'{path}/logs/{args.method}')
+    logging.basicConfig(filename=f'{path}/logs/{args.method}/{args.dataset}_{args.reduction_rate}.log',
+                        level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    args.logger = logging.getLogger(__name__)
+    args.logger.addHandler(logging.StreamHandler())
+    args.logger.info(args)
+    return args
+    # except Exception as e:
+    #     click.echo(f'An error occurred: {e}', err=True)
     # print(args)
 
 

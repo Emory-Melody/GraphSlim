@@ -88,6 +88,7 @@ class Evaluator:
             for i in range(args.run_eval):
                 seed_everything(i)
                 res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
+                torch.cuda.empty_cache()
             res = np.array(res)
             res_mean, res_std = res.mean(), res.std()
             if args.verbose:

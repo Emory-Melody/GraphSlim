@@ -23,5 +23,6 @@
   "syn_steps": 200,
   "beta": 0.05,
   "epochs": 2000,
-  "lr_feat": 0.0007
+  "lr_feat": 0.0007,
+  "init": "kcenter"
 }

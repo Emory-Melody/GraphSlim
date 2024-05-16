@@ -185,7 +185,7 @@ class GCondBase:
 
         res = np.array(res)
         current_val = res.mean()
-        args.logger.info('Val Accuracy and Std:', repr([current_val, res.std()]))
+        args.logger.info('Val Accuracy and Std:' + repr([current_val, res.std()]))
 
         if save and current_val > best_val:
             best_val = current_val
