@@ -35,6 +35,7 @@ def setting_config(args):
     args.pre_norm = True
     args.hidden = 256
     args.run_inter_eval = 3
+    args.eval_interval = args.epochs // 10
     args.checkpoints = range(-1, args.epochs + 1, args.eval_interval)
     args.eval_epochs = 300
     args.eval_model = 'GCN'

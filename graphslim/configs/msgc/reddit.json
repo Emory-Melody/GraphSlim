@@ -1,11 +1,12 @@
 {
-  "init": "averaging",
-  "lr_feat": 0.01,
-  "lr_adj": 0.01,
+  "init": "random",
+  "lr_feat": 0.1,
+  "lr_adj": 0.1,
   "dis_metric": "ours",
-  "ntrans": 2,
+  "ntrans": 1,
   "condense_model": "SGC",
   "threshold": 0.01,
   "outer_loop": 10,
-  "inner_loop": 1
+  "inner_loop": 1,
+  "epochs": 200
 }

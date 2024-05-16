@@ -5,7 +5,6 @@
   "dis_metric": "ours",
   "ntrans": 1,
   "pre_norm": true,
-  "batch_adj": 1,
   "condense_model": "SGC",
   "threshold": 0,
   "outer_loop": 20,

@@ -4,9 +4,9 @@
   "lr_adj": 0.01,
   "dis_metric": "ours",
   "ntrans": 2,
-  "batch_adj": 16,
   "condense_model": "SGC",
   "threshold": 0.01,
   "outer_loop": 20,
-  "inner_loop": 3
+  "inner_loop": 3,
+  "epochs": 1000
 }
