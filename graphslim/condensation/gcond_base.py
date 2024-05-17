@@ -19,12 +19,14 @@ class GCondBase:
         self.device = args.device
         self.setting = setting
 
-        # n = data.nclass * args.nsamples
-        self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
-        n = self.data.labels_syn.shape[0]
-        self.nnodes_syn = n
+        if args.method not in ['msgc']:
+            self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
+            n = self.data.labels_syn.shape[0]
+            self.nnodes_syn = n
+        else:
+            self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
-        self.d = d
+        # self.d = d
         print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
         print(f'actual reduced size:{n}')
 

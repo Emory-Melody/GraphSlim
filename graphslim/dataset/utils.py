@@ -64,12 +64,17 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args):
 
 def load_reduced(args):
     save_path = f'checkpoints/reduced_graph/{args.method}'
-    adj_syn = torch.load(
-        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+
     feat_syn = torch.load(
         f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
     labels_syn = torch.load(
         f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+    try:
+        adj_syn = torch.load(
+            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+    except:
+        print("find no adj, use identity matrix instead")
+        adj_syn = torch.eye(feat_syn.size(0), device=args.device)
     # args.logger.info(f"Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
     return adj_syn, feat_syn, labels_syn
 

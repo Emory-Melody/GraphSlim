@@ -46,6 +46,7 @@ def get_dataset(name, args):
             dataset = Amazon(root=path, name=name)
         elif name in ['ogbn-arxiv']:
             dataset = DataGraphSAINT(root=path, dataset=name)
+            dataset.num_classes = 40
         elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m']:
             dataset = PygNodePropPredDataset(name, root=path)
     else:
