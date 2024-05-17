@@ -8,7 +8,6 @@ from graphslim.models import *
 from graphslim.sparsification import *
 from graphslim.utils import *
 from graphslim.dataset.utils import save_reduced
-from math import ceil
 
 
 class GCondBase:
@@ -61,7 +60,7 @@ class GCondBase:
                 self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
                 labels_syn += [c] * num_class_dict[c]
             else:
-                num_class_dict[c] = ceil(num * self.args.reduction_rate)
+                num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
                 sum_ += num_class_dict[c]
                 self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
                 labels_syn += [c] * num_class_dict[c]
