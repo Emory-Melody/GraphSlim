@@ -27,7 +27,8 @@ class GCondBase:
             n = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
         # self.d = d
-        print(f'reduced size:{n}')
+        print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
+        print(f'actual reduced size:{n}')
 
         # from collections import Counter; print(Counter(data.labels_train))
 
