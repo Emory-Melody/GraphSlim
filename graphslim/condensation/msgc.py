@@ -20,7 +20,6 @@ class MSGC(GCondBase):
         self.n_syn = self.nnodes_syn
         n_each_y = self.generate_labels_syn(data)
         self.labels_syn = data.labels_syn = self.y_syn
-        self.feat_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
         self.batch_size = args.batch_adj
         self.n_classes = data.nclass
         self.device = args.device

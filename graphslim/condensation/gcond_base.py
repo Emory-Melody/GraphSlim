@@ -21,13 +21,12 @@ class GCondBase:
 
         if args.method not in ['msgc']:
             self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
-            n = self.data.labels_syn.shape[0]
-            self.nnodes_syn = n
+            n = self.nnodes_syn = self.data.labels_syn.shape[0]
         else:
-            self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
+            n = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         d = data.feat_train.shape[1]
         # self.d = d
-        print(f'reduced size:{self.nnodes_syn}')
+        print(f'reduced size:{n}')
 
         # from collections import Counter; print(Counter(data.labels_train))
 
