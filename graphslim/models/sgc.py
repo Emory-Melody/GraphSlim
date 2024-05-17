@@ -43,7 +43,9 @@ class SGC(BaseGNN):
                 x = F.dropout(x, self.dropout, training=self.training)
 
         for i in range(self.nlayers):
-            if type(adj) == torch.Tensor:
+            if isinstance(adj, list):
+                x = torch_sparse.matmul(adj[i], x)
+            elif type(adj) == torch.Tensor:
                 x = adj @ x
             else:
                 x = torch_sparse.matmul(adj, x)
