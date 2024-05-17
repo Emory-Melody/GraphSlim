@@ -46,7 +46,7 @@ class SGC(BaseGNN):
             if type(adj) == torch.Tensor:
                 x = adj @ x
             else:
-                x = torch_sparse.matmul(adj[i], x)
+                x = torch_sparse.matmul(adj, x)
 
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)

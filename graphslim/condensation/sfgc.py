@@ -90,12 +90,12 @@ class SFGC(GCondBase):
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
         syn_lr = torch.tensor(args.lr_student).float()
-        syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
-        optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
+        syn_lr = syn_lr.detach().to(self.device).requires_grad_(False)
+        # optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
 
         best_val = 0
 
-        bar = trange(args.epochs, ncols=80)
+        bar = trange(args.epochs, ncols=100)
         for it in bar:
             model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
 
@@ -131,18 +131,17 @@ class SFGC(GCondBase):
                 torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
 
             starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
-            print('it:{}--feat_max = {:.4f}, feat_min = {:.4f}'.format(it, torch.max(self.feat_syn),
-                                                                       torch.min(self.feat_syn)))
+            print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
             param_loss_list = []
             param_dist_list = []
 
             if it == 0:
                 feat_syn = self.feat_syn
                 adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
-                adj_syn_input = adj_syn_norm
+                adj_syn_input = to_tensor(adj_syn_norm, device=self.device)
             else:
                 feat_syn = self.feat_syn
-                adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
+                adj_syn = torch.eye(feat_syn.shape[0], device=self.device)
                 adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
                 adj_syn_input = adj_syn_cal_norm
             for step in range(args.syn_steps):
@@ -167,11 +166,11 @@ class SFGC(GCondBase):
             total_loss = param_loss
 
             self.optimizer_feat.zero_grad()
-            optimizer_lr.zero_grad()
+            # optimizer_lr.zero_grad()
 
             total_loss.backward()
             self.optimizer_feat.step()
-            optimizer_lr.step()
+            # optimizer_lr.step()
             if torch.isnan(total_loss):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(

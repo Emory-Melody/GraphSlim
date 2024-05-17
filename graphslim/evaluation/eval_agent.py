@@ -104,6 +104,7 @@ class Evaluator:
 
     def train_cross(self, data):
         args = self.args
+        eval_model_list = ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
         gs_params = {
             'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.0, 0.5]},
@@ -120,7 +121,7 @@ class Evaluator:
             'GAT': {'hidden': [64, 128], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                     'dropout': [0.05, 0.5, 0.7]}
         }
-        for model_type in gs_params.keys():
+        for model_type in eval_model_list:
             data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                              verbose=args.verbose)
             print(f'Starting Grid Search for {model_type}')

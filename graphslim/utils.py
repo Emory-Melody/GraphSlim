@@ -226,7 +226,6 @@ def tensor2onehot(labels):
     return onehot_mx
 
 
-
 def normalize_feature(mx):
     """Row-normalize sparse matrix or dense matrix
 
@@ -320,6 +319,7 @@ def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
     edge_index = torch.cat([edge_index, loop_index], dim=1)
 
     return edge_index, edge_weight
+
 
 def normalize_adj_tensor(adj, sparse=False):
     """Normalize adjacency tensor matrix.
@@ -707,8 +707,6 @@ def get_degree_squence(adj):
         return adj.sum(0)
     except:
         return ts.sum(adj, dim=1).to_dense()
-
-
 
 
 def degree_sequence_log_likelihood(degree_sequence, d_min):

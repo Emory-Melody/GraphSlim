@@ -20,7 +20,6 @@ class GCondBase:
         self.setting = setting
 
         # n = data.nclass * args.nsamples
-
         self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
         n = self.data.labels_syn.shape[0]
         self.nnodes_syn = n
@@ -70,7 +69,7 @@ class GCondBase:
             agent = Average(setting=args.setting, data=self.data, args=args)
         elif args.init == 'kcenter':
             agent = KCenter(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'Herding':
+        elif args.init == 'herding':
             agent = Herding(setting=args.setting, data=self.data, args=args)
         else:
             agent = Random(setting=args.setting, data=self.data, args=args)

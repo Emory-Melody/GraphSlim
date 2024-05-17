@@ -13,14 +13,16 @@ class MSGC(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
         super(MSGC, self).__init__(setting, data, args, **kwargs)
         x_channels = data.feat_train.shape[1]
-        edge_hidden_channels = 128
+        edge_hidden_channels = 256
         self.n_syn = self.nnodes_syn
-        self.y_syn = to_tensor(label=data.labels_syn, device=args.device)
+        self.y_syn = self.labels_syn
+        self.n_syn = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         self.feat_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
         self.batch_size = args.batch_adj
         self.n_classes = data.nclass
         self.device = args.device
 
+        self.regenerate_labels(data)
         self.adj_mlp = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
             nn.BatchNorm1d(edge_hidden_channels),
@@ -32,6 +34,31 @@ class MSGC(GCondBase):
         ).to(args.device)
         # -------------------------------------------------------------------------
         # self.reset_adj_batch()
+
+    def regenerate_labels(self, data):
+        labels_train = data.labels_train.to(self.device)
+        # labels_train = labels_train[labels_train >= 0]
+        n = labels_train.shape[0]
+        n_syn = self.nnodes_syn
+        base = torch.ones(data.nclass, device=self.device)
+        rate = F.one_hot(labels_train, num_classes=data.nclass).sum(0) / n
+        n_each_y = torch.floor((n_syn - base.sum()) * rate) + base
+        left = n_syn - n_each_y.sum()
+        for _ in range(int(left.item())):
+            more = n_each_y / n_each_y.sum() / rate
+            n_each_y[more.argmin()] += 1
+        n_each_y = n_each_y.to(torch.int64)
+
+        y_syn = torch.LongTensor(n_syn).to(self.device)
+        start = 0
+        starts = torch.zeros_like(n_each_y)
+        for c in range(data.nclass):
+            y_syn[start:start + n_each_y[c]] = c
+            starts[c] = start
+            start += n_each_y[c]
+        self.num_class_dict = self.data.num_class_dict = n_each_y
+        self.y_syn = y_syn
+        print(f'num_class:{n_each_y}')
 
     def reduce(self, data, verbose=True):
 
