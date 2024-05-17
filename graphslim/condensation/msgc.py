@@ -1,10 +1,13 @@
 from torch import nn
 from tqdm import trange
 
+from collections import Counter
+from sklearn.cluster import BisectingKMeans
 from graphslim.condensation.gcond_base import GCondBase
 from graphslim.condensation.utils import match_loss
 from graphslim.dataset.utils import save_reduced
 from graphslim.models import *
+from torch_scatter import scatter_mean
 from graphslim.utils import *
 
 
@@ -146,6 +149,39 @@ class MSGC(GCondBase):
 
         return data
 
+    def init(self, with_adj=False):
+        n_classes = self.data.nclass
+        y_syn = self.y_syn
+        # cluster is restricted in training set in MSGC.
+        x_train = self.data.feat_train
+        y_train = self.data.labels_train
+        if self.init == 'cluster':
+            x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
+            for c in range(n_classes):
+                x_c = x_train[y_train == c].cpu()
+                n_c = (y_syn == c).sum().item()
+                k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
+                k_means.fit(x_c)
+                clusters = torch.LongTensor(k_means.predict(x_c))
+                x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0)
+            return x_syn.to(x_train.device)
+        elif self.init == 'sample':
+            sam = SamplerForClass(y_train, n_classes)
+            counter = Counter(y_syn.cpu().numpy())
+            idx_selected_list = []
+            for c in range(n_classes):
+                idx_c = sam.sample_from_class(c, n_need_max=counter[c])
+                idx_selected_list.append(idx_c)
+            idx_selected = torch.cat(idx_selected_list).to(x_train.device)
+            return x_train[idx_selected]
+        elif self.init == 'mean':
+            x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1]).to(x_train.device)
+            for c in range(n_classes):
+                x_c = x_train[y_train == c]
+                n_c = (y_syn == c).sum()
+                x_syn[y_syn == c] = x_c.mean(0)
+            return x_syn
+
     def x_parameters(self):
         return [self.feat_syn]
 
@@ -216,3 +252,21 @@ class FixLenList:
         self.data.append(element)
         if len(self.data) > self.lenth:
             del self.data[0]
+
+
+class SamplerForClass:
+    '''
+    In inductive setting, sample $n_need_max nodes with label $class_id.
+    Return nodes ids, type:tensor.
+    '''
+
+    def __init__(self, labels, n_classes):
+        self.n_nodes = labels.shape[0]
+        idx_all = torch.arange(self.n_nodes)
+        self.class2idx = {}
+        for i in range(n_classes):
+            self.class2idx[i] = idx_all[labels == i]
+
+    def sample_from_class(self, class_id, n_need_max=256):
+        return self.class2idx[class_id] \
+            [torch.randperm(self.class2idx[class_id].shape[0])[:n_need_max]]
