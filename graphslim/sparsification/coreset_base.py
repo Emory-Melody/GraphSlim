@@ -11,7 +11,7 @@ class CoreSet:
         self.setting = setting
 
         self.device = args.device
-        if hasattr(data, 'label_syn'):
+        if hasattr(data, 'labels_syn'):
             self.num_class_dict = data.num_class_dict
             self.labels_train = data.labels_train
             if args.setting == 'ind':
