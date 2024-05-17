@@ -16,13 +16,15 @@ class MSGC(GCondBase):
         edge_hidden_channels = 256
         self.n_syn = self.nnodes_syn
         self.y_syn = self.labels_syn
-        self.n_syn = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
+        # self.n_syn = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         self.feat_syn = nn.Parameter(torch.empty(self.n_syn, x_channels).to(args.device))
         self.batch_size = args.batch_adj
         self.n_classes = data.nclass
         self.device = args.device
 
-        self.regenerate_labels(data)
+        n_each_y = self.regenerate_labels(data)
+        self.num_class_dict = self.data.num_class_dict = {index: value for index, value in enumerate(n_each_y)}
+
         self.adj_mlp = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
             nn.BatchNorm1d(edge_hidden_channels),
@@ -37,7 +39,6 @@ class MSGC(GCondBase):
 
     def regenerate_labels(self, data):
         labels_train = data.labels_train.to(self.device)
-        # labels_train = labels_train[labels_train >= 0]
         n = labels_train.shape[0]
         n_syn = self.nnodes_syn
         base = torch.ones(data.nclass, device=self.device)
@@ -56,9 +57,10 @@ class MSGC(GCondBase):
             y_syn[start:start + n_each_y[c]] = c
             starts[c] = start
             start += n_each_y[c]
-        self.num_class_dict = self.data.num_class_dict = n_each_y
         self.y_syn = y_syn
-        print(f'num_class:{n_each_y}')
+        if self.args.verbose:
+            print(f'num_class:{n_each_y}')
+        return n_each_y
 
     def reduce(self, data, verbose=True):
 
@@ -121,7 +123,8 @@ class MSGC(GCondBase):
             x_syns.append(x_syn.clone())
             adj_t_syns.append(adj_t_syn.clone())
             loss_window = sum(losses.data) / len(losses.data)
-            print(f'loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
+            if args.verbose:
+                print(f'loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
             if it in args.checkpoints:
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
@@ -186,7 +189,8 @@ class MSGC(GCondBase):
         self.cols = torch.cat(cols).to(self.device)
         self.batch = torch.cat(batch).to(self.device)
         n_edge = self.rows.shape[0] / self.batch_size / 2
-        print(f'n_edge:{n_edge}')
+        if self.args.verbose:
+            print(f'n_edge:{n_edge}')
 
     def get_adj_t_syn(self):
         adj = torch.zeros(size=(self.batch_size, self.n_syn, self.n_syn), device=self.device)
