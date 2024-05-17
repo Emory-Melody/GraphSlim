@@ -64,7 +64,8 @@ class GCondBase:
                 self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
                 labels_syn += [c] * num_class_dict[c]
         self.data.num_class_dict = self.num_class_dict = num_class_dict
-        print(num_class_dict)
+        if self.args.verbose:
+            print(num_class_dict)
         return np.array(labels_syn)
 
     def init(self, with_adj=False):
