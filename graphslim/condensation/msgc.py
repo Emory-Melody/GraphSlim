@@ -25,8 +25,8 @@ class MSGC(GCondBase):
         self.n_classes = data.nclass
         self.device = args.device
 
-        n_each_y = self.regenerate_labels(data)
-        self.num_class_dict = self.data.num_class_dict = {index: value for index, value in enumerate(n_each_y)}
+        # n_each_y = self.regenerate_labels(data)
+        # self.num_class_dict = self.data.num_class_dict = {index: value for index, value in enumerate(n_each_y)}
 
         self.adj_mlp = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
@@ -40,30 +40,30 @@ class MSGC(GCondBase):
         # -------------------------------------------------------------------------
         # self.reset_adj_batch()
 
-    def regenerate_labels(self, data):
-        labels_train = data.labels_train.to(self.device)
-        n = labels_train.shape[0]
-        n_syn = self.nnodes_syn
-        base = torch.ones(data.nclass, device=self.device)
-        rate = F.one_hot(labels_train, num_classes=data.nclass).sum(0) / n
-        n_each_y = torch.floor((n_syn - base.sum()) * rate) + base
-        left = n_syn - n_each_y.sum()
-        for _ in range(int(left.item())):
-            more = n_each_y / n_each_y.sum() / rate
-            n_each_y[more.argmin()] += 1
-        n_each_y = n_each_y.to(torch.int64)
-
-        y_syn = torch.LongTensor(n_syn).to(self.device)
-        start = 0
-        starts = torch.zeros_like(n_each_y)
-        for c in range(data.nclass):
-            y_syn[start:start + n_each_y[c]] = c
-            starts[c] = start
-            start += n_each_y[c]
-        self.y_syn = y_syn
-        if self.args.verbose:
-            print(f'num_class:{n_each_y}')
-        return n_each_y
+    # def regenerate_labels(self, data):
+    #     labels_train = data.labels_train.to(self.device)
+    #     n = labels_train.shape[0]
+    #     n_syn = self.nnodes_syn
+    #     base = torch.ones(data.nclass, device=self.device)
+    #     rate = F.one_hot(labels_train, num_classes=data.nclass).sum(0) / n
+    #     n_each_y = torch.floor((n_syn - base.sum()) * rate) + base
+    #     left = n_syn - n_each_y.sum()
+    #     for _ in range(int(left.item())):
+    #         more = n_each_y / n_each_y.sum() / rate
+    #         n_each_y[more.argmin()] += 1
+    #     n_each_y = n_each_y.to(torch.int64)
+    #
+    #     y_syn = torch.LongTensor(n_syn).to(self.device)
+    #     start = 0
+    #     starts = torch.zeros_like(n_each_y)
+    #     for c in range(data.nclass):
+    #         y_syn[start:start + n_each_y[c]] = c
+    #         starts[c] = start
+    #         start += n_each_y[c]
+    #     self.y_syn = y_syn
+    #     if self.args.verbose:
+    #         print(f'num_class:{n_each_y}')
+    #     return n_each_y
 
     def reduce(self, data, verbose=True):
 
@@ -75,7 +75,7 @@ class MSGC(GCondBase):
                                               device=self.device)
 
         adj = normalize_adj_tensor(adj, sparse=True)
-        y_syn = self.y_syn.repeat(self.batch_size)
+        y_syn = to_tensor(label=self.y_syn, device=self.device).repeat(self.batch_size)
         # assert args.condense_model != 'GAT'
         basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
 
@@ -149,44 +149,38 @@ class MSGC(GCondBase):
 
         return data
 
-    def init(self, with_adj=False):
-        n_classes = self.data.nclass
-        y_syn = self.y_syn
-        # cluster is restricted in training set in MSGC.
-        x_train = self.data.feat_train
-        y_train = self.data.labels_train
-        if self.init == 'cluster':
-            x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
-            for c in range(n_classes):
-                x_c = x_train[y_train == c].cpu()
-                n_c = (y_syn == c).sum().item()
-                k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
-                k_means.fit(x_c)
-                clusters = torch.LongTensor(k_means.predict(x_c))
-                x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0)
-            return x_syn.to(x_train.device)
-        elif self.init == 'sample':
-            sam = SamplerForClass(y_train, n_classes)
-            counter = Counter(y_syn.cpu().numpy())
-            idx_selected_list = []
-            for c in range(n_classes):
-                idx_c = sam.sample_from_class(c, n_need_max=counter[c])
-                idx_selected_list.append(idx_c)
-            idx_selected = torch.cat(idx_selected_list).to(x_train.device)
-            return x_train[idx_selected]
-        elif self.init == 'mean':
-            x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1]).to(x_train.device)
-            for c in range(n_classes):
-                x_c = x_train[y_train == c]
-                n_c = (y_syn == c).sum()
-                x_syn[y_syn == c] = x_c.mean(0)
-            return x_syn
-
-    def x_parameters(self):
-        return [self.feat_syn]
-
-    def adj_parameters(self):
-        return self.adj_mlp.parameters()
+    # def init(self, with_adj=False):
+    #     n_classes = self.data.nclass
+    #     y_syn = self.y_syn
+    #     # cluster is restricted in training set in MSGC.
+    #     x_train = self.data.feat_train
+    #     y_train = self.data.labels_train
+    #     if self.init == 'cluster':
+    #         x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
+    #         for c in range(n_classes):
+    #             x_c = x_train[y_train == c].cpu()
+    #             n_c = (y_syn == c).sum().item()
+    #             k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
+    #             k_means.fit(x_c)
+    #             clusters = torch.LongTensor(k_means.predict(x_c))
+    #             x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0)
+    #         return x_syn.to(x_train.device)
+    #     elif self.init == 'sample':
+    #         sam = SamplerForClass(y_train, n_classes)
+    #         counter = Counter(y_syn.cpu().numpy())
+    #         idx_selected_list = []
+    #         for c in range(n_classes):
+    #             idx_c = sam.sample_from_class(c, n_need_max=counter[c])
+    #             idx_selected_list.append(idx_c)
+    #         idx_selected = torch.cat(idx_selected_list).to(x_train.device)
+    #         return x_train[idx_selected]
+    #     elif self.init == 'mean':
+    #         x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1]).to(x_train.device)
+    #         for c in range(n_classes):
+    #             x_c = x_train[y_train == c]
+    #             n_c = (y_syn == c).sum()
+    #             x_syn[y_syn == c] = x_c.mean(0)
+    #         return x_syn
 
     def reset_adj_batch(self):
         rows = []
@@ -252,21 +246,3 @@ class FixLenList:
         self.data.append(element)
         if len(self.data) > self.lenth:
             del self.data[0]
-
-
-class SamplerForClass:
-    '''
-    In inductive setting, sample $n_need_max nodes with label $class_id.
-    Return nodes ids, type:tensor.
-    '''
-
-    def __init__(self, labels, n_classes):
-        self.n_nodes = labels.shape[0]
-        idx_all = torch.arange(self.n_nodes)
-        self.class2idx = {}
-        for i in range(n_classes):
-            self.class2idx[i] = idx_all[labels == i]
-
-    def sample_from_class(self, class_id, n_need_max=256):
-        return self.class2idx[class_id] \
-            [torch.randperm(self.class2idx[class_id].shape[0])[:n_need_max]]

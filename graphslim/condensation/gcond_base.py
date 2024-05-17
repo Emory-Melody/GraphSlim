@@ -46,19 +46,25 @@ class GCondBase:
     def generate_labels_syn(self, data):
         counter = Counter(data.labels_train.tolist())
         num_class_dict = {}
-        # n = len(data.labels_train)
+        n = len(data.labels_train)
 
         sorted_counter = sorted(counter.items(), key=lambda x: x[1])
         sum_ = 0
         labels_syn = []
         self.syn_class_indices = {}
         for ix, (c, num) in enumerate(sorted_counter):
-            num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
-            sum_ += num_class_dict[c]
-            self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
-            labels_syn += [c] * num_class_dict[c]
-
+            if ix == len(sorted_counter) - 1:
+                # only clip labels with largest number of samples
+                num_class_dict[c] = max(int(n * self.args.reduction_rate) - sum_, 1)
+                self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
+                labels_syn += [c] * num_class_dict[c]
+            else:
+                num_class_dict[c] = max(int(num * self.args.reduction_rate), 1)
+                sum_ += num_class_dict[c]
+                self.syn_class_indices[c] = [len(labels_syn), len(labels_syn) + num_class_dict[c]]
+                labels_syn += [c] * num_class_dict[c]
         self.data.num_class_dict = self.num_class_dict = num_class_dict
+        print(num_class_dict)
         return np.array(labels_syn)
 
     def init(self, with_adj=False):
@@ -79,22 +85,6 @@ class GCondBase:
             return reduced_data.feat_syn, reduced_data.adj_syn
         else:
             return reduced_data.feat_syn
-
-    # def init_by_coreset(self):
-    #     args = self.args
-    #     if args.init == 'clustering':
-    #         agent = Cluster(setting=args.setting, data=self.data, args=args)
-    #     elif args.init == 'averaging':
-    #         agent = Average(setting=args.setting, data=self.data, args=args)
-    #     elif args.init == 'kcenter':
-    #         agent = KCenter(setting=args.setting, data=self.data, args=args)
-    #     elif args.init == 'Herding':
-    #         agent = Herding(setting=args.setting, data=self.data, args=args)
-    #     else:
-    #         agent = Random(setting=args.setting, data=self.data, args=args)
-    #
-    #     reduced_data = agent.reduce(self.data, verbose=False, save=False)
-    #     return reduced_data
 
     def train_class(self, model, adj, features, labels, labels_syn, args):
         data = self.data
@@ -119,37 +109,6 @@ class GCondBase:
             loss += coeff * ml
 
         return loss
-
-    # def get_sub_adj_feat(self):
-    #     data = self.data
-    #     args = self.args
-    #     idx_selected = []
-    #
-    #     counter = Counter(self.data.labels_syn)
-    #
-    #     for c in range(data.nclass):
-    #         tmp = data.retrieve_class(c, num=counter[c])
-    #         tmp = list(tmp)
-    #         idx_selected = idx_selected + tmp
-    #     idx_selected = np.array(idx_selected).reshape(-1)
-    #     features = data.feat_train[idx_selected]
-    #     args.knnsamples = 3
-    #     adj_knn = torch.zeros((self.nnodes_syn, self.nnodes_syn)).to(self.device)
-    #
-    #     # for i in range(data.nclass):
-    #     #     idx = np.arange(i*args.nsamples, i*args.nsamples+args.nsamples)
-    #     #     adj_knn[np.ix_(idx, idx)] = 1
-    #
-    #     # from sklearn.metrics.pairwise import cosine_similarity
-    #     # # features[features!=0] = 1
-    #     # k = 2
-    #     # sims = cosine_similarity(features.cpu().numpy())
-    #     # sims[(np.arange(len(sims)), np.arange(len(sims)))] = 0
-    #     # for i in range(len(sims)):
-    #     #     indices_argsort = np.argsort(sims[i])
-    #     #     sims[i, indices_argsort[: -k]] = 0
-    #     # adj_knn = torch.FloatTensor(sims).to(self.device)
-    #     return features, adj_knn
 
     def get_loops(self, args):
         # Get the two hyper-parameters of outer-loop and inner-loop.
