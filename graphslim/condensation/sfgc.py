@@ -90,8 +90,8 @@ class SFGC(GCondBase):
         file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
 
         syn_lr = torch.tensor(args.lr_student).float()
-        syn_lr = syn_lr.detach().to(self.device).requires_grad_(False)
-        # optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
+        syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
+        optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.9)
 
         best_val = 0
 
@@ -166,11 +166,11 @@ class SFGC(GCondBase):
             total_loss = param_loss
 
             self.optimizer_feat.zero_grad()
-            # optimizer_lr.zero_grad()
+            optimizer_lr.zero_grad()
 
             total_loss.backward()
             self.optimizer_feat.step()
-            # optimizer_lr.step()
+            optimizer_lr.step()
             if torch.isnan(total_loss):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(

@@ -3,11 +3,11 @@
   "lr_feat": 0.1,
   "lr_adj": 0.1,
   "dis_metric": "ours",
-  "ntrans": 1,
+  "ntrans": 2,
   "condense_model": "SGC",
   "threshold": 0.01,
   "outer_loop": 10,
   "inner_loop": 1,
-  "epochs": 200,
+  "epochs": 500,
   "seed": 0
 }

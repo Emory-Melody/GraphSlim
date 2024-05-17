@@ -8,5 +8,5 @@
   "threshold": 0.01,
   "outer_loop": 20,
   "inner_loop": 3,
-  "epochs": 1000
+  "epochs": 500
 }
