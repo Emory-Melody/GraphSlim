@@ -33,7 +33,6 @@ def setting_config(args):
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
     args.pre_norm = True
-    args.hidden = 256
     args.run_inter_eval = 3
     args.eval_interval = args.epochs // 10
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
