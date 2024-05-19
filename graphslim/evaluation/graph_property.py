@@ -68,11 +68,11 @@ def graph_property(adj, label):
     homophily = calculate_homophily(label, adj)
 
     # print("Degree Distribution:", degree_distribution)
+    print("Density %:", density * 100)
     print("Spectral Radius:", spectral_radius)
-    print("Spectral Min:", spectral_min)
+    # print("Spectral Min:", spectral_min)
     print("Cluster Coefficient:", cluster_coefficient)
     # print("Density:", density)
-    print("Density %:", density * 100)
     print("Homophily:", homophily)
     return degree_distribution
 
@@ -81,20 +81,24 @@ if __name__ == '__main__':
 
     args = cli(standalone_mode=False)
 
-    args.device = 'cpu'
-    graph = get_dataset(args.dataset, args)
-    if args.setting == 'ind':
-        adj, label = graph.adj_train, graph.labels_train
-    else:
-        adj, label = graph.adj_full, graph.labels_full
-    adj = adj.toarray()
-    label = label.numpy()
-    degree_distribution_origin = graph_property(adj, label)
+    if args.origin:
+        args.device = 'cpu'
+        graph = get_dataset(args.dataset, args)
+        if args.setting == 'ind':
+            adj, label = graph.adj_train, graph.labels_train
+        else:
+            adj, label = graph.adj_full, graph.labels_full
+        adj = adj.toarray()
+        label = label.numpy()
+        degree_distribution_origin = graph_property(adj, label)
     save_path = f'checkpoints/reduced_graph/{args.method}'
     adj_syn = torch.load(
         f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
     label = torch.load(
         f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+    if args.method == 'msgc':
+        adj_syn = adj_syn[0]
+        label = label[:adj_syn.shape[0]]
     adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
     adj = adj_syn.numpy()
     label = label.numpy()
