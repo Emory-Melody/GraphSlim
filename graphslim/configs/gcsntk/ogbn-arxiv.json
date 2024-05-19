@@ -7,6 +7,7 @@
   "k": 1,
   "adj": false,
   "scale": "add",
+  "batch_size": 2000,
   "accumulate_steps": 10,
   "eval_interval": 20
 }

@@ -14,6 +14,7 @@ import torch
 
 
 def calculate_homophily(y, adj):
+    adj = (adj > 0.5).astype(int)
     y = y.squeeze()
     edge_indices = np.asarray(adj.nonzero())
     src_labels = y[edge_indices[0]]
@@ -41,7 +42,6 @@ def plot_normalized_degree_distribution(degree_frequencies, graph_names):
 
     plt.xlabel('Degree')
     plt.ylabel('Normalized Frequency')
-    plt.title('Normalized Degree Distribution for Different Graphs')
     plt.yscale('log')  # Set y-axis to logarithmic scale
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.7)
@@ -49,33 +49,10 @@ def plot_normalized_degree_distribution(degree_frequencies, graph_names):
     plt.show()
 
 
-if __name__ == '__main__':
-
-    args = cli(standalone_mode=False)
-
-    args.device = 'cpu'
-    if args.origin:
-        graph = get_dataset(args.dataset, args)
-        if args.setting == 'ind':
-            adj, label = graph.adj_train, graph.labels_train
-        else:
-            adj, label = graph.adj_full, graph.labels_full
-        adj = adj.toarray()
-        label = label.numpy()
-    else:
-        save_path = f'checkpoints/reduced_graph/{args.method}'
-        adj_syn = torch.load(
-            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-        label = torch.load(
-            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-        adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
-        adj = (adj_syn > 0.5).int().numpy()
-        label = label.numpy()
-
+def graph_property(adj, label):
     G = nx.from_numpy_array(adj)
 
     degree_distribution = nx.degree_histogram(G)
-    plot_normalized_degree_distribution([degree_distribution], [args.dataset])
 
     laplacian_matrix = nx.laplacian_matrix(G)
     eigenvalues = np.linalg.eigvals(laplacian_matrix.A)
@@ -85,15 +62,43 @@ if __name__ == '__main__':
     cluster_coefficient = nx.average_clustering(G)
 
     density = nx.density(G)
-    sparsity = 1 - density
+    # sparsity = 1 - density
 
     # 同质性
     homophily = calculate_homophily(label, adj)
 
-    print("Degree Distribution:", degree_distribution)
+    # print("Degree Distribution:", degree_distribution)
     print("Spectral Radius:", spectral_radius)
     print("Spectral Min:", spectral_min)
     print("Cluster Coefficient:", cluster_coefficient)
     # print("Density:", density)
-    print("Sparsity:", sparsity)
+    print("Density:", density)
     print("Homophily:", homophily)
+    return degree_distribution
+
+
+if __name__ == '__main__':
+
+    args = cli(standalone_mode=False)
+
+    args.device = 'cpu'
+    graph = get_dataset(args.dataset, args)
+    if args.setting == 'ind':
+        adj, label = graph.adj_train, graph.labels_train
+    else:
+        adj, label = graph.adj_full, graph.labels_full
+    adj = adj.toarray()
+    label = label.numpy()
+    degree_distribution_origin = graph_property(adj, label)
+    save_path = f'checkpoints/reduced_graph/{args.method}'
+    adj_syn = torch.load(
+        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+    label = torch.load(
+        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+    adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
+    adj = adj_syn.numpy()
+    label = label.numpy()
+    degree_distribution = graph_property(adj, label)
+
+    # plot_normalized_degree_distribution([degree_distribution, degree_distribution_origin],
+    #                                     [args.dataset + '_reduced', args.dataset + '_origin'])
