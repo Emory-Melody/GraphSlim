@@ -9,5 +9,4 @@
   "outer_loop": 10,
   "inner_loop": 1,
   "epochs": 500,
-  "seed": 0
 }
