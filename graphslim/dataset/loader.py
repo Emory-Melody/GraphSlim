@@ -179,7 +179,7 @@ class LargeDataLoader(nn.Module):
             data = dataset[0]
             self.n, self.dim = data.feat_full.shape
             labels = data.labels_full
-            features = data.feat_full
+            features = to_tensor(data.feat_full)
             edge_index = csr2ei(data.adj_full)
             values = torch.ones(edge_index.shape[1])
             Adj = torch.sparse_coo_tensor(edge_index, values, torch.Size([self.n, self.n]))
@@ -187,7 +187,7 @@ class LargeDataLoader(nn.Module):
                                                  (self.n, self.n))
             self.Adj = Adj + sparse_eye
 
-            features = self.normalize_data(features)
+            features = self.normalize_data(features.numpy())
             features = self.GCF(self.Adj, features, k=1)
             labels = torch.tensor(labels)
 

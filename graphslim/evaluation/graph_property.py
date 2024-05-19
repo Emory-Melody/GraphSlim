@@ -72,7 +72,7 @@ def graph_property(adj, label):
     print("Spectral Min:", spectral_min)
     print("Cluster Coefficient:", cluster_coefficient)
     # print("Density:", density)
-    print("Density:", density)
+    print("Density %:", density * 100)
     print("Homophily:", homophily)
     return degree_distribution
 
