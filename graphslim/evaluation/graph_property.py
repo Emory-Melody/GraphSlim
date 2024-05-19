@@ -6,6 +6,7 @@ if os.path.abspath('') not in sys.path:
 from graphslim.configs import *
 from graphslim.dataset import *
 from graphslim.evaluation.utils import sparsify
+import matplotlib.pyplot as plt
 import logging
 import networkx as nx
 import numpy as np
@@ -23,7 +24,33 @@ def calculate_homophily(y, adj):
     return homophily
 
 
+def plot_normalized_degree_distribution(degree_frequencies, graph_names):
+    plt.figure(figsize=(6, 6))
+
+    markers = ['o', 's', '^', 'D', 'v']  # Different marker styles
+    colors = ['b', 'g', 'r', 'c', 'm']  # Different colors
+
+    for i, (freq, name) in enumerate(zip(degree_frequencies, graph_names)):
+        total_nodes = sum(freq)
+        degrees = list(range(len(freq)))
+        max_degree = max(degrees)
+        normalized_degrees = [d / max_degree for d in degrees]
+        normalized_freq = [f / total_nodes for f in freq]
+        plt.scatter(normalized_degrees, normalized_freq, marker=markers[i % len(markers)],
+                    color=colors[i % len(colors)], label=name, s=100, alpha=0.75, edgecolors='w')
+
+    plt.xlabel('Degree')
+    plt.ylabel('Normalized Frequency')
+    plt.title('Normalized Degree Distribution for Different Graphs')
+    plt.yscale('log')  # Set y-axis to logarithmic scale
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == '__main__':
+
     args = cli(standalone_mode=False)
 
     args.device = 'cpu'
@@ -48,6 +75,7 @@ if __name__ == '__main__':
     G = nx.from_numpy_array(adj)
 
     degree_distribution = nx.degree_histogram(G)
+    plot_normalized_degree_distribution([degree_distribution], [args.dataset])
 
     laplacian_matrix = nx.laplacian_matrix(G)
     eigenvalues = np.linalg.eigvals(laplacian_matrix.A)

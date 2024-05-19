@@ -19,7 +19,13 @@ class Average(Coarsen):
     def reduce(self, data, verbose=True, save=True):
         args = self.args
         n_classes = data.nclass
-        y_syn, y_train, x_train = self.prepare_select(data, args)
+        if hasattr(data, 'labels_syn'):
+            y_syn = data.labels_syn
+            self.labels_train = data.labels_train
+            y_train = data.labels_train
+            x_train = data.feat_train
+        else:
+            y_syn, y_train, x_train = self.prepare_select(data, args)
         x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
         for c in range(n_classes):
             x_c = x_train[y_train == c]
