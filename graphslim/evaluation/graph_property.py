@@ -52,6 +52,7 @@ if __name__ == '__main__':
     laplacian_matrix = nx.laplacian_matrix(G)
     eigenvalues = np.linalg.eigvals(laplacian_matrix.A)
     spectral_radius = max(eigenvalues)
+    spectral_min = min(eigenvalues[eigenvalues > 0])
 
     cluster_coefficient = nx.average_clustering(G)
 
@@ -63,7 +64,8 @@ if __name__ == '__main__':
 
     print("Degree Distribution:", degree_distribution)
     print("Spectral Radius:", spectral_radius)
+    print("Spectral Min:", spectral_min)
     print("Cluster Coefficient:", cluster_coefficient)
-    print("Density:", density)
+    # print("Density:", density)
     print("Sparsity:", sparsity)
     print("Homophily:", homophily)
