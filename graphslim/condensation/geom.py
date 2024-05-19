@@ -21,34 +21,22 @@ class GEOM(GCondBase):
         args.condense_model = 'GCN'
         args.init = 'kcenter'
 
-        self.buf_dir = '../../data/GEOM_Buffer/{}'.format(args.dataset)
+        self.buf_dir = '../geom_buffer/{}'.format(args.dataset)
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
+        args.num_experts = 10  # 200
 
         if not args.no_buff:
             print("=================Begin buffer===============")
             self.buffer_cl(data)
             print("=================Finish buffer===============")
 
-        # self.init_coreset_select(data)
-        #
-        #
-        # if args.setting == 'trans':
-        #     features, adj, labels = data.feat_full, data.adj_full, data.labels_full
-        # else:
-        #     features, adj, labels = data.feat_train, data.adj_train, data.labels_train
-        # feat_init, adj_init, labels_init = self.get_coreset_init(features, adj, labels)
-        # feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init,
-        #                                              label=labels_init, device=self.device)
-
-        # features_tensor, adj_tensor, labels_tensor = to_tensor(features, adj, label=labels, device=self.device)
         feat_init, adj_init = self.init(with_adj=True)
         labels_init = to_tensor(label=self.labels_syn)
-        # adj_tensor_norm = normalize_adj_tensor(adj_tensor, sparse=True)
 
         self.labels_syn = labels_init
         self.adj_syn_init = adj_init
@@ -288,11 +276,6 @@ class GEOM(GCondBase):
 
     def buffer_cl(self, data):
         args = self.args
-
-        random.seed(15)
-        np.random.seed(15)
-        torch.manual_seed(15)
-        torch.cuda.manual_seed(15)
 
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)

@@ -22,9 +22,6 @@ class SGDD(GCondBase):
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
         print('adj_syn:', (self.nnodes_syn, self.nnodes_syn), 'feat_syn:', self.feat_syn.shape)
 
-    def reset_parameters(self):
-        self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
-        self.pge.reset_parameters()
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -63,24 +60,16 @@ class SGDD(GCondBase):
 
             for ol in range(outer_loop):
                 adj_syn, opt_loss = self.pge(self.feat_syn, Lx=data.adj_mx)
-
                 self.adj_syn = normalize_adj_tensor(adj_syn, sparse=False)
-                # feat_syn_norm = feat_syn
 
                 model = self.check_bn(model)
                 loss = self.train_class(model, adj, features, labels, labels_syn, args)
-
-                if args.alpha > 0:
-                    loss_reg = args.alpha * regularization(adj_syn, tensor2onehot(labels_syn))
-                else:
-                    loss_reg = torch.tensor(0)
-
                 if args.opt_scale > 0:
                     loss_opt = args.opt_scale * opt_loss
                 else:
                     loss_opt = torch.tensor(0)
 
-                loss = loss + loss_reg + loss_opt
+                loss = loss + loss_opt
                 loss_avg += loss.item()
 
                 # update sythetic graph

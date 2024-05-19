@@ -36,13 +36,14 @@ class GCondBase:
             self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
             self.adj_syn = None
 
-            self.reset_parameters()
+            # self.reset_parameters()
             self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
             self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
             print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
+        self.pge.reset_parameters()
 
     def generate_labels_syn(self, data):
         counter = Counter(data.labels_train.tolist())

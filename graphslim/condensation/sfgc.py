@@ -20,6 +20,10 @@ class SFGC(GCondBase):
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
         args.init = 'kcenter'
+        self.buf_dir = '../sfgc_buffer/{}'.format(args.dataset)
+
+        if not os.path.exists(self.buf_dir):
+            os.mkdir(self.buf_dir)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -27,12 +31,9 @@ class SFGC(GCondBase):
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
 
-        buf_dir = '../SFGC_Buffer/{}'.format(args.dataset)
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 20  # 200
-            if not os.path.exists(buf_dir):
-                os.mkdir(buf_dir)
+            args.num_experts = 10  # 200
 
             if args.setting == 'ind':
                 features, adj, labels = to_tensor(data.feat_train, data.adj_train, data.labels_train)
@@ -75,10 +76,10 @@ class SFGC(GCondBase):
                 # need too many space to save
                 if len(trajectories) == 10:
                     n = 0
-                    while os.path.exists(os.path.join(buf_dir, "replay_buffer_{}.pt".format(n))):
+                    while os.path.exists(os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))):
                         n += 1
-                    print("Saving {}".format(os.path.join(buf_dir, "replay_buffer_{}.pt".format(n))))
-                    torch.save(trajectories, os.path.join(buf_dir, "replay_buffer_{}.pt".format(n)))
+                    print("Saving {}".format(os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))))
+                    torch.save(trajectories, os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n)))
                     trajectories = []
         # =============stage 2 trajectory alignment and GCN evaluation==================#
         # kcenter select
@@ -87,7 +88,7 @@ class SFGC(GCondBase):
         labels_syn = to_tensor(label=data.labels_syn, device=self.device)
         self.adj_syn_init = adj_init
 
-        file_idx, expert_idx, expert_files = self.expert_load(buf_dir)
+        file_idx, expert_idx, expert_files = self.expert_load(self.buf_dir)
 
         syn_lr = torch.tensor(args.lr_student).float()
         syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)

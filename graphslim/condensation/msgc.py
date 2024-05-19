@@ -26,7 +26,7 @@ class MSGC(GCondBase):
 
         self.num_class_dict = self.data.num_class_dict = {index: value for index, value in enumerate(n_each_y)}
 
-        self.adj_mlp = nn.Sequential(
+        self.pge = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
             nn.BatchNorm1d(edge_hidden_channels),
             nn.ReLU(),
@@ -35,8 +35,6 @@ class MSGC(GCondBase):
             nn.ReLU(),
             nn.Linear(edge_hidden_channels, 1)
         ).to(args.device)
-        # -------------------------------------------------------------------------
-        # self.reset_adj_batch()
 
     def generate_labels_syn(self, data):
         labels_train = data.labels_train.to(self.device)
