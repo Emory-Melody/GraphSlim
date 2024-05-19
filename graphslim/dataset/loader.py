@@ -174,12 +174,13 @@ class LargeDataLoader(nn.Module):
         super(LargeDataLoader, self).__init__()
         path = osp.join('../../data')
         if name in ['ogbn-arxiv']:
-            Dataset = PygNodePropPredDataset(name, root=path)
-            self.n, self.dim = Dataset.graph['node_feat'].shape
-            split_set = Dataset.get_idx_split()
-            graph, labels = Dataset[0]
-            features = torch.tensor(graph['node_feat'])
-            edge_index = torch.tensor(graph['edge_index'])
+            dataset = DataGraphSAINT(root=path, dataset=name)
+            dataset.num_classes = 40
+            data = dataset[0]
+            self.n, self.dim = data.feat_full.shape
+            labels = data.labels_full
+            features = data.feat_full
+            edge_index = csr2ei(data.adj_full)
             values = torch.ones(edge_index.shape[1])
             Adj = torch.sparse_coo_tensor(edge_index, values, torch.Size([self.n, self.n]))
             sparse_eye = torch.sparse_coo_tensor(torch.arange(self.n).repeat(2, 1), torch.ones(self.n),
@@ -190,14 +191,14 @@ class LargeDataLoader(nn.Module):
             features = self.GCF(self.Adj, features, k=1)
             labels = torch.tensor(labels)
 
-            self.split_idx = torch.tensor(split_set[split])
+            self.split_idx = torch.tensor(data.idx_train)
             self.n_split = len(self.split_idx)
             self.k = torch.round(torch.tensor(self.n_split / batch_size)).to(torch.int)
             self.split_feat = features[self.split_idx]
             self.split_label = labels[self.split_idx]
 
             self.split_method = split_method
-            self.n_classes = Dataset.num_classes
+            self.n_classes = dataset.num_classes
         else:
             if name == 'flickr':
                 from torch_geometric.datasets import Flickr as DataSet
