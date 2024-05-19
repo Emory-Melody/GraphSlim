@@ -11,6 +11,40 @@ from torch_sparse import SparseTensor
 from graphslim.dataset.utils import csr2ei
 
 
+def sparsify(model_type, adj_syn, args, verbose=False):
+    threshold = 0
+    if model_type == 'MLP':
+        adj_syn = adj_syn - adj_syn
+        torch.diagonal(adj_syn).fill_(1)
+    elif model_type == 'GAT':
+        if args.method in ['gcond', 'doscond']:
+            if args.dataset in ['cora', 'citeseer']:
+                threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
+            else:
+                threshold = 0.1
+        elif args.method in ['msgc']:
+            threshold = args.threshold
+        else:
+            threshold = 0
+    else:
+        if args.method in ['gcond', 'doscond']:
+            threshold = args.threshold
+        elif args.method in ['msgc']:
+            threshold = 0
+        else:
+            threshold = 0
+    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom']:
+        print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
+        print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+    if threshold > 0:
+        adj_syn[adj_syn < threshold] = 0
+        if verbose:
+            print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+        # else:
+        #     print("structure free methods do not need to truncate the adjacency matrix")
+    return adj_syn
+
+
 def getsize_mb(elements):
     size = 0
     for e in elements:

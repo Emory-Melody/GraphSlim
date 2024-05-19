@@ -89,6 +89,7 @@ class GCSNTK(GCondBase):
 
             n_train = len(y_train)
         Cond_size = round(n_train * self.args.reduction_rate)
+        # fixed initialization by gaussian
         x_s = torch.rand(round(Cond_size), dim, device=args.device)
         y_s = torch.rand(round(Cond_size), n_class, device=args.device)
         x_s.requires_grad = True

@@ -6,6 +6,7 @@ from sklearn.model_selection import ParameterGrid
 
 from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
+from graphslim.evaluation.utils import sparsify
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
@@ -27,41 +28,6 @@ class Evaluator:
         # self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
-    #
-    def sparsify(self, model_type, adj_syn, verbose=False):
-        args = self.args
-        threshold = 0
-        if model_type == 'MLP':
-            adj_syn = adj_syn - adj_syn
-            torch.diagonal(adj_syn).fill_(1)
-        elif model_type == 'GAT':
-            if args.method in ['gcond', 'doscond']:
-                if args.dataset in ['cora', 'citeseer']:
-                    threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
-                else:
-                    threshold = 0.1
-            elif args.method in ['msgc']:
-                threshold = args.threshold
-            else:
-                threshold = 0
-        else:
-            if args.method in ['gcond', 'doscond']:
-                threshold = args.threshold
-            elif args.method in ['msgc']:
-                threshold = 0
-            else:
-                threshold = 0
-        if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom']:
-            print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
-            print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
-        if threshold > 0:
-            adj_syn[adj_syn < threshold] = 0
-            if verbose:
-                print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
-            # else:
-            #     print("structure free methods do not need to truncate the adjacency matrix")
-        return adj_syn
-
     def get_syn_data(self, model_type, verbose=False):
 
         args = self.args
@@ -73,7 +39,7 @@ class Evaluator:
             adj_syn = adj_syn.to_dense()
         else:
             adj_syn = adj_syn
-        adj_syn = self.sparsify(model_type, adj_syn, verbose=verbose)
+        adj_syn = sparsify(model_type, adj_syn, args, verbose=verbose)
         return feat_syn, adj_syn, labels_syn
 
     def grid_search(self, data, model_type, param_grid):

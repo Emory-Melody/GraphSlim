@@ -114,6 +114,7 @@ def method_config(args):
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
+@click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     # try:
