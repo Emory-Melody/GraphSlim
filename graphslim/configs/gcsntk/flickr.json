@@ -9,5 +9,5 @@
   "batch_size": 2000,
   "accumulate_steps": 10,
   "scale": "add",
-  "eval_interval": 20
+  "eval_interval": 10
 }

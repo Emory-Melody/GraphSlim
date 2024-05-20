@@ -59,7 +59,7 @@ def method_config(args):
 @click.command()
 @click.option('--dataset', '-D', default='cora', show_default=True)
 @click.option('--gpu_id', '-G', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
-@click.option('--setting', '-S', type=click.Choice(['trans', 'ind']), show_default=True)
+@click.option('--setting', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--run_eval', default=10, show_default=True)
 @click.option('--run_inter_eval', default=5, show_default=True)
@@ -85,7 +85,7 @@ def method_config(args):
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
-@click.option('--seed', default=1, help='Random seed.', show_default=True)
+@click.option('--seed', '-S', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--init', default='random', help='initialization synthetic features',
