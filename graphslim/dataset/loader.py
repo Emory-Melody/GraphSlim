@@ -187,7 +187,7 @@ class LargeDataLoader(nn.Module):
                                                  (self.n, self.n))
             self.Adj = Adj + sparse_eye
 
-            features = self.normalize_data(features.numpy())
+            features = self.normalize_data(features)
             features = self.GCF(self.Adj, features, k=1)
 
             self.split_idx = torch.tensor(data.idx_train)
