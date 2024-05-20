@@ -1,5 +1,8 @@
 import os
 import sys
+import scipy
+
+from sklearn.metrics import pairwise_distances
 
 if os.path.abspath('') not in sys.path:
     sys.path.append(os.path.abspath(''))
@@ -25,8 +28,10 @@ def calculate_homophily(y, adj):
     return homophily
 
 
-def plot_normalized_degree_distribution(degree_frequencies, graph_names):
+def plot_normalized_degree_distribution(degree_frequencies, graph_name, method_list):
     plt.figure(figsize=(6, 6))
+    graph_names = [graph_name + '_' + n for n in method_list]
+    graph_names.append(graph_name)
 
     markers = ['o', 's', '^', 'D', 'v']  # Different marker styles
     colors = ['b', 'g', 'r', 'c', 'm']  # Different colors
@@ -49,32 +54,55 @@ def plot_normalized_degree_distribution(degree_frequencies, graph_names):
     plt.show()
 
 
-def graph_property(adj, label):
+def davies_bouldin_index(X, labels):
+    # kmeans = KMeans(n_clusters=3, random_state=42).fit(X)
+    # labels = kmeans.labels_
+    n_clusters = len(np.unique(labels))
+    cluster_kmeans = [X[labels == k] for k in range(n_clusters)]
+
+    centroids = [np.mean(cluster, axis=0) for cluster in cluster_kmeans]
+    scatters = [np.mean(pairwise_distances(cluster, [centroid])) for cluster, centroid in
+                zip(cluster_kmeans, centroids)]
+
+    db_index = 0
+    for i in range(n_clusters):
+        max_ratio = 0
+        for j in range(n_clusters):
+            if i != j:
+                d_ij = np.linalg.norm(centroids[i] - centroids[j])
+                ratio = (scatters[i] + scatters[j]) / d_ij
+                max_ratio = max(max_ratio, ratio)
+        db_index += max_ratio
+
+    db_index /= n_clusters
+    return db_index
+
+
+def graph_property(adj, feat, label):
     G = nx.from_numpy_array(adj)
 
-    degree_distribution = nx.degree_histogram(G)
-
     laplacian_matrix = nx.laplacian_matrix(G)
-    eigenvalues = np.linalg.eigvals(laplacian_matrix.A)
+    laplacian_dense = laplacian_matrix.toarray() if scipy.sparse.issparse(laplacian_matrix) else laplacian_matrix
+
+    eigenvalues = np.linalg.eigvals(laplacian_dense)
     spectral_radius = max(eigenvalues)
-    spectral_min = min(eigenvalues[eigenvalues > 0])
+    # spectral_min = min(eigenvalues[eigenvalues > 0])
 
     cluster_coefficient = nx.average_clustering(G)
 
     density = nx.density(G)
     # sparsity = 1 - density
 
-    # 同质性
     homophily = calculate_homophily(label, adj)
-
+    db_index = davies_bouldin_index(feat, label)
     # print("Degree Distribution:", degree_distribution)
-    print("Density %:", density * 100)
-    print("Spectral Radius:", spectral_radius)
+    args.logger.info("Density %:", density * 100)
+    args.logger.info("Spectral Radius:", spectral_radius)
     # print("Spectral Min:", spectral_min)
-    print("Cluster Coefficient:", cluster_coefficient)
+    args.logger.info("Cluster Coefficient:", cluster_coefficient)
     # print("Density:", density)
-    print("Homophily:", homophily)
-    return degree_distribution
+    args.logger.info("Homophily:", homophily)
+    args.logger.info("Davies-Bouldin Index:", db_index)
 
 
 if __name__ == '__main__':
@@ -85,24 +113,29 @@ if __name__ == '__main__':
         args.device = 'cpu'
         graph = get_dataset(args.dataset, args)
         if args.setting == 'ind':
-            adj, label = graph.adj_train, graph.labels_train
+            adj, feat, label = graph.adj_train, graph.feat_train, graph.labels_train
         else:
-            adj, label = graph.adj_full, graph.labels_full
+            adj, feat, label = graph.adj_full, graph.feat_full, graph.labels_full
         adj = adj.toarray()
+        feat = feat.numpy()
         label = label.numpy()
-        degree_distribution_origin = graph_property(adj, label)
-    save_path = f'checkpoints/reduced_graph/{args.method}'
-    adj_syn = torch.load(
-        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-    label = torch.load(
-        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-    if args.method == 'msgc':
-        adj_syn = adj_syn[0]
-        label = label[:adj_syn.shape[0]]
-    adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
-    adj = adj_syn.numpy()
-    label = label.numpy()
-    degree_distribution = graph_property(adj, label)
+        graph_property(adj, feat, label)
+    method_list = ['gcond', 'doscond', 'msgc', 'sgdd']
+    for args.method in method_list:
 
-    # plot_normalized_degree_distribution([degree_distribution, degree_distribution_origin],
-    #                                     [args.dataset + '_reduced', args.dataset + '_origin'])
+        save_path = f'checkpoints/reduced_graph/{args.method}'
+        adj_syn = torch.load(
+            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        label = torch.load(
+            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        feat = torch.load(
+            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        if args.method == 'msgc':
+            adj_syn = adj_syn[0]
+            label = label[:adj_syn.shape[0]]
+        adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
+        adj = adj_syn.numpy()
+        label = label.numpy()
+        feat = feat.numpy()
+        print(f'========{args.method}========')
+        graph_property(adj, feat, label)
