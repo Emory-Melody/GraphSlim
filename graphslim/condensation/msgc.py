@@ -80,7 +80,7 @@ class MSGC(GCondBase):
         self.feat_syn.data.copy_(feat_init)
 
         optimizer_x = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
-        optimizer_adj = torch.optim.Adam(self.adj_mlp.parameters(), lr=args.lr_adj)
+        optimizer_adj = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
         best_val = 0
         args.window = args.patience = 20
         losses = FixLenList(args.window)
@@ -220,7 +220,7 @@ class MSGC(GCondBase):
 
     def get_adj_t_syn(self):
         adj = torch.zeros(size=(self.batch_size, self.n_syn, self.n_syn), device=self.device)
-        adj[self.batch, self.rows, self.cols] = torch.sigmoid(self.adj_mlp(
+        adj[self.batch, self.rows, self.cols] = torch.sigmoid(self.pge(
             torch.cat([self.feat_syn[self.rows], self.feat_syn[self.cols]], dim=1)).flatten())
         adj = (torch.transpose(adj, 1, 2) + adj) / 2
 
