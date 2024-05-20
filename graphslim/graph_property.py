@@ -34,9 +34,19 @@ def davies_bouldin_index(X, labels):
     n_clusters = len(np.unique(labels))
     cluster_kmeans = [X[labels == k] for k in range(n_clusters)]
 
-    centroids = [np.mean(cluster, axis=0) for cluster in cluster_kmeans]
-    scatters = [np.mean(pairwise_distances(cluster, [centroid])) for cluster, centroid in
-                zip(cluster_kmeans, centroids)]
+    # Print sizes of each cluster for debugging
+    for i, cluster in enumerate(cluster_kmeans):
+        print(f"Cluster {i} size: {cluster.shape}")
+
+    # Check for and handle empty clusters
+    non_empty_clusters = [(cluster, np.mean(cluster, axis=0)) for cluster in cluster_kmeans if cluster.shape[0] > 0]
+
+    if len(non_empty_clusters) < 2:
+        raise ValueError("Not enough non-empty clusters to calculate Davies-Bouldin index.")
+
+    centroids = [centroid for cluster, centroid in non_empty_clusters]
+    scatters = [np.mean(pairwise_distances(cluster, centroid.reshape(1, -1))) for cluster, centroid in
+                non_empty_clusters]
 
     db_index = 0
     for i in range(n_clusters):
