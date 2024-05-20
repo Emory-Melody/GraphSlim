@@ -116,6 +116,7 @@ def method_config(args):
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
+@click.option('--save_path', '--sp', default='checkpoints/reduced_graph', show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     # try:
@@ -126,8 +127,6 @@ def cli(ctx, **kwargs):
     else:
         # if gpu_id=-1, use cpu
         args.device = 'cpu'
-    # print("device:", args.device)
-    # print("seed: ", args.seed)
     seed_everything(args.seed)
     path = "checkpoints"
     if not os.path.exists(path):

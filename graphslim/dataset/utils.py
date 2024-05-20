@@ -50,7 +50,7 @@ def splits(data, exp):
 
 
 def save_reduced(adj_syn, feat_syn, labels_syn, args):
-    save_path = f'checkpoints/reduced_graph/{args.method}'
+    save_path = f'{args.save_path}/{args.method}'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     torch.save(adj_syn,
@@ -63,7 +63,7 @@ def save_reduced(adj_syn, feat_syn, labels_syn, args):
 
 
 def load_reduced(args):
-    save_path = f'checkpoints/reduced_graph/{args.method}'
+    save_path = f'{args.save_path}/{args.method}'
 
     feat_syn = torch.load(
         f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
