@@ -35,10 +35,6 @@ def davies_bouldin_index(X, labels):
     n_clusters = len(unique_labels)
     cluster_kmeans = [X[labels == k] for k in unique_labels]
 
-    # Print sizes of each cluster for debugging
-    for i, cluster in enumerate(cluster_kmeans):
-        print(f"Cluster {i} size: {cluster.shape[0]}")
-
     centroids = []
     scatters = []
 
@@ -75,9 +71,12 @@ def graph_property(adj, feat, label):
     G = nx.from_numpy_array(adj)
 
     laplacian_matrix = nx.laplacian_matrix(G)
-    laplacian_dense = laplacian_matrix.toarray() if scipy.sparse.issparse(laplacian_matrix) else laplacian_matrix
 
-    eigenvalues = np.linalg.eigvals(laplacian_dense)
+    # Compute the largest eigenvalue using sparse linear algebra
+    k = 1  # number of eigenvalues and eigenvectors to compute
+    eigenvalues, _ = scipy.sparse.eigsh(laplacian_matrix, k=k, which='LM')
+
+    # The largest eigenvalue is the spectral radius
     spectral_radius = max(eigenvalues)
     # spectral_min = min(eigenvalues[eigenvalues > 0])
 
