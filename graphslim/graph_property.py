@@ -96,13 +96,13 @@ def graph_property(adj, feat, label):
     homophily = calculate_homophily(label, adj)
     db_index = davies_bouldin_index(feat, label)
     # print("Degree Distribution:", degree_distribution)
-    args.logger.info("Density %:", density * 100)
-    args.logger.info("Spectral Radius:", spectral_radius)
+    args.logger.info(f"Density %: {density * 100}")
+    args.logger.info(f"Spectral Radius: {spectral_radius}")
     # print("Spectral Min:", spectral_min)
-    args.logger.info("Cluster Coefficient:", cluster_coefficient)
+    args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
     # print("Density:", density)
-    args.logger.info("Homophily:", homophily)
-    args.logger.info("Davies-Bouldin Index:", db_index)
+    args.logger.info(f"Homophily: {homophily}")
+    args.logger.info(f"Davies-Bouldin Index: {db_index}")
 
 
 if __name__ == '__main__':
