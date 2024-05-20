@@ -14,6 +14,7 @@ import logging
 import networkx as nx
 import numpy as np
 import torch
+from sklearn.preprocessing import StandardScaler
 
 
 def calculate_homophily(y, adj):
@@ -45,8 +46,8 @@ def calculate_homophily(y, adj):
 
 
 def davies_bouldin_index(X, labels):
-    # kmeans = KMeans(n_clusters=3, random_state=42).fit(X)
-    # labels = kmeans.labels_
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
     unique_labels = np.unique(labels)
     n_clusters = len(unique_labels)
     cluster_kmeans = [X[labels == k] for k in unique_labels]
@@ -124,7 +125,6 @@ if __name__ == '__main__':
             adj, feat, label = graph.adj_train, graph.feat_train, graph.labels_train
         else:
             adj, feat, label = graph.adj_full, graph.feat_full, graph.labels_full
-        adj = adj.toarray()
         feat = feat.numpy()
         label = label.numpy()
         graph_property(adj, feat, label)
