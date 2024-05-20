@@ -1,8 +1,8 @@
 import os
 import sys
 
-if os.path.abspath('') not in sys.path:
-    sys.path.append(os.path.abspath(''))
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
 from graphslim.configs import *
 from graphslim.dataset import *
 from graphslim.evaluation.utils import sparsify
