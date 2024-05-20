@@ -28,32 +28,6 @@ def calculate_homophily(y, adj):
     return homophily
 
 
-def plot_normalized_degree_distribution(degree_frequencies, graph_name, method_list):
-    plt.figure(figsize=(6, 6))
-    graph_names = [graph_name + '_' + n for n in method_list]
-    graph_names.append(graph_name)
-
-    markers = ['o', 's', '^', 'D', 'v']  # Different marker styles
-    colors = ['b', 'g', 'r', 'c', 'm']  # Different colors
-
-    for i, (freq, name) in enumerate(zip(degree_frequencies, graph_names)):
-        total_nodes = sum(freq)
-        degrees = list(range(len(freq)))
-        max_degree = max(degrees)
-        normalized_degrees = [d / max_degree for d in degrees]
-        normalized_freq = [f / total_nodes for f in freq]
-        plt.scatter(normalized_degrees, normalized_freq, marker=markers[i % len(markers)],
-                    color=colors[i % len(colors)], label=name, s=100, alpha=0.75, edgecolors='w')
-
-    plt.xlabel('Degree')
-    plt.ylabel('Normalized Frequency')
-    plt.yscale('log')  # Set y-axis to logarithmic scale
-    plt.legend()
-    plt.grid(True, linestyle='--', alpha=0.7)
-    plt.tight_layout()
-    plt.show()
-
-
 def davies_bouldin_index(X, labels):
     # kmeans = KMeans(n_clusters=3, random_state=42).fit(X)
     # labels = kmeans.labels_
@@ -108,9 +82,9 @@ def graph_property(adj, feat, label):
 if __name__ == '__main__':
 
     args = cli(standalone_mode=False)
+    args.device = 'cpu'
 
     if args.origin:
-        args.device = 'cpu'
         graph = get_dataset(args.dataset, args)
         if args.setting == 'ind':
             adj, feat, label = graph.adj_train, graph.feat_train, graph.labels_train
@@ -120,19 +94,15 @@ if __name__ == '__main__':
         feat = feat.numpy()
         label = label.numpy()
         graph_property(adj, feat, label)
-    method_list = ['gcond', 'doscond', 'msgc', 'sgdd']
+    method_list = ['vng', 'gcond', 'doscond', 'msgc', 'sgdd', 'geom', 'gcsntk']
     for args.method in method_list:
 
-        save_path = f'checkpoints/reduced_graph/{args.method}'
-        adj_syn = torch.load(
-            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-        label = torch.load(
-            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-        feat = torch.load(
-            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        adj_syn, feat, label = load_reduced(args)
         if args.method == 'msgc':
             adj_syn = adj_syn[0]
             label = label[:adj_syn.shape[0]]
+        if args.method in ['geom', 'gcsntk']:
+            label = torch.argmax(label, dim=1)
         adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
         adj = adj_syn.numpy()
         label = label.numpy()

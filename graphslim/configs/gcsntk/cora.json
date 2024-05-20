@@ -6,5 +6,6 @@
   "adj": false,
   "k": 2,
   "scale": "average",
-  "epochs": 500
+  "epochs": 500,
+  "eval_interval": 10
 }
