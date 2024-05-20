@@ -17,13 +17,20 @@ import torch
 
 
 def calculate_homophily(y, adj):
-    adj = (adj > 0.5).astype(int)
-    y = y.squeeze()
-    edge_indices = np.asarray(adj.nonzero())
+    if not scipy.sparse.isspmatrix_csr(adj):
+        adj = adj.tocsr()
+
+    adj.data = (adj.data > 0.5).astype(int)
+
+    y = np.squeeze(y)
+
+    edge_indices = adj.nonzero()
+
     src_labels = y[edge_indices[0]]
     tgt_labels = y[edge_indices[1]]
+
     same_label = src_labels == tgt_labels
-    homophily = same_label.mean()
+    homophily = np.mean(same_label)
 
     return homophily
 
@@ -70,7 +77,7 @@ def davies_bouldin_index(X, labels):
 def graph_property(adj, feat, label):
     G = nx.from_numpy_array(adj)
 
-    laplacian_matrix = nx.laplacian_matrix(G)
+    laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
 
     # Compute the largest eigenvalue using sparse linear algebra
     k = 1  # number of eigenvalues and eigenvectors to compute
