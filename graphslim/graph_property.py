@@ -31,28 +31,37 @@ def calculate_homophily(y, adj):
 def davies_bouldin_index(X, labels):
     # kmeans = KMeans(n_clusters=3, random_state=42).fit(X)
     # labels = kmeans.labels_
-    n_clusters = len(np.unique(labels))
-    cluster_kmeans = [X[labels == k] for k in range(n_clusters)]
+    unique_labels = np.unique(labels)
+    n_clusters = len(unique_labels)
+    cluster_kmeans = [X[labels == k] for k in unique_labels]
 
     # Print sizes of each cluster for debugging
     for i, cluster in enumerate(cluster_kmeans):
-        print(f"Cluster {i} size: {cluster.shape}")
+        print(f"Cluster {i} size: {cluster.shape[0]}")
 
-    # Check for and handle empty clusters
-    non_empty_clusters = [(cluster, np.mean(cluster, axis=0)) for cluster in cluster_kmeans if cluster.shape[0] > 0]
+    centroids = []
+    scatters = []
 
-    if len(non_empty_clusters) < 2:
+    for cluster in cluster_kmeans:
+        if cluster.shape[0] > 0:
+            centroid = np.mean(cluster, axis=0)
+            centroids.append(centroid)
+            scatter = np.mean(pairwise_distances(cluster, centroid.reshape(1, -1)))
+            scatters.append(scatter)
+        else:
+            centroids.append(None)
+            scatters.append(None)
+
+    if len([c for c in centroids if c is not None]) < 2:
         raise ValueError("Not enough non-empty clusters to calculate Davies-Bouldin index.")
-
-    centroids = [centroid for cluster, centroid in non_empty_clusters]
-    scatters = [np.mean(pairwise_distances(cluster, centroid.reshape(1, -1))) for cluster, centroid in
-                non_empty_clusters]
 
     db_index = 0
     for i in range(n_clusters):
+        if centroids[i] is None:
+            continue
         max_ratio = 0
         for j in range(n_clusters):
-            if i != j:
+            if i != j and centroids[j] is not None:
                 d_ij = np.linalg.norm(centroids[i] - centroids[j])
                 ratio = (scatters[i] + scatters[j]) / d_ij
                 max_ratio = max(max_ratio, ratio)
