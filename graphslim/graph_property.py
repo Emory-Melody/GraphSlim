@@ -74,7 +74,7 @@ def graph_property(adj, feat, label):
 
     # Compute the largest eigenvalue using sparse linear algebra
     k = 1  # number of eigenvalues and eigenvectors to compute
-    eigenvalues, _ = scipy.sparse.eigsh(laplacian_matrix, k=k, which='LM')
+    eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
 
     # The largest eigenvalue is the spectral radius
     spectral_radius = max(eigenvalues)
