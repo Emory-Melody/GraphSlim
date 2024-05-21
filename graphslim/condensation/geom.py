@@ -160,11 +160,15 @@ class GEOM(GCondBase):
             param_dist_list = []
             # print('it:{}--feat_max = {:.4f}, feat_min = {:.4f}'.format(it, torch.max(self.feat_syn),
             #                                                                   torch.min(self.feat_syn)))
-
-            feat_syn = self.feat_syn
-            adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
-            adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
-            adj_syn_input = adj_syn_cal_norm
+            if it == 0:
+                feat_syn = self.feat_syn
+                adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
+                adj_syn_input = to_tensor(adj_syn_norm, device=self.device)
+            else:
+                feat_syn = self.feat_syn
+                adj_syn = torch.eye(feat_syn.shape[0], device=self.device)
+                adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                adj_syn_input = adj_syn_cal_norm
 
             # tag
             for step in range(args.syn_steps):
@@ -361,75 +365,3 @@ class GEOM(GCondBase):
         self.buffer = buffer
 
         return file_idx, expert_idx, expert_files
-
-    def synset_save(self):
-        args = self.args
-
-        with torch.no_grad():
-            feat_save = self.feat_syn
-            eval_labs = self.labels_syn
-
-        feat_syn_eval, label_syn_eval = copy.deepcopy(feat_save.detach()), copy.deepcopy(
-            eval_labs.detach())  # avoid any unaware modification
-
-        adj_syn_eval = torch.eye(feat_syn_eval.shape[0]).to(self.device)
-
-        return feat_syn_eval, adj_syn_eval, label_syn_eval
-
-    def init_coreset_select(self, data):
-        args = self.args
-
-        random.seed(15)
-        np.random.seed(15)
-        torch.manual_seed(15)
-        torch.cuda.manual_seed(15)
-
-        if args.setting == 'trans':
-            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
-        else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
-                                              device=self.device)
-
-        adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
-        idx_train = data.idx_train
-
-        device = args.device
-
-        model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
-
-        optimizer_model = torch.optim.Adam(model.parameters(), lr=args.lr_coreset, weight_decay=5e-4)
-
-        for e in range(args.coreset_epochs + 1):
-            model.train()
-            optimizer_model.zero_grad()
-            output = model.forward(features, adj)
-            if args.setting == 'trans':
-                loss = F.nll_loss(output[idx_train], labels[idx_train])
-            else:
-                loss = F.nll_loss(output, labels)
-
-            loss.backward()
-            optimizer_model.step()
-
-        embed_out = model.predict(features, adj, normadj=False, output_layer_features=True)[-1].detach()
-
-        agent = KCenter(args.setting, data, args)
-
-        idx_selected = agent.select(embed_out)
-
-        np.save(f'{self.buf_dir}/idx_{args.dataset}_{args.reduction_rate}_kcenter_{args.seed}.npy',
-                idx_selected)
-        print("Finish corset selection, saved.")
-
-        return idx_selected
-
-    def get_coreset_init(self, features, adj, labels):
-        args = self.args
-        print('Loading from: {}'.format(
-            f'{self.buf_dir}/idx_{args.dataset}_{args.reduction_rate}_kcenter_{args.seed}.npy'))
-        idx_selected_train = np.load(
-            f'{self.buf_dir}/idx_{args.dataset}_{args.reduction_rate}_kcenter_{args.seed}.npy')
-        feat_train = features.numpy()[idx_selected_train]
-        adj_train = adj[np.ix_(idx_selected_train, idx_selected_train)]
-        labels_train = labels[idx_selected_train]
-        return feat_train, adj_train, labels_train
