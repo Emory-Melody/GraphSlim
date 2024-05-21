@@ -12,6 +12,7 @@ from graphslim.dataset import *
 import logging
 from deeprobust.graph.defense import GCN
 from deeprobust.graph.global_attack import DICE, random_attack, Metattack, PRBCD
+from graphslim.models.gcn import GCN
 import scipy.sparse as sp
 import time
 
@@ -30,13 +31,17 @@ if os.path.exists(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_
         data.adj_full = sp.load_npz(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz')
 
 else:
+    gcn_model = GCN(nfeat=data.x.shape[1], nhid=args.hidden, nclass=data.nclass, args=args, mode='eval')
     if args.attack == 'metattack':
         if args.setting == 'ind':
             adj = data.adj_train
             args.ptb_n = int(args.ptb_r * (adj.sum() // 2))
             model = PRBCD(data, device=args.device)
+            # ignore the test results!
             edge_index, _ = model.attack(ptb_rate=args.ptb_r)
             data.adj_train = ei2csr(edge_index.cpu(), data.num_nodes)[np.ix_(data.idx_train, data.idx_train)]
+            gcn_model.fit_with_val(data, train_iters=args.train_iters, verbose=args.verbose, setting=args.setting)
+            gcn_model.test(data, setting=args.setting, verbose=True)
             sp.save_npz(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz', data.adj_train)
             print(f'save corrupt graph at adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz')
         else:
@@ -44,6 +49,8 @@ else:
             args.ptb_n = int(args.ptb_r * (adj.sum() // 2))
             model = PRBCD(data, device=args.device)
             data.edge_index, _ = model.attack(data.edge_index, ptb_rate=args.ptb_r)
+            gcn_model.fit_with_val(data, train_iters=args.train_iters, verbose=args.verbose, setting=args.setting)
+            gcn_model.test(data, setting=args.setting, verbose=True)
             data.adj_full = ei2csr(data.edge_index.cpu(), data.num_nodes)
             sp.save_npz(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz', data.adj_full)
             print(f'save corrupt graph at {args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz')

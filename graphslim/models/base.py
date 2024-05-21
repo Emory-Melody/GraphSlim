@@ -166,7 +166,8 @@ class BaseGNN(nn.Module):
         self.load_state_dict(weights)
         return best_acc_val
 
-    def test(self, data=None, setting='trans', verbose=False):
+    @torch.no_grad()
+    def test(self, data, setting='trans', verbose=False):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
