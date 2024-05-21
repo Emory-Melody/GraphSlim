@@ -97,6 +97,24 @@ class TransAndInd:
         self.feat_val = self.feat_full[self.idx_val]
         self.feat_test = self.feat_full[self.idx_test]
 
+    def to(self, device):
+        """Move data to the specified device."""
+        self.feat_full = self.feat_full.to(device)
+        self.labels_full = self.labels_full.to(device)
+        self.x = self.x.to(device)
+        self.y = self.y.to(device)
+        self.edge_index = self.edge_index.to(device)
+
+        self.feat_train = self.feat_train.to(device)
+        self.feat_val = self.feat_val.to(device)
+        self.feat_test = self.feat_test.to(device)
+
+        # self.labels_train = self.labels_train.to(device)
+        # self.labels_val = self.labels_val.to(device)
+        # self.labels_test = self.labels_test.to(device)
+
+        return self
+
     def pyg_saint(self, data):
         # reference type
         # pyg format use x,y,edge_index

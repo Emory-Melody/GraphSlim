@@ -102,6 +102,10 @@ def method_config(args):
               type=click.Choice(
                   ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']
               ), show_default=True)
+@click.option('--attack', default='metattack', help='initialization synthetic features',
+              type=click.Choice(
+                  ['random_attack', 'dice', 'metattack']
+              ), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
 @click.option('--lr_adj', default=1e-4, show_default=True)

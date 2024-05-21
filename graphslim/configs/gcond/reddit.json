@@ -7,5 +7,5 @@
   "threshold": 0.01,
   "condense_model": "SGC",
   "ntrans": 1,
-  "epochs": 400
+  "epochs": 1000
 }
