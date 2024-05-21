@@ -93,7 +93,7 @@ class GEOM(GCondBase):
 
         best_val = 0
 
-        bar = trange(args.epochs + 1)
+        bar = trange(args.epochs)
         for it in bar:
             if args.setting == 'ind' and args.soft_label:
                 if self.tem > args.maxtem:
@@ -252,7 +252,7 @@ class GEOM(GCondBase):
             #         self.syn_lr.item()))
 
             # eval_it_pool = np.arange(0, args.epochs + 1, args.eval_interval).tolist()
-            if it in args.checkpoints and it > 0:
+            if it in args.checkpoints:
                 feat_syn_save, adj_syn_save, label_syn_save = self.synset_save()
                 data.adj_syn, data.feat_syn, data.labels_syn = adj_syn_save, feat_syn_save, label_syn_save
                 best_val = self.intermediate_evaluation(best_val, total_loss.item())
