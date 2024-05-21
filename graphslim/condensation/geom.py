@@ -83,7 +83,7 @@ class GEOM(GCondBase):
                 optimizer_tem = torch.optim.Adam([self.tem], lr=args.lr_tem)
             # -------------------------------------softlabel-------------------------------------------------------end-----------------------------------------------------------------#
         else:
-            self.labels_syn = labels_init
+            self.labels_syn = to_tensor(labels=labels_init, device=self.device)
 
         self.syn_lr = torch.tensor(args.lr_student).to(self.device)
 

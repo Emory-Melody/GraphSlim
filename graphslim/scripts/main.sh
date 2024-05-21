@@ -11,7 +11,7 @@ source ~/.bashrc
 source ~/anaconda3/bin/activate torch1.13.1
 cd /mnt/home/jinwei2/juntong/graphslim/graphslim
 
-if [[ "${2}" == "gcondx" || "${2}" == "gcond" || "${2}" == "doscond" || "${2}" == "sgdd" ]]; then
+if [[ "${2}" == "gcondx" || "${2}" == "gcond" || "${2}" == "doscond" || "${2}" == "sgdd"|| "${2}" == "geom"|| "${2}" == "sfgc"|| "${2}" == "msgc" || "${2}" == "gcsntk"]]; then
     srun -n 1 python train_gcond.py --dataset ${1} --method ${2} --reduction_rate ${3}
 elif [[ "${2}" == "random" || "${2}" == "herding" || "${2}" == "kcenter" || "${2}" == "cent_p" || "${2}" == "cent_d" ]]; then
     srun -n 1 python train_coreset.py --dataset ${1} --method ${2} --reduction_rate ${3}
