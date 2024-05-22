@@ -2,8 +2,8 @@ import os
 import sys
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
-from configs import *
-from evaluation.eval_agent import Evaluator
+from graphslim.configs import *
+from graphslim.evaluation.eval_agent import Evaluator
 from graphslim.condensation import *
 from graphslim.dataset import *
 import logging

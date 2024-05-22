@@ -7,6 +7,7 @@ import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
 from torch_sparse import SparseTensor
+import scipy.sparse as sp
 
 
 # from deeprobust.graph.utils import *
@@ -348,6 +349,8 @@ def normalize_adj_tensor(adj, sparse=False):
 
 
 def dense_gcn_norm(adj, device):
+    if type(adj) is not torch.Tensor:
+        adj = torch.from_numpy(adj)
     mx = adj + torch.eye(adj.shape[0]).to(device)
     rowsum = mx.sum(1)
     r_inv = rowsum.pow(-1 / 2).flatten()
@@ -356,6 +359,25 @@ def dense_gcn_norm(adj, device):
     mx = r_mat_inv @ mx
     mx = mx @ r_mat_inv
     return mx
+
+
+def normalize_adj(adj, device='cpu'):
+    if sp.issparse(adj):
+        return sparse_gcn_norm(adj)
+    elif type(adj) is torch.Tensor:
+        return dense_gcn_norm(adj, device)
+    else:
+        return dense_gcn_norm(adj, device).numpy()
+
+
+def sparse_gcn_norm(adj):
+    adj = adj + sp.eye(adj.shape[0])
+    rowsum = np.array(adj.sum(1))
+    r_inv = np.power(rowsum, -0.5).flatten()
+    r_inv[np.isinf(r_inv)] = 0.
+    r_mat_inv = sp.diags(r_inv)
+    adj = r_mat_inv.dot(adj).dot(r_mat_inv)
+    return adj
 
 
 def degree_normalize_adj(mx):

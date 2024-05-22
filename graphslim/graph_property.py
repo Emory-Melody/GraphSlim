@@ -14,6 +14,8 @@ import logging
 import networkx as nx
 import numpy as np
 import torch
+from graphslim.utils import normalize_adj
+from sklearn.metrics import davies_bouldin_score
 from sklearn.preprocessing import StandardScaler
 
 
@@ -45,43 +47,43 @@ def calculate_homophily(y, adj):
     return homophily
 
 
-def davies_bouldin_index(X, labels):
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-    unique_labels = np.unique(labels)
-    n_clusters = len(unique_labels)
-    cluster_kmeans = [X[labels == k] for k in unique_labels]
-
-    centroids = []
-    scatters = []
-
-    for cluster in cluster_kmeans:
-        if cluster.shape[0] > 0:
-            centroid = np.mean(cluster, axis=0)
-            centroids.append(centroid)
-            scatter = np.mean(pairwise_distances(cluster, centroid.reshape(1, -1)))
-            scatters.append(scatter)
-        else:
-            centroids.append(None)
-            scatters.append(None)
-
-    if len([c for c in centroids if c is not None]) < 2:
-        raise ValueError("Not enough non-empty clusters to calculate Davies-Bouldin index.")
-
-    db_index = 0
-    for i in range(n_clusters):
-        if centroids[i] is None:
-            continue
-        max_ratio = 0
-        for j in range(n_clusters):
-            if i != j and centroids[j] is not None:
-                d_ij = np.linalg.norm(centroids[i] - centroids[j])
-                ratio = (scatters[i] + scatters[j]) / d_ij
-                max_ratio = max(max_ratio, ratio)
-        db_index += max_ratio
-
-    db_index /= n_clusters
-    return db_index
+# def davies_bouldin_index(X, labels):
+#     scaler = StandardScaler()
+#     X = scaler.fit_transform(X)
+#     unique_labels = np.unique(labels)
+#     n_clusters = len(unique_labels)
+#     cluster_kmeans = [X[labels == k] for k in unique_labels]
+#
+#     centroids = []
+#     scatters = []
+#
+#     for cluster in cluster_kmeans:
+#         if cluster.shape[0] > 0:
+#             centroid = np.mean(cluster, axis=0)
+#             centroids.append(centroid)
+#             scatter = np.mean(pairwise_distances(cluster, centroid.reshape(1, -1)))
+#             scatters.append(scatter)
+#         else:
+#             centroids.append(None)
+#             scatters.append(None)
+#
+#     if len([c for c in centroids if c is not None]) < 2:
+#         raise ValueError("Not enough non-empty clusters to calculate Davies-Bouldin index.")
+#
+#     db_index = 0
+#     for i in range(n_clusters):
+#         if centroids[i] is None:
+#             continue
+#         max_ratio = 0
+#         for j in range(n_clusters):
+#             if i != j and centroids[j] is not None:
+#                 d_ij = np.linalg.norm(centroids[i] - centroids[j])
+#                 ratio = (scatters[i] + scatters[j]) / d_ij
+#                 max_ratio = max(max_ratio, ratio)
+#         db_index += max_ratio
+#
+#     db_index /= n_clusters
+#     return db_index
 
 
 def graph_property(adj, feat, label):
@@ -103,7 +105,10 @@ def graph_property(adj, feat, label):
     # sparsity = 1 - density
 
     homophily = calculate_homophily(label, adj)
-    db_index = davies_bouldin_index(feat, label)
+    db_index = davies_bouldin_score(feat, label)
+    adj = normalize_adj(adj)
+
+    db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
     # print("Degree Distribution:", degree_distribution)
     args.logger.info(f"Density %: {density * 100}")
     args.logger.info(f"Spectral Radius: {spectral_radius}")
@@ -112,10 +117,10 @@ def graph_property(adj, feat, label):
     # print("Density:", density)
     args.logger.info(f"Homophily: {homophily}")
     args.logger.info(f"Davies-Bouldin Index: {db_index}")
+    args.logger.info(f"Davies-Bouldin Index AGG: {db_index_agg}")
 
 
 if __name__ == '__main__':
-
     args = cli(standalone_mode=False)
     args.device = 'cpu'
 
@@ -128,13 +133,12 @@ if __name__ == '__main__':
         feat = feat.numpy()
         label = label.numpy()
         graph_property(adj, feat, label)
-    method_list = ['vng', 'gcond', 'doscond', 'msgc', 'sgdd', 'geom', 'gcsntk']
+    method_list = ['gcond', 'doscond', 'msgc', 'sgdd', 'geom', 'gcsntk']
     for args.method in method_list:
-
         adj_syn, feat, label = load_reduced(args)
         if args.method == 'msgc':
             adj_syn = adj_syn[0]
-            label = label[:adj_syn.shape[0]]
+        label = label[:adj_syn.shape[0]]
         if args.method in ['geom', 'gcsntk']:
             label = torch.argmax(label, dim=1)
         adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)

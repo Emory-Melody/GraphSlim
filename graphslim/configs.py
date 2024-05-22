@@ -102,9 +102,9 @@ def method_config(args):
               type=click.Choice(
                   ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']
               ), show_default=True)
-@click.option('--attack', default='metattack', help='initialization synthetic features',
+@click.option('--attack', '-A', default='none', help='attack method',
               type=click.Choice(
-                  ['random_attack', 'dice', 'metattack']
+                  ['none', 'random', 'dice', 'metattack']
               ), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)
@@ -121,6 +121,7 @@ def method_config(args):
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
 @click.option('--save_path', '--sp', default='checkpoints/reduced_graph', show_default=True)
+@click.option('--ptb_r', '-P', default=0.25, show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
     # try:
