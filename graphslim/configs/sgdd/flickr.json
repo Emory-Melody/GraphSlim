@@ -10,5 +10,6 @@
   "outer_loop": 20,
   "inner_loop": 15,
   "condense_model": "SGC",
-  "ntrans": 2
+  "ntrans": 2,
+  "epochs": 500
 }

@@ -9,7 +9,7 @@
   "T": 250,
   "scheduler": "root",
   "lam": 0.8,
-  "lr_student": 1,
+  "lr_student": 1.0,
   "lr_coreset": 0.001,
   "coreset_epochs": 800,
   "expert_epochs": 350,
@@ -23,6 +23,5 @@
   "syn_steps": 200,
   "beta": 0.05,
   "epochs": 2000,
-  "lr_feat": 0.0007,
-  "init": "kcenter"
+  "lr_feat": 0.0007
 }

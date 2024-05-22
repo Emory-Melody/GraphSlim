@@ -12,5 +12,6 @@
   "condense_model": "SGC",
   "ntrans": 1,
   "mx_size": 100,
-  "alpha": 0
+  "alpha": 0,
+  "epochs": 200
 }

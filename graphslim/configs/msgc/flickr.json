@@ -1,5 +1,4 @@
 {
-  "init": "random",
   "lr_feat": 0.005,
   "lr_adj": 0.005,
   "dis_metric": "ours",
