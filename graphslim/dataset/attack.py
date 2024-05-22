@@ -8,9 +8,8 @@ if os.path.abspath('..') not in sys.path:
 from graphslim.configs import *
 from graphslim.dataset import *
 import logging
-# from deeprobust.graph.defense import GCN
-# from deeprobust.graph.global_attack import DICE, Random, Metattack, PRBCD
-from graphslim.models.gcn import GCN
+from deeprobust.graph.global_attack import DICE, Random, Metattack, PRBCD
+from graphslim.models import *
 import scipy.sparse as sp
 
 

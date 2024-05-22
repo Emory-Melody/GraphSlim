@@ -77,7 +77,7 @@ class BaseGNN(nn.Module):
         self.initialize()
         # data for training
         if reduced:
-            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
+            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
                                                           label2=data.labels_val,
                                                           device=self.device)
 
@@ -100,15 +100,17 @@ class BaseGNN(nn.Module):
 
         if self.args.method == 'geom' and self.args.soft_label:
             self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
-        elif self.args.method == 'gcsntk':  # for GCSNTK, use MSE for training
-            self.float_label = True
+        if len(labels.shape) == 2:
             self.loss = torch.nn.MSELoss()
-        elif len(data.labels_full.shape) > 1:
-            self.multi_label = True
-            self.loss = torch.nn.BCELoss()
         else:
-            self.multi_label = False
+            labels = to_tensor(label=labels, device=self.device)
             self.loss = F.nll_loss
+        # elif len(data.labels_full.shape) > 1:
+        #     self.multi_label = True
+        #     self.loss = torch.nn.BCELoss()
+        # else:
+        #     self.multi_label = False
+        #     self.loss = F.nll_loss
 
         if reduced or setting == 'ind':
             reindex = True
@@ -139,12 +141,14 @@ class BaseGNN(nn.Module):
             optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
+            acc_train = accuracy(output if reindex else output[data.idx_train], labels)
 
             loss_train.backward()
             optimizer.step()
 
             if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
+                print('Epoch {}, training acc: {}'.format(i, acc_train))
 
             with torch.no_grad():
                 self.eval()

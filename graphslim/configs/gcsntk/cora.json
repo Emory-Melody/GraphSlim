@@ -7,5 +7,5 @@
   "k": 2,
   "scale": "average",
   "epochs": 500,
-  "eval_interval": 5
+  "eval_interval": 10
 }
