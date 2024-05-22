@@ -23,7 +23,7 @@ class SFGC(GCondBase):
         self.buf_dir = '../sfgc_buffer/{}'.format(args.dataset)
 
         if not os.path.exists(self.buf_dir):
-            os.mkdir(self.buf_dir)
+            os.makedirs(self.buf_dir)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -36,7 +36,8 @@ class SFGC(GCondBase):
             args.num_experts = 10  # 200
 
             if args.setting == 'ind':
-                features, adj, labels = to_tensor(data.feat_train, data.adj_train, data.labels_train)
+                features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
+                                                  device=self.device)
             else:
                 features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full,
                                                   device=self.device)

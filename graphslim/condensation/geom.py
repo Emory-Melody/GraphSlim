@@ -19,7 +19,7 @@ class GEOM(GCondBase):
         super(GEOM, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
-        args.init = 'kcenter'
+        # args.init = 'kcenter'
 
         self.buf_dir = '../geom_buffer/{}'.format(args.dataset)
         if not os.path.exists(self.buf_dir):
@@ -35,9 +35,18 @@ class GEOM(GCondBase):
             self.buffer_cl(data)
             print("=================Finish buffer===============")
 
+        flag = None
+        if args.soft_label:
+            flag = True
+            args.soft_label = False
         feat_init, adj_init = self.init(with_adj=True)
-        labels_init = to_tensor(label=self.labels_syn)
+        if flag:
+            args.soft_label = True
 
+        feat_init, adj_init, labels_init = to_tensor(feat_init, adj_init,
+                                                     label=self.labels_syn, device=self.device)
+
+        self.feat_syn.data.copy_(feat_init)
         self.labels_syn = labels_init
         self.adj_syn_init = adj_init
 
