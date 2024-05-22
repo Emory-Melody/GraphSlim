@@ -35,7 +35,7 @@ def setting_config(args):
     args.pre_norm = True
     args.run_inter_eval = 3
     if args.method not in ['gcsntk']:
-        args.eval_interval = args.epochs // 10
+        args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
     args.eval_epochs = 300
     return args
@@ -90,7 +90,7 @@ def method_config(args):
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--init', default='random', help='initialization synthetic features',
               type=click.Choice(
-                  ['random', 'clustering', 'degree', 'pagerank', 'kcenter', 'herding']
+                  ['random', 'clustering', 'averaging', 'kcenter', 'herding']
               ), show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(
@@ -120,7 +120,7 @@ def method_config(args):
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
-@click.option('--save_path', '--sp', default='checkpoints/reduced_graph', show_default=True)
+@click.option('--save_path', '--sp', default='checkpoints', show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):
@@ -133,7 +133,8 @@ def cli(ctx, **kwargs):
         # if gpu_id=-1, use cpu
         args.device = 'cpu'
     seed_everything(args.seed)
-    path = "checkpoints"
+    # path = "checkpoints"
+    path = args.save_path
     if not os.path.exists(path):
         os.mkdir(path)
     args.path = path

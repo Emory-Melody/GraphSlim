@@ -68,32 +68,43 @@ class Evaluator:
                 f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         return best_result, best_params
 
-    def train_cross(self, data):
+    def train_cross(self, data, grid_search=True):
         args = self.args
-        eval_model_list = ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
-        gs_params = {
-            'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                    'dropout': [0.0, 0.5]},
-            'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                    'dropout': [0.0, 0.5]},
-            'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                    'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
-            'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                      'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
-            'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                      'dropout': [0.0, 0.5]},
-            'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+        if grid_search:
+            gs_params = {
+                'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5]},
+                'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5]},
+                'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
+                'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+                'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                           'dropout': [0.0, 0.5]},
-            'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                    'dropout': [0.05, 0.5, 0.7]}
-        }
-        for model_type in eval_model_list:
-            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
-                                                                             verbose=args.verbose)
-            print(f'Starting Grid Search for {model_type}')
-            best_result, best_params = self.grid_search(data, model_type, gs_params[model_type])
-            args.logger.info(
-                f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+                'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                              'dropout': [0.0, 0.5]},
+                'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.05, 0.5, 0.7]}
+            }
+            for model_type in gs_params:
+                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                                 verbose=args.verbose)
+                print(f'Starting Grid Search for {model_type}')
+                best_result, best_params = self.grid_search(data, model_type, gs_params[model_type])
+                args.logger.info(
+                    f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+        else:
+            eval_model_list = ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
+            evaluator = Evaluator(args)
+            for model_type in eval_model_list:
+                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                                 verbose=args.verbose)
+                best_result = evaluator.evaluate(data, model_type=args.eval_model)
+                args.logger.info(
+                    f'{model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f}')
+
+
 
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
