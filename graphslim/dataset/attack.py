@@ -45,10 +45,10 @@ def attack(data, args):
         if args.attack == 'random':
             model = RandomAttack()
             if args.setting == 'ind':
-                model.attack(data.adj_train, n_perturbations=args.ptb_n, type='remove')
+                model.attack(data.adj_train, n_perturbations=args.ptb_n, type='add')
                 data.adj_train = model.modified_adj.tocsr()
             else:
-                model.attack(data.adj_full, n_perturbations=args.ptb_n, type='remove')
+                model.attack(data.adj_full, n_perturbations=args.ptb_n, type='add')
                 data.adj_full = model.modified_adj.tocsr()
         if args.attack == 'random_feat':
             model = RandomAttack(attack_structure=False, attack_features=True)
