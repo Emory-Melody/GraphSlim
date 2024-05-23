@@ -21,6 +21,5 @@
   "min_start_epoch": 0,
   "eval_interval": 1,
   "syn_steps": 2500,
-  "beta": 0.01,
-  "epochs": 200
+  "beta": 0.01
 }
