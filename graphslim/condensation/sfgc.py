@@ -21,7 +21,7 @@ class SFGC(GCondBase):
         args.condense_model = 'GCN'
         args.init = 'kcenter'
 
-        self.buf_dir = '../sfgc_buffer/{}'.format(args.dataset)
+        self.buf_dir = '../sfgc_buffer/{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r)
 
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
