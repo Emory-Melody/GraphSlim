@@ -87,37 +87,85 @@ def calculate_homophily(y, adj):
 
 
 def graph_property(adj, feat, label):
-    G = nx.from_numpy_array(adj)
+    spe_list = []
+    clu_list = []
+    den_list = []
+    hom_list = []
+    db_list = []
+    db_agg_list = []
+    if len(adj.shape) == 3:
+        for i in range(adj.shape[0]):
+            G = nx.from_numpy_array(adj[i])
+            laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
+            k = 1
+            eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
 
-    laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
+            # The largest eigenvalue is the spectral radius
+            spectral_radius = max(eigenvalues)
+            spe_list.append(spectral_radius)
+            # spectral_min = min(eigenvalues[eigenvalues > 0])
 
-    # Compute the largest eigenvalue using sparse linear algebra
-    k = 1  # number of eigenvalues and eigenvectors to compute
-    eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+            cluster_coefficient = nx.average_clustering(G)
+            clu_list.append(cluster_coefficient)
 
-    # The largest eigenvalue is the spectral radius
-    spectral_radius = max(eigenvalues)
-    # spectral_min = min(eigenvalues[eigenvalues > 0])
+            density = nx.density(G)
+            den_list.append(density)
+            # sparsity = 1 - density
 
-    cluster_coefficient = nx.average_clustering(G)
+            homophily = calculate_homophily(label, adj)
+            hom_list.append(homophily)
+            db_index = davies_bouldin_score(feat, label)
+            db_list.append(db_index)
+            adj = normalize_adj(adj)
 
-    density = nx.density(G)
-    # sparsity = 1 - density
+            db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
+            db_agg_list.append(db_index_agg)
+        spe_list = np.array(spe_list)
+        clu_list = np.array(clu_list)
+        den_list = np.array(den_list)
+        hom_list = np.array(hom_list)
+        db_list = np.array(db_list)
+        db_agg_list = np.array(db_agg_list)
+        args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
+        args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
+        args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
+        args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
+        args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
+        args.logger.info(f"Average Davies-Bouldin Index AGG: {np.mean(db_agg_list)}")
 
-    homophily = calculate_homophily(label, adj)
-    db_index = davies_bouldin_score(feat, label)
-    adj = normalize_adj(adj)
 
-    db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
-    # print("Degree Distribution:", degree_distribution)
-    args.logger.info(f"Density %: {density * 100}")
-    args.logger.info(f"Spectral Radius: {spectral_radius}")
-    # print("Spectral Min:", spectral_min)
-    args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
-    # print("Density:", density)
-    args.logger.info(f"Homophily: {homophily}")
-    args.logger.info(f"Davies-Bouldin Index: {db_index}")
-    args.logger.info(f"Davies-Bouldin Index AGG: {db_index_agg}")
+    else:
+        G = nx.from_numpy_array(adj)
+
+        laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
+
+        # Compute the largest eigenvalue using sparse linear algebra
+        k = 1  # number of eigenvalues and eigenvectors to compute
+        eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+
+        # The largest eigenvalue is the spectral radius
+        spectral_radius = max(eigenvalues)
+        # spectral_min = min(eigenvalues[eigenvalues > 0])
+
+        cluster_coefficient = nx.average_clustering(G)
+
+        density = nx.density(G)
+        # sparsity = 1 - density
+
+        homophily = calculate_homophily(label, adj)
+        db_index = davies_bouldin_score(feat, label)
+        adj = normalize_adj(adj)
+
+        db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
+        # print("Degree Distribution:", degree_distribution)
+        args.logger.info(f"Density %: {density * 100}")
+        args.logger.info(f"Spectral Radius: {spectral_radius}")
+        # print("Spectral Min:", spectral_min)
+        args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
+        # print("Density:", density)
+        args.logger.info(f"Homophily: {homophily}")
+        args.logger.info(f"Davies-Bouldin Index: {db_index}")
+        args.logger.info(f"Davies-Bouldin Index AGG: {db_index_agg}")
 
 
 if __name__ == '__main__':
@@ -136,8 +184,6 @@ if __name__ == '__main__':
     method_list = ['gcond', 'doscond', 'msgc', 'sgdd', 'geom', 'gcsntk']
     for args.method in method_list:
         adj_syn, feat, label = load_reduced(args)
-        if args.method == 'msgc':
-            adj_syn = adj_syn[0]
         label = label[:adj_syn.shape[0]]
         if args.method in ['geom', 'gcsntk']:
             label = torch.argmax(label, dim=1)
