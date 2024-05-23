@@ -22,6 +22,6 @@
   "eval_interval": 1,
   "syn_steps": 200,
   "beta": 0.05,
-  "epochs": 2000,
+  "epochs": 200,
   "lr_feat": 0.0007
 }

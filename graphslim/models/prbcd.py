@@ -79,7 +79,7 @@ class PRBCD:
                         device=device).to(device)
             print(model)
 
-        model.fit(data, train_iters=600, patience=200, verbose=True)
+        model.fit(data, train_iters=600, patience=200, verbose=False)
         model.eval()
         model.data = data.to(self.device)
         output = model.predict()
@@ -287,8 +287,8 @@ class PRBCD:
             if torch.cuda.is_available() and self.do_synchronize:
                 torch.cuda.empty_cache()
                 torch.cuda.synchronize()
-            if it % 10 == 0:
-                print(f'Epoch {it}: {loss}')
+            # if it % 10 == 0:
+            #     print(f'Epoch {it}: {loss}')
 
             with torch.no_grad():
                 self.update_edge_weights(n_perturbations, it, gradient)
@@ -310,10 +310,10 @@ class PRBCD:
         # Sample final discrete graph
         edge_index, edge_weight = self.sample_final_edges(n_perturbations)
         output = model.predict(feat, edge_index, edge_weight)
-        print('Test:')
-        self.get_perf(output, gt_labels, data.test_mask)
-        print('Validatoin:')
-        self.get_perf(output, gt_labels, data.val_mask)
+        # print('Test:')
+        # self.get_perf(output, gt_labels, data.test_mask)
+        # print('Validatoin:')
+        # self.get_perf(output, gt_labels, data.val_mask)
         return edge_index, edge_weight
 
     def loss_attack(self, logits, labels, type='CE'):

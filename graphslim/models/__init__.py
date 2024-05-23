@@ -9,3 +9,4 @@ from .parametrized_adj import PGE
 from .sgc import SGC
 from .sntk import StructureBasedNeuralTangentKernel
 from .prbcd import PRBCD
+from .random_attack import RandomAttack

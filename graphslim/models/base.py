@@ -23,10 +23,13 @@ class BaseGNN(nn.Module):
         self.ntrans = args.ntrans
         self.device = args.device
         self.layers = nn.ModuleList([])
+        self.loss = None
 
         if mode == 'eval':
             self.dropout = 0
             self.weight_decay = 5e-4
+        if mode == 'attack':
+            self.loss = F.nll_loss
 
         self.output = None
         self.best_model = None
@@ -98,13 +101,17 @@ class BaseGNN(nn.Module):
         else:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
-        if self.args.method == 'geom' and self.args.soft_label:
-            self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
-        if len(labels.shape) == 2:
-            self.loss = torch.nn.MSELoss()
+        if self.loss is None:
+            if self.args.method == 'geom' and self.args.soft_label:
+                self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+            elif len(labels.shape) == 2:
+                self.loss = torch.nn.MSELoss()
+            else:
+                labels = to_tensor(label=labels, device=self.device)
+                self.loss = F.nll_loss
         else:
             labels = to_tensor(label=labels, device=self.device)
-            self.loss = F.nll_loss
+
         # elif len(data.labels_full.shape) > 1:
         #     self.multi_label = True
         #     self.loss = torch.nn.BCELoss()
@@ -147,8 +154,8 @@ class BaseGNN(nn.Module):
 
             if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
-                acc_train = accuracy(output if reindex else output[data.idx_train], labels)
-                print('Epoch {}, training acc: {}'.format(i, acc_train))
+                # acc_train = accuracy(output if reindex else output[data.idx_train], labels)
+                # print('Epoch {}, training acc: {}'.format(i, acc_train))
 
             with torch.no_grad():
                 self.eval()
