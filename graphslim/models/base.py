@@ -141,13 +141,13 @@ class BaseGNN(nn.Module):
             optimizer.zero_grad()
             output = self.forward(features, adj)
             loss_train = self.loss(output if reindex else output[data.idx_train], labels)
-            acc_train = accuracy(output if reindex else output[data.idx_train], labels)
 
             loss_train.backward()
             optimizer.step()
 
             if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
+                acc_train = accuracy(output if reindex else output[data.idx_train], labels)
                 print('Epoch {}, training acc: {}'.format(i, acc_train))
 
             with torch.no_grad():

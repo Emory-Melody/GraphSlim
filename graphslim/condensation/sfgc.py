@@ -20,6 +20,7 @@ class SFGC(GCondBase):
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
         args.init = 'kcenter'
+
         self.buf_dir = '../sfgc_buffer/{}'.format(args.dataset)
 
         if not os.path.exists(self.buf_dir):
@@ -93,7 +94,7 @@ class SFGC(GCondBase):
 
         syn_lr = torch.tensor(args.lr_student).float()
         syn_lr = syn_lr.detach().to(self.device).requires_grad_(True)
-        optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.9)
+        optimizer_lr = torch.optim.SGD([syn_lr], lr=1e-6, momentum=0.5)
 
         best_val = 0
 
@@ -133,7 +134,7 @@ class SFGC(GCondBase):
                 torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
 
             starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
-            print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
+            # print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
             param_loss_list = []
             param_dist_list = []
 
