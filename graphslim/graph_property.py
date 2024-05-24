@@ -87,6 +87,7 @@ def calculate_homophily(y, adj):
 
 
 def graph_property(adj, feat, label):
+    eigtrace_list = []
     spe_list = []
     clu_list = []
     den_list = []
@@ -95,10 +96,14 @@ def graph_property(adj, feat, label):
     db_agg_list = []
     if len(adj.shape) == 3:
         for i in range(adj.shape[0]):
-            G = nx.from_numpy_array(adj[i])
+            ad = adj[i]
+            G = nx.from_numpy_array(ad)
             laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
             k = 1
-            eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+            eigenvalues, eigenvector = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+            eig = feat.T @ eigenvector @ eigenvector.T @ feat
+            trace = np.trace(eig)
+            eigtrace_list.append(trace)
 
             # The largest eigenvalue is the spectral radius
             spectral_radius = max(eigenvalues)
@@ -112,15 +117,16 @@ def graph_property(adj, feat, label):
             den_list.append(density)
             # sparsity = 1 - density
 
-            homophily = calculate_homophily(label, adj)
+            homophily = calculate_homophily(label, ad)
             hom_list.append(homophily)
             db_index = davies_bouldin_score(feat, label)
             db_list.append(db_index)
-            adj = normalize_adj(adj)
+            ad = normalize_adj(ad)
 
-            db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
+            db_index_agg = davies_bouldin_score(ad @ ad @ feat, label)
             db_agg_list.append(db_index_agg)
         spe_list = np.array(spe_list)
+        eigtrace_list = np.array(eigtrace_list)
         clu_list = np.array(clu_list)
         den_list = np.array(den_list)
         hom_list = np.array(hom_list)
@@ -128,6 +134,7 @@ def graph_property(adj, feat, label):
         db_agg_list = np.array(db_agg_list)
         args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
         args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
+        args.logger.info(f"Average EigTrace: {np.mean(eigtrace_list)}")
         args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
         args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
         args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
@@ -141,7 +148,9 @@ def graph_property(adj, feat, label):
 
         # Compute the largest eigenvalue using sparse linear algebra
         k = 1  # number of eigenvalues and eigenvectors to compute
-        eigenvalues, _ = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+        eigenvalues, eigenvector = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+        eig = feat.T @ eigenvector @ eigenvector.T @ feat
+        trace = np.trace(eig)
 
         # The largest eigenvalue is the spectral radius
         spectral_radius = max(eigenvalues)
@@ -159,6 +168,7 @@ def graph_property(adj, feat, label):
         db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
         # print("Degree Distribution:", degree_distribution)
         args.logger.info(f"Density %: {density * 100}")
+        args.logger.info(f"EigTrace: {trace}")
         args.logger.info(f"Spectral Radius: {spectral_radius}")
         # print("Spectral Min:", spectral_min)
         args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
@@ -181,11 +191,14 @@ if __name__ == '__main__':
         feat = feat.numpy()
         label = label.numpy()
         graph_property(adj, feat, label)
-    method_list = ['gcond', 'doscond', 'msgc', 'sgdd', 'geom', 'gcsntk']
+    method_list = ['sfgc', 'gcondx', 'vng', 'gcond', 'msgc', 'sgdd', 'geom', 'gcsntk']
     for args.method in method_list:
         adj_syn, feat, label = load_reduced(args)
-        label = label[:adj_syn.shape[0]]
-        if args.method in ['geom', 'gcsntk']:
+        if args.method not in ['msgc']:
+            label = label[:adj_syn.shape[0]]
+        else:
+            label = label[:adj_syn.shape[1]]
+        if args.method in ['geom', 'gcsntk'] and len(label.shape) > 1:
             label = torch.argmax(label, dim=1)
         adj_syn = sparsify('GCN', adj_syn, args, verbose=args.verbose)
         adj = adj_syn.numpy()

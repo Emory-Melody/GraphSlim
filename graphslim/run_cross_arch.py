@@ -13,3 +13,4 @@ if __name__ == '__main__':
     data = get_dataset(args.dataset, args)
     evaluator = Evaluator(args)
     evaluator.train_cross(data)
+    # evaluator.train_cross(data, reduced=False)

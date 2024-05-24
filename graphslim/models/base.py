@@ -95,7 +95,10 @@ class BaseGNN(nn.Module):
             if len(adj.shape) == 3:
                 adj = [normalize_adj_tensor(a.to_sparse(), sparse=True) for a in adj]
             else:
-                adj = normalize_adj_tensor(adj.to_sparse(), sparse=True)
+                if not is_sparse_tensor(adj):
+                    adj = adj.to_sparse()
+                adj = normalize_adj_tensor(adj, sparse=True)
+
         elif self.__class__.__name__ == 'GraphSage' and self.args.method == 'msgc':
             adj = adj
         else:
@@ -126,10 +129,6 @@ class BaseGNN(nn.Module):
             print('=== training ===')
 
         best_acc_val = 0
-        # TODO: we can have two strategies:
-        #  1) validate on the original validation set,
-        #  2) validate on all the nodes except for test set
-        # data for validation
         if setting == 'ind':
             feat_full, adj_full = data.feat_val, data.adj_val
         else:

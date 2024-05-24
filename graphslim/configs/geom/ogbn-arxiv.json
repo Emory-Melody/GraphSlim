@@ -19,7 +19,6 @@
   "max_start_epoch_s": 200,
   "max_start_epoch": 350,
   "min_start_epoch": 0,
-  "eval_interval": 1,
   "syn_steps": 2100,
   "beta": 0,
   "epochs": 400,

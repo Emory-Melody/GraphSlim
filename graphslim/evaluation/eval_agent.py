@@ -42,7 +42,7 @@ class Evaluator:
         adj_syn = sparsify(model_type, adj_syn, args, verbose=verbose)
         return feat_syn, adj_syn, labels_syn
 
-    def grid_search(self, data, model_type, param_grid):
+    def grid_search(self, data, model_type, param_grid, reduced=True):
         args = self.args
         best_result = None
         best_params = None
@@ -53,7 +53,7 @@ class Evaluator:
             res = []
             for i in range(args.run_eval):
                 seed_everything(i)
-                res.append(self.test(data, model_type=model_type, verbose=False, reduced=True, mode='cross'))
+                res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode='cross'))
                 torch.cuda.empty_cache()
             res = np.array(res)
             res_mean, res_std = res.mean(), res.std()
@@ -68,30 +68,34 @@ class Evaluator:
                 f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         return best_result, best_params
 
-    def train_cross(self, data, grid_search=True):
+    def train_cross(self, data, grid_search=True, reduced=True):
         args = self.args
         if grid_search:
             gs_params = {
-                'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                        'dropout': [0.0, 0.5]},
-                'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                        'dropout': [0.0, 0.5]},
-                'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                        'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
-                'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                          'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
-                'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                          'dropout': [0.0, 0.5]},
-                'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                              'dropout': [0.0, 0.5]},
+                # 'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #         'dropout': [0.0, 0.5]},
+                # 'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #         'dropout': [0.0, 0.5]},
+                # 'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #         'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
+                # 'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #           'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+                # 'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #           'dropout': [0.0, 0.5]},
+                # 'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                #               'dropout': [0.0, 0.5]},
                 'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                         'dropout': [0.05, 0.5, 0.7]}
             }
+            # avoid OOM
+            if args.dataset in ['reddit']:
+                gs_params['GAT']['hidden'] = [8, 16]
             for model_type in gs_params:
-                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
-                                                                                 verbose=args.verbose)
+                if reduced:
+                    data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                                                                                     verbose=args.verbose)
                 print(f'Starting Grid Search for {model_type}')
-                best_result, best_params = self.grid_search(data, model_type, gs_params[model_type])
+                best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
                 args.logger.info(
                     f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         else:
@@ -103,8 +107,6 @@ class Evaluator:
                 best_result = evaluator.evaluate(data, model_type=args.eval_model)
                 args.logger.info(
                     f'{model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f}')
-
-
 
     def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
@@ -121,7 +123,7 @@ class Evaluator:
             adj_full = data.adj_full
 
         # assert not (args.method not in ['msgc'] and model_type == 'GAT')
-        model = eval(model_type)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode=mode).to(
+        model = eval(model_type)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
         model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                            setting=args.setting,
