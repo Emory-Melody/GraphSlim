@@ -104,7 +104,7 @@ def method_config(args):
               ), show_default=True)
 @click.option('--attack', '-A', default='none', help='attack method',
               type=click.Choice(
-                  ['none', 'random', 'dice', 'metattack', 'random_feat']
+                  ['none', 'random_adj', 'metattack', 'random_feat']
               ), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)

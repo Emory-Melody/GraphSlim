@@ -20,7 +20,7 @@ def attack(data, args):
     if not os.path.exists(args.save_path):
         os.makedirs(args.save_path)
 
-    if args.attack in ['metattack', 'random']:
+    if args.attack in ['metattack', 'random_adj']:
         if os.path.exists(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz'):
             if args.setting == 'ind':
                 data.adj_train = sp.load_npz(f'{args.save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}.npz')
@@ -45,7 +45,7 @@ def attack(data, args):
                     model = PRBCD(data, device=args.device)
                     data.edge_index, _ = model.attack(data.edge_index, ptb_rate=args.ptb_r)
                     data.adj_full = ei2csr(data.edge_index.cpu(), data.num_nodes)
-            elif args.attack == 'random':
+            elif args.attack == 'random_adj':
                 model = RandomAttack()
                 if args.setting == 'ind':
                     model.attack(data.adj_train, n_perturbations=args.ptb_n, type='add')

@@ -3,11 +3,11 @@ declare -A ptbr
 datasets["cora"]="0.1 0.5"
 datasets["citeseer"]="0.1 0.5"
 datasets["flickr"]="0.001 0.01"
-ptbr["random"]="0.5"
+ptbr["random_adj"]="0.5"
 ptbr["random_feat"]="0.5"
 ptbr["metattack"]="0.25"
 methods="gcond gcondx geom kcenter"
-attacks="random random_feat metattack"
+attacks="random_adj random_feat metattack"
 gpus=(0 1 2 3)
 
 gpu_index=0
