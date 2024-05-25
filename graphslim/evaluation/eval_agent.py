@@ -72,18 +72,18 @@ class Evaluator:
         args = self.args
         if grid_search:
             gs_params = {
-                # 'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #         'dropout': [0.0, 0.5]},
-                # 'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #         'dropout': [0.0, 0.5]},
-                # 'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #         'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
-                # 'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #           'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
-                # 'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #           'dropout': [0.0, 0.5]},
-                # 'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #               'dropout': [0.0, 0.5]},
+                'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5]},
+                'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5]},
+                'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
+                'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+                'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5]},
+                'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                              'dropout': [0.0, 0.5]},
                 'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                         'dropout': [0.05, 0.5, 0.7]}
             }

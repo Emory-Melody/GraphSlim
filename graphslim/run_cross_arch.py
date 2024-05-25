@@ -12,5 +12,5 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     data = get_dataset(args.dataset, args)
     evaluator = Evaluator(args)
-    evaluator.train_cross(data)
-    # evaluator.train_cross(data, reduced=False)
+    # evaluator.train_cross(data)
+    evaluator.train_cross(data, reduced=False)
