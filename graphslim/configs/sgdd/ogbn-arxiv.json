@@ -14,5 +14,4 @@
   "epochs": 500,
   "mx_size": 1000,
   "threshold": 0.01,
-  "init": "kcenter"
 }
