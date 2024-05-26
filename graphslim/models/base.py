@@ -95,7 +95,7 @@ class BaseGNN(nn.Module):
             if len(adj.shape) == 3:
                 adj = [normalize_adj_tensor(a.to_sparse(), sparse=True) for a in adj]
             else:
-                if isinstance(adj, torch.Tensor):
+                if not is_sparse_tensor(adj):
                     adj = adj.to_sparse()
                 adj = normalize_adj_tensor(adj, sparse=True)
 

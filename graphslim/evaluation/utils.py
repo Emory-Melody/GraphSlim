@@ -25,7 +25,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
         elif args.method in ['msgc']:
             threshold = args.threshold
         else:
-            threshold = 0
+            threshold = 0.5
     else:
         if args.method in ['gcond', 'doscond']:
             threshold = args.threshold
@@ -33,7 +33,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
             threshold = 0
         else:
             threshold = 0
-    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom']:
+    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
         print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
         print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
     if threshold > 0:

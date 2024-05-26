@@ -50,7 +50,7 @@ class GAT(BaseGNN):
     def forward(self, x, adj, output_layer_features=False):
         if isinstance(adj, list):
             x_list = []
-            for i in range(self.args.batch_adj):
+            for i in range(len(adj)):
                 x_temp = F.dropout(x, p=self.dropout, training=self.training)
                 x_temp = F.elu(self.conv1(x_temp, adj[i]))
                 x_temp = F.dropout(x_temp, p=self.dropout, training=self.training)
