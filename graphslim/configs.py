@@ -23,6 +23,9 @@ def dict2obj(d):
 
 def update_from_dict(obj, updates):
     for key, value in updates.items():
+        # set higher priority from command line as we explore some factors
+        if key in ['init'] and obj.init is not None:
+            continue
         setattr(obj, key, value)
 
 
@@ -93,11 +96,11 @@ def method_config(args):
 @click.option('--pre_norm', is_flag=True, show_default=True)
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
-@click.option('--reduction_rate', '-R', default=-1, show_default=True, help='reduction rate of training set')
+@click.option('--reduction_rate', '-R', default=-1.0, show_default=True, help='reduction rate of training set')
 @click.option('--seed', '-S', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
-@click.option('--init', default='random', help='initialization synthetic features',
+@click.option('--init', default=None, help='initialization synthetic features, none will read command line',
               type=click.Choice(
                   ['random', 'clustering', 'averaging', 'kcenter', 'herding']
               ), show_default=True)
@@ -111,9 +114,9 @@ def method_config(args):
               type=click.Choice(
                   ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']
               ), show_default=True)
-@click.option('--attack', '-A', default='none', help='attack method',
+@click.option('--attack', '-A', default=None, help='attack method',
               type=click.Choice(
-                  ['none', 'random_adj', 'metattack', 'random_feat']
+                  ['random_adj', 'metattack', 'random_feat']
               ), show_default=True)
 @click.option('--aggpreprocess', is_flag=True, show_default=True)
 @click.option('--dis_metric', default='ours', show_default=True)

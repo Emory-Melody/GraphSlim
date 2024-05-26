@@ -15,7 +15,7 @@ from graphslim.coarsening import *
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
     graph = get_dataset(args.dataset, args)
-    if not args.attack == 'none':
+    if args.attack is not None:
         data = attack(graph, args)
     if args.method == 'kcenter' and not args.aggpreprocess:
         agent = KCenter(setting=args.setting, data=graph, args=args)

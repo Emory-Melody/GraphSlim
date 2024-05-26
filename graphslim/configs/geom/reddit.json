@@ -24,5 +24,6 @@
   "lr_feat": 0.2,
   "tem": 1,
   "lr_tem": 0.005,
-  "maxtem": 1
+  "maxtem": 1,
+  "init": "kcenter"
 }

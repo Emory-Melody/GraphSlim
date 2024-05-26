@@ -7,5 +7,6 @@
   "condense_model": "SGC",
   "threshold": 0,
   "outer_loop": 20,
-  "inner_loop": 15
+  "inner_loop": 15,
+  "init": "averaging"
 }
