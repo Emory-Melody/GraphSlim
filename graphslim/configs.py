@@ -28,6 +28,15 @@ def update_from_dict(obj, updates):
 
 # fix setting here
 def setting_config(args):
+    representative_r = {
+        'cora': 0.5,
+        'citeseer': 0.5,
+        'flickr': 0.01,
+        'reddit': 0.001,
+        'ogbn-arxiv': 0.01,
+    }
+    if args.reduction_rate == -1:
+        args.reduction_rate = representative_r[args.dataset]
     if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv']:
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
@@ -84,7 +93,7 @@ def method_config(args):
 @click.option('--pre_norm', is_flag=True, show_default=True)
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
-@click.option('--reduction_rate', '-R', default=0.5, show_default=True, help='reduction rate of training set')
+@click.option('--reduction_rate', '-R', default=-1, show_default=True, help='reduction rate of training set')
 @click.option('--seed', '-S', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
 @click.option('--verbose', is_flag=True, show_default=True)
@@ -121,6 +130,7 @@ def method_config(args):
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
 @click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
 @click.option('--save_path', '--sp', default='checkpoints', show_default=True)
+@click.option('--eval_whole', '-W', is_flag=True, show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True)
 @click.pass_context
 def cli(ctx, **kwargs):

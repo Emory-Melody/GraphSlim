@@ -44,7 +44,8 @@ class Evaluator:
 
     def grid_search(self, data, model_type, param_grid, reduced=True):
         args = self.args
-        best_result = None
+        best_val_result = None
+        best_test_result = None
         best_params = None
         for params in tqdm(ParameterGrid(param_grid)):
             for key, value in params.items():
@@ -53,20 +54,18 @@ class Evaluator:
             res = []
             for i in range(args.run_eval):
                 seed_everything(i)
-                res.append(self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode='cross'))
+                res.append([self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode='cross')])
                 torch.cuda.empty_cache()
-            res = np.array(res)
-            res_mean, res_std = res.mean(), res.std()
+            res = np.array(res).reshape(args.run_eval, -1)
+            res_mean, res_std = res.mean(axis=0), res.std(axis=0)
             if args.verbose:
-                print(f'{model_type} Test with params {params}: {100 * res_mean:.2f} +/- {100 * res_std:.2f}')
+                print(f'{model_type} Test with params {params}: {100 * res_mean[1]:.2f} +/- {100 * res_std[1]:.2f}')
 
-            if best_result is None or res_mean > best_result[0]:
-                best_result = (res_mean, res_std)
+            if best_val_result is None or res_mean[0] > best_val_result[0]:
+                best_val_result = (res_mean[0], res_std[0])
+                best_test_result = (res_mean[1], res_std[1])
                 best_params = params
-        if args.verbose:
-            print(
-                f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
-        return best_result, best_params
+        return best_test_result, best_params
 
     def train_cross(self, data, grid_search=True, reduced=True):
         args = self.args
@@ -74,18 +73,18 @@ class Evaluator:
             gs_params = {
                 # 'MLP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                 #         'dropout': [0.0, 0.5]},
-                # 'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #         'dropout': [0.0, 0.5]},
-                # 'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #         'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
-                # 'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #           'dropout': [0.05, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
-                # 'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #           'dropout': [0.0, 0.5]},
-                # 'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                #               'dropout': [0.0, 0.5]},
+                'GCN': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5]},
+                'SGC': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                        'dropout': [0.0, 0.5], 'ntrans': [1, 2]},
+                'APPNP': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5], 'ntrans': [1, 2], 'alpha': [0.1, 0.2]},
+                'Cheby': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                          'dropout': [0.0, 0.5]},
+                'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
+                              'dropout': [0.0, 0.5]},
                 'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                        'dropout': [0.05, 0.5, 0.7]}
+                        'dropout': [0.0, 0.5, 0.7]}
             }
             # avoid OOM
             if args.dataset in ['reddit']:
@@ -99,7 +98,7 @@ class Evaluator:
                 args.logger.info(
                     f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         else:
-            eval_model_list = ['MLP', 'GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
+            eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             evaluator = Evaluator(args)
             for model_type in eval_model_list:
                 data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
@@ -114,30 +113,28 @@ class Evaluator:
         if verbose:
             print('======= testing %s' % model_type)
 
-        if model_type == 'MLP':
-            adj_test = ei2csr(torch.arange(len(data.feat_test), dtype=torch.long).repeat(2, 1), len(data.feat_test))
-            adj_full = ei2csr(torch.arange(len(data.feat_full), dtype=torch.long).repeat(2, 1), len(data.feat_full))
-            model_type = 'GCN'
-        else:
-            adj_test = data.adj_test
-            adj_full = data.adj_full
+        # if model_type == 'MLP':
+        #     data.adj_train = torch.eye(len(data.feat_train))
+        #     data.adj_full = torch.eye(len(data.feat_full))
+        #     model_type = 'GCN'
+        # else:
+        # adj_test = data.adj_test
+        # adj_full = data.adj_full
 
         # assert not (args.method not in ['msgc'] and model_type == 'GAT')
         model = eval(model_type)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
-        model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
-                           setting=args.setting,
-                           reduced=reduced)
+        best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+                                          setting=args.setting,
+                                          reduced=reduced)
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
 
-        res = []
         if args.setting == 'ind':
-            output = model.predict(data.feat_test, adj_test)
+            output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
-            res.append(acc_test.item())
             if verbose:
                 print("Test set results:",
                       "loss= {:.4f}".format(loss_test.item()),
@@ -145,16 +142,15 @@ class Evaluator:
 
         else:
             # Full graph
-            output = model.predict(data.feat_full, adj_full)
+            output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
             acc_test = accuracy(output[data.idx_test], labels_test)
-            res.append(acc_test.item())
             if verbose:
                 print("Test full set results:",
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-        return res[0]
+        return acc_test.item(), best_acc_val.item()
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args

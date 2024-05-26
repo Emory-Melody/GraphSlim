@@ -34,8 +34,10 @@ def sparsify(model_type, adj_syn, args, verbose=False):
         else:
             threshold = 0
     if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
-        print('Sum:', adj_syn.sum().item(), (adj_syn.sum() / adj_syn.numel()))
+        # print('Sum:', adj_syn.sum().item())
         print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+    # if args.method in ['sgdd']:
+    #     threshold = 0.5
     if threshold > 0:
         adj_syn[adj_syn < threshold] = 0
         if verbose:
