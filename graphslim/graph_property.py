@@ -9,6 +9,7 @@ if os.path.abspath('..') not in sys.path:
 from graphslim.configs import *
 from graphslim.dataset import *
 from graphslim.evaluation.utils import sparsify
+from scipy.sparse.linalg import eigsh
 import matplotlib.pyplot as plt
 import logging
 import networkx as nx
@@ -16,7 +17,32 @@ import numpy as np
 import torch
 from graphslim.utils import normalize_adj
 from sklearn.metrics import davies_bouldin_score
-from sklearn.preprocessing import StandardScaler
+from scipy.sparse.csgraph import laplacian
+
+
+# def graph_fourier_transform(X, L):
+#     # Compute the eigenvalues and eigenvectors of the Laplacian
+#     eigvals, eigvecs = scipy.sparse.linalg.eigsh(L)
+#     # Compute the Graph Fourier Transform
+#     X_hat = eigvecs.T @ X
+#     return X_hat
+#
+#
+# def laplacian_energy_distribution(X_hat):
+#     # Compute the Laplacian Energy Distribution (LED)
+#     led = np.square(X_hat) / np.sum(np.square(X_hat), axis=0)
+#
+#     return np.mean(led, axis=1)
+#
+#
+# def calculate_led(adj, X):
+#     # Compute the Laplacian matrix
+#     L = laplacian(adj, normed=True)
+#     # Perform the Graph Fourier Transform
+#     X_hat = graph_fourier_transform(X, L)
+#     # Calculate the LED
+#     led = laplacian_energy_distribution(X_hat)
+#     return led
 
 
 def calculate_homophily(y, adj):
@@ -47,45 +73,6 @@ def calculate_homophily(y, adj):
     return homophily
 
 
-# def davies_bouldin_index(X, labels):
-#     scaler = StandardScaler()
-#     X = scaler.fit_transform(X)
-#     unique_labels = np.unique(labels)
-#     n_clusters = len(unique_labels)
-#     cluster_kmeans = [X[labels == k] for k in unique_labels]
-#
-#     centroids = []
-#     scatters = []
-#
-#     for cluster in cluster_kmeans:
-#         if cluster.shape[0] > 0:
-#             centroid = np.mean(cluster, axis=0)
-#             centroids.append(centroid)
-#             scatter = np.mean(pairwise_distances(cluster, centroid.reshape(1, -1)))
-#             scatters.append(scatter)
-#         else:
-#             centroids.append(None)
-#             scatters.append(None)
-#
-#     if len([c for c in centroids if c is not None]) < 2:
-#         raise ValueError("Not enough non-empty clusters to calculate Davies-Bouldin index.")
-#
-#     db_index = 0
-#     for i in range(n_clusters):
-#         if centroids[i] is None:
-#             continue
-#         max_ratio = 0
-#         for j in range(n_clusters):
-#             if i != j and centroids[j] is not None:
-#                 d_ij = np.linalg.norm(centroids[i] - centroids[j])
-#                 ratio = (scatters[i] + scatters[j]) / d_ij
-#                 max_ratio = max(max_ratio, ratio)
-#         db_index += max_ratio
-#
-#     db_index /= n_clusters
-#     return db_index
-
-
 def graph_property(adj, feat, label):
     eigtrace_list = []
     spe_list = []
@@ -98,9 +85,9 @@ def graph_property(adj, feat, label):
         for i in range(adj.shape[0]):
             ad = adj[i]
             G = nx.from_numpy_array(ad)
-            laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
-            k = 1
-            eigenvalues, eigenvector = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+            # laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
+            laplacian_matrix = laplacian(ad, normed=True)
+            eigenvalues, eigenvector = eigsh(laplacian_matrix)
             eig = feat.T @ eigenvector @ eigenvector.T @ feat
             trace = np.trace(eig)
             eigtrace_list.append(trace)
@@ -110,8 +97,8 @@ def graph_property(adj, feat, label):
             spe_list.append(spectral_radius)
             # spectral_min = min(eigenvalues[eigenvalues > 0])
 
-            cluster_coefficient = nx.average_clustering(G)
-            clu_list.append(cluster_coefficient)
+            # cluster_coefficient = nx.average_clustering(G)
+            # clu_list.append(cluster_coefficient)
 
             density = nx.density(G)
             den_list.append(density)
@@ -135,7 +122,7 @@ def graph_property(adj, feat, label):
         args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
         args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
         args.logger.info(f"Average EigTrace: {np.mean(eigtrace_list)}")
-        args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
+        # args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
         args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
         args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
         args.logger.info(f"Average Davies-Bouldin Index AGG: {np.mean(db_agg_list)}")
@@ -148,7 +135,7 @@ def graph_property(adj, feat, label):
 
         # Compute the largest eigenvalue using sparse linear algebra
         k = 1  # number of eigenvalues and eigenvectors to compute
-        eigenvalues, eigenvector = scipy.sparse.linalg.eigsh(laplacian_matrix, k=k, which='LM')
+        eigenvalues, eigenvector = eigsh(laplacian_matrix, k=k, which='LM')
         eig = feat.T @ eigenvector @ eigenvector.T @ feat
         trace = np.trace(eig)
 
@@ -171,7 +158,7 @@ def graph_property(adj, feat, label):
         args.logger.info(f"EigTrace: {trace}")
         args.logger.info(f"Spectral Radius: {spectral_radius}")
         # print("Spectral Min:", spectral_min)
-        args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
+        # args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
         # print("Density:", density)
         args.logger.info(f"Homophily: {homophily}")
         args.logger.info(f"Davies-Bouldin Index: {db_index}")

@@ -161,7 +161,6 @@ class NasEvaluator:
         # print("pearson score of accuracy:", pearson_corr)
         self.args.logger.info(f"pearson score of accuracy:, {pearson_corr}")
 
-
         results_syn_ranked = self.get_rank(self.results_syn)
         results_ori_ranked = self.get_rank(self.results_ori)
         # print("ori rank", results_ori_ranked)

@@ -13,5 +13,4 @@
   "ntrans": 1,
   "epochs": 600,
   "mx_size": 200,
-  "init": "kcenter"
 }

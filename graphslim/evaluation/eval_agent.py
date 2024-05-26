@@ -99,11 +99,10 @@ class Evaluator:
                     f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
-            evaluator = Evaluator(args)
             for model_type in eval_model_list:
                 data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
                                                                                  verbose=args.verbose)
-                best_result = evaluator.evaluate(data, model_type=args.eval_model)
+                best_result = self.evaluate(data, model_type=args.eval_model)
                 args.logger.info(
                     f'{model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f}')
 
@@ -166,10 +165,10 @@ class Evaluator:
         res = []
         for i in run_evaluation:
             seed_everything(i)
-            best_val_acc = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode=mode)
-            res.append(best_val_acc)
+            best_acc, _ = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode=mode)
+            res.append(best_acc)
             if verbose:
-                run_evaluation.set_postfix(best_val_acc=best_val_acc)
+                run_evaluation.set_postfix(best_val_acc=best_acc)
         res = np.array(res)
 
         args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
@@ -192,11 +191,11 @@ class Evaluator:
                                               verbose=verbose,
                                               setting=args.setting,
                                               reduced=reduced)
-            res.append(best_acc_val.item())
+            res.append(best_acc_val)
             if verbose:
                 run_evaluation.set_postfix(best_acc_val=best_acc_val.item())
         res = np.array(res)
 
         if verbose:
-            print(f'Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+            print(f'Val Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
         return res.mean(), res.std()
