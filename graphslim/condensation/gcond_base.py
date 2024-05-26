@@ -80,6 +80,10 @@ class GCondBase:
             agent = KCenter(setting=args.setting, data=self.data, args=args)
         elif args.init == 'herding':
             agent = Herding(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'cent_p':
+            agent = CentP(setting=args.setting, data=self.data, args=args)
+        elif args.init == 'cent_d':
+            agent = CentD(setting=args.setting, data=self.data, args=args)
         else:
             agent = Random(setting=args.setting, data=self.data, args=args)
 

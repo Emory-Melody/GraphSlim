@@ -12,5 +12,6 @@
   "condense_model": "SGC",
   "ntrans": 1,
   "epochs": 600,
-  "mx_size": 100
+  "mx_size": 100,
+  "init": "kcenter"
 }

@@ -102,7 +102,9 @@ def method_config(args):
 @click.option('--verbose', is_flag=True, show_default=True)
 @click.option('--init', default=None, help='initialization synthetic features, none will read command line',
               type=click.Choice(
-                  ['random', 'clustering', 'averaging', 'kcenter', 'herding']
+                  ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
+                   'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
+                   'cent_d', 'cent_p', 'kcenter', 'herding', 'random']
               ), show_default=True)
 @click.option('--method', '-M', default='kcenter',
               type=click.Choice(

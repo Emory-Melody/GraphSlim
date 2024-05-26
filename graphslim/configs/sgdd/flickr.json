@@ -11,5 +11,6 @@
   "inner_loop": 15,
   "condense_model": "SGC",
   "ntrans": 2,
-  "epochs": 500
+  "epochs": 500,
+  "init": "kcenter"
 }
