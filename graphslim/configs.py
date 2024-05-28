@@ -99,7 +99,7 @@ def method_config(args):
 @click.option('--reduction_rate', '-R', default=-1.0, show_default=True, help='reduction rate of training set')
 @click.option('--seed', '-S', default=1, help='Random seed.', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers', show_default=True)
-@click.option('--verbose', is_flag=True, show_default=True)
+@click.option('--verbose', '-V', is_flag=True, show_default=True)
 @click.option('--init', default=None, help='initialization synthetic features, none will read command line',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
@@ -133,7 +133,6 @@ def method_config(args):
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
-@click.option('-origin', '-O', is_flag=True, help='original or condensed', show_default=True)
 @click.option('--save_path', '--sp', default='checkpoints', show_default=True)
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True)

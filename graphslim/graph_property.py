@@ -54,7 +54,7 @@ def calculate_homophily(y, adj):
         adj = adj.tocsr()
 
     # Binarize the adjacency matrix (assuming adj contains weights)
-    adj.data = (adj.data > 0.5).astype(int)
+    # adj.data = (adj.data > 0.5).astype(int)
 
     # Ensure y is a 1D array
     y = np.squeeze(y)
@@ -89,7 +89,7 @@ def graph_property(adj, feat, label):
             laplacian_matrix = laplacian(ad, normed=True)
             eigenvalues, eigenvector = eigsh(laplacian_matrix)
             eig = feat.T @ eigenvector @ eigenvector.T @ feat
-            trace = np.trace(eig)
+            trace = np.trace(eig) / feat.shape[1]
             eigtrace_list.append(trace)
 
             # The largest eigenvalue is the spectral radius
@@ -137,7 +137,7 @@ def graph_property(adj, feat, label):
         k = 1  # number of eigenvalues and eigenvectors to compute
         eigenvalues, eigenvector = eigsh(laplacian_matrix, k=k, which='LM')
         eig = feat.T @ eigenvector @ eigenvector.T @ feat
-        trace = np.trace(eig)
+        trace = np.trace(eig) / feat.shape[1]
 
         # The largest eigenvalue is the spectral radius
         spectral_radius = max(eigenvalues)
@@ -169,7 +169,7 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     args.device = 'cpu'
 
-    if args.origin:
+    if args.eval_whole:
         graph = get_dataset(args.dataset, args)
         if args.setting == 'ind':
             adj, feat, label = graph.adj_train, graph.feat_train, graph.labels_train

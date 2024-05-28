@@ -59,7 +59,8 @@ class Evaluator:
             res = np.array(res).reshape(args.run_eval, -1)
             res_mean, res_std = res.mean(axis=0), res.std(axis=0)
             if args.verbose:
-                print(f'{model_type} Test with params {params}: {100 * res_mean[1]:.2f} +/- {100 * res_std[1]:.2f}')
+                print(
+                    f'{model_type} Test results with params {params}: {100 * res_mean[1]:.2f} +/- {100 * res_std[1]:.2f}')
 
             if best_val_result is None or res_mean[0] > best_val_result[0]:
                 best_val_result = (res_mean[0], res_std[0])
@@ -89,6 +90,7 @@ class Evaluator:
             # avoid OOM
             if args.dataset in ['reddit']:
                 gs_params['GAT']['hidden'] = [8, 16]
+                # args.eval_epochs = 300
             for model_type in gs_params:
                 if reduced:
                     data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
@@ -96,7 +98,7 @@ class Evaluator:
                 print(f'Starting Grid Search for {model_type}')
                 best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
                 args.logger.info(
-                    f'Best {model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+                    f'Best {model_type} Test Result: {100 * best_result[1]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             for model_type in eval_model_list:
@@ -149,12 +151,13 @@ class Evaluator:
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
 
-        return acc_test.item(), best_acc_val.item()
+        return best_acc_val.item(), acc_test.item()
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         args = self.args
 
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
+        if reduced:
+            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
 
         if verbose:
             print(f'evaluate reduced data by {model_type}')
@@ -165,10 +168,10 @@ class Evaluator:
         res = []
         for i in run_evaluation:
             seed_everything(i)
-            best_acc, _ = self.test(data, model_type=model_type, verbose=False, reduced=reduced, mode=mode)
+            _, best_acc = self.test(data, model_type=model_type, verbose=args.verbose, reduced=reduced, mode=mode)
             res.append(best_acc)
             if verbose:
-                run_evaluation.set_postfix(best_val_acc=best_acc)
+                run_evaluation.set_postfix(test_acc=best_acc)
         res = np.array(res)
 
         args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')

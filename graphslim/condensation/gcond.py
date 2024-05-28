@@ -26,6 +26,7 @@ class GCond(GCondBase):
 
         # initialization the features
         feat_init = self.init()
+        # self.reset_parameters()
         self.feat_syn.data.copy_(feat_init)
 
         adj = normalize_adj_tensor(adj, sparse=True)

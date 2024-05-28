@@ -25,7 +25,7 @@ class GCondBase:
         else:
             n = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         self.d = d = data.feat_train.shape[1]
-        # self.d = d
+        # self.d = d = 64
         print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
         print(f'actual reduced size:{n}')
 
