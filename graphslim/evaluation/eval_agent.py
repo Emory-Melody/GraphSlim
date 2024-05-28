@@ -98,7 +98,7 @@ class Evaluator:
                 print(f'Starting Grid Search for {model_type}')
                 best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
                 args.logger.info(
-                    f'Best {model_type} Test Result: {100 * best_result[1]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
+                    f'Best {model_type} Test Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f} with params {best_params}')
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             for model_type in eval_model_list:
