@@ -1,6 +1,8 @@
 import numpy as np
 
 from graphslim.sparsification.model_free_coreset_base import MFCoreSet
+from scipy.sparse import csr_matrix, diags
+from numpy.linalg import norm
 
 
 class CentP(MFCoreSet):
@@ -25,26 +27,29 @@ class CentP(MFCoreSet):
 
     def pagerank_algorithm(self, damping_factor=0.85, max_iterations=100, convergence_threshold=0.0001):
         if self.args.setting == 'ind':
-            adj = self.data.adj_train.astype(np.uint8).todense()
+            adj = self.data.adj_train.astype(np.uint8)
         else:
-            adj = self.data.adj_full.astype(np.uint8).todense()
+            adj = self.data.adj_full.astype(np.uint8)
+
         n = adj.shape[0]
+        adj = csr_matrix(adj)
 
-        # 构建转移矩阵
-        transition_matrix = adj / np.sum(adj, axis=0)
+        # Calculate out-degree
+        out_degree = np.array(adj.sum(axis=1)).flatten()
+        out_degree[out_degree == 0] = 1  # Avoid division by zero for isolated nodes
 
-        # 初始化PageRank向量
-        pagerank = (np.ones(n) / n).reshape(-1, 1)
+        # Create transition matrix
+        transition_matrix = adj.multiply(1.0 / out_degree[:, None])
 
-        # 开始迭代
+        # Initialize PageRank vector
+        pagerank = np.ones((n, 1)) / n
+        momentum = (1 - damping_factor) * np.ones((n, 1)) / n
+
+        # Iterate to compute PageRank
         for i in range(max_iterations):
-            old_pagerank = np.copy(pagerank)
-
-            # 计算新的PageRank向量
-            pagerank = damping_factor * np.dot(transition_matrix, old_pagerank) + (1 - damping_factor) / n
-
-            # 判断是否收敛
-            if np.sum(np.abs(pagerank - old_pagerank)) < convergence_threshold:
+            old_pagerank = pagerank.copy()
+            pagerank = damping_factor * (transition_matrix @ old_pagerank) + momentum
+            if norm(pagerank - old_pagerank, ord=1) < convergence_threshold:
                 break
 
-        return np.asarray(pagerank).ravel()
+        return pagerank.flatten()

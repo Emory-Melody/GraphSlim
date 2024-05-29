@@ -31,7 +31,8 @@ class Coarsen:
         cpu_data = copy.deepcopy(data)
 
         if args.setting == 'trans':
-            candidate, C_list, Gc_list = self.coarsening(pyg2gsp(data.edge_index), 1 - args.reduction_rate, args.method)
+            candidate, C_list, Gc_list = self.coarsening(graphs.Graph(W=data.adj_full), 1 - args.reduction_rate,
+                                                         args.method)
             coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
                 cpu_data, candidate, C_list, Gc_list)
 
@@ -41,7 +42,7 @@ class Coarsen:
             coarsen_edge = torch.from_numpy(coarsen_edge[np.ix_(train_idx, train_idx)])
             coarsen_train_labels = coarsen_train_labels[train_idx]
         else:
-            candidate, C_list, Gc_list = self.coarsening(pyg2gsp(csr2ei(data.adj_train)), 1 - args.reduction_rate,
+            candidate, C_list, Gc_list = self.coarsening(graphs.Graph(W=data.adj_train), 1 - args.reduction_rate,
                                                          args.method)
             coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
                 cpu_data, candidate, C_list, Gc_list)
