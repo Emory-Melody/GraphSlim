@@ -3,7 +3,9 @@ import sys
 import scipy
 
 from sklearn.metrics import pairwise_distances
+import warnings
 
+warnings.simplefilter(action='ignore', category=FutureWarning)
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 from graphslim.configs import *
@@ -20,29 +22,6 @@ from sklearn.metrics import davies_bouldin_score
 from scipy.sparse.csgraph import laplacian
 
 
-# def graph_fourier_transform(X, L):
-#     # Compute the eigenvalues and eigenvectors of the Laplacian
-#     eigvals, eigvecs = scipy.sparse.linalg.eigsh(L)
-#     # Compute the Graph Fourier Transform
-#     X_hat = eigvecs.T @ X
-#     return X_hat
-#
-#
-# def laplacian_energy_distribution(X_hat):
-#     # Compute the Laplacian Energy Distribution (LED)
-#     led = np.square(X_hat) / np.sum(np.square(X_hat), axis=0)
-#
-#     return np.mean(led, axis=1)
-#
-#
-# def calculate_led(adj, X):
-#     # Compute the Laplacian matrix
-#     L = laplacian(adj, normed=True)
-#     # Perform the Graph Fourier Transform
-#     X_hat = graph_fourier_transform(X, L)
-#     # Calculate the LED
-#     led = laplacian_energy_distribution(X_hat)
-#     return led
 
 
 def calculate_homophily(y, adj):
@@ -121,7 +100,7 @@ def graph_property(adj, feat, label):
         db_agg_list = np.array(db_agg_list)
         args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
         args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
-        args.logger.info(f"Average EigTrace: {np.mean(eigtrace_list)}")
+        args.logger.info(f"Average LapSpaceTrace: {np.mean(eigtrace_list)}")
         # args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
         args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
         args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
@@ -155,7 +134,7 @@ def graph_property(adj, feat, label):
         db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
         # print("Degree Distribution:", degree_distribution)
         args.logger.info(f"Density %: {density * 100}")
-        args.logger.info(f"EigTrace: {trace}")
+        args.logger.info(f"LapSpaceTrace: {trace}")
         args.logger.info(f"Spectral Radius: {spectral_radius}")
         # print("Spectral Min:", spectral_min)
         # args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
@@ -178,8 +157,10 @@ if __name__ == '__main__':
         feat = feat.numpy()
         label = label.numpy()
         graph_property(adj, feat, label)
-    method_list = ['sfgc', 'gcondx', 'vng', 'gcond', 'msgc', 'sgdd', 'geom', 'gcsntk']
+    method_list = ['vng', 'gcond', 'msgc', 'sgdd']
+    method_list2 = method_list + ['gcondx', 'geom', 'gcsntk']
     for args.method in method_list:
+        print(f'========{args.method}========')
         adj_syn, feat, label = load_reduced(args)
         if args.method not in ['msgc']:
             label = label[:adj_syn.shape[0]]
@@ -191,5 +172,4 @@ if __name__ == '__main__':
         adj = adj_syn.numpy()
         label = label.numpy()
         feat = feat.numpy()
-        print(f'========{args.method}========')
         graph_property(adj, feat, label)
