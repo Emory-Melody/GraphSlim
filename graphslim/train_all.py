@@ -11,12 +11,14 @@ from graphslim.evaluation import *
 from graphslim.sparsification import *
 from graphslim.condensation import *
 from graphslim.coarsening import *
+from graphslim.utils import seed_everything
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
     graph = get_dataset(args.dataset, args)
     if args.attack is not None:
-        data = attack(graph, args)
+        if args.setting == 'ind':
+            data = attack(graph, args)
     if args.method == 'kcenter' and not args.aggpreprocess:
         agent = KCenter(setting=args.setting, data=graph, args=args)
     elif args.method == 'kcenter' and args.aggpreprocess:

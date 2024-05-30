@@ -153,8 +153,8 @@ class BaseGNN(nn.Module):
 
             if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
-                # acc_train = accuracy(output if reindex else output[data.idx_train], labels)
-                # print('Epoch {}, training acc: {}'.format(i, acc_train))
+                acc_train = accuracy(output if reindex else output[data.idx_train], labels)
+                print('Epoch {}, training acc: {}'.format(i, acc_train))
 
             with torch.no_grad():
                 self.eval()

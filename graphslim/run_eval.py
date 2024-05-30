@@ -7,6 +7,7 @@ if os.path.abspath('..') not in sys.path:
 from graphslim.configs import cli
 from graphslim.dataset import *
 from graphslim.evaluation import Evaluator
+from graphslim.utils import seed_everything
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
@@ -16,4 +17,7 @@ if __name__ == '__main__':
         evaluator.evaluate(data, model_type=args.eval_model, reduced=False)
 
     else:
+        if args.attack is not None:
+            data = attack(data, args)
+            args.save_path = f'checkpoints'
         evaluator.evaluate(data, model_type=args.eval_model)

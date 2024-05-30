@@ -75,7 +75,6 @@ def method_config(args):
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
 @click.option('--run_eval', default=10, show_default=True)
 @click.option('--run_inter_eval', default=5, show_default=True)
-@click.option('--run_reduction', default=3, show_default=True)
 @click.option('--eval_interval', default=100, show_default=True)
 @click.option('--hidden', '-H', default=256, show_default=True)
 @click.option('--eval_epochs', '--ee', default=300, show_default=True)
@@ -145,8 +144,8 @@ def cli(ctx, **kwargs):
     else:
         # if gpu_id=-1, use cpu
         args.device = 'cpu'
-    seed_everything(args.seed)
     path = args.save_path
+    seed_everything(args.seed)
     # for benchmark, we need unified settings and reduce flexibility of args
     args = method_config(args)
     # setting_config has higher priority than methods_config

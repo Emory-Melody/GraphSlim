@@ -132,6 +132,8 @@ class Evaluator:
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
 
+        if args.attack is not None:
+            data = attack(data, args)
         if args.setting == 'ind':
             output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)

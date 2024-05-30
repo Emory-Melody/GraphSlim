@@ -10,6 +10,7 @@ from graphslim.evaluation import NasEvaluator
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
+
     data = get_dataset(args.dataset, args)
 
     NasEvaluator = NasEvaluator(args)
