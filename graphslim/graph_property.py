@@ -22,8 +22,6 @@ from sklearn.metrics import davies_bouldin_score
 from scipy.sparse.csgraph import laplacian
 
 
-
-
 def calculate_homophily(y, adj):
     # Convert dense numpy array to sparse matrix if necessary
     if isinstance(adj, np.ndarray):
@@ -99,8 +97,8 @@ def graph_property(adj, feat, label):
         db_list = np.array(db_list)
         db_agg_list = np.array(db_agg_list)
         args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
-        args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
         args.logger.info(f"Average LapSpaceTrace: {np.mean(eigtrace_list)}")
+        args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
         # args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
         args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
         args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
