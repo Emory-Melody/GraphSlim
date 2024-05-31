@@ -52,7 +52,7 @@ def splits(data, exp):
 def save_reduced(adj_syn, feat_syn, labels_syn, args):
     save_path = f'{args.save_path}/reduced_graph/{args.method}'
     if args.attack is not None:
-        save_path = f'{args.save_path}/corrupt_graph/{args.attack}/{save_path}'
+        save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     torch.save(adj_syn,
