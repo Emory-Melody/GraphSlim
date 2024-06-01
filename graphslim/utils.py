@@ -7,6 +7,7 @@ import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
 from torch_sparse import SparseTensor
+from torch_geometric.utils import degree
 import scipy.sparse as sp
 
 
@@ -268,7 +269,6 @@ def normalize_adj(mx):
         normalized matrix
     """
 
-    # TODO: maybe using coo format would be better?
     if type(mx) is not sp.lil.lil_matrix:
         mx = mx.tolil()
     if mx[0, 0] == 0:
@@ -319,6 +319,53 @@ def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
     edge_index = torch.cat([edge_index, loop_index], dim=1)
 
     return edge_index, edge_weight
+
+
+def normalize_adj_sgformer(adj):
+    """
+    Normalize the adjacency matrix. Works for both dense and sparse matrices.
+
+    Args:
+    adj (torch.Tensor): The adjacency matrix (either dense or sparse COO).
+    device (torch.device): The device to run the normalization on.
+
+    Returns:
+    torch.Tensor or SparseTensor: The normalized adjacency matrix.
+    """
+    # if is_sparse_tensor(adj):
+    #     # Sparse matrix normalization
+    #     row = adj.indices()[0]
+    #     col = adj.indices()[1]
+    #     values = adj.values()
+    if isinstance(adj, SparseTensor):
+        row, col, values = adj.coo()
+        # Number of nodes
+        N = adj.size(0)
+
+        # Compute degree for normalization
+        d = degree(col, N).float()
+        d_norm_in = (1. / d[col]).sqrt()
+        d_norm_out = (1. / d[row]).sqrt()
+
+        # Normalize the values directly
+        normalized_values = values * d_norm_in * d_norm_out
+        normalized_values = torch.nan_to_num(normalized_values, nan=0.0, posinf=0.0, neginf=0.0)
+
+        # Create a new SparseTensor with normalized values
+        adj_normalized = SparseTensor(row=row, col=col, value=normalized_values, sparse_sizes=(N, N))
+
+    else:
+        # Dense matrix normalization
+        N = adj.size(0)
+
+        # Compute degree for normalization
+        d = adj.sum(dim=1).float()
+        d_norm = torch.diag((1. / d).sqrt())
+
+        # Normalize the dense adjacency matrix
+        adj_normalized = d_norm @ adj @ d_norm
+        adj_normalized = torch.nan_to_num(adj_normalized, nan=0.0, posinf=0.0, neginf=0.0)
+    return adj_normalized
 
 
 def normalize_adj_tensor(adj, sparse=False):

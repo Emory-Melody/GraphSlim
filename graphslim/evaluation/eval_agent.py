@@ -125,7 +125,7 @@ class Evaluator:
         # assert not (args.method not in ['msgc'] and model_type == 'GAT')
         model = eval(model_type)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
-        best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
+        best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=False, verbose=verbose,
                                           setting=args.setting,
                                           reduced=reduced)
 
