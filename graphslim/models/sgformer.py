@@ -293,16 +293,19 @@ class TransConv(nn.Module):
 
 class SGFormer(nn.Module):
     def __init__(self, in_channels, hidden_channels, out_channels, args, mode='eval',
-                 trans_num_layers=2, trans_num_heads=1, trans_dropout=0.2, trans_use_bn=False, trans_use_residual=True,
-                 trans_use_weight=False, trans_use_act=True,
-                 gnn_num_layers=2, gnn_dropout=0.5, gnn_use_weight=False, gnn_use_init=False, gnn_use_bn=False,
-                 gnn_use_residual=False, gnn_use_act=True,
+                 trans_num_layers=3, trans_num_heads=1, trans_dropout=0.2, trans_weight_decay=0.001, trans_use_bn=False,
+                 trans_use_residual=True,
+                 trans_use_weight=False, trans_use_act=False,
+                 gnn_num_layers=2, gnn_dropout=0.5, gnn_use_weight=False, gnn_weight_decay=5e-4, gnn_use_init=False,
+                 gnn_use_bn=False,
+                 gnn_use_residual=False, gnn_use_act=False,
                  use_graph=True, graph_weight=0.8, aggregate='add'):
         super().__init__()
         self.device = args.device
         self.lr = args.lr
-        self.weight_decay = args.weight_decay
-        self.ours_weight_decay = 0.001
+        self.trans_weight_decay = trans_weight_decay
+        self.gnn_weight_decay = gnn_weight_decay
+        self.trans_weight_decay = trans_weight_decay
         self.trans_conv = TransConv(in_channels, hidden_channels, trans_num_layers, trans_num_heads, trans_dropout,
                                     trans_use_bn, trans_use_residual, trans_use_weight, trans_use_act)
         self.graph_conv = GraphConv(in_channels, hidden_channels, gnn_num_layers, gnn_dropout, gnn_use_bn,
@@ -388,9 +391,9 @@ class SGFormer(nn.Module):
             feat_full, adj_full = data.feat_full, data.adj_full
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
         optimizer = torch.optim.Adam([
-            {'params': self.params1, 'weight_decay': self.ours_weight_decay},
-            {'params': self.params2, 'weight_decay': self.weight_decay}
-        ])
+            {'params': self.params1, 'weight_decay': self.trans_weight_decay},
+            {'params': self.params2, 'weight_decay': self.gnn_weight_decay}
+        ], lr=self.lr)
 
         self.train()
         for i in range(train_iters):

@@ -49,7 +49,7 @@ def setting_config(args):
     if args.method not in ['gcsntk']:
         args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
-    args.eval_epochs = 600
+    args.eval_epochs = 300
     return args
 
 
