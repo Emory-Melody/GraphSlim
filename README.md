@@ -20,3 +20,15 @@ This package aims to reduce the large, original graph into a small, synthetic an
 # Features
 * Covering 3 mainstream reduction strategies: Sparsificaiton, Coarsening and Condensation
 * Unified test tools for easily producing benchmarks
+
+# Benchmark Reproduction
+
+Please enter `cd benchmark` and all the scripts are in this folder.
+
+For Table 1 7 8, use `sh peroformacne.sh`.
+For Figure 3, use `sh scalability.sh`.
+For Figure 4, use `sh data_initialization.sh`.
+For Figure 5 9, use `sh transferability.sh`.
+For Table 2, use `sh nas.sh`.
+For Table 3 10 11, use `sh graph_property_preservation.sh`.
+For Table 4 12, use `sh robustness.sh`.
