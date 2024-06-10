@@ -108,22 +108,18 @@ class NasEvaluator:
         if self.best_params_ori is None:
             file_path = f'{self.save_path}/best_params_ori.pkl'
             self.best_params_ori = load_pkl(file_path)
-        # print("best_params_ori", self.best_params_ori)
         self.args.logger.info(f"best_params_ori: {self.best_params_ori}")
         args = self.args
-        # args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_ori
         args.eval_epochs = 600
         args.ntrans = 2
         evaluator = Evaluator(args)
         acc_test_ori, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
-        # print("NAS: test accuracy on ori graph:", acc_test_ori)
         self.args.logger.info(f"NAS: test accuracy on ori graph: {acc_test_ori}")
 
     def test_params_syn(self, data):
         if self.best_params_syn is None:
             file_path = f'{self.save_path}/{self.args.method}_best_params_syn.pkl'
             self.best_params_syn = load_pkl(file_path)
-        # print("best_params_syn", self.best_params_syn)
         self.args.logger.info(f"best_params_syn: {self.best_params_syn}")
         args = self.args
         args.nlayers, args.hidden, args.alpha, args.activation = self.best_params_syn
@@ -131,8 +127,9 @@ class NasEvaluator:
         args.ntrans = 2
         evaluator = Evaluator(args)
         acc_test_syn, _ = evaluator.evaluate(data, model_type='APPNP', reduced=False, verbose=False)
-        # print("NAS: test accuracy on syn graph:", acc_test_syn)
         self.args.logger.info(f"NAS: test accuracy on syn graph: {acc_test_syn}")
+
+        return acc_test_syn
 
     def get_rank(self, results):
         sorted_tuples = sorted(enumerate(results), key=lambda x: x[1], reverse=True)
@@ -153,20 +150,12 @@ class NasEvaluator:
             self.results_syn = [float(x) for x in load_csv(
                 f'{self.save_path}/{self.args.method}_results_syn.csv')[0]]
             self.results_ori = [float(x) for x in load_csv(f'{self.save_path}/results_ori.csv')[0]]
-        # print("ori acc:", self.results_ori)
-        # print("syn acc:", self.results_syn)
-        self.args.logger.info(f"ori acc:, {self.results_ori}")
-        self.args.logger.info(f"syn acc:, {self.results_syn}")
-        pearson_corr, p_value = pearsonr(self.results_syn, self.results_ori)
-        # print("pearson score of accuracy:", pearson_corr)
-        self.args.logger.info(f"pearson score of accuracy:, {pearson_corr}")
+        pearson_corr_acc, p_value = pearsonr(self.results_syn, self.results_ori)
+        self.args.logger.info(f"pearson score of accuracy:, {pearson_corr_acc}")
 
         results_syn_ranked = self.get_rank(self.results_syn)
         results_ori_ranked = self.get_rank(self.results_ori)
-        # print("ori rank", results_ori_ranked)
-        # print("syn rank", results_syn_ranked)
-        self.args.logger.info(f"ori rank:, {results_ori_ranked}")
-        self.args.logger.info(f"syn rank:, {results_syn_ranked}")
-        pearson_corr, p_value = pearsonr(results_syn_ranked, results_ori_ranked)
-        # print("pearson score of rank:", pearson_corr)
-        self.args.logger.info(f"pearson score of rank:, {pearson_corr}")
+        pearson_corr_rank, p_value = pearsonr(results_syn_ranked, results_ori_ranked)
+        self.args.logger.info(f"pearson score of rank:, {pearson_corr_rank}")
+
+        return pearson_corr_acc, pearson_corr_rank

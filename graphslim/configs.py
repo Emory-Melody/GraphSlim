@@ -44,7 +44,7 @@ def setting_config(args):
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit']:
         args.setting = 'ind'
-    args.pre_norm = True
+    # args.pre_norm = True
     args.run_inter_eval = 3
     if args.method not in ['gcsntk']:
         args.eval_interval = max(args.epochs // 10, 1)
@@ -92,7 +92,7 @@ def method_config(args):
 @click.option('--lr', default=0.01, show_default=True)
 @click.option('--weight_decay', '--wd', default=0, show_default=True)
 # @click.option('--normalize_features', is_flag=True, show_default=True)
-@click.option('--pre_norm', is_flag=True, show_default=True)
+@click.option('--pre_norm', default=True, show_default=True)
 @click.option('--outer_loop', default=10, show_default=True)
 @click.option('--inner_loop', default=1, show_default=True)
 @click.option('--reduction_rate', '-R', default=-1.0, show_default=True, help='reduction rate of training set')
@@ -151,7 +151,10 @@ def cli(ctx, **kwargs):
     # setting_config has higher priority than methods_config
     args = setting_config(args)
     if not os.path.exists(f'{path}/logs/{args.method}'):
-        os.makedirs(f'{path}/logs/{args.method}')
+        try:
+            os.makedirs(f'{path}/logs/{args.method}')
+        except:
+            print(f'{path}/logs/{args.method} exists!')
     logging.basicConfig(filename=f'{path}/logs/{args.method}/{args.dataset}_{args.reduction_rate}.log',
                         level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     args.logger = logging.getLogger(__name__)

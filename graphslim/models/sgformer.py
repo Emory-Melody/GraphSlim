@@ -303,10 +303,21 @@ class SGFormer(nn.Module):
         super().__init__()
         self.device = args.device
         self.lr = args.lr
-        self.trans_weight_decay = trans_weight_decay
+        if hasattr(args, 'train_weight_decay'):
+            self.trans_weight_decay = args.trans_weight_decay
+        else:
+            self.trans_weight_decay = trans_weight_decay
+        if hasattr(args, 'trans_dropout'):
+            self.trans_dropout = args.trans_dropout
+        else:
+            self.trans_dropout = trans_dropout
+        if hasattr(args, 'trans_num_layers'):
+            self.trans_num_layers = args.trans_num_layers
+        else:
+            self.trans_num_layers = trans_num_layers
         self.gnn_weight_decay = gnn_weight_decay
-        self.trans_weight_decay = trans_weight_decay
-        self.trans_conv = TransConv(in_channels, hidden_channels, trans_num_layers, trans_num_heads, trans_dropout,
+        self.trans_conv = TransConv(in_channels, hidden_channels, self.trans_num_layers, trans_num_heads,
+                                    self.trans_dropout,
                                     trans_use_bn, trans_use_residual, trans_use_weight, trans_use_act)
         self.graph_conv = GraphConv(in_channels, hidden_channels, gnn_num_layers, gnn_dropout, gnn_use_bn,
                                     gnn_use_residual, gnn_use_weight, gnn_use_init, gnn_use_act)

@@ -21,7 +21,7 @@ class GEOM(GCondBase):
         args.condense_model = 'GCN'
         # args.init = 'kcenter'
 
-        self.buf_dir = '../geom_buffer/{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r)
+        self.buf_dir = '../geom_buffer/{}_{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r, args.seed)
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
 

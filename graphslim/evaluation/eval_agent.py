@@ -85,7 +85,9 @@ class Evaluator:
                 'GraphSage': {'hidden': [64, 256], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
                               'dropout': [0.0, 0.5]},
                 'GAT': {'hidden': [16, 64], 'lr': [0.01, 0.001], 'weight_decay': [0, 5e-4],
-                        'dropout': [0.0, 0.5, 0.7]}
+                        'dropout': [0.0, 0.5, 0.7]},
+                'SGFormer': {'trans_num_layers': [1, 2, 3], 'lr': [0.01, 0.001], 'trans_weight_decay': [0.001, 0.0001],
+                             'trans_dropout': [0.0, 0.5, 0.7]}
             }
             # avoid OOM
             if args.dataset in ['reddit']:
@@ -142,7 +144,6 @@ class Evaluator:
                 print("Test set results:",
                       "loss= {:.4f}".format(loss_test.item()),
                       "accuracy= {:.4f}".format(acc_test.item()))
-
         else:
             # Full graph
             output = model.predict(data.feat_full, data.adj_full)

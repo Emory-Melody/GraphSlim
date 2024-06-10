@@ -274,7 +274,7 @@ class PRBCD:
         self.perturbed_edge_weight.requires_grad = True
         self.optimizer_adj = torch.optim.Adam([self.perturbed_edge_weight], lr=lr_adj)
         best_loss_val = -float('Inf')
-        for it in tqdm(range(epochs)):
+        for it in range(epochs):
             self.perturbed_edge_weight.requires_grad = True
             edge_index, edge_weight = self.get_modified_adj()
             if torch.cuda.is_available() and self.do_synchronize:
