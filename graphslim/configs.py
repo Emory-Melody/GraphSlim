@@ -132,7 +132,7 @@ def method_config(args):
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for ntk methods, avoid SVD error', show_default=True)
-@click.option('--save_path', '--sp', default='checkpoints', show_default=True)
+@click.option('--save_path', '--sp', default='../checkpoints', show_default=True)
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True)
 @click.pass_context

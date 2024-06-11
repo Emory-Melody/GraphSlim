@@ -20,10 +20,7 @@ from graphslim.utils import index_to_mask, to_tensor
 
 
 def get_dataset(name, args):
-    # path = osp.join('../../data')
-    # print('Loading dataset:', path)
-    path = osp.join('../../../data')
-    print('Loading dataset:', path)
+    path = osp.join('../../data')
     # Create a dictionary that maps standard names to normalized names
     standard_names = ['flickr', 'reddit', 'dblp', 'cora_ml', 'physics', 'cs', 'cora', 'citeseer', 'pubmed', 'photo',
                       'computers', 'ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv']
