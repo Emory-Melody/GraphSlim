@@ -19,6 +19,7 @@ if __name__ == '__main__':
     if args.attack is not None:
         if args.setting == 'ind':
             data = attack(graph, args)
+    # TODO: Add spaner-based methods
     if args.method == 'kcenter' and not args.aggpreprocess:
         agent = KCenter(setting=args.setting, data=graph, args=args)
     elif args.method == 'kcenter' and args.aggpreprocess:
