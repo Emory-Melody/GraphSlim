@@ -21,6 +21,10 @@ This package aims to reduce the large, original graph into a small, synthetic an
 * Covering 3 mainstream reduction strategies: Sparsificaiton, Coarsening and Condensation
 * Unified test tools for easily producing benchmarks
 
+# Environment
+
+See `requirements.txt` for more information.
+
 # Benchmark Reproduction
 
 Please enter `cd benchmark` and all the scripts are in this folder.
