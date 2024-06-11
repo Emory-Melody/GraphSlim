@@ -1,8 +1,8 @@
 import os
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if os.path.abspath('../..') not in sys.path:
+    sys.path.append(os.path.abspath('../..'))
 import numpy as np
 
 from graphslim.configs import cli
