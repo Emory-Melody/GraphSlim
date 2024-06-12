@@ -36,7 +36,7 @@ if __name__ == '__main__':
         agent = GCond(setting=args.setting, data=graph, args=args)
     elif args.method == 'doscond':
         agent = DosCond(setting=args.setting, data=graph, args=args)
-    elif args.method in ['doscondx', 'gcondx']:
+    elif args.method in ['gcondx']:
         agent = DosCondX(setting=args.setting, data=graph, args=args)
     elif args.method == 'sfgc':
         agent = SFGC(setting=args.setting, data=graph, args=args)
@@ -52,8 +52,6 @@ if __name__ == '__main__':
         agent = VNG(setting=args.setting, data=graph, args=args)
     elif args.method == 'variation_neighborhoods':
         agent = Coarsen(setting=args.setting, data=graph, args=args)
-    elif args.method == 'clustering':
-        agent = Cluster(setting=args.setting, data=graph, args=args)
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)
