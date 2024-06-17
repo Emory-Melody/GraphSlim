@@ -1,7 +1,8 @@
 # GraphSlim
 
-**[Documentation](https://graphslim.readthedocs.io/en/latest/)** | **[Paper]()** | *
-*[Benchmark](https://github.com/rockcor/graphslim/tree/master/benchmark)**
+**[Documentation](https://graphslim.readthedocs.io/en/latest/)**
+
+**[Benchmark Paper]()** | **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)**
 
 Graph Slim is a PyTorch library for graph reduction methods.
 
