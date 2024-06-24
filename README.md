@@ -6,7 +6,7 @@
 
 Graph Slim is a PyTorch library for graph reduction methods.
 
-* If you are new to DeepRobust, we highly suggest you read
+* If you are new to GraphSlim, we highly suggest you read
   the [documentation page](https://graphslim.readthedocs.io/en/latest/) or the following content in this README to learn
   how to use it.
 * If you have any questions or suggestions regarding this library, feel free to create an
