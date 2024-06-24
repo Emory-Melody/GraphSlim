@@ -19,9 +19,9 @@ class SFGC(GCondBase):
         super(SFGC, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
-        args.init = 'kcenter'
+        # args.init = 'kcenter'
 
-        self.buf_dir = '../sfgc_buffer/{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r)
+        self.buf_dir = '../sfgc_buffer/{}_{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r, args.seed)
 
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
@@ -34,7 +34,7 @@ class SFGC(GCondBase):
 
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 10  # 200
+            args.num_experts = 20  # 200
 
             if args.setting == 'ind':
                 features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
@@ -134,7 +134,7 @@ class SFGC(GCondBase):
                 torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
 
             starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
-            # print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
+            print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
             param_loss_list = []
             param_dist_list = []
 

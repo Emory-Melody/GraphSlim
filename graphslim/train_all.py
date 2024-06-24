@@ -3,7 +3,6 @@ import sys
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
-import numpy as np
 
 from graphslim.configs import cli
 from graphslim.dataset import *
@@ -17,9 +16,7 @@ if __name__ == '__main__':
     args = cli(standalone_mode=False)
     graph = get_dataset(args.dataset, args)
     if args.attack is not None:
-        if args.setting == 'ind':
-            data = attack(graph, args)
-    # TODO: Add spaner-based methods
+        data = attack(graph, args)
     if args.method == 'kcenter' and not args.aggpreprocess:
         agent = KCenter(setting=args.setting, data=graph, args=args)
     elif args.method == 'kcenter' and args.aggpreprocess:

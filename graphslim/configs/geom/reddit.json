@@ -8,7 +8,7 @@
   "T": 800,
   "scheduler": "linear",
   "lam": 0.9,
-  "lr_student": 0.5,
+  "lr_student": 0.2,
   "lr_coreset": 0.001,
   "coreset_epochs": 1000,
   "expert_epochs": 900,

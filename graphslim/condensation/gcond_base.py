@@ -87,7 +87,7 @@ class GCondBase:
         else:
             agent = Random(setting=args.setting, data=self.data, args=args)
 
-        reduced_data = agent.reduce(self.data, verbose=False, save=False)
+        reduced_data = agent.reduce(self.data, verbose=True, save=False)
         if with_adj:
             return reduced_data.feat_syn, reduced_data.adj_syn
         else:

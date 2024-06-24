@@ -73,6 +73,7 @@ def method_config(args):
 @click.option('--gpu_id', '-G', default=0, help='gpu id start from 0, -1 means cpu', show_default=True)
 @click.option('--setting', type=click.Choice(['trans', 'ind']), show_default=True)
 @click.option('--split', default='fixed', show_default=True)  # 'fixed', 'random', 'few'
+@click.option('--run_reduction', default=3, show_default=True)
 @click.option('--run_eval', default=10, show_default=True)
 @click.option('--run_inter_eval', default=5, show_default=True)
 @click.option('--eval_interval', default=100, show_default=True)

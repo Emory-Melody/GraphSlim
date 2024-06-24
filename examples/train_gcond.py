@@ -1,5 +1,9 @@
-from configs import *
-from evaluation.eval_agent import Evaluator
+import os, sys
+
+if os.path.abspath('../graphslim') not in sys.path:
+    sys.path.append(os.path.abspath('../graphslim'))
+from graphslim.configs import *
+from graphslim.evaluation.eval_agent import Evaluator
 
 from graphslim.condensation import GCond
 from graphslim.dataset import *

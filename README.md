@@ -1,56 +1,122 @@
 # GraphSlim
 
-**[Documentation](https://graphslim.readthedocs.io/en/latest/)**
+[//]: # (**[Documentation]&#40;https://graphslim.readthedocs.io/en/latest/&#41;**)
 
-**[Benchmark Paper]()** | **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)**
+**[Benchmark Paper]()** | **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)** | *
+*[Survey Paper](https://arxiv.org/pdf/2402.03358)**
 
-Graph Slim is a PyTorch library for graph reduction methods.
+# Features
 
-* If you are new to GraphSlim, we highly suggest you read
-  the [documentation page](https://graphslim.readthedocs.io/en/latest/) or the following content in this README to learn
-  how to use it.
+Graph Slim is a PyTorch library for graph reduction.
+
+* Covering all 3 reduction strategies: Sparsification, Coarsening and Condensation
+* Different reduction strategies can be easily combined in one run.
+* Unified evaluation protocols including Grid search and NAS.
+* Support evasion and poisoning attacks on graph by DeepRobust.
+
+# Guidance
+
+* Please first prepare the environment and datasets.
+* If you are new to GraphSlim, we highly suggest you first run the examples in the `examples` folder.
 * If you have any questions or suggestions regarding this library, feel free to create an
   issue [here](https://github.com/rockcor/graphslim/issues). We will reply as soon as possible :)
 
-# Basic Environment
+# Environment Preparation
 
-see `requirements.txt` for more information.
+Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience.
+Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
+your system configuration.
 
-# Installation
+# Download Datasets
 
-## Install from pip
+For cora, citeseer, flickr and reddit (reddit2 in pyg), the pyg code will directly download them.
+For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT).
+They are available on [Google Drive link](https://drive.google.com/open?id=1zycmmDES39zVlbVCYs88JTJ1Wm5FbfLz) (
+alternatively, [BaiduYun link (code: f1ao)](https://pan.baidu.com/s/1SOb0SiSAXavwAcNqkttwcg)).
+Rename the folder to `../../data/ogbn_arxiv`. Note that the links are provided by GraphSAINT team.
+
+The default path of datasets is `../../data`.
+
+
+[//]: # (# Installation)
+
+[//]: # ()
+
+[//]: # (## Install from pip)
+
+[//]: # ()
+
+[//]: # (```)
+
+[//]: # (pip install graphslim)
+
+[//]: # (```)
+
+# Examples
 
 ```
-pip install graphslim
+python examples/train_coreset.py
+python examples/train_coarsen.py
+python examples/train_gcond.py
 ```
 
-# Test Examples
-
-```
-python examples/train_all.py -D cora -R 0.5 -M random
-```
-
+See more examples in **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)**.
 # Usage
 
 ```python
 from graphslim.configs import cli
 from graphslim.dataset import *
 from graphslim.evaluation import *
+from graphslim.sparsification import Random
 
 args = cli(standalone_mode=False)
 graph = get_dataset(args.dataset, args)
+# To reproduce the benchmark, use our args and graph class
+# To use your own args and graph format, please ensure the args and graph class has the required attributes
 
-from graphslim.sparsification import Random
-
+# create an agent of one reduction algorithm
 agent = Random(setting=args.setting, data=graph, args=args)
-
+# reduce the graph 
 reduced_graph = agent.reduce(graph, verbose=args.verbose)
+# create an evaluator
 evaluator = Evaluator(args)
+# evaluate the reduced graph on a GNN model
 res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
 ```
 
-## Acknowledgement
+# Customization
+
+* To implement a new reduction algorithm, you need to create a new class in `sparsification` or `coarsening`
+  or `condensation` and inherit the `Base` class.
+* To implement a new dataset, you need to create a new class in `dataset/loader.py` and inherit the `TransAndInd` class.
+* To implement a new evaluation metric, you need to create a new function in `evaluation/eval_agent.py`.
+* To implement a new GNN model, you need to create a new class in `models` and inherit the `Base` class.
+* To customize sparsification before evaluation, please modify the function `sparsify` in `evaluation/utils.py`.
+
+# TODO
+
+[] Add sparsification algorithms like Spanner
+[] Add latest condensation methods
+[] Support more datasets
+
+# Limitations
+
+* The GEOM and SFGC are not fully implemented in the current version due to disk space limit. We set the number of
+  experts to 20 currently.
+
+# Acknowledgement
 
 Some of the algorithms are referred to paper authors' implementations and other packages.
 
+[SCAL](https://github.com/szzhang17/Scaling-Up-Graph-Neural-Networks-Via-Graph-Coarsening)
+
+[GCOND](https://github.com/ChandlerBang/GCond)
+
+[GCSNTK](https://github.com/WANGLin0126/GCSNTK)
+
+[SFGC](https://github.com/Amanda-Zheng/SFGC)
+
+[GEOM](https://github.com/NUS-HPC-AI-Lab/GEOM/tree/main)
+
 [DeepRobust](https://github.com/DSE-MSU/DeepRobust)
+

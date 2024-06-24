@@ -19,6 +19,7 @@ class GEOM(GCondBase):
         super(GEOM, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = 'GCN'
+        # if run init experiment, please comment this
         # args.init = 'kcenter'
 
         self.buf_dir = '../geom_buffer/{}_{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r, args.seed)
@@ -28,7 +29,7 @@ class GEOM(GCondBase):
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
-        args.num_experts = 10  # 200
+        args.num_experts = 20  # 200
 
         if not args.no_buff:
             print("=================Begin buffer===============")
@@ -138,10 +139,8 @@ class GEOM(GCondBase):
             Upper_Bound = min(Upper_Bound, args.max_start_epoch)
             # print(Upper_Bound)
 
-            np.random.seed(it)
             start_epoch = np.random.randint(args.min_start_epoch, Upper_Bound)
 
-            np.random.seed(15)
             start_epoch = start_epoch // 10
             starting_params = expert_trajectory[start_epoch]
 
@@ -170,12 +169,17 @@ class GEOM(GCondBase):
             # print('it:{}--feat_max = {:.4f}, feat_min = {:.4f}'.format(it, torch.max(self.feat_syn),
             #                                                                   torch.min(self.feat_syn)))
 
-            feat_syn = self.feat_syn
-            adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
-            adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
-            adj_syn_input = adj_syn_cal_norm
+            if it == 0 and args.dataset in ['reddit'] and args.reduction_rate < 0.075:
+                feat_syn = self.feat_syn
+                adj_syn_norm = normalize_adj_tensor(self.adj_syn_init, sparse=True)
+                adj_syn_input = adj_syn_norm
 
-            # tag
+            else:
+                feat_syn = self.feat_syn
+                adj_syn = torch.eye(feat_syn.shape[0]).to(self.device)
+                adj_syn_cal_norm = normalize_adj_tensor(adj_syn, sparse=False)
+                adj_syn_input = adj_syn_cal_norm
+
             for step in range(args.syn_steps):
                 forward_params = student_params[-1]
                 output_syn = model.forward(feat_syn, adj_syn_input, flat_param=forward_params)
@@ -388,10 +392,10 @@ class GEOM(GCondBase):
     def init_coreset_select(self, data):
         args = self.args
 
-        random.seed(15)
-        np.random.seed(15)
-        torch.manual_seed(15)
-        torch.cuda.manual_seed(15)
+        # random.seed(15)
+        # np.random.seed(15)
+        # torch.manual_seed(15)
+        # torch.cuda.manual_seed(15)
 
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)

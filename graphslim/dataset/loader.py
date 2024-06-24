@@ -64,6 +64,7 @@ def get_dataset(name, args):
 class TransAndInd:
 
     def __init__(self, data, dataset, norm=True):
+        self.labels_syn = None
         self.class_dict = None  # sample the training data per class when initializing synthetic graph
         self.samplers = None
         self.class_dict2 = None  # sample from the same class when training
@@ -186,6 +187,11 @@ class TransAndInd:
         batch = np.random.permutation(self.class_dict2[c])[:num]
         out = self.samplers[c].sample(batch.astype(np.int64))
         return out
+
+    def reset(self):
+        self.samplers = None
+        self.class_dict2 = None
+        self.labels_syn, self.feat_syn, self.adj_syn = None, None, None
 
 
 class LargeDataLoader(nn.Module):

@@ -58,9 +58,9 @@ class BaseGNN(nn.Module):
                     x = F.dropout(x, self.dropout, training=self.training)
         else:
             for ix, layer in enumerate(self.layers):
+                x = layer(x, adj)
                 if output_layer_features:
                     outputs.append(x)
-                x = layer(x, adj)
                 if ix != self.nlayers - 1:
                     x = self.bns[ix](x) if self.with_bn else x
                     if self.with_relu:
@@ -68,7 +68,6 @@ class BaseGNN(nn.Module):
                     x = F.dropout(x, self.dropout, training=self.training)
 
         if output_layer_features:
-            outputs.append(x)
             return outputs
         x = x.view(-1, x.shape[-1])
         return F.log_softmax(x, dim=1)

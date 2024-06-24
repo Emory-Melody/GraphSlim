@@ -127,7 +127,7 @@ class Evaluator:
         # assert not (args.method not in ['msgc'] and model_type == 'GAT')
         model = eval(model_type)(data.feat_full.shape[1], args.hidden, data.nclass, args, mode=mode).to(
             self.device)
-        best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=False, verbose=verbose,
+        best_acc_val = model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose,
                                           setting=args.setting,
                                           reduced=reduced)
 
@@ -170,7 +170,7 @@ class Evaluator:
 
         res = []
         for i in run_evaluation:
-            seed_everything(i)
+            seed_everything(args.seed + i)
             _, best_acc = self.test(data, model_type=model_type, verbose=args.verbose, reduced=reduced, mode=mode)
             res.append(best_acc)
             if verbose:
