@@ -3,7 +3,7 @@
 [//]: # (**[Documentation]&#40;https://graphslim.readthedocs.io/en/latest/&#41;**)
 
 **[Benchmark Paper]()** | **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)** | *
-*[Survey Paper](https://arxiv.org/pdf/2402.03358)**
+**[Survey Paper](https://arxiv.org/pdf/2402.03358)**
 
 # Features
 
