@@ -21,7 +21,7 @@ GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG or Gra
 * If you have any questions or suggestions regarding this library, feel free to create an
   issue [here](https://github.com/rockcor/graphslim/issues). We will reply as soon as possible :)
 
-# Environment Preparation
+# Prepare Environments
 
 Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience.
 Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
