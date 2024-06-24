@@ -95,9 +95,9 @@ res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
 
 # TODO
 
-[] Add sparsification algorithms like Spanner
-[] Add latest condensation methods
-[] Support more datasets
+- [ ] Add sparsification algorithms like Spanner
+- [ ] Add latest condensation methods
+- [ ] Support more datasets
 
 # Limitations
 
