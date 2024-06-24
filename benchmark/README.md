@@ -31,9 +31,9 @@ Put all datasets in `../../data` in your system!
 
 # Benchmark Reproduction
 
-Please enter `cd benchmark` and all the scripts are in this folder.
+All the scripts are in `benchmark` folder.
 
-For Table 1 7 8, use `sh peroformacne.sh`.
+For Table 1 7 8, use `sh performacne.sh`.
 
 For Figure 3, use `sh scalability.sh`.
 

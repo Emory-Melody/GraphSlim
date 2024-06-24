@@ -1,5 +1,8 @@
 # Performance
-for method in random kcenter gcondx geom gcond; do
+# For geom, we obtain its performance by the source code of the authors but condense graph by our package for other experiments except performance.
+# For sfgc, we obtain its performance by the source code of the authors.
+# The reason is that we do not have enough disk space to fully reproduce them two.
+for method in random herding kcenter averaging gcondx vng gcondx geom sfgc gcsntk doscond gcond msgc sgdd; do
   for dataset in cora citeseer flickr; do
     case $dataset in
       cora)
