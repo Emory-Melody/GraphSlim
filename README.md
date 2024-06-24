@@ -7,12 +7,12 @@
 
 # Features
 
-Graph Slim is a PyTorch library for graph reduction.
+GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG or GraphSAINT format as input and outputs a reduced graph preserving **properties or performance** of the original graph.
 
-* Covering all 3 reduction strategies: Sparsification, Coarsening and Condensation
+* Covering representative methods of all 3 graph reduction strategies: Sparsification, Coarsening and Condensation.
 * Different reduction strategies can be easily combined in one run.
-* Unified evaluation protocols including Grid search and NAS.
-* Support evasion and poisoning attacks on graph by DeepRobust.
+* Unified evaluation tools including Grid Search and NAS.
+* Support evasion and poisoning attacks on the input graph by DeepRobust.
 
 # Guidance
 
