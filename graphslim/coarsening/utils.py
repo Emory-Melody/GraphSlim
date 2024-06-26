@@ -733,7 +733,7 @@ def maxWeightMatching(edges, maxcardinality=False):
                 checkDelta2()
                 checkDelta3()
 
-            # Compute delta1: the minumum value of any vertex dual.
+            # Compute delta1: the minimum value of any vertex dual.
             if not maxcardinality:
                 deltatype = 1
                 delta = min(dualvar[:nvertex])
