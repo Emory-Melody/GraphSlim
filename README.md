@@ -7,7 +7,7 @@
 
 # Features
 
-GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG or GraphSAINT format as input and outputs a reduced graph preserving **properties or performance** of the original graph.
+GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format as input and outputs a reduced graph preserving **properties or performance** of the original graph.
 
 * Covering representative methods of all 3 graph reduction strategies: Sparsification, Coarsening and Condensation.
 * Different reduction strategies can be easily combined in one run.
@@ -23,17 +23,14 @@ GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG or Gra
 
 # Prepare Environments
 
-Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience.
+Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience. 
 Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
 your system configuration.
 
 # Download Datasets
 
 For cora, citeseer, flickr and reddit (reddit2 in pyg), the pyg code will directly download them.
-For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT).
-They are available on [Google Drive link](https://drive.google.com/open?id=1zycmmDES39zVlbVCYs88JTJ1Wm5FbfLz) (
-alternatively, [BaiduYun link (code: f1ao)](https://pan.baidu.com/s/1SOb0SiSAXavwAcNqkttwcg)).
-Rename the folder to `../../data/ogbn_arxiv`. Note that the links are provided by GraphSAINT team.
+For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). Our code will automatically download it.
 
 The default path of datasets is `../../data`.
 
