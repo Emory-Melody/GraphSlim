@@ -1,10 +1,17 @@
 [//]: # (# Preparation)
 
-# Requirements
+# GC-Bench: A Benchmark Framework for Graph Condensation with New Insights
+ 
+[[Paper Link]](https://arxiv.org/pdf/2406.16715) Graph condensation (GC) is an emerging technique designed to learn a significantly smaller graph that retains the essential information of the original graph.  Despite the rapid development of GC methods, a systematic evaluation framework remains absent, which is necessary to clarify the critical designs for particular evaluative aspects. Furthermore, several meaningful questions have not been investigated, such as whether GC inherently preserves certain graph properties and offers robustness even without targeted design efforts. Here, we introduce GC-Bench, a comprehensive framework to evaluate recent GC methods across multiple dimensions and generate new insights. Our experimental findings provide deeper insights into the GC process and the characteristics of condensed graphs, guiding future efforts in enhancing performance and exploring new applications
+
+
+
+
+## Requirements
 
 Please see `requirements.txt`.
 
-# Download Datasets
+## Download Datasets
 
 For cora, citeseer, flickr and reddit, the pyg code will directly download them.
 For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT).
@@ -29,7 +36,7 @@ Put all datasets in `../../data` in your system!
 
 [//]: # (* Unified test tools for easily producing benchmarks)
 
-# Benchmark Reproduction
+## Benchmark Reproduction
 
 All the scripts are in `benchmark` folder.
 
