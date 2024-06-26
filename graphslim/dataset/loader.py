@@ -1,5 +1,6 @@
 import json
 import os.path as osp
+import os
 
 import numpy as np
 import scipy.sparse as sp
@@ -346,11 +347,17 @@ class DataGraphSAINT:
     '''datasets used in GraphSAINT paper'''
 
     def __init__(self, root, dataset, **kwargs):
+        import gdown
         dataset = dataset.replace('-', '_')
         dataset_str = root + '/' + dataset + '/raw/'
-        self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
+        if not osp.exists(dataset_str):
+            os.makedirs(dataset_str)
+            print('Downloading dataset')
+            url = 'https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa'  # Change this to your actual file ID
+            gdown.download_folder(url=url, output=dataset_str, quiet=False)
 
         if dataset == 'ogbn_arxiv':
+            self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
             self.adj_full = self.adj_full + self.adj_full.T
             self.adj_full[self.adj_full > 1] = 1
 

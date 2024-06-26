@@ -18,3 +18,4 @@ deeprobust==0.2.10
 gensim==2.8.0
 dgl==2.1.0
 pandas==2.2.1
+gdown==5.2.0

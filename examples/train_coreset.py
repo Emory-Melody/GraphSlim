@@ -8,7 +8,6 @@ from graphslim.configs import cli
 from graphslim.dataset import *
 from graphslim.evaluation import *
 from graphslim.sparsification import KCenter
-from graphslim.utils import seed_everything
 
 args = cli(standalone_mode=False)
 graph = get_dataset(args.dataset, args)
