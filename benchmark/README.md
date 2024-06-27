@@ -18,7 +18,6 @@ Please see `requirements.txt`.
 For cora, citeseer, flickr and reddit, the pyg code will directly download them.
 For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). Our code will also automatically download it.
 
-Put all datasets in `../../data` in your system!
 
 [//]: # (# Abstract)
 
