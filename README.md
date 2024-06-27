@@ -2,7 +2,8 @@
 
 [//]: # (**[Documentation]&#40;https://graphslim.readthedocs.io/en/latest/&#41;**)
 
-**[Benchmark Paper]()** | **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)** | 
+**[Benchmark Paper](https://arxiv.org/abs/2406.16715)** | *
+*[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
 **[Survey Paper](https://arxiv.org/pdf/2402.03358)** | **[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)**
 
 # Features
@@ -19,7 +20,7 @@ GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format
 * Please first prepare the environment and datasets.
 * If you are new to GraphSlim, we highly suggest you first run the examples in the `examples` folder.
 * If you have any questions or suggestions regarding this library, feel free to create an
-  issue [here](https://github.com/rockcor/graphslim/issues). We will reply as soon as possible :)
+  issue [here](https://github.com/Emory-Melody/GraphSlim/issues). We will reply as soon as possible :)
 
 # Prepare Environments
 
@@ -57,7 +58,7 @@ python examples/train_coarsen.py
 python examples/train_gcond.py
 ```
 
-See more examples in **[Benchmark Scripts](https://github.com/rockcor/graphslim/tree/master/benchmark)**.
+See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
 # Usage
 
 ```python
