@@ -2,8 +2,8 @@
 
 [//]: # (**[Documentation]&#40;https://graphslim.readthedocs.io/en/latest/&#41;**)
 
-**[Benchmark Paper](https://arxiv.org/abs/2406.16715)** | *
-*[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
+**[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
+**[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
 **[Survey Paper](https://arxiv.org/pdf/2402.03358)** | **[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)**
 
 # Features
