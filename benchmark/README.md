@@ -13,10 +13,10 @@ Graph condensation (GC) is an emerging technique designed to learn a significant
 
 Please see `requirements.txt`.
 
-## Download Datasets
+<!--## Download Datasets
 
 For cora, citeseer, flickr and reddit, the pyg code will directly download them.
-For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). Our code will also automatically download it.
+For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). Our code will also automatically download it.-->
 
 
 [//]: # (# Abstract)
