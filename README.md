@@ -17,7 +17,7 @@ GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format
 
 # Guidance
 
-* Please first prepare the environment and datasets.
+* Please first prepare the environments.
 * If you are new to GraphSlim, we highly suggest you first run the examples in the `examples` folder.
 * If you have any questions or suggestions regarding this library, feel free to create an
   issue [here](https://github.com/Emory-Melody/GraphSlim/issues). We will reply as soon as possible :)
@@ -28,13 +28,13 @@ Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at 
 Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
 your system configuration.
 
-# Download Datasets
+<!--# Download Datasets
 
 For cora, citeseer, flickr and reddit (reddit2 in pyg), the pyg code will directly download them.
 For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). 
 Our code will automatically download all datasets.
 
-The default path of datasets is `../../data`.
+The default path of datasets is `../../data`.-->
 
 
 [//]: # (# Installation)
