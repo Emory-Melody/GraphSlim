@@ -31,7 +31,8 @@ your system configuration.
 # Download Datasets
 
 For cora, citeseer, flickr and reddit (reddit2 in pyg), the pyg code will directly download them.
-For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). Our code will automatically download it.
+For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). 
+Our code will automatically download all datasets.
 
 The default path of datasets is `../../data`.
 
