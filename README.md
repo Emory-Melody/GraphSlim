@@ -64,8 +64,6 @@ See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/Graph
 ## Command Line
 Run `python configs.py --help` and you will see
 ```shell
-Usage: configs.py [OPTIONS]
-
 Options:
   -D, --dataset TEXT              [default: cora]
   -G, --gpu_id INTEGER            gpu id start from 0, -1 means cpu  [default:
@@ -109,6 +107,8 @@ Options:
                                   relu]
   -A, --attack [random_adj|metattack|random_feat]
                                   corruption method
+  -P, --ptb_r FLOAT               perturbation rate for corruptions  [default:
+                                  0.25]
   --aggpreprocess                 use aggregation for coreset methods
   --dis_metric TEXT               distance metric for all condensation
                                   methods,ours means metric used in GCond
@@ -127,9 +127,9 @@ Options:
   --alpha FLOAT                   for appnp  [default: 0.1]
   --mx_size INTEGER               for gcsntk methods, avoid SVD error
                                   [default: 100]
-  --save_path, --sp TEXT          [default: ../checkpoints]
-  -W, --eval_whole
-  -P, --ptb_r FLOAT               [default: 0.25]
+  --save_path, --sp TEXT          save path for synthetic graph  [default:
+                                  ../checkpoints]
+  -W, --eval_whole                if run on whole graph
   --help                          Show this message and exit.
 ```
 ## Package Style
