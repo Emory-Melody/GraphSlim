@@ -61,7 +61,78 @@ python examples/train_gcond.py
 
 See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
 # Usage
+## Command Line
+Run `python configs.py --help` and you will see
+```shell
+Usage: configs.py [OPTIONS]
 
+Options:
+  -D, --dataset TEXT              [default: cora]
+  -G, --gpu_id INTEGER            gpu id start from 0, -1 means cpu  [default:
+                                  0]
+  --setting [trans|ind]           transductive or inductive setting
+  --split TEXT                    only support public split now, do not change
+                                  it  [default: fixed]
+  --run_reduction INTEGER         repeat times of reduction  [default: 3]
+  --run_eval INTEGER              repeat times of final evaluations  [default:
+                                  10]
+  --run_inter_eval INTEGER        repeat times of intermediate evaluations
+                                  [default: 5]
+  --eval_interval INTEGER         [default: 100]
+  -H, --hidden INTEGER            [default: 256]
+  --eval_epochs, --ee INTEGER     [default: 300]
+  --eval_model, --em [GCN|GAT|SGC|APPNP|Cheby|GraphSage|GAT|SGFormer]
+                                  [default: GCN]
+  --condense_model [GCN|GAT|SGC|APPNP|Cheby|GraphSage|GAT]
+                                  [default: SGC]
+  -E, --epochs INTEGER            number of reduction epochs  [default: 1000]
+  --lr FLOAT                      [default: 0.01]
+  --weight_decay, --wd INTEGER    [default: 0]
+  --pre_norm BOOLEAN              pre-normalize features, forced true for
+                                  arxiv, flickr and reddit  [default: True]
+  --outer_loop INTEGER            [default: 10]
+  --inner_loop INTEGER            [default: 1]
+  -R, --reduction_rate FLOAT      -1 means use representative reduction rate;
+                                  reduction rate of training set, defined as
+                                  (number of nodes in small graph)/(number of
+                                  nodes in original graph)  [default: -1.0]
+  -S, --seed INTEGER              Random seed  [default: 1]
+  --nlayers INTEGER               number of GNN layers of condensed model
+                                  [default: 2]
+  -V, --verbose
+  --init [variation_neighborhoods|variation_edges|variation_cliques|heavy_edge|algebraic_JC|affinity_GS|kron|vng|clustering|averaging|cent_d|cent_p|kcenter|herding|random]
+                                  features initialization methods
+  -M, --method [variation_neighborhoods|variation_edges|variation_cliques|heavy_edge|algebraic_JC|affinity_GS|kron|vng|clustering|averaging|gcond|doscond|gcondx|doscondx|sfgc|msgc|disco|sgdd|gcsntk|geom|cent_d|cent_p|kcenter|herding|random]
+                                  [default: kcenter]
+  --activation [sigmoid|tanh|relu|linear|softplus|leakyrelu|relu6|elu]
+                                  activation function when do NAS  [default:
+                                  relu]
+  -A, --attack [random_adj|metattack|random_feat]
+                                  corruption method
+  --aggpreprocess                 use aggregation for coreset methods
+  --dis_metric TEXT               distance metric for all condensation
+                                  methods,ours means metric used in GCond
+                                  paper  [default: ours]
+  --lr_adj FLOAT                  [default: 0.0001]
+  --lr_feat FLOAT                 [default: 0.0001]
+  --threshold INTEGER             sparsificaiton threshold before evaluation
+                                  [default: 0]
+  --dropout FLOAT                 [default: 0.0]
+  --ntrans INTEGER                number of transformations in SGC and APPNP
+                                  [default: 1]
+  --with_bn
+  --no_buff                       skip the buffer generation and use existing
+                                  in geom,sfgc
+  --batch_adj INTEGER             batch size for msgc  [default: 1]
+  --alpha FLOAT                   for appnp  [default: 0.1]
+  --mx_size INTEGER               for gcsntk methods, avoid SVD error
+                                  [default: 100]
+  --save_path, --sp TEXT          [default: ../checkpoints]
+  -W, --eval_whole
+  -P, --ptb_r FLOAT               [default: 0.25]
+  --help                          Show this message and exit.
+```
+## Package Style
 ```python
 from graphslim.configs import cli
 from graphslim.dataset import *
