@@ -134,6 +134,7 @@ def method_config(args):
               help='distance metric for all condensation methods,ours means metric used in GCond paper')
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
+@click.option('--optim', default="Adam", show_default=True)
 @click.option('--threshold', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')

@@ -7,5 +7,6 @@
   "expert_epochs": 1500,
   "syn_steps": 500,
   "start_epoch": 30,
-  "init": "kcenter"
+  "init": "kcenter",
+  "optim": "SGD"
 }

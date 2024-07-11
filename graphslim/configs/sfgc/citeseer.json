@@ -7,5 +7,6 @@
   "expert_epochs": 500,
   "syn_steps": 200,
   "start_epoch": 30,
-  "init": "kcenter"
+  "init": "kcenter",
+  "optim": "Adam"
 }

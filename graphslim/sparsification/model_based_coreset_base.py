@@ -15,14 +15,6 @@ class MBCoreSet(CoreSet):
     def reduce(self, data, verbose=False, save=True):
 
         args = self.args
-        # if args.method in ['sfgc', 'geom']:
-        #     # temporary change args for sfgc and geom
-        #     epoch = args.eval_epochs
-        #     args.eval_epochs = 1000
-        #     wd = args.weight_decay
-        #     args.weight_decay = 5e-4
-        #     lr = args.lr
-        #     args.lr = 0.01
         model = eval(self.condense_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(
             self.device)
         if self.setting == 'trans':
@@ -30,10 +22,10 @@ class MBCoreSet(CoreSet):
                                setting=args.setting, reduced=False)
 
             # model.test(data, setting=self.setting, verbose=True)
-            if args.method in ['geom', 'sfgc']:
-                embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
-            else:
-                embeds = model.predict(data.feat_full, data.adj_full).detach()
+            # if args.method in ['geom', 'sfgc']:
+            #     embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
+            # else:
+            embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.select(embeds)
 
@@ -49,10 +41,10 @@ class MBCoreSet(CoreSet):
 
             model.eval()
 
-            if args.method in ['geom', 'sfgc']:
-                embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
-            else:
-                embeds = model.predict(data.feat_full, data.adj_full).detach()
+            # if args.method in ['geom', 'sfgc']:
+            #     embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
+            # else:
+            embeds = model.predict(data.feat_full, data.adj_full).detach()
 
             idx_selected = self.select(embeds)
             # idx_selected = np.load('sparsification/idx_reddit_0.001_kcenter_15.npy')

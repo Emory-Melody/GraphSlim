@@ -12,6 +12,7 @@ from graphslim.models.reparam_module import ReparamModule
 from graphslim.sparsification import *
 from graphslim.utils import *
 from tqdm import trange
+from torch.optim import Adam, SGD
 
 
 class SFGC(GCondBase):
@@ -53,8 +54,8 @@ class SFGC(GCondBase):
 
                 model_parameters = list(model.parameters())
 
-                optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr_teacher, weight_decay=args.wd_teacher)
-
+                optimizer_model = eval(args.optim)(model_parameters, lr=args.lr_teacher,
+                                                                   weight_decay=args.wd_teacher)
                 timestamps = []
 
                 timestamps.append([p.detach().cpu() for p in model.parameters()])
