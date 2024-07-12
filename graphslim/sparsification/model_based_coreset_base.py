@@ -27,7 +27,8 @@ class MBCoreSet(CoreSet):
             # else:
             embeds = model.predict(data.feat_full, data.adj_full).detach()
 
-            idx_selected = self.select(embeds)
+            idx_selected=np.load('sparsification/idx_cora_0.5_kcenter_15.npy')
+            # idx_selected = self.select(embeds)
 
             data.adj_syn = data.adj_full[np.ix_(idx_selected, idx_selected)]
             data.feat_syn = data.feat_full[idx_selected]
