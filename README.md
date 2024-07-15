@@ -4,11 +4,13 @@
 
 **[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
-**[Survey Paper](https://arxiv.org/pdf/2402.03358)** | **[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)**
+**[Survey Paper](https://arxiv.org/pdf/2402.03358)** | *
+*[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)**
 
 # Features
 
-GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format as input and outputs a reduced graph preserving **properties or performance** of the original graph.
+GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format as input and outputs a reduced graph
+preserving **properties or performance** of the original graph.
 
 * Covering representative methods of all 3 graph reduction strategies: Sparsification, Coarsening and Condensation.
 * Different reduction strategies can be easily combined in one run.
@@ -24,7 +26,7 @@ GraphSlim is a PyTorch library for graph reduction. It takes graph of PyG format
 
 # Prepare Environments
 
-Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience. 
+Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience.
 Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
 your system configuration.
 
@@ -60,9 +62,13 @@ python examples/train_gcond.py
 ```
 
 See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
+
 # Usage
+
 ## Command Line
+
 Run `python configs.py --help` and you will see
+
 ```shell
 Options:
   -D, --dataset TEXT              [default: cora]
@@ -132,7 +138,9 @@ Options:
   -W, --eval_whole                if run on whole graph
   --help                          Show this message and exit.
 ```
+
 ## Package Style
+
 ```python
 from graphslim.configs import cli
 from graphslim.dataset import *
@@ -168,11 +176,13 @@ res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
 - [ ] Add sparsification algorithms like Spanner
 - [ ] Add latest condensation methods
 - [ ] Support more datasets
+- [ ] Present full results in a website
 
 # Limitations
 
 * The GEOM and SFGC are not fully implemented in the current version due to disk space limit. We set the number of
-  experts to 20 currently.
+  experts to 20 currently. If you have over 100GB disk space, you can set the number of experts to 1000 to reproduce the
+  If you have over 100GB disk space, you can set the number of experts to 200 to reproduce the results in the paper.
 
 # Acknowledgement
 
