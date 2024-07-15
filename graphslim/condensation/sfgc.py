@@ -35,7 +35,7 @@ class SFGC(GCondBase):
 
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 10  # 200
+            args.num_experts = 20  # 200
 
             if args.setting == 'ind':
                 features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
