@@ -47,7 +47,6 @@ class BaseGNN(nn.Module):
                 bn.reset_parameters()
 
     def forward(self, x, adj, output_layer_features=False):
-        outputs = []
 
         if isinstance(adj, list):
             for i, layer in enumerate(self.layers):
@@ -59,21 +58,23 @@ class BaseGNN(nn.Module):
         else:
             for ix, layer in enumerate(self.layers):
                 x = layer(x, adj)
-                if output_layer_features:
-                    outputs.append(x)
                 if ix != self.nlayers - 1:
                     x = self.bns[ix](x) if self.with_bn else x
                     if self.with_relu:
                         x = F.relu(x)
                     x = F.dropout(x, self.dropout, training=self.training)
+                if output_layer_features and ix == self.nlayers - 2:
+                    x_out = x
 
         if output_layer_features:
-            return outputs
-        x = x.view(-1, x.shape[-1])
-        return F.log_softmax(x, dim=1)
+            x = x.view(-1, x.shape[-1])
+            return x_out, F.log_softmax(x, dim=1)
+        else:
+            x = x.view(-1, x.shape[-1])
+            return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
-                     normadj=True, setting='trans', reduced=False, reindex=False,
+                     normadj=True, setting='trans', reduced=False, reindex=False, final_output=False,
                      **kwargs):
 
         self.initialize()
@@ -170,10 +171,13 @@ class BaseGNN(nn.Module):
                     # self.output = output
                     weights = deepcopy(self.state_dict())
 
-        if verbose:
-            print('=== picking the best model according to the performance on validation ===')
-        self.load_state_dict(weights)
-        return best_acc_val
+        if final_output:
+            return
+        else:
+            if verbose:
+                print('=== picking the best model according to the performance on validation ===')
+            self.load_state_dict(weights)
+            return best_acc_val
 
     @torch.no_grad()
     def test(self, data, setting='trans', verbose=False):

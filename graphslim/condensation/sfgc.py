@@ -35,7 +35,7 @@ class SFGC(GCondBase):
 
         if not args.no_buff:
             args.condense_model = 'GCN'
-            args.num_experts = 20  # 200
+            args.num_experts = 10  # 200
 
             if args.setting == 'ind':
                 features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
@@ -50,12 +50,12 @@ class SFGC(GCondBase):
             model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
             for it in trange(args.num_experts):
 
-                model.initialize()
+                # model.initialize()
 
                 model_parameters = list(model.parameters())
 
                 optimizer_model = eval(args.optim)(model_parameters, lr=args.lr_teacher,
-                                                                   weight_decay=args.wd_teacher)
+                                                   weight_decay=args.wd_teacher)
                 timestamps = []
 
                 timestamps.append([p.detach().cpu() for p in model.parameters()])
@@ -123,7 +123,8 @@ class SFGC(GCondBase):
 
             start = np.linspace(0, args.start_epoch, num=args.start_epoch // 10 + 1)
             start_epoch = int(np.random.choice(start, 1)[0])
-            start_epoch = start_epoch // 10
+            if args.optim == 'Adam':
+                start_epoch = start_epoch // 10
 
             starting_params = expert_trajectory[start_epoch]
 
@@ -135,7 +136,6 @@ class SFGC(GCondBase):
                 torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
 
             starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
-            print('feat_max = {:.4f}, feat_min = {:.4f}'.format(torch.max(self.feat_syn), torch.min(self.feat_syn)))
             param_loss_list = []
             param_dist_list = []
 

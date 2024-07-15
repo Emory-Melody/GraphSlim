@@ -20,8 +20,5 @@ class KCenter(MBCoreSet):
                 dis_min, _ = torch.min(dis_center, dim=-1)
                 id_max = torch.argmax(dis_min).item()
                 idx_centers.append(id_max)
-
             idx_selected.append(idx[idx_centers])
-        # return np.array(idx_selected).reshape(-1)
         return np.hstack(idx_selected)
-

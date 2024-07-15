@@ -50,8 +50,9 @@ def setting_config(args):
         args.setting = 'ind'
     # args.pre_norm = True
     args.run_inter_eval = 3
-    if args.method not in ['gcsntk']:
-        args.eval_interval = max(args.epochs // 10, 1)
+    args.eval_interval = 1
+    # if args.method not in ['gcsntk']:
+    #     args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
     args.eval_epochs = 300
     return args
@@ -97,7 +98,7 @@ def method_config(args):
 # @click.option('--valid_result', '--vr', default=0.0, show_default=True)
 # @click.option('--patience', '-P', default=20, show_default=True)  # only for msgc
 @click.option('--lr', default=0.01, show_default=True)
-@click.option('--weight_decay', '--wd', default=0, show_default=True)
+@click.option('--weight_decay', '--wd', default=0.0, show_default=True)
 # @click.option('--normalize_features', is_flag=True, show_default=True)
 @click.option('--pre_norm', default=True, show_default=True,
               help='pre-normalize features, forced true for arxiv, flickr and reddit')
@@ -108,6 +109,7 @@ def method_config(args):
 @click.option('--seed', '-S', default=1, help='Random seed', show_default=True)
 @click.option('--nlayers', default=2, help='number of GNN layers of condensed model', show_default=True)
 @click.option('--verbose', '-V', is_flag=True, show_default=True)
+@click.option('--soft_label', default=0, show_default=True)
 @click.option('--init', default=None, help='features initialization methods',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',

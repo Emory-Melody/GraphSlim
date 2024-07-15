@@ -141,7 +141,8 @@ class GEOM(GCondBase):
 
             start_epoch = np.random.randint(args.min_start_epoch, Upper_Bound)
 
-            start_epoch = start_epoch // 10
+            if args.optim == 'Adam':
+                start_epoch = start_epoch // 10
             starting_params = expert_trajectory[start_epoch]
 
             # if args.interval_buffer == 1:

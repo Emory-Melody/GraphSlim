@@ -12,7 +12,6 @@ class KCenterAgg(MFCoreSet):
             idx = self.idx_train[self.labels_train == class_id]
             feature = embeds[idx]
             mean = torch.mean(feature, dim=0, keepdim=True)
-            # dis = distance(feature, mean)[:,0]
             dis = torch.cdist(feature, mean)[:, 0]
             rank = torch.argsort(dis)
             idx_centers = rank[:1].tolist()
