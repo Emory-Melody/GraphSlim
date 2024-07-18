@@ -12,7 +12,6 @@ build:
 sphinx:
   configuration: docs/conf.py
 
-python:
-  install:
-    - requirements: docs/requirements_torch.txt
-    - requirements: docs/requirements.txt
+formats:
+  - pdf
+  - epub
