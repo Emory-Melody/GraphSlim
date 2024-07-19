@@ -9,25 +9,39 @@ from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 
+from torch_sparse import matmul
+from graphslim.utils import normalize_adj_tensor, to_tensor
 
-class Cluster(Coarsen):
+
+class ClusterAgg(Coarsen):
     # a structure free coarsening method
     # also serve as initialization for condensation methods
     # output: feat_syn, label_syn
     def __init__(self, setting, data, args, **kwargs):
-        super(Cluster, self).__init__(setting, data, args, **kwargs)
+        super(ClusterAgg, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):
         args = self.args
         n_classes = data.nclass
+        if args.setting == 'trans':
+            data.adj_fully = to_tensor(data.adj_full)
+            data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
+            data.pre_conv = matmul(data.pre_conv, data.pre_conv)
+            feat_agg = matmul(data.pre_conv, data.feat_full).float()
+        else:
+            data.adj_fully = to_tensor(data.adj_train)
+            data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
+            data.pre_conv = matmul(data.pre_conv, data.pre_conv)
+            feat_agg = matmul(data.pre_conv, data.feat_train).float()
+
         if hasattr(data, 'labels_syn') and data.labels_syn is not None:
             y_syn = data.labels_syn
             self.labels_train = data.labels_train
             y_train = data.labels_train
-            x_train = data.feat_train
         else:
-            y_syn, y_train, x_train = self.prepare_select(data, args)
+            y_syn, y_train = self.prepare_select(data, args)
+        x_train = feat_agg[data.train_mask] if args.setting == 'trans' else data.feat_agg
         x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
         for c in range(n_classes):
             x_c = x_train[y_train == c].cpu()
@@ -45,7 +59,6 @@ class Cluster(Coarsen):
     def prepare_select(self, data, args):
         num_class_dict = {}
         syn_class_indices = {}
-        feat_train = data.feat_train
 
         labels_train = data.labels_train
         # d = data.feat_train.shape[1]
@@ -61,4 +74,4 @@ class Cluster(Coarsen):
             labels_syn += [c] * num_class_dict[c]
         labels_syn = np.array(labels_syn)
 
-        return labels_syn, labels_train, feat_train
+        return labels_syn, labels_train

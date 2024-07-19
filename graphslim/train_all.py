@@ -51,8 +51,10 @@ if __name__ == '__main__':
         agent = VNG(setting=args.setting, data=graph, args=args)
     elif args.method == 'variation_neighborhoods':
         agent = Coarsen(setting=args.setting, data=graph, args=args)
-    elif args.method == 'clustering':
+    elif args.method == 'clustering' and not args.aggpreprocess:
         agent = Cluster(setting=args.setting, data=graph, args=args)
+    elif args.method == 'clustering' and args.aggpreprocess:
+        agent = ClusterAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)
