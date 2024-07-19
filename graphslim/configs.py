@@ -90,6 +90,10 @@ def method_config(args):
               type=click.Choice(
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT', 'SGFormer']
               ), show_default=True)
+@click.option('--final_eval_model', '--fem', default='GCN',
+              type=click.Choice(
+                  ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT', 'SGFormer']
+              ), show_default=True)
 @click.option('--condense_model', default='SGC',
               type=click.Choice(
                   ['GCN', 'GAT', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']

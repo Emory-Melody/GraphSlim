@@ -21,6 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="GraphSlim’s API" href="packageref/index.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -46,13 +47,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#online-demo">Online Demo</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#train-coreset">Train Coreset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#online-demo">Online demo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="packageref/index.html">GraphSlim’s API</a></li>
 </ul>
 
         </div>
@@ -82,13 +81,24 @@
   <section id="quick-start">
 <h1>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h1>
 <section id="online-demo">
-<h2>Online Demo<a class="headerlink" href="#online-demo" title="Link to this heading"></a></h2>
+<h2>Online demo<a class="headerlink" href="#online-demo" title="Link to this heading"></a></h2>
+<p>You can run our examples at <a class="reference internal" href="#"><span class="xref myst">Collab</span></a></p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading"></a></h2>
-<section id="train-coreset">
-<h3>Train Coreset<a class="headerlink" href="#train-coreset" title="Link to this heading"></a></h3>
-</section>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_node_sparsification.py
+</pre></div>
+</div>
+<p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">kcenter</span></code> method.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_coarsen.py
+</pre></div>
+</div>
+<p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">variation_neighborhoods</span></code> as coarsening method.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_condense.py
+</pre></div>
+</div>
+<p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">GCond</span></code> as coarsening method.
+t</p>
 </section>
 </section>
 
@@ -97,6 +107,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="packageref/index.html" class="btn btn-neutral float-right" title="GraphSlim’s API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

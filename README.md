@@ -64,12 +64,12 @@ python examples/train_gcond.py
 
 See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
 
-# Usage
-
-## Command Line
-
-Run `python configs.py --help` and you will see
-
+# Use As Project
+```shell
+cd graphslim
+python train_all.py -xxx xx
+```
+Run `python configs.py --help` to get all command line options.
 ```shell
 Options:
   -D, --dataset TEXT              [default: cora]
@@ -139,29 +139,36 @@ Options:
   -W, --eval_whole                if run on whole graph
   --help                          Show this message and exit.
 ```
-
-## Package Style
+# Use As Package
 
 ```python
-from graphslim.configs import cli
 from graphslim.dataset import *
 from graphslim.evaluation import *
-from graphslim.sparsification import Random
+from graphslim.sparsification/coarsening/condensation import <main:method>
 
-args = cli(standalone_mode=False)
-graph = get_dataset(args.dataset, args)
+graph = get_dataset(<main:dataset>, <dataset_args>)
 # To reproduce the benchmark, use our args and graph class
 # To use your own args and graph format, please ensure the args and graph class has the required attributes
 
 # create an agent of one reduction algorithm
-agent = Random(setting=args.setting, data=graph, args=args)
+agent = <main:method>(setting=<'trans/ind'>, data=graph, args=<agent_args>)
 # reduce the graph 
-reduced_graph = agent.reduce(graph, verbose=args.verbose)
+reduced_graph = agent.reduce(graph, verbose=<True/False>)
 # create an evaluator
-evaluator = Evaluator(args)
+evaluator = Evaluator(<evaluator_args>)
 # evaluate the reduced graph on a GNN model
-res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
+res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=<evaluator:eval_model>)
 ```
+All parameters can be divided into 
+```shell
+<main_args>: dataset, method, setting, init, reduction_rate, seed, aggpreprocess, eval_whole, run_reduction
+<attack_args>: attack, ptb_r
+<dataset_args>: pre_norm, save_path, split, threshold
+<agent_args>: eval_interval, eval_epochs, eval_model, condense_model, epochs, lr, weight_decay, outer_loop, inner_loop, nlayers, method, activation, dropout, ntrans, with_bn, no_buff, batch_adj, alpha, mx_size, dis_metric, lr_adj, lr_feat
+<evaluator_args>: final_eval_model, eval_epochs, lr, weight_decay
+```
+See more details in [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
+
 
 # Customization
 

@@ -18,7 +18,7 @@ if __name__ == '__main__':
     if args.attack is not None:
         data = attack(graph, args)
     if args.method == 'kcenter' and not args.aggpreprocess:
-        agent = KCenter(setting=args.setting, data=graph, args=args)
+        agent = KCenter(setting=args.setting, reduction_rate=args.reduction_rate, data=graph, args=args)
     elif args.method == 'kcenter' and args.aggpreprocess:
         agent = KCenterAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'herding' and not args.aggpreprocess:
@@ -65,5 +65,5 @@ if __name__ == '__main__':
         else:
             print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask).item() * 100, "%")
     evaluator = Evaluator(args)
-    res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
+    res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=args.final_eval_model)
     # args.logger.info(f'Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
