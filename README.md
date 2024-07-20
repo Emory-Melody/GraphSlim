@@ -1,7 +1,6 @@
 # GraphSlim
 
-[//]: # (**[Documentation]&#40;https://graphslim.readthedocs.io/en/latest/&#41;**)
-[![Documentation Status](https://readthedocs.org/projects/graphslim/badge/?version=latest)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
 
 **[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
