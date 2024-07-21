@@ -5,7 +5,8 @@
 **[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
 **[Survey Paper](https://arxiv.org/pdf/2402.03358)** |
-**[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)**
+**[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)** |
+**[Web Interface](https://graphslim-vis.streamlit.app/)**
 
 # Features
 
@@ -177,6 +178,18 @@ See more details in [![Documentation](https://img.shields.io/badge/docs-latest-b
 * To implement a new evaluation metric, you need to create a new function in `evaluation/eval_agent.py`.
 * To implement a new GNN model, you need to create a new class in `models` and inherit the `Base` class.
 * To customize sparsification before evaluation, please modify the function `sparsify` in `evaluation/utils.py`.
+
+# Web Interface
+
+Our [web application](https://graphslim-vis.streamlit.app/) is deployed online using [streamlit](https://streamlit.io/).
+But it also can be initiated using:
+
+```bash
+cd interface
+python -m streamlit run vis_graphslim.py
+```
+
+to activate the interface. Please satisfy the dependency in [interface/requirements.txt](interface/requirements.txt).
 
 # TODO
 
