@@ -17,7 +17,7 @@ st.set_page_config(
 
 st.title('Interactive Visualization of GraphSlim')
 
-st.sidebar.image("logo.png")
+st.sidebar.image("interface/logo.png")
 # st.sidebar.markdown("GraphSlim")
 st.write(
     "<style> #input-container { position: fixed; bottom: 0; width: 100%; padding: 10px; background-color: white; z-index: 100; } h1, h2 { font-weight: bold; background: -webkit-linear-gradient(left, red, orange); background: linear-gradient(to right, red, orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline; font-size: 3em; } .user-avatar { float: right; width: 40px; height: 40px; margin-left: 5px; margin-bottom: -10px; border-radius: 50%; object-fit: cover; } .bot-avatar { float: left; width: 40px; height: 40px; margin-right: 5px; border-radius: 50%; object-fit: cover; } </style>",
