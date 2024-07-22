@@ -145,7 +145,9 @@ def index_to_mask(index, size):
     mask = torch.zeros((size,), dtype=torch.bool)
     mask[index] = 1
     return mask
-
+def to_camel_case(snake_str):
+    components = snake_str.split('_')
+    return ''.join(x.title() for x in components)
 
 # def cal_storage(data, setting):
 #     if setting == 'trans':

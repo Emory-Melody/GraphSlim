@@ -96,6 +96,15 @@ def verbose_time_memory(func):
                 origin_storage = getsize_mb([data.x, data.edge_index, data.y])
             else:
                 origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
+            if not hasattr(data, 'feat_syn'):
+                if 'setting' in kwargs and kwargs['setting'] == 'trans':
+                    data.feat_syn = data.feat_full
+                else:
+                    data.feat_syn = data.feat_train
+            if not hasattr(data, 'adj_syn'):
+                data.adj_syn = torch.eye(data.labels_train.shape[0])
+            if not hasattr(data, 'labels_syn'):
+                data.labels_syn = data.labels_train
             condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
             print(f'Original graph:{origin_storage:.2f} Mb  Condensed graph:{condensed_storage:.2f} Mb')
 

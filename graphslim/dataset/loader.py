@@ -54,6 +54,8 @@ def get_dataset(name, args):
     else:
         raise ValueError("Dataset name not recognized.")
     data = dataset[0]
+
+    # pyg2TransAndInd: add splits
     data = splits(data, args.split)
 
     data = TransAndInd(data, name, args.pre_norm)
@@ -65,7 +67,6 @@ def get_dataset(name, args):
 class TransAndInd:
 
     def __init__(self, data, dataset, norm=True):
-        self.labels_syn = None
         self.class_dict = None  # sample the training data per class when initializing synthetic graph
         self.samplers = None
         self.class_dict2 = None  # sample from the same class when training

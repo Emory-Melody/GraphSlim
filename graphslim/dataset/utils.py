@@ -49,29 +49,44 @@ def splits(data, exp):
     return data
 
 
-def save_reduced(adj_syn, feat_syn, labels_syn, args):
+def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
     save_path = f'{args.save_path}/reduced_graph/{args.method}'
     if args.attack is not None and args.dataset in ['flickr']:
         save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
-    torch.save(adj_syn,
-               f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    torch.save(feat_syn,
-               f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    torch.save(labels_syn,
-               f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    if adj_syn is not None:
+        torch.save(adj_syn,
+                   f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    if feat_syn is not None:
+        torch.save(feat_syn,
+                   f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+    if labels_syn is not None:
+        torch.save(labels_syn,
+                   f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
     args.logger.info(f"Saved {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
 
 
-def load_reduced(args):
+def load_reduced(args, data=None):
     save_path = f'{args.save_path}/reduced_graph/{args.method}'
     if args.attack is not None and args.dataset in ['flickr']:
         save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
-    feat_syn = torch.load(
-        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
-    labels_syn = torch.load(
-        f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+    try:
+        feat_syn = torch.load(
+            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+    except:
+        print("find no feat, use original feature matrix instead")
+        if args.setting == 'trans':
+            feat_syn = data.feat_full
+        else:
+            feat_syn = data.feat_train
+    try:
+        labels_syn = torch.load(
+            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+    except:
+        print("find no label, use original label matrix instead")
+        labels_syn = data.labels_train
+
     try:
         adj_syn = torch.load(
             f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)

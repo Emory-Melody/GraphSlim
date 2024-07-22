@@ -28,10 +28,10 @@ class Evaluator:
         # self.adj_param.data.copy_(torch.randn(self.adj_param.size()))
         # self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
 
-    def get_syn_data(self, model_type, verbose=False):
+    def get_syn_data(self, data, model_type, verbose=False):
 
         args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args)
+        adj_syn, feat_syn, labels_syn = load_reduced(args, data)
 
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()
@@ -95,7 +95,7 @@ class Evaluator:
                 # args.eval_epochs = 300
             for model_type in gs_params:
                 if reduced:
-                    data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                    data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
                                                                                      verbose=args.verbose)
                 print(f'Starting Grid Search for {model_type}')
                 best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
@@ -104,7 +104,7 @@ class Evaluator:
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             for model_type in eval_model_list:
-                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type,
+                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
                                                                                  verbose=args.verbose)
                 best_result = self.evaluate(data, model_type=args.eval_model)
                 args.logger.info(
@@ -160,7 +160,8 @@ class Evaluator:
         args = self.args
 
         if reduced:
-            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
+            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
+                                                                             verbose=verbose)
 
         if verbose:
             print(f'evaluate reduced data by {model_type}')
@@ -183,7 +184,7 @@ class Evaluator:
     def nas_evaluate(self, data, model_type, verbose=False, reduced=None):
         args = self.args
         res = []
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(model_type=model_type, verbose=verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type, verbose=verbose)
         if verbose:
             run_evaluation = trange(args.run_evaluation)
         else:

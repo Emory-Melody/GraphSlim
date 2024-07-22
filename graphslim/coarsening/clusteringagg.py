@@ -41,7 +41,7 @@ class ClusterAgg(Coarsen):
             y_train = data.labels_train
         else:
             y_syn, y_train = self.prepare_select(data, args)
-        x_train = feat_agg[data.train_mask] if args.setting == 'trans' else data.feat_agg
+        x_train = feat_agg[data.train_mask] if args.setting == 'trans' else feat_agg
         x_syn = torch.zeros(y_syn.shape[0], x_train.shape[1])
         for c in range(n_classes):
             x_c = x_train[y_train == c].cpu()

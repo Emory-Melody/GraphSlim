@@ -120,12 +120,15 @@ def method_config(args):
                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random']
               ), show_default=True)
-@click.option('--method', '-M', default='kcenter',
-              type=click.Choice(
-                  ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
-                   'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
-                   'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk', 'geom',
-                   'cent_d', 'cent_p', 'kcenter', 'herding', 'random']), show_default=True)
+# @click.option('--method', '-M', default='kcenter',
+#               type=click.Choice(
+#                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
+#                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
+#                    'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk', 'geom',
+#                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random',
+#                    'random_edge'
+#                    ]), show_default=True)
+@click.option('--method', '-M', default='kcenter', show_default=True)
 @click.option('--activation', default='relu', help='activation function when do NAS',
               type=click.Choice(
                   ['sigmoid', 'tanh', 'relu', 'linear', 'softplus', 'leakyrelu', 'relu6', 'elu']
@@ -151,6 +154,7 @@ def method_config(args):
 # model specific args
 @click.option('--alpha', default=0.1, help='for appnp', show_default=True)
 @click.option('--mx_size', default=100, help='for gcsntk methods, avoid SVD error', show_default=True)
+@click.option('--ts', default=4, help='for tspanner', show_default=True)
 @click.option('--save_path', '--sp', default='../checkpoints', show_default=True, help='save path for synthetic graph')
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True, help='if run on whole graph')
 @click.pass_context

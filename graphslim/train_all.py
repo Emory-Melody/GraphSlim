@@ -10,7 +10,7 @@ from graphslim.evaluation import *
 from graphslim.sparsification import *
 from graphslim.condensation import *
 from graphslim.coarsening import *
-from graphslim.utils import seed_everything
+from graphslim.utils import seed_everything, to_camel_case
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
@@ -57,6 +57,8 @@ if __name__ == '__main__':
         agent = ClusterAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)
+    else:
+        agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)
     if args.method in ['variation_edges', 'variation_neighborhoods', 'vng', 'heavy_edge', 'algebraic_JC', 'affinity_GS',
                        'kron']:

@@ -50,7 +50,7 @@ if __name__ == '__main__':
     method_list2 = method_list + ['gcondx', 'geom']
     for args.method in method_list2:
         print(f'========{args.method}========')
-        adj_syn, feat, label = load_reduced(args)
+        adj_syn, feat, label = load_reduced(args, graph)
         if args.method not in ['msgc']:
             label = label[:adj_syn.shape[0]]
         else:

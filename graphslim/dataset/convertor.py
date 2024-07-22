@@ -7,12 +7,13 @@ from pygsp import graphs
 from scipy.sparse import coo_matrix
 from torch_geometric.utils import to_undirected, to_dense_adj
 from torch_sparse import SparseTensor
+import networkit as nk
+from torch_geometric.data import Data
 
 
 def pyg2gsp(edge_index):
     G = graphs.Graph(W=to_dense_adj(to_undirected(edge_index))[0])
     return G
-
 
 
 def csr2ei(adjacency_matrix_csr):
@@ -52,6 +53,79 @@ def dense2sparsetensor(mat: torch.Tensor, has_value: bool = True):
         is_sorted=True,
         trust_data=True,
     )
+
+
+def networkit_to_pyg(graph):
+    # Extract edges from Networkit graph
+    edges = list(graph.edges())
+    edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+
+    # Check if the graph is weighted
+    if graph.isWeighted():
+        edge_attr = torch.tensor([graph.weight(u, v) for u, v in edges], dtype=torch.float)
+    else:
+        edge_attr = None
+
+    pyg_graph = Data(edge_index=edge_index, edge_attr=edge_attr)
+    return pyg_graph
+
+
+def pyg_to_networkit(pyg_graph):
+    # Create an empty Networkit graph
+    # if hasattr(pyg_graph, 'edge_attr') and pyg_graph.edge_attr is not None:
+    #     graph = nk.Graph(weighted=True, directed=False)
+    # else:
+    #     graph = nk.Graph(weighted=False, directed=False)
+
+    # Add edges to the Networkit graph
+    edge_index = pyg_graph.edge_index.numpy()
+    if hasattr(pyg_graph, 'edge_attr') and pyg_graph.edge_attr is not None:
+        edge_attr = pyg_graph.edge_attr.numpy()
+        graph = nk.GraphFromCoo(inputData=(edge_attr, (edge_index[0], edge_index[1])), n=pyg_graph.num_nodes,
+                                weighted=True, directed=False)
+    else:
+        graph = nk.GraphFromCoo(inputData=((edge_index[0], edge_index[1])), n=pyg_graph.num_nodes,
+                                weighted=False, directed=False)
+
+    graph.indexEdges()
+
+    return graph
+
+
+def loadSparseGraph(dataset_name):
+    """Load original graph from file from paper
+    CHEN Y, YE H, VEDULA S, et al. Demystifying graph sparsification algorithms in graph properties preservation[M/OL].
+
+    GraphSlim package only supports undirected graph and we do not distinguish the weighted and unweighted
+    pyg->nt->save sparsified nt->pyg->evaluation
+
+    Args:
+        dataset_name (str): dataset name
+        config (dict): config loaded from json
+        undirected_only (bool, optional): Set to True to override graph directness in config file and load undirected graph only.
+                                          Defaults to False. This is used for sparsifiers that only support undirected graph.
+
+    Returns:
+        nk graph: original graph
+    """
+
+    # else:
+    #     if config[dataset_name]["directed"] and config[dataset_name]["weighted"]:
+    #         originalGraph = nk.readGraph(f"../data/{dataset_name}/raw/dw.wel", nk.Format.EdgeListSpaceZero,
+    #                                      directed=True)
+    #     elif config[dataset_name]["directed"]:
+    #         originalGraph = nk.readGraph(f"../data/{dataset_name}/raw/duw.el", nk.Format.EdgeListSpaceZero,
+    #                                      directed=True)
+    #     elif config[dataset_name]["weighted"]:
+    #         originalGraph = nk.readGraph(f"../data/{dataset_name}/raw/udw.wel", nk.Format.EdgeListSpaceZero,
+    #                                      directed=False)
+    #     else:
+    #         originalGraph = nk.readGraph(f"../data/{dataset_name}/raw/uduw.el", nk.Format.EdgeListSpaceZero,
+    #                                      directed=False)
+
+    nk.overview(originalGraph)
+    nk.graph.Graph.indexEdges(originalGraph)
+    return graph
 
 # class Pyg2Dpr(Dataset):
 # def __init__(self, pyg_data, **kwargs):

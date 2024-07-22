@@ -74,7 +74,7 @@ class BaseGNN(nn.Module):
             return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
-                     normadj=True, setting='trans', reduced=False, reindex=False, final_output=False,
+                     normadj=True, setting='trans', reduced=False, final_output=False,
                      **kwargs):
 
         self.initialize()
@@ -122,9 +122,6 @@ class BaseGNN(nn.Module):
         #     self.multi_label = False
         #     self.loss = F.nll_loss
 
-        if reduced or setting == 'ind':
-            reindex = True
-
         if verbose:
             print('=== training ===')
 
@@ -146,26 +143,23 @@ class BaseGNN(nn.Module):
 
             optimizer.zero_grad()
             output = self.forward(features, adj)
-            loss_train = self.loss(output if reindex else output[data.idx_train], labels)
+            loss_train = self.loss(output if output.shape[0] == labels.shape[0] else output[data.idx_train], labels)
 
             loss_train.backward()
             optimizer.step()
 
             if verbose and i % 100 == 0:
                 print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
-                acc_train = accuracy(output if reindex else output[data.idx_train], labels)
+                acc_train = accuracy(output if output.shape[0] == labels.shape[0] else output[data.idx_train], labels)
                 print('Epoch {}, training acc: {}'.format(i, acc_train))
 
             with torch.no_grad():
                 self.eval()
                 output = self.forward(feat_full, adj_full)
 
-                if setting == 'ind':
-                    # loss_val = F.nll_loss(output, labels_val)
-                    acc_val = accuracy(output, labels_val)
-                else:
-                    # loss_val = F.nll_loss(output[data.idx_val], labels_val)
-                    acc_val = accuracy(output[data.idx_val], labels_val)
+                acc_val = accuracy(output if output.shape[0] == labels_val.shape[0] else output[data.idx_val],
+                                   labels_val)
+
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val
                     # self.output = output
