@@ -1,6 +1,6 @@
 # GraphSlim
 
-[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://static.pepy.tech/badge/graphslim)](https://pepy.tech/project/graphslim)
 
 **[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
@@ -27,7 +27,7 @@ preserving **properties or performance** of the original graph.
 
 # Prepare Environments
 
-Please choose from `requirements_torch1+.txt` and `requirements_torch2+.txt` at your convenience.
+Please choose from `requirements_torch1+.txt (torch 1.\*)` and `requirements.txt (torch2.*)` at your convenience.
 Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
 your system configuration.
 
@@ -40,19 +40,15 @@ Our code will automatically download all datasets.
 The default path of datasets is `../../data`.-->
 
 
-[//]: # (# Installation)
 
-[//]: # ()
+## Install from pip
 
-[//]: # (## Install from pip)
 
-[//]: # ()
-
-[//]: # (```)
-
-[//]: # (pip install graphslim)
-
-[//]: # (```)
+```shell
+# choose one version from https://data.pyg.org/whl/ based on your environment
+pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
+pip install graphslim
+```
 
 # Examples
 
@@ -145,17 +141,19 @@ Options:
 from graphslim.dataset import *
 from graphslim.evaluation import *
 from graphslim.sparsification/coarsening/condensation import <main:method>
+from graphslim.configs import cli
 
-graph = get_dataset(<main:dataset>, <dataset_args>)
+args=cli(standalone_mode=False)
+# customize args here
+graph = get_dataset(dataset=<main:dataset>, args=args.<dataset_args/attack_args>)
 # To reproduce the benchmark, use our args and graph class
 # To use your own args and graph format, please ensure the args and graph class has the required attributes
-
 # create an agent of one reduction algorithm
-agent = <main:method>(setting=<'trans/ind'>, data=graph, args=<agent_args>)
+agent = <main:method>(setting=<'trans/ind'>, data=graph, args=args.<agent_args>)
 # reduce the graph 
 reduced_graph = agent.reduce(graph, verbose=<True/False>)
 # create an evaluator
-evaluator = Evaluator(<evaluator_args>)
+evaluator = Evaluator(args.<evaluator_args>)
 # evaluate the reduced graph on a GNN model
 res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=<evaluator:eval_model>)
 ```
