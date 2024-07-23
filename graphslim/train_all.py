@@ -49,8 +49,6 @@ if __name__ == '__main__':
         agent = GEOM(setting=args.setting, data=graph, args=args)
     elif args.method == 'vng':
         agent = VNG(setting=args.setting, data=graph, args=args)
-    elif args.method == 'variation_neighborhoods':
-        agent = Coarsen(setting=args.setting, data=graph, args=args)
     elif args.method == 'clustering' and not args.aggpreprocess:
         agent = Cluster(setting=args.setting, data=graph, args=args)
     elif args.method == 'clustering' and args.aggpreprocess:

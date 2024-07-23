@@ -32,6 +32,8 @@ class Evaluator:
 
         args = self.args
         adj_syn, feat_syn, labels_syn = load_reduced(args, data)
+        if labels_syn.shape[0]==data.labels_train.shape[0]:
+            return feat_syn, adj_syn, labels_syn
 
         if is_sparse_tensor(adj_syn):
             adj_syn = adj_syn.to_dense()

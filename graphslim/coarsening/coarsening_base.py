@@ -8,10 +8,10 @@ from torch_geometric.utils import to_dense_adj
 
 from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
     matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
-from graphslim.dataset.convertor import pyg2gsp, csr2ei
+from graphslim.dataset.convertor import pyg2gsp, csr2ei, ei2csr
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation import *
-from graphslim.utils import one_hot
+from graphslim.utils import one_hot, to_tensor
 
 
 class Coarsen:
@@ -22,7 +22,7 @@ class Coarsen:
         # pass data for initialization
 
     @verbose_time_memory
-    def reduce(self, data, verbose=True):
+    def reduce(self, data, verbose=True, save=True):
 
         args = self.args
         # setting = self.setting
@@ -31,28 +31,26 @@ class Coarsen:
         cpu_data = copy.deepcopy(data)
 
         if args.setting == 'trans':
-            candidate, C_list, Gc_list = self.coarsening(graphs.Graph(W=data.adj_full), 1 - args.reduction_rate,
-                                                         args.method)
+            gps_graph = graphs.Graph(W=data.adj_full)
+            candidate, C_list, Gc_list = self.coarsening(gps_graph)
             coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
                 cpu_data, candidate, C_list, Gc_list)
 
             train_idx = np.nonzero(coarsen_train_mask.numpy())[0]
             coarsen_features = coarsen_features[train_idx]
-            coarsen_edge = to_dense_adj(coarsen_edge)[0].numpy()
-            coarsen_edge = torch.from_numpy(coarsen_edge[np.ix_(train_idx, train_idx)])
+            coarsen_edge = ei2csr(coarsen_edge, coarsen_train_mask.shape[0])[np.ix_(train_idx, train_idx)]
             coarsen_train_labels = coarsen_train_labels[train_idx]
         else:
-            candidate, C_list, Gc_list = self.coarsening(graphs.Graph(W=data.adj_train), 1 - args.reduction_rate,
-                                                         args.method)
+            gps_graph = graphs.Graph(W=data.adj_full)
+            candidate, C_list, Gc_list = self.coarsening(gps_graph)
             coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = self.process_coarsened(
                 cpu_data, candidate, C_list, Gc_list)
 
-            coarsen_edge = to_dense_adj(coarsen_edge)[0].numpy()
-            coarsen_edge = torch.from_numpy(coarsen_edge)
+            coarsen_edge = ei2csr(coarsen_edge, coarsen_train_mask.shape[0])
 
-        data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_train_labels
-
-        save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
+        data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(coarsen_edge), coarsen_features, coarsen_train_labels
+        if save:
+            save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 
         return data
 
@@ -117,7 +115,7 @@ class Coarsen:
         #
         # print('ave_test_acc: {:.4f}'.format(np.mean(all_acc)), '+/- {:.4f}'.format(np.std(all_acc)))
 
-    def coarsening(self, H, coarsening_ratio, coarsening_method):
+    def coarsening(self, H):
         if H.A.shape[-1] != H.A.shape[1]:
             H.logger.error('Inconsistent shape to extract components. '
                            'Square matrix required.')
@@ -156,7 +154,7 @@ class Coarsen:
         while number < len(candidate):
             H = candidate[number]
             if len(H.info['orig_idx']) > 10:
-                C, Gc, Call, Gall = self.coarsen(H, r=coarsening_ratio, method=coarsening_method)
+                C, Gc, Call, Gall = self.coarsen(H)
                 C_list.append(C)
                 Gc_list.append(Gc)
             number += 1
@@ -246,139 +244,3 @@ class Coarsen:
         coarsen_train_labels = coarsen_train_labels.long()
 
         return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge
-
-    def coarsen(
-            self,
-            G,
-            K=10,
-            r=0.5,
-            max_levels=10,
-            method="variation_neighborhood",
-            algorithm="greedy",
-            Uk=None,
-            lk=None,
-            max_level_r=0.99,
-    ):
-        """
-        This function provides a common interface for coarsening algorithms that contract subgraphs
-
-        Parameters
-        ----------
-        G : pygsp Graph
-        K : int
-            The size of the subspace we are interested in preserving.
-        r : float between (0,1)
-            The desired reduction defined as 1 - n/N.
-        method : String
-            ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron']
-
-        Returns
-        -------
-        C : np.array of size n x N
-            The coarsening matrix.
-        Gc : pygsp Graph
-            The smaller graph.
-        Call : list of np.arrays
-            Coarsening matrices for each level
-        Gall : list of (n_levels+1) pygsp Graphs
-            All graphs involved in the multilevel coarsening
-
-        Example
-        -------
-        C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)
-        """
-        r = np.clip(r, 0, 0.999)
-        G0 = G
-        N = G.N
-
-        # current and target graph sizes
-        n, n_target = N, np.ceil((1 - r) * N)
-
-        C = sp.sparse.eye(N, format="csc")
-        Gc = G
-
-        Call, Gall = [], []
-        Gall.append(G)
-
-        for level in range(1, max_levels + 1):
-
-            G = Gc
-
-            # how much more we need to reduce the current graph
-            r_cur = np.clip(1 - n_target / n, 0.0, max_level_r)
-
-            if "variation" in method:
-
-                if level == 1:
-                    if (Uk is not None) and (lk is not None) and (len(lk) >= K):
-                        mask = lk < 1e-10
-                        lk[mask] = 1
-                        lsinv = lk ** (-0.5)
-                        lsinv[mask] = 0
-                        B = Uk[:, :K] @ np.diag(lsinv[:K])
-                    else:
-                        offset = 2 * max(G.dw)
-                        T = offset * sp.sparse.eye(G.N, format="csc") - G.L
-                        lk, Uk = sp.sparse.linalg.eigsh(T, k=K, which="LM", tol=1e-5)
-                        lk = (offset - lk)[::-1]
-                        Uk = Uk[:, ::-1]
-                        mask = lk < 1e-10
-                        lk[mask] = 1
-                        lsinv = lk ** (-0.5)
-                        lsinv[mask] = 0
-                        B = Uk @ np.diag(lsinv)
-                    A = B
-                else:
-                    B = iC.dot(B)
-                    d, V = np.linalg.eig(B.T @ (G.L).dot(B))
-                    mask = d == 0
-                    d[mask] = 1
-                    dinvsqrt = (d + 1e-9) ** (-1 / 2)
-                    dinvsqrt[mask] = 0
-                    A = B @ np.diag(dinvsqrt) @ V
-
-                if method == "variation_edges":
-                    coarsening_list = contract_variation_edges(
-                        G, K=K, A=A, r=r_cur, algorithm=algorithm
-                    )
-                else:
-                    coarsening_list = contract_variation_linear(
-                        G, K=K, A=A, r=r_cur, mode=method
-                    )
-
-            else:
-                weights = get_proximity_measure(G, method, K=K)
-
-                if algorithm == "optimal":
-                    # the edge-weight should be light at proximal edges
-                    weights = -weights
-                    if "rss" not in method:
-                        weights -= min(weights)
-                    coarsening_list = matching_optimal(G, weights=weights, r=r_cur)
-
-                elif algorithm == "greedy":
-                    coarsening_list = matching_greedy(G, weights=weights, r=r_cur)
-
-            iC = get_coarsening_matrix(G, coarsening_list)
-
-            if iC.shape[1] - iC.shape[0] <= 2:
-                break  # avoid too many levels for so few nodes
-
-            C = iC.dot(C)
-            Call.append(iC)
-
-            Wc = zero_diag(coarsen_matrix(G.W, iC))  # coarsen and remove self-loops
-            Wc = (Wc + Wc.T) / 2  # this is only needed to avoid pygsp complaining for tiny errors
-
-            if not hasattr(G, "coords"):
-                Gc = graphs.Graph(Wc)
-            else:
-                Gc = graphs.Graph(Wc, coords=coarsen_vector(G.coords, iC))
-            Gall.append(Gc)
-
-            n = Gc.N
-
-            if n <= n_target:
-                break
-
-        return C, Gc, Call, Gall

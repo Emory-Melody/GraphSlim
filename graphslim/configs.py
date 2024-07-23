@@ -137,6 +137,10 @@ def method_config(args):
               type=click.Choice(
                   ['random_adj', 'metattack', 'random_feat']
               ), show_default=True)
+@click.option('--coarsen_strategy', '--cs', default='greedy', help='for edge contraction method',
+              type=click.Choice(
+                  ['optimal', 'greedy']
+              ), show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True, help='perturbation rate for corruptions')
 @click.option('--aggpreprocess', is_flag=True, show_default=True, help='use aggregation for coreset methods')
 @click.option('--dis_metric', default='ours', show_default=True,

@@ -1017,128 +1017,128 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     return metrics
 
 
-def plot_coarsening(
-        Gall, Call, size=3, edge_width=0.8, node_size=20, alpha=0.55, title=""
-):
-    """
-    Plot a (hierarchical) coarsening
-
-    Parameters
-    ----------
-    G_all : list of pygsp Graphs
-    Call  : list of np.arrays
-
-    Returns
-    -------
-    fig : matplotlib figure
-    """
-    # colors signify the size of a coarsened subgraph ('k' is 1, 'g' is 2, 'b' is 3, and so on)
-    colors = ["k", "g", "b", "r", "y"]
-
-    n_levels = len(Gall) - 1
-    if n_levels == 0:
-        return None
-    fig = plt.figure(figsize=(n_levels * size * 3, size * 2))
-
-    for level in range(n_levels):
-
-        G = Gall[level]
-        edges = np.array(G.get_edge_list()[0:2])
-
-        Gc = Gall[level + 1]
-        #         Lc = C.dot(G.L.dot(C.T))
-        #         Wc = sp.sparse.diags(Lc.diagonal(), 0) - Lc;
-        #         Wc = (Wc + Wc.T) / 2
-        #         Gc = gsp.graphs.Graph(Wc, coords=(C.power(2)).dot(G.coords))
-        edges_c = np.array(Gc.get_edge_list()[0:2])
-        C = Call[level]
-        C = C.toarray()
-
-        if G.coords.shape[1] == 2:
-            ax = fig.add_subplot(1, n_levels + 1, level + 1)
-            ax.axis("off")
-            ax.set_title(f"{title} | level = {level}, N = {G.N}")
-
-            [x, y] = G.coords.T
-            for eIdx in range(0, edges.shape[1]):
-                ax.plot(
-                    x[edges[:, eIdx]],
-                    y[edges[:, eIdx]],
-                    color="k",
-                    alpha=alpha,
-                    lineWidth=edge_width,
-                )
-            for i in range(Gc.N):
-                subgraph = np.arange(G.N)[C[i, :] > 0]
-                ax.scatter(
-                    x[subgraph],
-                    y[subgraph],
-                    c=colors[np.clip(len(subgraph) - 1, 0, 4)],
-                    s=node_size * len(subgraph),
-                    alpha=alpha,
-                )
-
-        elif G.coords.shape[1] == 3:
-            ax = fig.add_subplot(1, n_levels + 1, level + 1, projection="3d")
-            ax.axis("off")
-
-            [x, y, z] = G.coords.T
-            for eIdx in range(0, edges.shape[1]):
-                ax.plot(
-                    x[edges[:, eIdx]],
-                    y[edges[:, eIdx]],
-                    zs=z[edges[:, eIdx]],
-                    color="k",
-                    alpha=alpha,
-                    lineWidth=edge_width,
-                )
-            for i in range(Gc.N):
-                subgraph = np.arange(G.N)[C[i, :] > 0]
-                ax.scatter(
-                    x[subgraph],
-                    y[subgraph],
-                    z[subgraph],
-                    c=colors[np.clip(len(subgraph) - 1, 0, 4)],
-                    s=node_size * len(subgraph),
-                    alpha=alpha,
-                )
-
-    # the final graph
-    Gc = Gall[-1]
-    edges_c = np.array(Gc.get_edge_list()[0:2])
-
-    if G.coords.shape[1] == 2:
-        ax = fig.add_subplot(1, n_levels + 1, n_levels + 1)
-        ax.axis("off")
-        [x, y] = Gc.coords.T
-        ax.scatter(x, y, c="k", s=node_size, alpha=alpha)
-        for eIdx in range(0, edges_c.shape[1]):
-            ax.plot(
-                x[edges_c[:, eIdx]],
-                y[edges_c[:, eIdx]],
-                color="k",
-                alpha=alpha,
-                lineWidth=edge_width,
-            )
-
-    elif G.coords.shape[1] == 3:
-        ax = fig.add_subplot(1, n_levels + 1, n_levels + 1, projection="3d")
-        ax.axis("off")
-        [x, y, z] = Gc.coords.T
-        ax.scatter(x, y, z, c="k", s=node_size, alpha=alpha)
-        for eIdx in range(0, edges_c.shape[1]):
-            ax.plot(
-                x[edges_c[:, eIdx]],
-                y[edges_c[:, eIdx]],
-                z[edges_c[:, eIdx]],
-                color="k",
-                alpha=alpha,
-                lineWidth=edge_width,
-            )
-
-    ax.set_title(f"{title} | level = {n_levels}, n = {Gc.N}")
-    fig.tight_layout()
-    return fig
+# def plot_coarsening(
+#         Gall, Call, size=3, edge_width=0.8, node_size=20, alpha=0.55, title=""
+# ):
+#     """
+#     Plot a (hierarchical) coarsening
+#
+#     Parameters
+#     ----------
+#     G_all : list of pygsp Graphs
+#     Call  : list of np.arrays
+#
+#     Returns
+#     -------
+#     fig : matplotlib figure
+#     """
+#     # colors signify the size of a coarsened subgraph ('k' is 1, 'g' is 2, 'b' is 3, and so on)
+#     colors = ["k", "g", "b", "r", "y"]
+#
+#     n_levels = len(Gall) - 1
+#     if n_levels == 0:
+#         return None
+#     fig = plt.figure(figsize=(n_levels * size * 3, size * 2))
+#
+#     for level in range(n_levels):
+#
+#         G = Gall[level]
+#         edges = np.array(G.get_edge_list()[0:2])
+#
+#         Gc = Gall[level + 1]
+#         #         Lc = C.dot(G.L.dot(C.T))
+#         #         Wc = sp.sparse.diags(Lc.diagonal(), 0) - Lc;
+#         #         Wc = (Wc + Wc.T) / 2
+#         #         Gc = gsp.graphs.Graph(Wc, coords=(C.power(2)).dot(G.coords))
+#         edges_c = np.array(Gc.get_edge_list()[0:2])
+#         C = Call[level]
+#         C = C.toarray()
+#
+#         if G.coords.shape[1] == 2:
+#             ax = fig.add_subplot(1, n_levels + 1, level + 1)
+#             ax.axis("off")
+#             ax.set_title(f"{title} | level = {level}, N = {G.N}")
+#
+#             [x, y] = G.coords.T
+#             for eIdx in range(0, edges.shape[1]):
+#                 ax.plot(
+#                     x[edges[:, eIdx]],
+#                     y[edges[:, eIdx]],
+#                     color="k",
+#                     alpha=alpha,
+#                     lineWidth=edge_width,
+#                 )
+#             for i in range(Gc.N):
+#                 subgraph = np.arange(G.N)[C[i, :] > 0]
+#                 ax.scatter(
+#                     x[subgraph],
+#                     y[subgraph],
+#                     c=colors[np.clip(len(subgraph) - 1, 0, 4)],
+#                     s=node_size * len(subgraph),
+#                     alpha=alpha,
+#                 )
+#
+#         elif G.coords.shape[1] == 3:
+#             ax = fig.add_subplot(1, n_levels + 1, level + 1, projection="3d")
+#             ax.axis("off")
+#
+#             [x, y, z] = G.coords.T
+#             for eIdx in range(0, edges.shape[1]):
+#                 ax.plot(
+#                     x[edges[:, eIdx]],
+#                     y[edges[:, eIdx]],
+#                     zs=z[edges[:, eIdx]],
+#                     color="k",
+#                     alpha=alpha,
+#                     lineWidth=edge_width,
+#                 )
+#             for i in range(Gc.N):
+#                 subgraph = np.arange(G.N)[C[i, :] > 0]
+#                 ax.scatter(
+#                     x[subgraph],
+#                     y[subgraph],
+#                     z[subgraph],
+#                     c=colors[np.clip(len(subgraph) - 1, 0, 4)],
+#                     s=node_size * len(subgraph),
+#                     alpha=alpha,
+#                 )
+#
+#     # the final graph
+#     Gc = Gall[-1]
+#     edges_c = np.array(Gc.get_edge_list()[0:2])
+#
+#     if G.coords.shape[1] == 2:
+#         ax = fig.add_subplot(1, n_levels + 1, n_levels + 1)
+#         ax.axis("off")
+#         [x, y] = Gc.coords.T
+#         ax.scatter(x, y, c="k", s=node_size, alpha=alpha)
+#         for eIdx in range(0, edges_c.shape[1]):
+#             ax.plot(
+#                 x[edges_c[:, eIdx]],
+#                 y[edges_c[:, eIdx]],
+#                 color="k",
+#                 alpha=alpha,
+#                 lineWidth=edge_width,
+#             )
+#
+#     elif G.coords.shape[1] == 3:
+#         ax = fig.add_subplot(1, n_levels + 1, n_levels + 1, projection="3d")
+#         ax.axis("off")
+#         [x, y, z] = Gc.coords.T
+#         ax.scatter(x, y, z, c="k", s=node_size, alpha=alpha)
+#         for eIdx in range(0, edges_c.shape[1]):
+#             ax.plot(
+#                 x[edges_c[:, eIdx]],
+#                 y[edges_c[:, eIdx]],
+#                 z[edges_c[:, eIdx]],
+#                 color="k",
+#                 alpha=alpha,
+#                 lineWidth=edge_width,
+#             )
+#
+#     ax.set_title(f"{title} | level = {n_levels}, n = {Gc.N}")
+#     fig.tight_layout()
+#     return fig
 
 
 ################################################################################
