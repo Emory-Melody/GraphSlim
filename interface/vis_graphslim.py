@@ -36,26 +36,26 @@ reduction_rate = st.sidebar.selectbox(
     'Reduction Rate',
     ('0.1', '0.25', '0.5')
 )
-
-st.markdown('### Original Graph')
-dataset = Planetoid(root='', name='Cora')
-data = dataset[0]
-
-G = to_networkx(data, to_undirected=True)
-node_labels = {i: int(data.y[i]) for i in range(data.num_nodes)}
-unique_labels = list(set(node_labels.values()))
-colors = plt.cm.get_cmap('jet', len(unique_labels))
-color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
-node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
-nx.set_node_attributes(G, node_colors, "color")
-
-net = Network(
-    height='400px',
-    width='100%'
-)
-
-net.from_nx(G)
-net.repulsion()
+#
+# st.markdown('### Original Graph')
+# dataset = Planetoid(root='', name='Cora')
+# data = dataset[0]
+#
+# G = to_networkx(data, to_undirected=True)
+# node_labels = {i: int(data.y[i]) for i in range(data.num_nodes)}
+# unique_labels = list(set(node_labels.values()))
+# colors = plt.cm.get_cmap('jet', len(unique_labels))
+# color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
+# node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
+# nx.set_node_attributes(G, node_colors, "color")
+#
+# net = Network(
+#     height='400px',
+#     width='100%'
+# )
+#
+# net.from_nx(G)
+# net.repulsion()
 
 # net.repulsion(
 #             node_distance=420,
@@ -72,12 +72,12 @@ net.repulsion()
 
 #     # Save and read graph as HTML file (locally)
 # except:
-path = 'html_files'
-net.save_graph(f'{path}/pyvis_graph.html')
-HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
-# Load HTML file in HTML component for display on Streamlit page
-
-components1 = components.html(HtmlFile.read(), height=500)
+# path = 'html_files'
+# net.save_graph(f'{path}/pyvis_graph.html')
+# HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+# # Load HTML file in HTML component for display on Streamlit page
+#
+# components1 = components.html(HtmlFile.read(), height=500)
 
 st.markdown('### Reduced Graph')
 adj_path = f'reduced_graph/{method}/adj_cora_{reduction_rate}_1.pt'
