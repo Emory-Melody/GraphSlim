@@ -20,7 +20,7 @@ from graphslim.dataset.utils import splits
 from graphslim.utils import index_to_mask, to_tensor
 
 
-def get_dataset(name, args):
+def get_dataset(name='cora', args=None):
     path = osp.join('../../data')
     # Create a dictionary that maps standard names to normalized names
     standard_names = ['flickr', 'reddit', 'dblp', 'cora_ml', 'physics', 'cs', 'cora', 'citeseer', 'pubmed', 'photo',
