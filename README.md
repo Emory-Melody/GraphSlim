@@ -213,6 +213,8 @@ Some of the algorithms are referred to paper authors' implementations and other 
 
 [SCAL](https://github.com/szzhang17/Scaling-Up-Graph-Neural-Networks-Via-Graph-Coarsening)
 
+[Sparsification](https://github.com/yuhanchan/sparsification)
+
 [GCOND](https://github.com/ChandlerBang/GCond)
 
 [GCSNTK](https://github.com/WANGLin0126/GCSNTK)
