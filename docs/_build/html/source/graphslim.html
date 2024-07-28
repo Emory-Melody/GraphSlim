@@ -1,0 +1,2046 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>graphslim package &mdash; GraphSlim documentation</title>
+    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
+    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../" id="documentation_options"
+            src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link href="../genindex.html" rel="index" title="Index"/>
+    <link href="../search.html" rel="search" title="Search"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a class="icon icon-home" href="../index.html">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+                        <input name="check_keywords" type="hidden" value="yes"/>
+                        <input name="area" type="hidden" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
+            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+            <a href="../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div aria-label="Page navigation" role="navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li class="breadcrumb-item active">graphslim package</li>
+                        <li class="wy-breadcrumbs-aside">
+                            <a href="../_sources/source/graphslim.rst.txt" rel="nofollow"> View page source</a>
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                    <div itemprop="articleBody">
+
+                        <section id="graphslim-package">
+                            <h1>graphslim package<a class="headerlink" href="#graphslim-package"
+                                                    title="Permalink to this heading"></a></h1>
+                            <section id="subpackages">
+                                <h2>Subpackages<a class="headerlink" href="#subpackages"
+                                                  title="Permalink to this heading"></a></h2>
+                                <div class="toctree-wrapper compound">
+                                    <ul>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.coarsening.html">graphslim.coarsening
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-affinity-gs-module">graphslim.coarsening.affinity_gs
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-algebraic-jc-module">graphslim.coarsening.algebraic_jc
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-averaging-module">graphslim.coarsening.averaging
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-clustering-module">graphslim.coarsening.clustering
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-clusteringagg-module">graphslim.coarsening.clusteringagg
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-coarsening-base-module">graphslim.coarsening.coarsening_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-heavy-edge-module">graphslim.coarsening.heavy_edge
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-kron-module">graphslim.coarsening.kron
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#module-graphslim.coarsening.utils">graphslim.coarsening.utils
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.coarsen_matrix"><code
+                                                                class="docutils literal notranslate"><span class="pre">coarsen_matrix()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.coarsen_vector"><code
+                                                                class="docutils literal notranslate"><span class="pre">coarsen_vector()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.coarsening_quality"><code
+                                                                class="docutils literal notranslate"><span class="pre">coarsening_quality()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.contract_variation_edges"><code
+                                                                class="docutils literal notranslate"><span class="pre">contract_variation_edges()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.contract_variation_linear"><code
+                                                                class="docutils literal notranslate"><span class="pre">contract_variation_linear()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.eig"><code
+                                                                class="docutils literal notranslate"><span class="pre">eig()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.generate_test_vectors"><code
+                                                                class="docutils literal notranslate"><span class="pre">generate_test_vectors()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.get_S"><code
+                                                                class="docutils literal notranslate"><span class="pre">get_S()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.get_coarsening_matrix"><code
+                                                                class="docutils literal notranslate"><span class="pre">get_coarsening_matrix()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.get_proximity_measure"><code
+                                                                class="docutils literal notranslate"><span class="pre">get_proximity_measure()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.graph_sparsify"><code
+                                                                class="docutils literal notranslate"><span class="pre">graph_sparsify()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.kron_coarsening"><code
+                                                                class="docutils literal notranslate"><span class="pre">kron_coarsening()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.kron_interpolate"><code
+                                                                class="docutils literal notranslate"><span class="pre">kron_interpolate()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.kron_quality"><code
+                                                                class="docutils literal notranslate"><span class="pre">kron_quality()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.lift_matrix"><code
+                                                                class="docutils literal notranslate"><span class="pre">lift_matrix()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.lift_vector"><code
+                                                                class="docutils literal notranslate"><span class="pre">lift_vector()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.matching_greedy"><code
+                                                                class="docutils literal notranslate"><span class="pre">matching_greedy()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.matching_optimal"><code
+                                                                class="docutils literal notranslate"><span class="pre">matching_optimal()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.maxWeightMatching"><code
+                                                                class="docutils literal notranslate"><span class="pre">maxWeightMatching()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.my_graph_multiresolution"><code
+                                                                class="docutils literal notranslate"><span class="pre">my_graph_multiresolution()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.coarsening.html#graphslim.coarsening.utils.zero_diag"><code
+                                                                class="docutils literal notranslate"><span class="pre">zero_diag()</span></code></a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-variation-cliques-module">graphslim.coarsening.variation_cliques
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-variation-edges-module">graphslim.coarsening.variation_edges
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-variation-neighborhoods-module">graphslim.coarsening.variation_neighborhoods
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#graphslim-coarsening-vng-module">graphslim.coarsening.vng
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.coarsening.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.condensation.html">graphslim.condensation
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-doscond-module">graphslim.condensation.doscond
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-doscondx-module">graphslim.condensation.doscondx
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-gcond-module">graphslim.condensation.gcond
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-gcond-base-module">graphslim.condensation.gcond_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-gcondx-module">graphslim.condensation.gcondx
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-gcsntk-module">graphslim.condensation.gcsntk
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-geom-module">graphslim.condensation.geom
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-msgc-module">graphslim.condensation.msgc
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-sfgc-module">graphslim.condensation.sfgc
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-sgdd-module">graphslim.condensation.sgdd
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#graphslim-condensation-utils-module">graphslim.condensation.utils
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.condensation.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.dataset.html">graphslim.dataset
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#graphslim-dataset-attack-module">graphslim.dataset.attack
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#graphslim-dataset-convertor-module">graphslim.dataset.convertor
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#graphslim-dataset-loader-module">graphslim.dataset.loader
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#graphslim-dataset-utils-module">graphslim.dataset.utils
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.dataset.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.evaluation.html">graphslim.evaluation
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#graphslim-evaluation-eval-agent-module">graphslim.evaluation.eval_agent
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#graphslim-evaluation-nas-eval-module">graphslim.evaluation.nas_eval
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#graphslim-evaluation-utils-module">graphslim.evaluation.utils
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#graphslim-evaluation-vis-module">graphslim.evaluation.vis
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.evaluation.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.models.html">graphslim.models
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.appnp">graphslim.models.appnp
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.appnp.APPNP"><code
+                                                                class="docutils literal notranslate"><span class="pre">APPNP</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.appnp.APPNP.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">APPNP.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.appnp.APPNP.forward_sampler"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">APPNP.forward_sampler()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.appnp.APPNP.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">APPNP.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.appnp.SparseDropout"><code
+                                                                class="docutils literal notranslate"><span class="pre">SparseDropout</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.appnp.SparseDropout.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SparseDropout.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.appnp.SparseDropout.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SparseDropout.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.base">graphslim.models.base
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.base.BaseGNN"><code
+                                                                class="docutils literal notranslate"><span class="pre">BaseGNN</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.fit_with_val"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.fit_with_val()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.initialize"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.initialize()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.predict"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.predict()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.test"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.test()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.base.BaseGNN.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">BaseGNN.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.cheby">graphslim.models.cheby
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.cheby.Cheby"><code
+                                                                class="docutils literal notranslate"><span class="pre">Cheby</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.cheby.Cheby.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">Cheby.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.gat">graphslim.models.gat
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.gat.GAT"><code
+                                                                class="docutils literal notranslate"><span class="pre">GAT</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.gat.GAT.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GAT.forward()</span></code></a></li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.gat.GAT.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GAT.training</span></code></a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.gcn">graphslim.models.gcn
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.gcn.GCN"><code
+                                                                class="docutils literal notranslate"><span class="pre">GCN</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.gcn.GCN.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GCN.training</span></code></a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#graphslim-models-gntk-module">graphslim.models.gntk
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.graphsage">graphslim.models.graphsage
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.graphsage.GraphSage"><code
+                                                                class="docutils literal notranslate"><span class="pre">GraphSage</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.graphsage.GraphSage.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphSage.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.ignr">graphslim.models.ignr
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.EdgeBlock"><code
+                                                                class="docutils literal notranslate"><span class="pre">EdgeBlock</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.EdgeBlock.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">EdgeBlock.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.EdgeBlock.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">EdgeBlock.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.GraphonLearner"><code
+                                                                class="docutils literal notranslate"><span class="pre">GraphonLearner</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.GraphonLearner.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphonLearner.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.GraphonLearner.inference"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphonLearner.inference()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.GraphonLearner.opt_loss"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphonLearner.opt_loss()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.GraphonLearner.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphonLearner.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.GraphonLearner.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphonLearner.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.Sine"><code
+                                                                class="docutils literal notranslate"><span class="pre">Sine</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.Sine.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">Sine.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.ignr.Sine.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">Sine.training</span></code></a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.get_mgrid"><code
+                                                                class="docutils literal notranslate"><span class="pre">get_mgrid()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.mx_inv"><code
+                                                                class="docutils literal notranslate"><span class="pre">mx_inv()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.mx_inv_sqrt"><code
+                                                                class="docutils literal notranslate"><span class="pre">mx_inv_sqrt()</span></code></a>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.ignr.mx_tr"><code
+                                                                class="docutils literal notranslate"><span class="pre">mx_tr()</span></code></a>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.krr">graphslim.models.krr
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.krr.KernelRidgeRegression"><code
+                                                                class="docutils literal notranslate"><span class="pre">KernelRidgeRegression</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.krr.KernelRidgeRegression.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">KernelRidgeRegression.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.krr.KernelRidgeRegression.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">KernelRidgeRegression.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.layers">graphslim.models.layers
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.layers.ChebConvolution"><code
+                                                                class="docutils literal notranslate"><span class="pre">ChebConvolution</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.ChebConvolution.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">ChebConvolution.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.ChebConvolution.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">ChebConvolution.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.ChebConvolution.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">ChebConvolution.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.layers.GATConv"><code
+                                                                class="docutils literal notranslate"><span class="pre">GATConv</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GATConv.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GATConv.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GATConv.message"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GATConv.message()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GATConv.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GATConv.reset_parameters()</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.layers.GraphConvolution"><code
+                                                                class="docutils literal notranslate"><span class="pre">GraphConvolution</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GraphConvolution.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphConvolution.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GraphConvolution.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphConvolution.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.GraphConvolution.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">GraphConvolution.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.layers.MyLinear"><code
+                                                                class="docutils literal notranslate"><span class="pre">MyLinear</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.MyLinear.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">MyLinear.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.MyLinear.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">MyLinear.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.MyLinear.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">MyLinear.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.layers.SageConvolution"><code
+                                                                class="docutils literal notranslate"><span class="pre">SageConvolution</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.SageConvolution.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SageConvolution.forward()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.SageConvolution.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SageConvolution.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.layers.SageConvolution.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SageConvolution.training</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.parametrized_adj">graphslim.models.parametrized_adj
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.parametrized_adj.PGE"><code
+                                                                class="docutils literal notranslate"><span class="pre">PGE</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.parametrized_adj.PGE.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">PGE.forward()</span></code></a></li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.parametrized_adj.PGE.inference"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">PGE.inference()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.parametrized_adj.PGE.reset_parameters"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">PGE.reset_parameters()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.parametrized_adj.PGE.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">PGE.training</span></code></a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#graphslim-models-prbcd-module">graphslim.models.prbcd
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#graphslim-models-random-attack-module">graphslim.models.random_attack
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#graphslim-models-reparam-module-module">graphslim.models.reparam_module
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.sgc">graphslim.models.sgc
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.sgc.SGC"><code
+                                                                class="docutils literal notranslate"><span class="pre">SGC</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sgc.SGC.forward"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SGC.forward()</span></code></a></li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sgc.SGC.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">SGC.training</span></code></a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#graphslim-models-sgformer-module">graphslim.models.sgformer
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-graphslim.models.sntk">graphslim.models.sntk
+                                                    module</a>
+                                                    <ul>
+                                                        <li class="toctree-l3"><a class="reference internal"
+                                                                                  href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel"><code
+                                                                class="docutils literal notranslate"><span class="pre">StructureBasedNeuralTangentKernel</span></code></a>
+                                                            <ul>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.aggr"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.aggr()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.diag"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.diag()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.nodes_gram"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.nodes_gram()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.sparse_kron"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.sparse_kron()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.training"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.training</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.update_diag"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.update_diag()</span></code></a>
+                                                                </li>
+                                                                <li class="toctree-l4"><a class="reference internal"
+                                                                                          href="graphslim.models.html#graphslim.models.sntk.StructureBasedNeuralTangentKernel.update_sigma"><code
+                                                                        class="docutils literal notranslate"><span
+                                                                        class="pre">StructureBasedNeuralTangentKernel.update_sigma()</span></code></a>
+                                                                </li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.models.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="toctree-l1"><a class="reference internal"
+                                                                  href="graphslim.sparsification.html">graphslim.sparsification
+                                            package</a>
+                                            <ul>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#submodules">Submodules</a>
+                                                </li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-cent-degree-module">graphslim.sparsification.cent_degree
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-cent-pagerank-module">graphslim.sparsification.cent_pagerank
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-coreset-base-module">graphslim.sparsification.coreset_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-edge-sparsification-base-module">graphslim.sparsification.edge_sparsification_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-g-spar-module">graphslim.sparsification.g_spar
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-herding-module">graphslim.sparsification.herding
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-herding-agg-module">graphslim.sparsification.herding_agg
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-kcenter-module">graphslim.sparsification.kcenter
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-kcenter-agg-module">graphslim.sparsification.kcenter_agg
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-kcenter-sample-module">graphslim.sparsification.kcenter_sample
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-local-degree-module">graphslim.sparsification.local_degree
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-model-based-coreset-base-module">graphslim.sparsification.model_based_coreset_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-model-free-coreset-base-module">graphslim.sparsification.model_free_coreset_base
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-random-module">graphslim.sparsification.random
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-random-edge-module">graphslim.sparsification.random_edge
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-rank-degree-module">graphslim.sparsification.rank_degree
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-scan-module">graphslim.sparsification.scan
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-spanning-forest-module">graphslim.sparsification.spanning_forest
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-t-spanner-module">graphslim.sparsification.t_spanner
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#graphslim-sparsification-utils-module">graphslim.sparsification.utils
+                                                    module</a></li>
+                                                <li class="toctree-l2"><a class="reference internal"
+                                                                          href="graphslim.sparsification.html#module-contents">Module
+                                                    contents</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </section>
+                            <section id="submodules">
+                                <h2>Submodules<a class="headerlink" href="#submodules"
+                                                 title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="module-graphslim.configs">
+                                <span id="graphslim-configs-module"></span>
+                                <h2>graphslim.configs module<a class="headerlink" href="#module-graphslim.configs"
+                                                               title="Permalink to this heading"></a></h2>
+                                <p>Configuration</p>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.configs.Obj">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span
+                                            class="pre">graphslim.configs.</span></span><span class="sig-name descname"><span
+                                            class="pre">Obj</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.configs.Obj"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.configs.dict2obj">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span class="pre">dict2obj</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">d</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.configs.dict2obj"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.configs.method_config">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span class="pre">method_config</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.configs.method_config"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.configs.setting_config">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">setting_config</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.configs.setting_config"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.configs.update_from_dict">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">update_from_dict</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">obj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">updates</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.configs.update_from_dict"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                            </section>
+                            <section id="graphslim-train-all-module">
+                                <h2>graphslim.train_all module<a class="headerlink" href="#graphslim-train-all-module"
+                                                                 title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="module-graphslim.utils">
+                                <span id="graphslim-utils-module"></span>
+                                <h2>graphslim.utils module<a class="headerlink" href="#module-graphslim.utils"
+                                                             title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.accuracy">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">accuracy</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">output</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">labels</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.accuracy"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Return accuracy of output compared to labels.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>output</strong> (<em>torch.Tensor</em>) – output from
+                                                        model</p></li>
+                                                    <li><p><strong>labels</strong> (<em>torch.Tensor</em><em>
+                                                        or </em><em>numpy.array</em>) – node labels</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>accuracy</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>float</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.add_feature_noise">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_feature_noise</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">noise_ratio</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">seed</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.add_feature_noise"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.add_feature_noise_test">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_feature_noise_test</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">noise_ratio</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">seed</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.add_feature_noise_test"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.add_mask">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">add_mask</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">dataset</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.add_mask"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>data: ogb-arxiv pyg data format</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.add_self_loops">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_self_loops</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">edge_weight</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">None</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">fill_value</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">1</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num_nodes</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.add_self_loops"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.calc">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">calc</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">gntk</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">feat1</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">feat2</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">diag1</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">diag2</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">A1</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">A2</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.calc"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.check_type">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">check_type</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">var</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">device</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.check_type"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.classification_margin">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">classification_margin</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">output</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">true_label</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.classification_margin"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Calculate classification margin for outputs.
+                                        <cite>probs_true_label - probs_best_second_class</cite></p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>output</strong> (<em>torch.Tensor</em>) – output
+                                                        vector (1 dimension)</p></li>
+                                                    <li><p><strong>true_label</strong> (<em>int</em>) – true label for
+                                                        this node</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>classification margin for this node</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>list</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.compute_alpha">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">compute_alpha</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">n</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">sum_log_degrees</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">d_min</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.compute_alpha"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.compute_log_likelihood">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">compute_log_likelihood</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">n</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">sum_log_degrees</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">d_min</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.compute_log_likelihood"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_adj">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_adj</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mx</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.degree_normalize_adj"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Row-normalize sparse matrix</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_adj_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_adj_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">sparse</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.degree_normalize_adj_tensor"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>degree_normalize_adj_tensor.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_sparse_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_sparse_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">fill_value</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">1</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.degree_normalize_sparse_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>degree_normalize_sparse_tensor.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.degree_sequence_log_likelihood">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_sequence_log_likelihood</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">degree_sequence</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">d_min</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.degree_sequence_log_likelihood"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Compute the (maximum) log likelihood of the Powerlaw distribution fit on a
+                                        degree distribution.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.dense_gcn_norm">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">dense_gcn_norm</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">adj</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">device</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.dense_gcn_norm"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.encode_onehot">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">encode_onehot</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">labels</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.encode_onehot"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Convert label to onehot format.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>labels</strong> (<em>numpy.array</em>) –
+                                                node labels</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>onehot labels</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>numpy.array</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.feature_smoothing">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">feature_smoothing</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">X</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.feature_smoothing"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_degree_squence">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_degree_squence</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.get_degree_squence"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_perf">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_perf</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">output</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">labels</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">mask</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">verbose</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">True</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.get_perf"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>evalute performance for test masked data</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_splits_each_class">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_splits_each_class</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">labels</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">train_size</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.get_splits_each_class"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>We randomly sample n instances for class, where n = train_size.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_train_test">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_train_test</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">nnodes</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">test_size</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.8</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">stratify</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.get_train_test"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>This function returns training and test set without validation.
+                                        It can be used for settings of different label rates.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>nnodes</strong> (<em>int</em>) – number of nodes in
+                                                        total</p></li>
+                                                    <li><p><strong>test_size</strong> (<em>float</em>) – size of test
+                                                        set</p></li>
+                                                    <li><p><strong>stratify</strong> – data is expected to split in a
+                                                        stratified fashion. So stratify should be labels.</p></li>
+                                                    <li><p><strong>seed</strong> (<em>int</em><em> or </em><em>None</em>)
+                                                        – random seed</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p><em>idx_train</em> – node training indices</p></li>
+                                                    <li><p><em>idx_test</em> – node test indices</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_train_test_labelrate">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_train_test_labelrate</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">labels</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">label_rate</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.get_train_test_labelrate"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Get train test according to given label rate.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_train_val_test">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_train_val_test</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">nnodes</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">val_size</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.1</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">test_size</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.8</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">stratify</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.get_train_val_test"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>This setting follows nettack/mettack, where we split the nodes
+                                        into 10% training, 10% validation and 80% testing data</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>nnodes</strong> (<em>int</em>) – number of nodes in
+                                                        total</p></li>
+                                                    <li><p><strong>val_size</strong> (<em>float</em>) – size of
+                                                        validation set</p></li>
+                                                    <li><p><strong>test_size</strong> (<em>float</em>) – size of test
+                                                        set</p></li>
+                                                    <li><p><strong>stratify</strong> – data is expected to split in a
+                                                        stratified fashion. So stratify should be labels.</p></li>
+                                                    <li><p><strong>seed</strong> (<em>int</em><em> or </em><em>None</em>)
+                                                        – random seed</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p><em>idx_train</em> – node training indices</p></li>
+                                                    <li><p><em>idx_val</em> – node validation indices</p></li>
+                                                    <li><p><em>idx_test</em> – node test indices</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.get_train_val_test_gcn">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_train_val_test_gcn</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">labels</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">seed</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.get_train_val_test_gcn"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>This setting follows gcn, where we randomly sample 20 instances for each
+                                        class
+                                        as training data, 500 instances as validation data, 1000 instances as test data.
+                                        Note here we are not using fixed splits. When random seed changes, the splits
+                                        will also change.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>labels</strong> (<em>numpy.array</em>) – node labels
+                                                    </p></li>
+                                                    <li><p><strong>seed</strong> (<em>int</em><em> or </em><em>None</em>)
+                                                        – random seed</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p><em>idx_train</em> – node training indices</p></li>
+                                                    <li><p><em>idx_val</em> – node validation indices</p></li>
+                                                    <li><p><em>idx_test</em> – node test indices</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.index_to_mask">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">index_to_mask</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
+                                            class="pre">size</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.index_to_mask"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.is_identity">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">is_identity</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mx</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">device</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.is_identity"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.is_sparse_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">is_sparse_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">tensor</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.is_sparse_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Check if a tensor is sparse tensor.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>tensor</strong> (<em>torch.Tensor</em>) –
+                                                given tensor</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>whether a tensor is sparse tensor</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>bool</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.loss_acc">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">loss_acc</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">output</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">labels</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">targets</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">avg_loss</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.loss_acc"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.loss_acc_fn_eval">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">loss_acc_fn_eval</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">k_ss</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">k_ts</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">y_support</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">y_target</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">reg</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.loss_acc_fn_eval"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.mask_to_index">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">mask_to_index</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
+                                            class="pre">size</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.mask_to_index"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.maxdegree">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">maxdegree</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.maxdegree"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.normalize_adj">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">normalize_adj</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">device</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'cpu'</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.normalize_adj"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.normalize_adj_sgformer">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_adj_sgformer</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.normalize_adj_sgformer"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Normalize the adjacency matrix. Works for both dense and sparse matrices.</p>
+                                        <p>Args:
+                                            adj (torch.Tensor): The adjacency matrix (either dense or sparse COO).
+                                            device (torch.device): The device to run the normalization on.</p>
+                                        <p>Returns:
+                                            torch.Tensor or SparseTensor: The normalized adjacency matrix.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.normalize_adj_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_adj_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">sparse</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.normalize_adj_tensor"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Normalize adjacency tensor matrix.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.normalize_feature">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_feature</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mx</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.normalize_feature"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Row-normalize sparse matrix or dense matrix</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>mx</strong>
+                                                (<em>scipy.sparse.csr_matrix</em><em> or </em><em>numpy.array</em>) –
+                                                matrix to be normalized</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>normalized matrix</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>scipy.sprase.lil_matrix</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.normalize_sparse_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_sparse_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">fill_value</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">1</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.normalize_sparse_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Normalize sparse tensor. Need to import torch_scatter</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.one_hot">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">one_hot</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">x</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">class_count</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.one_hot"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.one_hot_sfgc">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">one_hot_sfgc</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">x</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num_classes</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">center=True</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">dtype=&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.one_hot_sfgc"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.ravel_multiple_indices">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">ravel_multiple_indices</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">ixs</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">reverse</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.ravel_multiple_indices"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>“Flattens” multiple 2D input indices into indices on the flattened matrix,
+                                        similar to np.ravel_multi_index.
+                                        Does the same as ravel_index but for multiple indices at once.
+                                        :param ixs: The array of n indices that will be flattened.
+                                        :type ixs: array of ints shape (n, 2)
+                                        :param shape: The shape of the corresponding matrix.
+                                        :type shape: list or tuple of ints of length 2</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>The indices on the flattened matrix corresponding
+                                                to the 2D input indices.</p>
+                                            </dd>
+                                            <dt class="field-even">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>array of n ints between 0 and
+                                                shape[0]*shape[1]-1</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.regularization">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">regularization</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">adj</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">eig_real</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.regularization"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.reshape_mx">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">reshape_mx</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mx</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.reshape_mx"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.row_normalize_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">row_normalize_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mx</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.row_normalize_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.seed_everything">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">seed_everything</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">seed</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.seed_everything"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.sparse_gcn_norm">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">sparse_gcn_norm</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.sparse_gcn_norm"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.sparse_mx_to_torch_sparse_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">sparse_mx_to_torch_sparse_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">sparse_mx</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.sparse_mx_to_torch_sparse_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Convert a scipy sparse matrix to a torch sparse tensor.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.sparsity">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">sparsity</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.sparsity"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.sparsity2">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">sparsity2</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.sparsity2"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.tensor2onehot">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">tensor2onehot</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">labels</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.tensor2onehot"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Convert label tensor to label onehot tensor.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>labels</strong> (<em>torch.LongTensor</em>)
+                                                – node labels</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>onehot labels tensor</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>torch.LongTensor</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.to_camel_case">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_camel_case</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">snake_str</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.to_camel_case"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.to_scipy">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_scipy</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">tensor</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.to_scipy"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Convert a dense/sparse tensor to scipy matrix</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.to_tensor">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_tensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="o"><span
+                                            class="pre">*</span></span><span class="n"><span
+                                            class="pre">vars</span></span></em>, <em class="sig-param"><span
+                                            class="o"><span class="pre">**</span></span><span class="n"><span
+                                            class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.to_tensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.unravel_index">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">unravel_index</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
+                                            class="pre">array_shape</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.utils.unravel_index"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.utils.update_sum_log_degrees">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">update_sum_log_degrees</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">sum_log_degrees_before</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">n_old</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">d_old</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">d_new</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">d_min</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.update_sum_log_degrees"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.utils.updated_log_likelihood_for_edge_changes">
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">updated_log_likelihood_for_edge_changes</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">node_pairs</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adjacency_matrix</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">d_min</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.utils.updated_log_likelihood_for_edge_changes"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Adopted from <a class="reference external"
+                                                           href="https://github.com/danielzuegner/nettack">https://github.com/danielzuegner/nettack</a>
+                                    </p>
+                                    </dd>
+                                </dl>
+
+                            </section>
+                            <section id="module-graphslim">
+                                <span id="module-contents"></span>
+                                <h2>Module contents<a class="headerlink" href="#module-graphslim"
+                                                      title="Permalink to this heading"></a></h2>
+                            </section>
+                        </section>
+
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

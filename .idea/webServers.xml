@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="93269cee-7dcb-4c03-b212-ba9421ee0493" name="autodl">
+        <fileTransfer accessType="SFTP" host="connect.cqa1.seetacloud.com" port="55299" sshConfigId="437d42a2-d9c2-482b-a5ee-5f5441a1a6bc" sshConfig="root@connect.cqa1.seetacloud.com:55299 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="75967551-3aad-4fe8-9044-c10aabe2539e" name="hpcc">
+        <fileTransfer accessType="SFTP" host="hpcc-msu-v100" port="22" sshConfigId="da645138-2e04-42e5-a990-89dda5a2bc73" sshConfig="jinwei2@hpcc-msu-v100:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="7228d3ce-af69-49c5-adf2-bf5e149d41cc" name="yangji73">
+        <fileTransfer accessType="SFTP" host="hpcc.msu.edu" port="22" sshConfigId="a0de7093-63ed-469f-be1b-7690999343e7" sshConfig="yangji73@hpcc.msu.edu:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

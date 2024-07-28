@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>graphslim.coarsening package &mdash; GraphSlim documentation</title>
+    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
+    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../" id="documentation_options"
+            src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link href="../genindex.html" rel="index" title="Index"/>
+    <link href="../search.html" rel="search" title="Search"/>
+    <link href="graphslim.condensation.html" rel="next" title="graphslim.condensation package"/>
+    <link href="graphslim.models.html" rel="prev" title="graphslim.models package"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a class="icon icon-home" href="../index.html">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+                        <input name="check_keywords" type="hidden" value="yes"/>
+                        <input name="area" type="hidden" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="current reference internal" href="#">graphslim.coarsening
+                        package</a>
+                        <ul>
+                            <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-affinity-gs-module">graphslim.coarsening.affinity_gs
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-algebraic-jc-module">graphslim.coarsening.algebraic_jc
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-averaging-module">graphslim.coarsening.averaging
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-clustering-module">graphslim.coarsening.clustering
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-clusteringagg-module">graphslim.coarsening.clusteringagg
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-coarsening-base-module">graphslim.coarsening.coarsening_base
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-heavy-edge-module">graphslim.coarsening.heavy_edge
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-kron-module">graphslim.coarsening.kron
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.coarsening.utils">graphslim.coarsening.utils
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.coarsen_matrix"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">coarsen_matrix()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.coarsen_vector"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">coarsen_vector()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.coarsening_quality"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">coarsening_quality()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.contract_variation_edges"><code
+                                            class="docutils literal notranslate"><span class="pre">contract_variation_edges()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.contract_variation_linear"><code
+                                            class="docutils literal notranslate"><span class="pre">contract_variation_linear()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.eig"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">eig()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.generate_test_vectors"><code
+                                            class="docutils literal notranslate"><span class="pre">generate_test_vectors()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.get_S"><code
+                                            class="docutils literal notranslate"><span class="pre">get_S()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.get_coarsening_matrix"><code
+                                            class="docutils literal notranslate"><span class="pre">get_coarsening_matrix()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.get_proximity_measure"><code
+                                            class="docutils literal notranslate"><span class="pre">get_proximity_measure()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.graph_sparsify"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">graph_sparsify()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.kron_coarsening"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">kron_coarsening()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.kron_interpolate"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">kron_interpolate()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.kron_quality"><code
+                                            class="docutils literal notranslate"><span class="pre">kron_quality()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.lift_matrix"><code
+                                            class="docutils literal notranslate"><span class="pre">lift_matrix()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.lift_vector"><code
+                                            class="docutils literal notranslate"><span class="pre">lift_vector()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.matching_greedy"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">matching_greedy()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.matching_optimal"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">matching_optimal()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.maxWeightMatching"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">maxWeightMatching()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.my_graph_multiresolution"><code
+                                            class="docutils literal notranslate"><span class="pre">my_graph_multiresolution()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.coarsening.utils.zero_diag"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">zero_diag()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-variation-cliques-module">graphslim.coarsening.variation_cliques
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-variation-edges-module">graphslim.coarsening.variation_edges
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-variation-neighborhoods-module">graphslim.coarsening.variation_neighborhoods
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#graphslim-coarsening-vng-module">graphslim.coarsening.vng
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal" href="#module-contents">Module
+                                contents</a></li>
+                        </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
+            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+            <a href="../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div aria-label="Page navigation" role="navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li class="breadcrumb-item active">graphslim.coarsening package</li>
+                        <li class="wy-breadcrumbs-aside">
+                            <a href="../_sources/source/graphslim.coarsening.rst.txt" rel="nofollow"> View page
+                                source</a>
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                    <div itemprop="articleBody">
+
+                        <section id="graphslim-coarsening-package">
+                            <h1>graphslim.coarsening package<a class="headerlink" href="#graphslim-coarsening-package"
+                                                               title="Permalink to this heading"></a></h1>
+                            <section id="submodules">
+                                <h2>Submodules<a class="headerlink" href="#submodules"
+                                                 title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="graphslim-coarsening-affinity-gs-module">
+                                <h2>graphslim.coarsening.affinity_gs module<a class="headerlink"
+                                                                              href="#graphslim-coarsening-affinity-gs-module"
+                                                                              title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-algebraic-jc-module">
+                                <h2>graphslim.coarsening.algebraic_jc module<a class="headerlink"
+                                                                               href="#graphslim-coarsening-algebraic-jc-module"
+                                                                               title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-averaging-module">
+                                <h2>graphslim.coarsening.averaging module<a class="headerlink"
+                                                                            href="#graphslim-coarsening-averaging-module"
+                                                                            title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="graphslim-coarsening-clustering-module">
+                                <h2>graphslim.coarsening.clustering module<a class="headerlink"
+                                                                             href="#graphslim-coarsening-clustering-module"
+                                                                             title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-clusteringagg-module">
+                                <h2>graphslim.coarsening.clusteringagg module<a class="headerlink"
+                                                                                href="#graphslim-coarsening-clusteringagg-module"
+                                                                                title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-coarsening-base-module">
+                                <h2>graphslim.coarsening.coarsening_base module<a class="headerlink"
+                                                                                  href="#graphslim-coarsening-coarsening-base-module"
+                                                                                  title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-heavy-edge-module">
+                                <h2>graphslim.coarsening.heavy_edge module<a class="headerlink"
+                                                                             href="#graphslim-coarsening-heavy-edge-module"
+                                                                             title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-kron-module">
+                                <h2>graphslim.coarsening.kron module<a class="headerlink"
+                                                                       href="#graphslim-coarsening-kron-module"
+                                                                       title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="module-graphslim.coarsening.utils">
+                                <span id="graphslim-coarsening-utils-module"></span>
+                                <h2>graphslim.coarsening.utils module<a class="headerlink"
+                                                                        href="#module-graphslim.coarsening.utils"
+                                                                        title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.coarsen_matrix">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">coarsen_matrix</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">W</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">C</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.coarsen_matrix"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Coarsen the input adjacency matrix W using the coarsening matrix C.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>W</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – The original adjacency matrix to
+                                                        be coarsened.</p></li>
+                                                    <li><p><strong>C</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – The coarsening matrix used to
+                                                        reduce the size of the original matrix.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>coarsened_W</strong> – The coarsened
+                                                adjacency matrix obtained after applying the coarsening process.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>scipy.sparse.csr_matrix or numpy.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">scipy.sparse</span> <span class="kn">import</span> <span
+                                                    class="n">csr_matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">W</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">1</span><span class="p">,</span> <span
+                                                        class="mi">0</span><span class="p">,</span> <span
+                                                        class="mi">1</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">0</span><span class="p">,</span> <span
+                                                        class="mi">1</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coarsen_matrix</span><span class="p">(</span><span
+                                                        class="n">W</span><span class="p">,</span> <span
+                                                        class="n">C</span><span class="p">)</span>
+<span class="go">matrix([[0.5, 0.5],</span>
+<span class="go">        [0.5, 0.5]])</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.coarsen_vector">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">coarsen_vector</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">x</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">C</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.coarsen_vector"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Coarsen a vector by applying the square of a matrix and then performing a dot
+                                        product.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>x</strong> (<em>array_like</em>) – Input vector to be
+                                                        coarsened.</p></li>
+                                                    <li><p><strong>C</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – Matrix used to coarsen the
+                                                        vector. The matrix is squared before the dot product is
+                                                        performed.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>The resulting vector after coarsening.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>numpy.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">scipy.sparse</span> <span class="kn">import</span> <span
+                                                    class="n">csr_matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span
+                                                        class="o">.</span><span class="n">array</span><span
+                                                        class="p">([</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">2</span><span
+                                                        class="p">,</span> <span class="mi">3</span><span
+                                                        class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">0</span><span class="p">,</span> <span
+                                                        class="mi">2</span><span class="p">,</span> <span
+                                                        class="mi">0</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">3</span><span
+                                                        class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coarsen_vector</span><span class="p">(</span><span
+                                                        class="n">x</span><span class="p">,</span> <span
+                                                        class="n">C</span><span class="p">)</span>
+<span class="go">array([ 1,  8, 27])</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.coarsening_quality">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">coarsening_quality</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">C</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">kmax</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">30</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">Uk</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">lk</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.coarsening_quality"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Measures the quality of a coarsening.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) – The
+                                                        original graph to be coarsened.</p></li>
+                                                    <li><p><strong>C</strong> (<em>np.array</em>) – The coarsening
+                                                        matrix of shape (n, N).</p></li>
+                                                    <li><p><strong>kmax</strong>
+                                                        (<em>int</em><em>, </em><em>optional</em>) – The maximum number
+                                                        of eigenvalues/eigenvectors to consider. Default is 30.</p></li>
+                                                    <li><p><strong>Uk</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – Precomputed
+                                                        eigenvectors of the graph Laplacian. Default is None.</p></li>
+                                                    <li><p><strong>lk</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – Precomputed
+                                                        eigenvalues of the graph Laplacian. Default is None.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <p><strong>metrics</strong> – A dictionary containing various metrics
+                                                    for coarsening quality:</p>
+                                                <ul class="simple">
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’error_eigenvalue’<span
+                                                                    class="classifier">np.array</span></dt>
+                                                            <dd><p>Relative error of eigenvalues.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’error_subspace’<span class="classifier">np.array</span>
+                                                            </dt>
+                                                            <dd><p>Subspace error.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’error_sintheta’<span class="classifier">np.array</span>
+                                                            </dt>
+                                                            <dd><p>Sine of the principal angles between subspaces.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’angle_matrix’<span class="classifier">np.array</span>
+                                                            </dt>
+                                                            <dd><p>Matrix of angles between eigenvectors.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’r’<span class="classifier">int</span></dt>
+                                                            <dd><p>Reduction ratio.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                    <li>
+                                                        <dl class="simple">
+                                                            <dt>’m’<span class="classifier">int</span></dt>
+                                                            <dd><p>Number of edges in the coarsened graph.</p>
+                                                            </dd>
+                                                        </dl>
+                                                    </li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>dict</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">graphs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">np</span><span
+                                                        class="o">.</span><span class="n">random</span><span
+                                                        class="o">.</span><span class="n">rand</span><span
+                                                        class="p">(</span><span class="mi">10</span><span
+                                                        class="p">,</span> <span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">metrics</span> <span class="o">=</span> <span class="n">coarsening_quality</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">C</span><span
+                                                        class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.coarsening.utils.contract_variation_edges">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">contract_variation_edges</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">A</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">K</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">10</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">r</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.5</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">algorithm</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'greedy'</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.contract_variation_edges"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Perform sequential contraction with local variation and edge-based
+                                        families.</p>
+                                        <p>This is a specialized implementation for the edge-based family, optimized for
+                                            faster performance compared to the general <cite>contract_variation()</cite>
+                                            function.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) – The
+                                                        original graph to be coarsened.</p></li>
+                                                    <li><p><strong>A</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – A matrix used
+                                                        in the subgraph cost function. Default is None.</p></li>
+                                                    <li><p><strong>K</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The number of clusters or partitions. Default is 10.</p></li>
+                                                    <li><p><strong>r</strong>
+                                                        (<em>float</em><em>, </em><em>optional</em>) – The reduction
+                                                        ratio. Default is 0.5.</p></li>
+                                                    <li><p><strong>algorithm</strong> (<em>str</em><em>, </em><em>optional</em>)
+                                                        – The algorithm used for edge contraction. Can be “greedy” or
+                                                        “optimal”. Default is “greedy”.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>coarsening_list</strong> – A list of edges
+                                                to be contracted based on the selected algorithm.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>list</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>This function is designed for edge-based families and works slightly faster
+                                            than
+                                            the <cite>contract_variation()</cite> function, which is more general.</p>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">graphs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span
+                                                        class="o">.</span><span class="n">random</span><span
+                                                        class="o">.</span><span class="n">rand</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">,</span> <span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coarsening_list</span> <span class="o">=</span> <span class="n">contract_variation_edges</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">A</span><span
+                                                        class="p">,</span> <span class="n">K</span><span
+                                                        class="o">=</span><span class="mi">5</span><span
+                                                        class="p">,</span> <span class="n">r</span><span
+                                                        class="o">=</span><span class="mf">0.3</span><span
+                                                        class="p">,</span> <span class="n">algorithm</span><span
+                                                        class="o">=</span><span
+                                                        class="s2">&quot;greedy&quot;</span><span class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.coarsening.utils.contract_variation_linear">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">contract_variation_linear</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">A</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">K</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">10</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">r</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.5</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">mode</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'neighborhood'</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.contract_variation_linear"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Perform sequential contraction with local variation and general families.</p>
+                                        <p>This implementation improves running speed at the expense of being more
+                                            greedy, potentially resulting in slightly larger errors.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) – The
+                                                        original graph to be coarsened.</p></li>
+                                                    <li><p><strong>A</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – A matrix used
+                                                        in the subgraph cost function. If None, it will be computed.
+                                                        Default is None.</p></li>
+                                                    <li><p><strong>K</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The number of clusters or partitions. Default is 10.</p></li>
+                                                    <li><p><strong>r</strong>
+                                                        (<em>float</em><em>, </em><em>optional</em>) – The reduction
+                                                        ratio. Default is 0.5.</p></li>
+                                                    <li><p><strong>mode</strong>
+                                                        (<em>str</em><em>, </em><em>optional</em>) – The mode of
+                                                        contraction. Can be “neighborhood”, “cliques”, “edges”, or
+                                                        “triangles”. Default is “neighborhood”.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>coarsening_list</strong> – A list of node
+                                                sets to be contracted based on the selected mode.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>list</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>This function is designed for general families and aims to speed up the
+                                            process
+                                            by being more greedy, potentially at the cost of higher error.</p>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">graphs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span
+                                                        class="o">.</span><span class="n">random</span><span
+                                                        class="o">.</span><span class="n">rand</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">,</span> <span class="mi">10</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">coarsening_list</span> <span class="o">=</span> <span class="n">contract_variation_linear</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">A</span><span
+                                                        class="p">,</span> <span class="n">K</span><span
+                                                        class="o">=</span><span class="mi">5</span><span
+                                                        class="p">,</span> <span class="n">r</span><span
+                                                        class="o">=</span><span class="mf">0.3</span><span
+                                                        class="p">,</span> <span class="n">mode</span><span
+                                                        class="o">=</span><span
+                                                        class="s2">&quot;neighborhood&quot;</span><span
+                                                        class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.eig">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">eig</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">A</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">order</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'ascend'</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.eig"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Perform eigenvalue decomposition on a symmetric matrix and sort the
+                                        eigenvalues
+                                        and eigenvectors in ascending or descending order.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>A</strong> (<em>np.ndarray</em>) – A symmetric
+                                                        matrix.</p></li>
+                                                    <li><p><strong>order</strong>
+                                                        (<em>str</em><em>, </em><em>optional</em>) – The order in which
+                                                        to sort the eigenvalues and eigenvectors. Can be ‘ascend’
+                                                        (default)
+                                                        for ascending order or ‘descend’ for descending order.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p><strong>X</strong> (<em>np.ndarray</em>) – Matrix of
+                                                        eigenvectors, where each column is an eigenvector.</p></li>
+                                                    <li><p><strong>l</strong> (<em>np.ndarray</em>) – Array of
+                                                        eigenvalues, sorted in the specified order.</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.generate_test_vectors">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">generate_test_vectors</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num_vectors</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">10</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">method</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'Gauss-Seidel'</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">5</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">lambda_cut</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.1</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.generate_test_vectors"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Generate test vectors for graph processing using different iterative
+                                        methods.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) – The input
+                                                        graph.</p></li>
+                                                    <li><p><strong>num_vectors</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The number of test vectors to generate. Default is 10.</p>
+                                                    </li>
+                                                    <li><p><strong>method</strong>
+                                                        (<em>str</em><em>, </em><em>optional</em>) – The iterative
+                                                        method to use for generating the test vectors. Options are
+                                                        “Gauss-Seidel”, “Jacobi”, and “Chebychev”.
+                                                        Default is “Gauss-Seidel”.</p></li>
+                                                    <li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The number of iterations to perform for the iterative methods.
+                                                        Default is 5.</p></li>
+                                                    <li><p><strong>lambda_cut</strong> (<em>float</em><em>, </em><em>optional</em>)
+                                                        – The eigenvalue cutoff for the Chebychev method. Default is
+                                                        0.1.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>X</strong> – An array containing the
+                                                generated test vectors.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">graphs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X</span> <span class="o">=</span> <span class="n">generate_test_vectors</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">num_vectors</span><span
+                                                        class="o">=</span><span class="mi">5</span><span
+                                                        class="p">,</span> <span class="n">method</span><span class="o">=</span><span
+                                                        class="s2">&quot;Jacobi&quot;</span><span
+                                                        class="p">,</span> <span class="n">iterations</span><span
+                                                        class="o">=</span><span class="mi">10</span><span
+                                                        class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.get_S">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_S</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.get_S"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Construct the N x E gradient matrix S.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) –
+                                                The input graph.</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>S</strong> – The gradient matrix of shape
+                                                (N, E), where N is the number of nodes
+                                                and E is the number of edges.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.get_coarsening_matrix">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_coarsening_matrix</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">partitioning</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.get_coarsening_matrix"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Build the coarsening matrix C for a given graph G based on the specified
+                                        partitioning.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>Graph</em>) – The graph to be
+                                                        coarsened. The graph should have an attribute <cite>N</cite>
+                                                        representing the number of nodes.</p></li>
+                                                    <li><p><strong>partitioning</strong> (<em>list</em><em> of </em><em>lists</em>)
+                                                        – A list of subgraphs, where each subgraph is represented as a
+                                                        list of node indices to be contracted.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>C</strong> – The coarsening matrix.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>scipy.sparse.csc_matrix</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Example</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">gsp.graphs</span> <span class="kn">import</span> <span
+                                                    class="n">sensor</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">sensor</span><span class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">partitioning</span> <span class="o">=</span> <span
+                                                        class="p">[[</span><span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">2</span><span class="p">,</span> <span
+                                                        class="mi">3</span><span class="p">,</span> <span
+                                                        class="mi">4</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">5</span><span
+                                                        class="p">,</span> <span class="mi">6</span><span
+                                                        class="p">,</span> <span class="mi">7</span><span
+                                                        class="p">,</span> <span class="mi">8</span><span
+                                                        class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">get_coarsening_matrix</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">partitioning</span><span
+                                                        class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.get_proximity_measure">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_proximity_measure</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">name</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">K</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">10</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.get_proximity_measure"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Calculate a proximity measure for edges in the graph based on various
+                                        heuristics.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graphs.Graph</em>) – The input
+                                                        graph.</p></li>
+                                                    <li><p><strong>name</strong> (<em>str</em>) – The name of the
+                                                        proximity measure to be calculated. Options include
+                                                        “heavy_edge”, “algebraic_JC”,
+                                                        “affinity_GS”, “heavy_edge_degree”, “min_expected_loss”,
+                                                        “min_expected_gradient_loss”, “rss”, “rss_lanczos”,
+                                                        “rss_cheby”, “algebraic_GS”.</p></li>
+                                                    <li><p><strong>K</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The number of clusters or partitions. Default is 10.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>proximity</strong> – An array containing
+                                                the proximity measure for each edge in the graph.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.array</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">graphs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="mi">20</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">proximity</span> <span class="o">=</span> <span class="n">get_proximity_measure</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span
+                                                        class="s2">&quot;heavy_edge&quot;</span><span class="p">,</span> <span
+                                                        class="n">K</span><span class="o">=</span><span
+                                                        class="mi">5</span><span class="p">)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.graph_sparsify">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">graph_sparsify</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">M</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">epsilon</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">maxiter</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">10</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.graph_sparsify"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Sparsifies a graph by sampling edges based on their resistance distance.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>M</strong> (<em>pygsp.graph</em><em> or </em><em>scipy.sparse
+                                                        matrix</em>) – The graph or its Laplacian matrix to be
+                                                        sparsified.</p></li>
+                                                    <li><p><strong>epsilon</strong> (<em>float</em>) – Sparsification
+                                                        parameter, should be in the range [1/sqrt(N), 1).</p></li>
+                                                    <li><p><strong>maxiter</strong> (<em>int</em>) – Maximum number of
+                                                        iterations for the sparsification process.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>Mnew</strong> – The sparsified graph or
+                                                its Laplacian matrix.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>pygsp.graph or scipy.sparse matrix</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.kron_coarsening">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">kron_coarsening</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">G</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">r</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">0.5</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">m</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">None</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.kron_coarsening"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Perform Kronecker coarsening on a graph G.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graph</em>) – The input graph.
+                                                    </p></li>
+                                                    <li><p><strong>r</strong>
+                                                        (<em>float</em><em>, </em><em>optional</em>) – The coarsening
+                                                        ratio (r = 1 - n/N). Default is 0.5.</p></li>
+                                                    <li><p><strong>m</strong> (<em>int</em><em>, </em><em>optional</em>)
+                                                        – The target number of edges for sparsification. Default is
+                                                        None.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p><strong>Gc</strong> (<em>pygsp.graph</em>) – The coarsened
+                                                        graph.</p></li>
+                                                    <li><p><strong>Gs[0]</strong> (<em>pygsp.graph</em>) – The original
+                                                        graph.</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>If the coarsening fails, the function returns (None, None).</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.kron_interpolate">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">kron_interpolate</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">Gc</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">x</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.kron_interpolate"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Interpolates a signal from the coarse graph to the original graph.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graph</em>) – The original
+                                                        graph.</p></li>
+                                                    <li><p><strong>Gc</strong> (<em>pygsp.graph</em>) – The coarsened
+                                                        graph.</p></li>
+                                                    <li><p><strong>x</strong> (<em>np.array</em>) – The signal defined
+                                                        on the coarse graph nodes.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>The interpolated signal on the original graph
+                                                nodes.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.array</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>The function uses the interpolation method from the reduction module.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.kron_quality">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">kron_quality</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">Gc</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">kmax</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">30</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">Uk</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">lk</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.kron_quality"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Evaluate the quality of Kronecker coarsening.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graph</em>) – The original
+                                                        graph.</p></li>
+                                                    <li><p><strong>Gc</strong> (<em>pygsp.graph</em>) – The coarsened
+                                                        graph.</p></li>
+                                                    <li><p><strong>kmax</strong>
+                                                        (<em>int</em><em>, </em><em>optional</em>) – The maximum number
+                                                        of eigenvalues/eigenvectors to consider. Default is 30.</p></li>
+                                                    <li><p><strong>Uk</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – Precomputed
+                                                        eigenvectors of the original graph. Default is None.</p></li>
+                                                    <li><p><strong>lk</strong>
+                                                        (<em>np.array</em><em>, </em><em>optional</em>) – Precomputed
+                                                        eigenvalues of the original graph. Default is None.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>metrics</strong> – A dictionary containing
+                                                various quality metrics of the coarsening.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>dict</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>The function may fail, indicated by metrics[‘failed’] being True.</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.lift_matrix">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">lift_matrix</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">W</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">C</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.lift_matrix"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Lift the input adjacency matrix W using the lifting matrix C.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>W</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – The original adjacency matrix to
+                                                        be lifted.</p></li>
+                                                    <li><p><strong>C</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – The lifting matrix used to expand
+                                                        the size of the original matrix.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>lifted_W</strong> – The lifted adjacency
+                                                matrix obtained after applying the lifting process.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>scipy.sparse.csr_matrix or numpy.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">scipy.sparse</span> <span class="kn">import</span> <span
+                                                    class="n">csr_matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">W</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">1</span><span class="p">,</span> <span
+                                                        class="mi">0</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">0</span><span class="p">,</span> <span
+                                                        class="mi">1</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lift_matrix</span><span class="p">(</span><span
+                                                        class="n">W</span><span class="p">,</span> <span
+                                                        class="n">C</span><span class="p">)</span>
+<span class="go">matrix([[0., 1., 0.],</span>
+<span class="go">        [1., 0., 1.],</span>
+<span class="go">        [0., 1., 0.]])</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.lift_vector">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">lift_vector</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">input_vector</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">C</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.lift_vector"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Lift a vector by applying a transformation involving a matrix and its
+                                        pseudoinverse.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>input_vector</strong> (<em>array_like</em>) – Input
+                                                        vector to be lifted.</p></li>
+                                                    <li><p><strong>C</strong> (<em>scipy.sparse.csr_matrix</em><em>
+                                                        or </em><em>array_like</em>) – Matrix used in the lifting
+                                                        process. A pseudoinverse transformation is applied to this
+                                                        matrix.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>The resulting vector after lifting.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>numpy.ndarray</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <p>The function creates a diagonal matrix <cite>D</cite> based on the inverse of
+                                            the sum of <cite>C</cite> along the columns.
+                                            It then computes <cite>Pinv</cite>, the transpose of the product of
+                                            <cite>C</cite> and <cite>D</cite>. The final lifted vector is obtained
+                                            by performing a dot product of <cite>Pinv</cite> and the input vector.</p>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">scipy.sparse</span> <span class="kn">import</span> <span
+                                                    class="n">csr_matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span
+                                                        class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">input_vector</span> <span class="o">=</span> <span
+                                                        class="n">np</span><span class="o">.</span><span
+                                                        class="n">array</span><span class="p">([</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">2</span><span
+                                                        class="p">,</span> <span class="mi">3</span><span
+                                                        class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">C</span> <span class="o">=</span> <span class="n">csr_matrix</span><span
+                                                        class="p">([[</span><span class="mi">1</span><span
+                                                        class="p">,</span> <span class="mi">2</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">],</span> <span class="p">[</span><span
+                                                        class="mi">0</span><span class="p">,</span> <span
+                                                        class="mi">1</span><span class="p">,</span> <span
+                                                        class="mi">3</span><span class="p">],</span> <span
+                                                        class="p">[</span><span class="mi">4</span><span
+                                                        class="p">,</span> <span class="mi">0</span><span
+                                                        class="p">,</span> <span class="mi">1</span><span
+                                                        class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lift_vector</span><span class="p">(</span><span class="n">input_vector</span><span
+                                                        class="p">,</span> <span class="n">C</span><span
+                                                        class="p">)</span>
+<span class="go">array([0.57142857, 0.14285714, 0.85714286])</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.matching_greedy">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">matching_greedy</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">G</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">weights</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">r</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.4</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.matching_greedy"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Generates a matching greedily by selecting at each iteration the edge
+                                        with the largest weight and then removing all adjacent edges from the
+                                        candidate set.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp graph</em>) – The input graph.
+                                                    </p></li>
+                                                    <li><p><strong>weights</strong>
+                                                        (<em>np.array</em><em>(</em><em>M</em><em>)</em>) – A weight for
+                                                        each edge.</p></li>
+                                                    <li><p><strong>r</strong>
+                                                        (<em>float</em><em>, </em><em>optional</em>) – The desired
+                                                        dimensionality reduction (r = 1 - n/N). Default is 0.4.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>matching</strong> – An array of shape (k,
+                                                2) where each row represents a matched pair of nodes.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.array</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <ul class="simple">
+                                            <li><p>The complexity of this algorithm is O(M).</p></li>
+                                            <li><p>Depending on G, the algorithm might fail to return ratios &gt;
+                                                0.3.</p></li>
+                                        </ul>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.matching_optimal">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">matching_optimal</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">weights</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">r</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.4</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.matching_optimal"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Generates a matching optimally with the objective of minimizing the total
+                                        weight of all edges in the matching.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp graph</em>) – The input graph.
+                                                    </p></li>
+                                                    <li><p><strong>weights</strong>
+                                                        (<em>np.array</em><em>(</em><em>M</em><em>)</em>) – A weight for
+                                                        each edge.</p></li>
+                                                    <li><p><strong>r</strong>
+                                                        (<em>float</em><em>, </em><em>optional</em>) – The desired
+                                                        dimensionality reduction (ratio = 1 - n/N). Default is 0.4.</p>
+                                                    </li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>matching</strong> – An array of shape (k,
+                                                2) where each row represents a matched pair of nodes.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.array</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Notes</p>
+                                        <ul class="simple">
+                                            <li><p>The complexity of this algorithm is O(N^3).</p></li>
+                                            <li><p>Depending on G, the algorithm might fail to return ratios &gt;
+                                                0.3.</p></li>
+                                        </ul>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.maxWeightMatching">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">maxWeightMatching</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">edges</span></span></em>, <em class="sig-param"><span class="n"><span
+                                            class="pre">maxcardinality</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span
+                                            class="sig-paren">)</span><a class="headerlink"
+                                                                         href="#graphslim.coarsening.utils.maxWeightMatching"
+                                                                         title="Permalink to this definition"></a></dt>
+                                    <dd><p>Compute a maximum-weighted matching in the general undirected
+                                        weighted graph given by “edges”. If “maxcardinality” is true,
+                                        only maximum-cardinality matchings are considered as solutions.</p>
+                                        <p>Edges is a sequence of tuples (i, j, wt) describing an undirected
+                                            edge between vertex i and vertex j with weight wt. There is at most
+                                            one edge between any two vertices; no vertex has an edge to itself.
+                                            Vertices are identified by consecutive, non-negative integers.</p>
+                                        <p>Return a list “mate”, such that mate[i] == j if vertex i is
+                                            matched to vertex j, and mate[i] == -1 if vertex i is not matched.</p>
+                                        <p>This function takes time O(n ** 3).</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.coarsening.utils.my_graph_multiresolution">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">my_graph_multiresolution</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">G</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">levels</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">r</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">0.5</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">sparsify</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">sparsify_eps</span></span><span class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">downsampling_method</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'largest_eigenvector'</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">reduction_method</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">'kron'</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">compute_full_eigen</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">reg_eps</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">0.005</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink"
+                                            href="#graphslim.coarsening.utils.my_graph_multiresolution"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Compute a pyramid of graphs (by Kron reduction).</p>
+                                        <p>‘my_graph_multiresolution(G, levels)’ computes a multiresolution of
+                                            a graph by repeatedly downsampling and performing graph reduction. The
+                                            default downsampling method is the largest eigenvector method based on
+                                            the polarity of the components of the eigenvector associated with the
+                                            largest graph Laplacian eigenvalue. The default graph reduction method
+                                            is Kron reduction followed by a graph sparsification step.
+                                            <em>param</em> is a structure of optional parameters.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>G</strong> (<em>pygsp.graph</em>) – The graph to
+                                                        reduce.</p></li>
+                                                    <li><p><strong>levels</strong> (<em>int</em>) – Number of levels of
+                                                        decomposition.</p></li>
+                                                    <li><p><strong>r</strong> (<em>float</em>) – Dimensionality
+                                                        reduction ratio (default is 0.5).</p></li>
+                                                    <li><p><strong>sparsify</strong> (<em>bool</em>) – Whether to
+                                                        perform a spectral sparsification step immediately after
+                                                        the graph reduction (default is True).</p></li>
+                                                    <li><p><strong>sparsify_eps</strong> (<em>float</em>) – Parameter
+                                                        epsilon used in the spectral sparsification
+                                                        (default is min(10/sqrt(G.N), 0.3)).</p></li>
+                                                    <li><p><strong>downsampling_method</strong> (<em>string</em>) – The
+                                                        graph downsampling method (default is ‘largest_eigenvector’).
+                                                    </p></li>
+                                                    <li><p><strong>reduction_method</strong> (<em>string</em>) – The
+                                                        graph reduction method (default is ‘kron’).</p></li>
+                                                    <li><p><strong>compute_full_eigen</strong> (<em>bool</em>) – Whether
+                                                        to compute the graph Laplacian eigenvalues and eigenvectors
+                                                        for every graph in the multiresolution sequence (default is
+                                                        False).</p></li>
+                                                    <li><p><strong>reg_eps</strong> (<em>float</em>) – The regularized
+                                                        graph Laplacian is L + epsilon * I.
+                                                        A smaller epsilon may lead to better regularization, but will
+                                                        also
+                                                        require a higher order Chebyshev approximation (default is
+                                                        0.005).</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>Gs</strong> – A list of graph layers.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>list</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span
+                                                    class="nn">pygsp</span> <span class="kn">import</span> <span
+                                                    class="n">reduction</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">levels</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span
+                                                        class="n">graphs</span><span class="o">.</span><span class="n">Sensor</span><span
+                                                        class="p">(</span><span class="n">N</span><span
+                                                        class="o">=</span><span class="mi">512</span><span
+                                                        class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">compute_fourier_basis</span><span
+                                                        class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Gs</span> <span class="o">=</span> <span class="n">my_graph_multiresolution</span><span
+                                                        class="p">(</span><span class="n">G</span><span
+                                                        class="p">,</span> <span class="n">levels</span><span class="p">,</span> <span
+                                                        class="n">sparsify</span><span class="o">=</span><span
+                                                        class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">idx</span> <span
+                                                        class="ow">in</span> <span class="nb">range</span><span
+                                                        class="p">(</span><span class="n">levels</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">Gs</span><span class="p">[</span><span class="n">idx</span><span
+                                                        class="p">]</span><span class="o">.</span><span class="n">plotting</span><span
+                                                        class="p">[</span><span
+                                                        class="s1">&#39;plot_name&#39;</span><span
+                                                        class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Reduction level: </span><span
+                                                        class="si">{}</span><span class="s1">&#39;</span><span
+                                                        class="o">.</span><span class="n">format</span><span
+                                                        class="p">(</span><span class="n">idx</span><span
+                                                        class="p">)</span>
+<span class="gp">... </span>    <span class="n">Gs</span><span class="p">[</span><span class="n">idx</span><span
+                                                        class="p">]</span><span class="o">.</span><span
+                                                        class="n">plot</span><span class="p">()</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.coarsening.utils.zero_diag">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.coarsening.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">zero_diag</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">A</span></span></em><span class="sig-paren">)</span><a
+                                            class="headerlink" href="#graphslim.coarsening.utils.zero_diag"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Set the diagonal elements of a matrix to zero.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>A</strong> (<em>np.ndarray</em><em>
+                                                or </em><em>scipy.sparse matrix</em>) – The input matrix.</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>A</strong> – The matrix with diagonal
+                                                elements set to zero.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>np.ndarray or scipy.sparse matrix</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                            </section>
+                            <section id="graphslim-coarsening-variation-cliques-module">
+                                <h2>graphslim.coarsening.variation_cliques module<a class="headerlink"
+                                                                                    href="#graphslim-coarsening-variation-cliques-module"
+                                                                                    title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-variation-edges-module">
+                                <h2>graphslim.coarsening.variation_edges module<a class="headerlink"
+                                                                                  href="#graphslim-coarsening-variation-edges-module"
+                                                                                  title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-variation-neighborhoods-module">
+                                <h2>graphslim.coarsening.variation_neighborhoods module<a class="headerlink"
+                                                                                          href="#graphslim-coarsening-variation-neighborhoods-module"
+                                                                                          title="Permalink to this heading"></a>
+                                </h2>
+                            </section>
+                            <section id="graphslim-coarsening-vng-module">
+                                <h2>graphslim.coarsening.vng module<a class="headerlink"
+                                                                      href="#graphslim-coarsening-vng-module"
+                                                                      title="Permalink to this heading"></a></h2>
+                            </section>
+                            <section id="module-contents">
+                                <h2>Module contents<a class="headerlink" href="#module-contents"
+                                                      title="Permalink to this heading"></a></h2>
+                            </section>
+                        </section>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+                        <a accesskey="p" class="btn btn-neutral float-left"
+                           href="graphslim.models.html" rel="prev" title="graphslim.models package"><span
+                                aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+                        <a accesskey="n" class="btn btn-neutral float-right"
+                           href="graphslim.condensation.html" rel="next" title="graphslim.condensation package">Next <span
+                                aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+                    </div>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>GraphSlim &mdash; GraphSlim documentation</title>
+    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
+    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../" id="documentation_options"
+            src="../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link href="../genindex.html" rel="index" title="Index"/>
+    <link href="../search.html" rel="search" title="Search"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a class="icon icon-home" href="../index.html">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
+                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+                        <input name="check_keywords" type="hidden" value="yes"/>
+                        <input name="area" type="hidden" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
+            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+            <a href="../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div aria-label="Page navigation" role="navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li class="breadcrumb-item active">GraphSlim</li>
+                        <li class="wy-breadcrumbs-aside">
+                            <a href="../_sources/source/modules.rst.txt" rel="nofollow"> View page source</a>
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                    <div itemprop="articleBody">
+
+                        <section id="graphslim">
+                            <h1>GraphSlim<a class="headerlink" href="#graphslim" title="Permalink to this heading"></a>
+                            </h1>
+                            <div class="toctree-wrapper compound">
+                                <ul>
+                                    <li class="toctree-l1"><a class="reference internal" href="graphslim.html">graphslim
+                                        package</a>
+                                        <ul>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#subpackages">Subpackages</a>
+                                                <ul>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.coarsening.html">graphslim.coarsening
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-affinity-gs-module">graphslim.coarsening.affinity_gs
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-algebraic-jc-module">graphslim.coarsening.algebraic_jc
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-averaging-module">graphslim.coarsening.averaging
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-clustering-module">graphslim.coarsening.clustering
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-clusteringagg-module">graphslim.coarsening.clusteringagg
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-coarsening-base-module">graphslim.coarsening.coarsening_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-heavy-edge-module">graphslim.coarsening.heavy_edge
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-kron-module">graphslim.coarsening.kron
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#module-graphslim.coarsening.utils">graphslim.coarsening.utils
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-variation-cliques-module">graphslim.coarsening.variation_cliques
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-variation-edges-module">graphslim.coarsening.variation_edges
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-variation-neighborhoods-module">graphslim.coarsening.variation_neighborhoods
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#graphslim-coarsening-vng-module">graphslim.coarsening.vng
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.coarsening.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.condensation.html">graphslim.condensation
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-doscond-module">graphslim.condensation.doscond
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-doscondx-module">graphslim.condensation.doscondx
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-gcond-module">graphslim.condensation.gcond
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-gcond-base-module">graphslim.condensation.gcond_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-gcondx-module">graphslim.condensation.gcondx
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-gcsntk-module">graphslim.condensation.gcsntk
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-geom-module">graphslim.condensation.geom
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-msgc-module">graphslim.condensation.msgc
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-sfgc-module">graphslim.condensation.sfgc
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-sgdd-module">graphslim.condensation.sgdd
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#graphslim-condensation-utils-module">graphslim.condensation.utils
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.condensation.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.dataset.html">graphslim.dataset
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#graphslim-dataset-attack-module">graphslim.dataset.attack
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#graphslim-dataset-convertor-module">graphslim.dataset.convertor
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#graphslim-dataset-loader-module">graphslim.dataset.loader
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#graphslim-dataset-utils-module">graphslim.dataset.utils
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.dataset.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.evaluation.html">graphslim.evaluation
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#graphslim-evaluation-eval-agent-module">graphslim.evaluation.eval_agent
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#graphslim-evaluation-nas-eval-module">graphslim.evaluation.nas_eval
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#graphslim-evaluation-utils-module">graphslim.evaluation.utils
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#graphslim-evaluation-vis-module">graphslim.evaluation.vis
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.evaluation.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.models.html">graphslim.models
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.appnp">graphslim.models.appnp
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.base">graphslim.models.base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.cheby">graphslim.models.cheby
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.gat">graphslim.models.gat
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.gcn">graphslim.models.gcn
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#graphslim-models-gntk-module">graphslim.models.gntk
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.graphsage">graphslim.models.graphsage
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.ignr">graphslim.models.ignr
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.krr">graphslim.models.krr
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.layers">graphslim.models.layers
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.parametrized_adj">graphslim.models.parametrized_adj
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#graphslim-models-prbcd-module">graphslim.models.prbcd
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#graphslim-models-random-attack-module">graphslim.models.random_attack
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#graphslim-models-reparam-module-module">graphslim.models.reparam_module
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.sgc">graphslim.models.sgc
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#graphslim-models-sgformer-module">graphslim.models.sgformer
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-graphslim.models.sntk">graphslim.models.sntk
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.models.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.sparsification.html">graphslim.sparsification
+                                                        package</a>
+                                                        <ul>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#submodules">Submodules</a>
+                                                            </li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-cent-degree-module">graphslim.sparsification.cent_degree
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-cent-pagerank-module">graphslim.sparsification.cent_pagerank
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-coreset-base-module">graphslim.sparsification.coreset_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-edge-sparsification-base-module">graphslim.sparsification.edge_sparsification_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-g-spar-module">graphslim.sparsification.g_spar
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-herding-module">graphslim.sparsification.herding
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-herding-agg-module">graphslim.sparsification.herding_agg
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-kcenter-module">graphslim.sparsification.kcenter
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-kcenter-agg-module">graphslim.sparsification.kcenter_agg
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-kcenter-sample-module">graphslim.sparsification.kcenter_sample
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-local-degree-module">graphslim.sparsification.local_degree
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-model-based-coreset-base-module">graphslim.sparsification.model_based_coreset_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-model-free-coreset-base-module">graphslim.sparsification.model_free_coreset_base
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-random-module">graphslim.sparsification.random
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-random-edge-module">graphslim.sparsification.random_edge
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-rank-degree-module">graphslim.sparsification.rank_degree
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-scan-module">graphslim.sparsification.scan
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-spanning-forest-module">graphslim.sparsification.spanning_forest
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-t-spanner-module">graphslim.sparsification.t_spanner
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#graphslim-sparsification-utils-module">graphslim.sparsification.utils
+                                                                module</a></li>
+                                                            <li class="toctree-l4"><a class="reference internal"
+                                                                                      href="graphslim.sparsification.html#module-contents">Module
+                                                                contents</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#submodules">Submodules</a>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#module-graphslim.configs">graphslim.configs
+                                                module</a>
+                                                <ul>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.configs.Obj"><code
+                                                            class="docutils literal notranslate"><span
+                                                            class="pre">Obj</span></code></a></li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.configs.dict2obj"><code
+                                                            class="docutils literal notranslate"><span class="pre">dict2obj()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.configs.method_config"><code
+                                                            class="docutils literal notranslate"><span class="pre">method_config()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.configs.setting_config"><code
+                                                            class="docutils literal notranslate"><span class="pre">setting_config()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.configs.update_from_dict"><code
+                                                            class="docutils literal notranslate"><span class="pre">update_from_dict()</span></code></a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#graphslim-train-all-module">graphslim.train_all
+                                                module</a></li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#module-graphslim.utils">graphslim.utils
+                                                module</a>
+                                                <ul>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.accuracy"><code
+                                                            class="docutils literal notranslate"><span class="pre">accuracy()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.add_feature_noise"><code
+                                                            class="docutils literal notranslate"><span class="pre">add_feature_noise()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.add_feature_noise_test"><code
+                                                            class="docutils literal notranslate"><span class="pre">add_feature_noise_test()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.add_mask"><code
+                                                            class="docutils literal notranslate"><span class="pre">add_mask()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.add_self_loops"><code
+                                                            class="docutils literal notranslate"><span class="pre">add_self_loops()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.calc"><code
+                                                            class="docutils literal notranslate"><span class="pre">calc()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.check_type"><code
+                                                            class="docutils literal notranslate"><span class="pre">check_type()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.classification_margin"><code
+                                                            class="docutils literal notranslate"><span class="pre">classification_margin()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.compute_alpha"><code
+                                                            class="docutils literal notranslate"><span class="pre">compute_alpha()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.compute_log_likelihood"><code
+                                                            class="docutils literal notranslate"><span class="pre">compute_log_likelihood()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.degree_normalize_adj"><code
+                                                            class="docutils literal notranslate"><span class="pre">degree_normalize_adj()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.degree_normalize_adj_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">degree_normalize_adj_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.degree_normalize_sparse_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">degree_normalize_sparse_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.degree_sequence_log_likelihood"><code
+                                                            class="docutils literal notranslate"><span class="pre">degree_sequence_log_likelihood()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.dense_gcn_norm"><code
+                                                            class="docutils literal notranslate"><span class="pre">dense_gcn_norm()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.encode_onehot"><code
+                                                            class="docutils literal notranslate"><span class="pre">encode_onehot()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.feature_smoothing"><code
+                                                            class="docutils literal notranslate"><span class="pre">feature_smoothing()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_degree_squence"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_degree_squence()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_perf"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_perf()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_splits_each_class"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_splits_each_class()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_train_test"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_train_test()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_train_test_labelrate"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_train_test_labelrate()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_train_val_test"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_train_val_test()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.get_train_val_test_gcn"><code
+                                                            class="docutils literal notranslate"><span class="pre">get_train_val_test_gcn()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.index_to_mask"><code
+                                                            class="docutils literal notranslate"><span class="pre">index_to_mask()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.is_identity"><code
+                                                            class="docutils literal notranslate"><span class="pre">is_identity()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.is_sparse_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">is_sparse_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.loss_acc"><code
+                                                            class="docutils literal notranslate"><span class="pre">loss_acc()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.loss_acc_fn_eval"><code
+                                                            class="docutils literal notranslate"><span class="pre">loss_acc_fn_eval()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.mask_to_index"><code
+                                                            class="docutils literal notranslate"><span class="pre">mask_to_index()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.maxdegree"><code
+                                                            class="docutils literal notranslate"><span class="pre">maxdegree()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.normalize_adj"><code
+                                                            class="docutils literal notranslate"><span class="pre">normalize_adj()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.normalize_adj_sgformer"><code
+                                                            class="docutils literal notranslate"><span class="pre">normalize_adj_sgformer()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.normalize_adj_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">normalize_adj_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.normalize_feature"><code
+                                                            class="docutils literal notranslate"><span class="pre">normalize_feature()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.normalize_sparse_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">normalize_sparse_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.one_hot"><code
+                                                            class="docutils literal notranslate"><span class="pre">one_hot()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.one_hot_sfgc"><code
+                                                            class="docutils literal notranslate"><span class="pre">one_hot_sfgc()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.ravel_multiple_indices"><code
+                                                            class="docutils literal notranslate"><span class="pre">ravel_multiple_indices()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.regularization"><code
+                                                            class="docutils literal notranslate"><span class="pre">regularization()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.reshape_mx"><code
+                                                            class="docutils literal notranslate"><span class="pre">reshape_mx()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.row_normalize_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">row_normalize_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.seed_everything"><code
+                                                            class="docutils literal notranslate"><span class="pre">seed_everything()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.sparse_gcn_norm"><code
+                                                            class="docutils literal notranslate"><span class="pre">sparse_gcn_norm()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.sparse_mx_to_torch_sparse_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">sparse_mx_to_torch_sparse_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.sparsity"><code
+                                                            class="docutils literal notranslate"><span class="pre">sparsity()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.sparsity2"><code
+                                                            class="docutils literal notranslate"><span class="pre">sparsity2()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.tensor2onehot"><code
+                                                            class="docutils literal notranslate"><span class="pre">tensor2onehot()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.to_camel_case"><code
+                                                            class="docutils literal notranslate"><span class="pre">to_camel_case()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.to_scipy"><code
+                                                            class="docutils literal notranslate"><span class="pre">to_scipy()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.to_tensor"><code
+                                                            class="docutils literal notranslate"><span class="pre">to_tensor()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.unravel_index"><code
+                                                            class="docutils literal notranslate"><span class="pre">unravel_index()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.update_sum_log_degrees"><code
+                                                            class="docutils literal notranslate"><span class="pre">update_sum_log_degrees()</span></code></a>
+                                                    </li>
+                                                    <li class="toctree-l3"><a class="reference internal"
+                                                                              href="graphslim.html#graphslim.utils.updated_log_likelihood_for_edge_changes"><code
+                                                            class="docutils literal notranslate"><span class="pre">updated_log_likelihood_for_edge_changes()</span></code></a>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li class="toctree-l2"><a class="reference internal"
+                                                                      href="graphslim.html#module-graphslim">Module
+                                                contents</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l1"><a class="reference internal" href="setup.html">setup
+                                        module</a></li>
+                                </ul>
+                            </div>
+                        </section>
+
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

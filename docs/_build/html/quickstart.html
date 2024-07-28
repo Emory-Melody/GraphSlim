@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Quick Start &mdash; GraphSlim documentation</title>
+    <link href="_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
+    <link href="_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="_static/jquery.js?v=5d32c60e"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link href="genindex.html" rel="index" title="Index"/>
+    <link href="search.html" rel="search" title="Search"/>
+    <link href="source/graphslim.models.html" rel="next" title="graphslim.models package"/>
+    <link href="installation.html" rel="prev" title="Installation"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a class="icon icon-home" href="index.html">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form action="search.html" class="wy-form" id="rtd-search-form" method="get">
+                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
+                        <input name="check_keywords" type="hidden" value="yes"/>
+                        <input name="area" type="hidden" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="current reference internal" href="#">Quick Start</a>
+                        <ul>
+                            <li class="toctree-l2"><a class="reference internal" href="#online-demo">Online demo</a>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal" href="#examples">Examples</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal" href="source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
+        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
+            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+            <a href="index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div aria-label="Page navigation" role="navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a aria-label="Home" class="icon icon-home" href="index.html"></a></li>
+                        <li class="breadcrumb-item active">Quick Start</li>
+                        <li class="wy-breadcrumbs-aside">
+                            <a href="_sources/quickstart.md.txt" rel="nofollow"> View page source</a>
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                    <div itemprop="articleBody">
+
+                        <section id="quick-start">
+                            <h1>Quick Start<a class="headerlink" href="#quick-start"
+                                              title="Permalink to this heading"></a></h1>
+                            <section id="online-demo">
+                                <h2>Online demo<a class="headerlink" href="#online-demo"
+                                                  title="Permalink to this heading"></a></h2>
+                                <p>You can run our examples at <a class="reference internal" href="#"><span
+                                        class="xref myst">Collab</span></a></p>
+                            </section>
+                            <section id="examples">
+                                <h2>Examples<a class="headerlink" href="#examples"
+                                               title="Permalink to this heading"></a></h2>
+                                <div class="highlight-shell notranslate">
+                                    <div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_node_sparsification.py
+</pre>
+                                    </div>
+                                </div>
+                                <p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">kcenter</span></code>
+                                    method.</p>
+                                <div class="highlight-shell notranslate">
+                                    <div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_coarsen.py
+</pre>
+                                    </div>
+                                </div>
+                                <p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">variation_neighborhoods</span></code>
+                                    as coarsening method.</p>
+                                <div class="highlight-shell notranslate">
+                                    <div class="highlight"><pre><span></span>python<span class="w"> </span>examples/train_condense.py
+</pre>
+                                    </div>
+                                </div>
+                                <p>It will defaultly adopt <code class="docutils literal notranslate"><span class="pre">GCond</span></code>
+                                    as coarsening method.
+                                    t</p>
+                            </section>
+                        </section>
+
+
+                    </div>
+                </div>
+                <footer>
+                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+                        <a accesskey="p" class="btn btn-neutral float-left" href="installation.html" rel="prev"
+                           title="Installation"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span>
+                            Previous</a>
+                        <a accesskey="n" class="btn btn-neutral float-right"
+                           href="source/graphslim.models.html" rel="next" title="graphslim.models package">Next <span
+                                aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+                    </div>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>
