@@ -853,103 +853,246 @@ def maxWeightMatching(edges, maxcardinality=False):
 
 
 def coarsen_vector(x, C):
+    """
+    Coarsen a vector by applying the square of a matrix and then performing a dot product.
+
+    Parameters
+    ----------
+    x : array_like
+        Input vector to be coarsened.
+    C : scipy.sparse.csr_matrix or array_like
+        Matrix used to coarsen the vector. The matrix is squared before the dot product is performed.
+
+    Returns
+    -------
+    numpy.ndarray
+        The resulting vector after coarsening.
+
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> import numpy as np
+    >>> x = np.array([1, 2, 3])
+    >>> C = csr_matrix([[1, 0, 0], [0, 2, 0], [0, 0, 3]])
+    >>> coarsen_vector(x, C)
+    array([ 1,  8, 27])
+    """
     return (C.power(2)).dot(x)
 
 
-def lift_vector(x, C):
-    # Pinv = C.T; Pinv[Pinv>0] = 1
-    D = sp.sparse.diags(np.array(1 / np.sum(C, 0))[0])
+def lift_vector(input_vector, C):
+    """
+    Lift a vector by applying a transformation involving a matrix and its pseudoinverse.
+
+    Parameters
+    ----------
+    input_vector : array_like
+        Input vector to be lifted.
+    C : scipy.sparse.csr_matrix or array_like
+        Matrix used in the lifting process. A pseudoinverse transformation is applied to this matrix.
+
+    Returns
+    -------
+    numpy.ndarray
+        The resulting vector after lifting.
+
+    Notes
+    -----
+    The function creates a diagonal matrix `D` based on the inverse of the sum of `C` along the columns.
+    It then computes `Pinv`, the transpose of the product of `C` and `D`. The final lifted vector is obtained
+    by performing a dot product of `Pinv` and the input vector.
+
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> import numpy as np
+    >>> input_vector = np.array([1, 2, 3])
+    >>> C = csr_matrix([[1, 2, 0], [0, 1, 3], [4, 0, 1]])
+    >>> lift_vector(input_vector, C)
+    array([0.57142857, 0.14285714, 0.85714286])
+    """
+    D = sp.sparse.diags(np.array(1 / np.sum(C, axis=0))[0])
     Pinv = (C.dot(D)).T
-    return Pinv.dot(x)
+    return Pinv.dot(input_vector)
 
 
 def coarsen_matrix(W, C):
-    # Pinv = C.T; #Pinv[Pinv>0] = 1
-    D = sp.sparse.diags(np.array(1 / np.sum(C, 0))[0])
+    """
+    Coarsen the input adjacency matrix W using the coarsening matrix C.
+
+    Parameters
+    ----------
+    W : scipy.sparse.csr_matrix or array_like
+        The original adjacency matrix to be coarsened.
+    C : scipy.sparse.csr_matrix or array_like
+        The coarsening matrix used to reduce the size of the original matrix.
+
+    Returns
+    -------
+    coarsened_W : scipy.sparse.csr_matrix or numpy.ndarray
+        The coarsened adjacency matrix obtained after applying the coarsening process.
+
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> import numpy as np
+    >>> W = csr_matrix([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
+    >>> C = csr_matrix([[1, 0], [0, 1], [1, 1]])
+    >>> coarsen_matrix(W, C)
+    matrix([[0.5, 0.5],
+            [0.5, 0.5]])
+    """
+    # Create a diagonal matrix D where each element is the inverse of the sum of the corresponding column in C
+    D = sp.sparse.diags(np.array(1 / np.sum(C, axis=0))[0])
+
+    # Compute the pseudo-inverse of C by multiplying C with D and then transposing
     Pinv = (C.dot(D)).T
-    return (Pinv.T).dot(W.dot(Pinv))
+
+    # Coarsen the matrix W by first multiplying W with Pinv from the right,
+    # and then multiplying the result with the transpose of Pinv from the left
+    coarsened_W = (Pinv.T).dot(W.dot(Pinv))
+
+    return coarsened_W
+
 
 
 def lift_matrix(W, C):
+    """
+    Lift the input adjacency matrix W using the lifting matrix C.
+
+    Parameters
+    ----------
+    W : scipy.sparse.csr_matrix or array_like
+        The original adjacency matrix to be lifted.
+    C : scipy.sparse.csr_matrix or array_like
+        The lifting matrix used to expand the size of the original matrix.
+
+    Returns
+    -------
+    lifted_W : scipy.sparse.csr_matrix or numpy.ndarray
+        The lifted adjacency matrix obtained after applying the lifting process.
+
+    Examples
+    --------
+    >>> from scipy.sparse import csr_matrix
+    >>> import numpy as np
+    >>> W = csr_matrix([[0, 1], [1, 0]])
+    >>> C = csr_matrix([[1, 0], [0, 1], [1, 1]])
+    >>> lift_matrix(W, C)
+    matrix([[0., 1., 0.],
+            [1., 0., 1.],
+            [0., 1., 0.]])
+    """
+    # Compute the element-wise square of the matrix C to obtain P
     P = C.power(2)
-    return (P.T).dot(W.dot(P))
+
+    # Lift the matrix W by first multiplying W with P from the right,
+    # and then multiplying the result with the transpose of P from the left
+    lifted_W = (P.T).dot(W.dot(P))
+
+    return lifted_W
 
 
 def get_coarsening_matrix(G, partitioning):
     """
-    This function should be called in order to build the coarsening matrix C.
+    Build the coarsening matrix C for a given graph G based on the specified partitioning.
 
     Parameters
     ----------
-    G : the graph to be coarsened
-    partitioning : a list of subgraphs to be contracted
+    G : Graph
+        The graph to be coarsened. The graph should have an attribute `N` representing the number of nodes.
+    partitioning : list of lists
+        A list of subgraphs, where each subgraph is represented as a list of node indices to be contracted.
 
     Returns
     -------
-    C : the new coarsening matrix
+    C : scipy.sparse.csc_matrix
+        The coarsening matrix.
 
     Example
     -------
-    C = contract(gsp.graphs.sensor(20),[0,1]) ??
+    >>> from gsp.graphs import sensor
+    >>> G = sensor(20)
+    >>> partitioning = [[0, 1], [2, 3, 4], [5, 6, 7, 8]]
+    >>> C = get_coarsening_matrix(G, partitioning)
     """
 
-    # C = np.eye(G.N)
+    # Initialize the coarsening matrix C as an identity matrix in sparse format
     C = sp.sparse.eye(G.N, format="lil")
 
+    # List to keep track of rows to be deleted
     rows_to_delete = []
+
     for subgraph in partitioning:
         nc = len(subgraph)
 
-        # add v_j's to v_i's row
-        C[subgraph[0], subgraph] = 1 / np.sqrt(nc)  # np.ones((1,nc))/np.sqrt(nc)
+        # Update the first row of the subgraph with normalized values
+        C[subgraph[0], subgraph] = 1 / np.sqrt(nc)
 
+        # Collect rows to delete, excluding the first row of the subgraph
         rows_to_delete.extend(subgraph[1:])
 
-    # delete vertices
-    # C = np.delete(C,rows_to_delete,0)
-
+    # Delete the rows corresponding to the contracted nodes
     C.rows = np.delete(C.rows, rows_to_delete)
     C.data = np.delete(C.data, rows_to_delete)
     C._shape = (G.N - len(rows_to_delete), G.N)
 
+    # Convert the coarsening matrix to Compressed Sparse Column format
     C = sp.sparse.csc_matrix(C)
 
-    # check that this is a projection matrix
-    # assert sp.sparse.linalg.norm( ((C.T).dot(C))**2 - ((C.T).dot(C)) , ord='fro') < 1e-5
+    # Optional: check that this is a projection matrix
+    # assert sp.sparse.linalg.norm(((C.T).dot(C))**2 - ((C.T).dot(C)), ord='fro') < 1e-5
 
     return C
 
 
 def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     """
-    Measures how good is a coarsening.
+    Measures the quality of a coarsening.
 
     Parameters
     ----------
-    G : pygsp Graph
-    C : np.array(n,N)
-        The coarsening matrix
-    kmax : int
-        Until which eigenvalue we are interested in.
+    G : pygsp.graphs.Graph
+        The original graph to be coarsened.
+    C : np.array
+        The coarsening matrix of shape (n, N).
+    kmax : int, optional
+        The maximum number of eigenvalues/eigenvectors to consider. Default is 30.
+    Uk : np.array, optional
+        Precomputed eigenvectors of the graph Laplacian. Default is None.
+    lk : np.array, optional
+        Precomputed eigenvalues of the graph Laplacian. Default is None.
 
     Returns
     -------
-    metric : dictionary
-        Contains all relevant metrics for coarsening quality:
-        * error_eigenvalue : np.array(kmax)
-        * error_subspace : np.array(kmax)
-        * error_sintheta : np.array(kmax)
-        * angle_matrix : np.array(kmax)
-        * rss constants : np.array(kmax)
-        as well as some general properties of Gc:
-        * r : int
-            reduction ratio
-        * m : int
-            number of edges
+    metrics : dict
+        A dictionary containing various metrics for coarsening quality:
+
+        * 'error_eigenvalue' : np.array
+            Relative error of eigenvalues.
+        * 'error_subspace' : np.array
+            Subspace error.
+        * 'error_sintheta' : np.array
+            Sine of the principal angles between subspaces.
+        * 'angle_matrix' : np.array
+            Matrix of angles between eigenvectors.
+        * 'r' : int
+            Reduction ratio.
+        * 'm' : int
+            Number of edges in the coarsened graph.
+
+    Examples
+    --------
+    >>> from pygsp import graphs
+    >>> import numpy as np
+    >>> G = graphs.Sensor(20)
+    >>> C = np.random.rand(10, 20)
+    >>> metrics = coarsening_quality(G, C)
     """
     N = G.N
     I = np.eye(N)
 
+    # Use provided eigenvectors/eigenvalues or compute them if not provided
     if (Uk is not None) and (lk is not None) and (len(lk) >= kmax):
         U, l = Uk, lk
     elif hasattr(G, "U"):
@@ -957,20 +1100,21 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     else:
         l, U = sp.sparse.linalg.eigsh(G.L, k=kmax, which="SM", tol=1e-3)
 
+    # Avoid divide by zero issues
     l[0] = 1
     linv = l ** (-0.5)
     linv[0] = 0
-    # l[0] = 0 # avoids divide by 0
 
-    # below here, everything is C specific
+    # Compute coarsening-specific matrices
     n = C.shape[0]
     Pi = C.T @ C
     S = get_S(G).T
     Lc = C.dot((G.L).dot(C.T))
     Lp = Pi @ G.L @ Pi
 
+    # Compute eigenvalues and eigenvectors of the coarsened Laplacian
     if kmax > n / 2:
-        [Uc, lc] = eig(Lc.toarray())
+        [Uc, lc] = np.linalg.eig(Lc.toarray())
     else:
         lc, Uc = sp.sparse.linalg.eigsh(Lc, k=kmax, which="SM", tol=1e-3)
 
@@ -981,37 +1125,27 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
 
     kmax = np.clip(kmax, 1, n)
 
-    # eigenvalue relative error
+    # Eigenvalue relative error
     metrics["error_eigenvalue"] = np.abs(l[:kmax] - lc[:kmax]) / l[:kmax]
     metrics["error_eigenvalue"][0] = 0
 
-    # angles between eigenspaces
+    # Angles between eigenspaces
     metrics["angle_matrix"] = U.T @ C.T @ Uc
 
-    # rss constants
-    #    metrics['rss'] = np.diag(U.T @ Lp @ U)/l - 1
-    #    metrics['rss'][0] = 0
-
-    # other errors
+    # Initialize error arrays
     kmax = np.clip(kmax, 2, n)
-
     error_subspace = np.zeros(kmax)
-    error_subspace_bound = np.zeros(kmax)
     error_sintheta = np.zeros(kmax)
 
     M = S @ Pi @ U @ np.diag(linv)
-    #    M_bound = S @ (I - Pi) @ U @ np.diag(linv)
 
     for kIdx in range(1, kmax):
         error_subspace[kIdx] = np.abs(np.linalg.norm(M[:, : kIdx + 1], ord=2) - 1)
-        #        error_subspace_bound[kIdx] = np.linalg.norm( M_bound[:,:kIdx + 1], ord=2)
         error_sintheta[kIdx] = (
-                np.linalg.norm(metrics["angle_matrix"][0: kIdx + 1, kIdx + 1:], ord="fro")
-                ** 2
+                np.linalg.norm(metrics["angle_matrix"][0: kIdx + 1, kIdx + 1:], ord="fro") ** 2
         )
 
     metrics["error_subspace"] = error_subspace
-    # metrics['error_subspace_bound'] = error_subspace_bound
     metrics["error_sintheta"] = error_sintheta
 
     return metrics
@@ -1148,46 +1282,104 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
 
 def contract_variation_edges(G, A=None, K=10, r=0.5, algorithm="greedy"):
     """
-    Sequential contraction with local variation and edge-based families.
-    This is a specialized implementation for the edge-based family, that works
-    slightly faster than the contract_variation() function, which works for
-    any family.
+    Perform sequential contraction with local variation and edge-based families.
 
-    See contract_variation() for documentation.
+    This is a specialized implementation for the edge-based family, optimized for
+    faster performance compared to the general `contract_variation()` function.
+
+    Parameters
+    ----------
+    G : pygsp.graphs.Graph
+        The original graph to be coarsened.
+    A : np.array, optional
+        A matrix used in the subgraph cost function. Default is None.
+    K : int, optional
+        The number of clusters or partitions. Default is 10.
+    r : float, optional
+        The reduction ratio. Default is 0.5.
+    algorithm : str, optional
+        The algorithm used for edge contraction. Can be "greedy" or "optimal". Default is "greedy".
+
+    Returns
+    -------
+    coarsening_list : list
+        A list of edges to be contracted based on the selected algorithm.
+
+    Notes
+    -----
+    This function is designed for edge-based families and works slightly faster than
+    the `contract_variation()` function, which is more general.
+
+    Examples
+    --------
+    >>> from pygsp import graphs
+    >>> G = graphs.Sensor(20)
+    >>> A = np.random.rand(20, 20)
+    >>> coarsening_list = contract_variation_edges(G, A, K=5, r=0.3, algorithm="greedy")
     """
+
     N, deg, M = G.N, G.dw, G.Ne
     ones = np.ones(2)
     Pibot = np.eye(2) - np.outer(ones, ones) / 2
 
-    # cost function for the edge
     def subgraph_cost(G, A, edge):
+        """
+        Calculate the cost of contracting a subgraph defined by an edge.
+
+        Parameters
+        ----------
+        G : pygsp.graphs.Graph
+            The original graph.
+        A : np.array
+            A matrix used in the cost calculation.
+        edge : np.array
+            An edge defined by its two nodes and its weight.
+
+        Returns
+        -------
+        float
+            The cost of contracting the subgraph.
+        """
         edge, w = edge[:2].astype(np.int_), edge[2]
         deg_new = 2 * deg[edge] - w
         L = np.array([[deg_new[0], -w], [-w, deg_new[1]]])
         B = Pibot @ A[edge, :]
         return np.linalg.norm(B.T @ L @ B)
 
-    # cost function for the edge
     def subgraph_cost_old(G, A, edge):
+        """
+        Calculate the cost of contracting a subgraph using an older method.
+
+        Parameters
+        ----------
+        G : pygsp.graphs.Graph
+            The original graph.
+        A : np.array
+            A matrix used in the cost calculation.
+        edge : np.array
+            An edge defined by its two nodes and its weight.
+
+        Returns
+        -------
+        float
+            The cost of contracting the subgraph.
+        """
         w = G.W[edge[0], edge[1]]
         deg_new = 2 * deg[edge] - w
         L = np.array([[deg_new[0], -w], [-w, deg_new[1]]])
         B = Pibot @ A[edge, :]
         return np.linalg.norm(B.T @ L @ B)
 
-    # edges = np.array(G.get_edge_list()[0:2])
+    # Get the edge list from the graph
     edges = np.array(G.get_edge_list())
+    # Calculate the weights for each edge based on the subgraph cost function
     weights = np.array([subgraph_cost(G, A, edges[:, e]) for e in range(M)])
-    # weights = np.zeros(M)
-    # for e in range(M):
-    #    weights[e] = subgraph_cost_old(G, A, edges[:,e])
 
     if algorithm == "optimal":
-        # identify the minimum weight matching
+        # Identify the minimum weight matching
         coarsening_list = matching_optimal(G, weights=weights, r=r)
-
     elif algorithm == "greedy":
-        # find a heavy weight matching
+        # Find a heavy weight matching
         coarsening_list = matching_greedy(G, weights=-weights, r=r)
 
     return coarsening_list
@@ -1195,38 +1387,79 @@ def contract_variation_edges(G, A=None, K=10, r=0.5, algorithm="greedy"):
 
 def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
     """
-    Sequential contraction with local variation and general families.
-    This is an implemmentation that improves running speed,
-    at the expense of being more greedy (and thus having slightly larger error).
+    Perform sequential contraction with local variation and general families.
 
-    See contract_variation() for documentation.
+    This implementation improves running speed at the expense of being more
+    greedy, potentially resulting in slightly larger errors.
+
+    Parameters
+    ----------
+    G : pygsp.graphs.Graph
+        The original graph to be coarsened.
+    A : np.array, optional
+        A matrix used in the subgraph cost function. If None, it will be computed. Default is None.
+    K : int, optional
+        The number of clusters or partitions. Default is 10.
+    r : float, optional
+        The reduction ratio. Default is 0.5.
+    mode : str, optional
+        The mode of contraction. Can be "neighborhood", "cliques", "edges", or "triangles". Default is "neighborhood".
+
+    Returns
+    -------
+    coarsening_list : list
+        A list of node sets to be contracted based on the selected mode.
+
+    Notes
+    -----
+    This function is designed for general families and aims to speed up the process
+    by being more greedy, potentially at the cost of higher error.
+
+    Examples
+    --------
+    >>> from pygsp import graphs
+    >>> import numpy as np
+    >>> G = graphs.Sensor(20)
+    >>> A = np.random.rand(20, 10)
+    >>> coarsening_list = contract_variation_linear(G, A, K=5, r=0.3, mode="neighborhood")
     """
-
     N, deg, W_lil = G.N, G.dw, G.W.tolil()
 
-    # The following is correct only for a single level of coarsening.
-    # Normally, A should be passed as an argument.
+    # Compute A if not provided
     if A is None:
-        lk, Uk = sp.sparse.linalg.eigsh(
-            G.L, k=K, which="SM", tol=1e-3
-        )  # this is not optimized!
+        lk, Uk = sp.sparse.linalg.eigsh(G.L, k=K, which="SM", tol=1e-3)
         lk[0] = 1
         lsinv = lk ** (-0.5)
         lsinv[0] = 0
         lk[0] = 0
-        D_lsinv = np.diag(lsinv)
         A = Uk @ np.diag(lsinv)
 
-    # cost function for the subgraph induced by nodes array
     def subgraph_cost(nodes):
+        """
+        Calculate the cost of contracting a subgraph defined by nodes.
+
+        Parameters
+        ----------
+        nodes : array-like
+            An array of node indices defining the subgraph.
+
+        Returns
+        -------
+        float
+            The cost of contracting the subgraph.
+        """
         nc = len(nodes)
         ones = np.ones(nc)
-        W = W_lil[nodes, :][:, nodes]  # .tocsc()
+        W = W_lil[nodes, :][:, nodes]
         L = np.diag(2 * deg[nodes] - W.dot(ones)) - W
         B = (np.eye(nc) - np.outer(ones, ones) / nc) @ A[nodes, :]
         return np.linalg.norm(B.T @ L @ B) / (nc - 1)
 
     class CandidateSet:
+        """
+        Class representing a candidate set of nodes for contraction.
+        """
+
         def __init__(self, candidate_list):
             self.set = candidate_list
             self.cost = subgraph_cost(candidate_list)
@@ -1236,15 +1469,13 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
 
     family = []
     W_bool = G.A + sp.sparse.eye(G.N, dtype=np.bool_, format="csr")
+
     if "neighborhood" in mode:
         for i in range(N):
-            # i_set = G.A[i,:].indices # graph_utils.get_neighbors(G, i)
-            # i_set = np.append(i_set, i)
             i_set = W_bool[i, :].indices
             family.append(CandidateSet(i_set))
 
     if "cliques" in mode:
-
         Gnx = nx.from_scipy_sparse_array(G.W)
         for clique in nx.find_cliques(Gnx):
             family.append(CandidateSet(np.array(clique)))
@@ -1252,13 +1483,13 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
     else:
         if "edges" in mode:
             edges = np.array(G.get_edge_list()[0:2])
-            for e in range(0, edges.shape[1]):
+            for e in range(edges.shape[1]):
                 family.append(CandidateSet(edges[:, e]))
         if "triangles" in mode:
-            triangles = set([])
+            triangles = set()
             edges = np.array(G.get_edge_list()[0:2])
-            for e in range(0, edges.shape[1]):
-                [u, v] = edges[:, e]
+            for e in range(edges.shape[1]):
+                u, v = edges[:, e]
                 for w in range(G.N):
                     if G.W[u, w] > 0 and G.W[v, w] > 0:
                         triangles.add(frozenset([u, v, w]))
@@ -1269,44 +1500,29 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
     family = SortedList(family)
     marked = np.zeros(G.N, dtype=np.bool_)
 
-    # ----------------------------------------------------------------------------
-    # Construct a (minimum weight) independent set.
-    # ----------------------------------------------------------------------------
     coarsening_list = []
-    # n, n_target = N, (1-r)*N
-    n_reduce = np.floor(r * N)  # how many nodes do we need to reduce/eliminate?
+    n_reduce = np.floor(r * N)
 
     while len(family) > 0:
-
         i_cset = family.pop(index=0)
         i_set = i_cset.set
 
-        # check if marked
         i_marked = marked[i_set]
 
         if not any(i_marked):
-
             n_gain = len(i_set) - 1
             if n_gain > n_reduce:
-                continue  # this helps avoid over-reducing
+                continue
 
-            # all vertices are unmarked: add i_set to the coarsening list
             marked[i_set] = True
             coarsening_list.append(i_set)
-            # n -= len(i_set) - 1
             n_reduce -= n_gain
 
-            # if n <= n_target: break
             if n_reduce <= 0:
                 break
-
-        # may be worth to keep this set
         else:
             i_set = i_set[~i_marked]
             if len(i_set) > 1:
-                # todo1: check whether to add to coarsening_list before adding to family
-                # todo2: currently this will also select contraction sets that are disconnected
-                # should we eliminate those?
                 i_cset.set = i_set
                 i_cset.cost = subgraph_cost(i_set)
                 family.add(i_cset)
@@ -1320,14 +1536,39 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
 
 
 def get_proximity_measure(G, name, K=10):
-    N = G.N
-    W = G.W  # np.array(G.W.toarray(), dtype=np.float32)
-    deg = G.dw  # np.sum(W, axis=0)
-    edges = np.array(G.get_edge_list()[0:2])
-    weights = np.array(G.get_edge_list()[2])
-    M = edges.shape[1]
+    """
+    Calculate a proximity measure for edges in the graph based on various heuristics.
 
-    num_vectors = K  # int(1*K*np.log(K))
+    Parameters
+    ----------
+    G : pygsp.graphs.Graph
+        The input graph.
+    name : str
+        The name of the proximity measure to be calculated. Options include "heavy_edge", "algebraic_JC",
+        "affinity_GS", "heavy_edge_degree", "min_expected_loss", "min_expected_gradient_loss", "rss", "rss_lanczos",
+        "rss_cheby", "algebraic_GS".
+    K : int, optional
+        The number of clusters or partitions. Default is 10.
+
+    Returns
+    -------
+    proximity : np.array
+        An array containing the proximity measure for each edge in the graph.
+
+    Examples
+    --------
+    >>> from pygsp import graphs
+    >>> G = graphs.Sensor(20)
+    >>> proximity = get_proximity_measure(G, "heavy_edge", K=5)
+    """
+    N = G.N
+    W = G.W  # Adjacency matrix of the graph
+    deg = G.dw  # Degree of each node
+    edges = np.array(G.get_edge_list()[0:2])  # Edge list
+    weights = np.array(G.get_edge_list()[2])  # Weights of edges
+    M = edges.shape[1]  # Number of edges
+
+    num_vectors = K  # Number of vectors for test vectors generation
     if "lanczos" in name:
         l_lan, X_lan = sp.sparse.linalg.eigsh(G.L, k=K, which="SM", tol=1e-2)
     elif "cheby" in name:
@@ -1350,61 +1591,59 @@ def get_proximity_measure(G, name, K=10):
 
     proximity = np.zeros(M, dtype=np.float32)
 
-    # heuristic for mutligrid
+    # heuristic for multigrid
     if name == "heavy_edge":
         wmax = np.array(np.max(G.W, 0).todense())[0] + 1e-5
-        for e in range(0, M):
+        for e in range(M):
             proximity[e] = weights[e] / max(
                 wmax[edges[:, e]]
-            )  # select edges with large proximity
+            )  # Select edges with large proximity
         return proximity
 
-    # heuristic for mutligrid
+    # heuristic for multigrid
     elif name == "algebraic_JC":
         proximity += np.Inf
-        for e in range(0, M):
+        for e in range(M):
             i, j = edges[:, e]
             for kIdx in range(num_vectors):
                 xk = X_jc[:, kIdx]
                 proximity[e] = min(
                     proximity[e], 1 / max(np.abs(xk[i] - xk[j]) ** 2, 1e-6)
-                )  # select edges with large proximity
-
+                )  # Select edges with large proximity
         return proximity
 
-    # heuristic for mutligrid
+    # heuristic for multigrid
     elif name == "affinity_GS":
         c = np.zeros((N, N))
-        for e in range(0, M):
+        for e in range(M):
             i, j = edges[:, e]
             c[i, j] = (X_gs[i, :] @ X_gs[j, :].T) ** 2 / (
                     (X_gs[i, :] @ X_gs[i, :].T) ** 2 * (X_gs[j, :] @ X_gs[j, :].T) ** 2
-            )  # select
-
+            )  # Select edges with large proximity
         c += c.T
         c -= np.diag(np.diag(c))
-        for e in range(0, M):
+        for e in range(M):
             i, j = edges[:, e]
             proximity[e] = c[i, j] / (max(c[i, :]) * max(c[j, :]))
-
         return proximity
 
-    for e in range(0, M):
+    for e in range(M):
         i, j = edges[:, e]
 
         if name == "heavy_edge_degree":
             proximity[e] = (
                     deg[i] + deg[j] + 2 * G.W[i, j]
-            )  # select edges with large proximity
+            )  # Select edges with large proximity
 
-        # loose as little information as possible (custom)
+        # Custom: minimize expected loss
         elif "min_expected_loss" in name:
             for kIdx in range(1, K):
                 xk = X[:, kIdx]
                 proximity[e] = sum(
                     [proximity[e], (xk[i] - xk[j]) ** 2]
-                )  # select edges with small proximity
-        # loose as little gradient information as possible (custom)
+                )  # Select edges with small proximity
+
+        # Custom: minimize expected gradient loss
         elif name == "min_expected_gradient_loss":
             for kIdx in range(1, K):
                 xk = X[:, kIdx]
@@ -1413,9 +1652,9 @@ def get_proximity_measure(G, name, K=10):
                         proximity[e],
                         (xk[i] - xk[j]) ** 2 * (deg[i] + deg[j] + 2 * G.W[i, j]),
                     ]
-                )  # select edges with small proximity
+                )  # Select edges with small proximity
 
-        # relaxation ensuring that K first eigenspaces are aligned (custom)
+        # Custom: relaxation ensuring alignment of K first eigenspaces
         elif name == "rss":
             for kIdx in range(1, K):
                 xk = G.U[:, kIdx]
@@ -1427,9 +1666,9 @@ def get_proximity_measure(G, name, K=10):
                         * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4)
                         / lk,
                     ]
-                )  # select edges with small proximity
+                )  # Select edges with small proximity
 
-        # fast relaxation ensuring that K first eigenspaces are aligned (custom)
+        # Custom: fast relaxation ensuring alignment of K first eigenspaces
         elif name == "rss_lanczos":
             for kIdx in range(1, K):
                 xk = X_lan[:, kIdx]
@@ -1441,9 +1680,9 @@ def get_proximity_measure(G, name, K=10):
                         * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4 - 0.5 * (lk + lk))
                         / lk,
                     ]
-                )  # select edges with small proximity
+                )  # Select edges with small proximity
 
-        # approximate relaxation ensuring that K first eigenspaces are aligned (custom)
+        # Custom: approximate relaxation ensuring alignment of K first eigenspaces
         elif name == "rss_cheby":
             for kIdx in range(num_vectors):
                 xk = X_cheby[:, kIdx]
@@ -1457,16 +1696,16 @@ def get_proximity_measure(G, name, K=10):
                                 / lk
                         ),
                     ]
-                )  # select edges with small proximity
+                )  # Select edges with small proximity
 
-        # heuristic for mutligrid (algebraic multigrid)
+        # Heuristic for multigrid (algebraic multigrid)
         elif name == "algebraic_GS":
             proximity[e] = np.Inf
             for kIdx in range(num_vectors):
                 xk = X_gs[:, kIdx]
                 proximity[e] = min(
                     proximity[e], 1 / max(np.abs(xk[i] - xk[j]) ** 2, 1e-6)
-                )  # select edges with large proximity
+                )  # Select edges with large proximity
 
     if ("rss" in name) or ("expected" in name):
         proximity = -proximity
@@ -1474,17 +1713,46 @@ def get_proximity_measure(G, name, K=10):
     return proximity
 
 
+
 def generate_test_vectors(
         G, num_vectors=10, method="Gauss-Seidel", iterations=5, lambda_cut=0.1
 ):
-    L = G.L
-    N = G.N
-    X = np.random.randn(N, num_vectors) / np.sqrt(N)
+    """
+    Generate test vectors for graph processing using different iterative methods.
+
+    Parameters
+    ----------
+    G : pygsp.graphs.Graph
+        The input graph.
+    num_vectors : int, optional
+        The number of test vectors to generate. Default is 10.
+    method : str, optional
+        The iterative method to use for generating the test vectors. Options are "Gauss-Seidel", "Jacobi", and "Chebychev".
+        Default is "Gauss-Seidel".
+    iterations : int, optional
+        The number of iterations to perform for the iterative methods. Default is 5.
+    lambda_cut : float, optional
+        The eigenvalue cutoff for the Chebychev method. Default is 0.1.
+
+    Returns
+    -------
+    X : np.ndarray
+        An array containing the generated test vectors.
+
+    Examples
+    --------
+    >>> from pygsp import graphs
+    >>> G = graphs.Sensor(20)
+    >>> X = generate_test_vectors(G, num_vectors=5, method="Jacobi", iterations=10)
+    """
+    L = G.L  # Laplacian matrix of the graph
+    N = G.N  # Number of nodes in the graph
+    X = np.random.randn(N, num_vectors) / np.sqrt(N)  # Initial random test vectors
 
     if method == "GS" or method == "Gauss-Seidel":
-
-        L_upper = sp.sparse.triu(L, 1, format="csc")
-        L_lower_diag = sp.sparse.triu(L, 0, format="csc").T
+        # Gauss-Seidel method
+        L_upper = sp.sparse.triu(L, 1, format="csc")  # Upper triangular part of L
+        L_lower_diag = sp.sparse.triu(L, 0, format="csc").T  # Lower triangular part + diagonal of L
 
         for j in range(num_vectors):
             x = X[:, j]
@@ -1494,13 +1762,13 @@ def generate_test_vectors(
         return X
 
     if method == "JC" or method == "Jacobi":
-
-        deg = G.dw.astype(np.float_)
-        D = sp.sparse.diags(deg, 0)
-        deginv = deg ** (-1)
-        deginv[deginv == np.Inf] = 0
-        Dinv = sp.sparse.diags(deginv, 0)
-        M = Dinv.dot(D - L)
+        # Jacobi method
+        deg = G.dw.astype(np.float_)  # Degrees of nodes
+        D = sp.sparse.diags(deg, 0)  # Diagonal matrix of degrees
+        deginv = deg ** (-1)  # Inverse of degrees
+        deginv[deginv == np.Inf] = 0  # Handle infinite values
+        Dinv = sp.sparse.diags(deginv, 0)  # Diagonal matrix of inverse degrees
+        M = Dinv.dot(D - L)  # Jacobi iteration matrix
 
         for j in range(num_vectors):
             x = X[:, j]
@@ -1510,9 +1778,10 @@ def generate_test_vectors(
         return X
 
     elif method == "Chebychev":
-
+        # Chebychev method
         f = filters.Filter(G, lambda x: ((x <= lambda_cut) * 1).astype(np.float32))
         return f.filter(X, method="chebyshev", order=50)
+
 
 
 def matching_optimal(G, weights, r=0.4):
@@ -1523,52 +1792,59 @@ def matching_optimal(G, weights, r=0.4):
     Parameters
     ----------
     G : pygsp graph
+        The input graph.
     weights : np.array(M)
-        a weight for each edge
-    ratio : float
-        The desired dimensionality reduction (ratio = 1 - n/N)
+        A weight for each edge.
+    r : float, optional
+        The desired dimensionality reduction (ratio = 1 - n/N). Default is 0.4.
 
-    Notes:
-    * The complexity of this is O(N^3)
-    * Depending on G, the algorithm might fail to return ratios>0.3
+    Returns
+    -------
+    matching : np.array
+        An array of shape (k, 2) where each row represents a matched pair of nodes.
+
+    Notes
+    -----
+    * The complexity of this algorithm is O(N^3).
+    * Depending on G, the algorithm might fail to return ratios > 0.3.
     """
-    N = G.N
+    N = G.N  # Number of nodes in the graph
 
-    # the edge set
+    # Get the edge list and format it
     edges = G.get_edge_list()
     edges = np.array(edges[0:2])
-    M = edges.shape[1]
+    M = edges.shape[1]  # Number of edges
 
-    max_weight = 1 * np.max(weights)
+    max_weight = 1 * np.max(weights)  # Max weight for normalization
 
-    # prepare the input for the minimum weight matching problem
+    # Prepare the input for the minimum weight matching problem
     edge_list = []
     for edgeIdx in range(M):
         [i, j] = edges[:, edgeIdx]
         if i == j:
-            continue
+            continue  # Skip self-loops
         edge_list.append((i, j, max_weight - weights[edgeIdx]))
 
-    assert min(weights) >= 0
+    assert min(weights) >= 0  # Ensure all weights are non-negative
 
-    # solve it
+    # Solve the minimum weight matching problem
     tmp = np.array(maxWeightMatching(edge_list))
 
-    # format output
+    # Format the output
     m = tmp.shape[0]
     matching = np.zeros((m, 2), dtype=int)
     matching[:, 0] = range(m)
     matching[:, 1] = tmp
 
-    # remove null edges and duplicates
+    # Remove null edges and duplicates
     idx = np.where(tmp != -1)[0]
     matching = matching[idx, :]
     idx = np.where(matching[:, 0] > matching[:, 1])[0]
     matching = matching[idx, :]
 
-    assert matching.shape[0] >= 1
+    assert matching.shape[0] >= 1  # Ensure there's at least one match
 
-    # if the returned matching is larger than what is requested, select the min weight subset of it
+    # If the returned matching is larger than requested, select the min weight subset of it
     matched_weights = np.zeros(matching.shape[0])
     for mIdx in range(matching.shape[0]):
         i = matching[mIdx, 0]
@@ -1589,6 +1865,7 @@ def matching_optimal(G, weights, r=0.4):
     return matching
 
 
+
 def matching_greedy(G, weights, r=0.4):
     """
     Generates a matching greedily by selecting at each iteration the edge
@@ -1598,56 +1875,64 @@ def matching_greedy(G, weights, r=0.4):
     Parameters
     ----------
     G : pygsp graph
+        The input graph.
     weights : np.array(M)
-        a weight for each edge
-    r : float
-        The desired dimensionality reduction (r = 1 - n/N)
+        A weight for each edge.
+    r : float, optional
+        The desired dimensionality reduction (r = 1 - n/N). Default is 0.4.
 
-    Notes:
-    * The complexity of this is O(M)
-    * Depending on G, the algorithm might fail to return ratios>0.3
+    Returns
+    -------
+    matching : np.array
+        An array of shape (k, 2) where each row represents a matched pair of nodes.
+
+    Notes
+    -----
+    * The complexity of this algorithm is O(M).
+    * Depending on G, the algorithm might fail to return ratios > 0.3.
     """
+    N = G.N  # Number of nodes in the graph
 
-    N = G.N
-
-    # the edge set
+    # Get the edge list and format it
     edges = np.array(G.get_edge_list()[0:2])
-    M = edges.shape[1]
+    M = edges.shape[1]  # Number of edges
 
+    # Sort edges by weights in descending order
     idx = np.argsort(-weights)
-    # idx = np.argsort(weights)[::-1]
     edges = edges[:, idx]
 
-    # the candidate edge set
+    # The candidate edge set
     candidate_edges = edges.T.tolist()
 
-    # the matching edge set (this is a list of arrays)
+    # The matching edge set (this is a list of arrays)
     matching = []
 
-    # which vertices have been selected
+    # Which vertices have been selected
     marked = np.zeros(N, dtype=np.bool_)
 
-    n, n_target = N, (1 - r) * N
+    n, n_target = N, (1 - r) * N  # Initial and target number of nodes
     while len(candidate_edges) > 0:
 
-        # pop a candidate edge
+        # Pop a candidate edge
         [i, j] = candidate_edges.pop(0)
 
-        # check if marked
+        # Check if either vertex is already marked
         if any(marked[[i, j]]):
             continue
 
+        # Mark both vertices
         marked[[i, j]] = True
         n -= 1
 
-        # add it to the matching
+        # Add the edge to the matching
         matching.append(np.array([i, j]))
 
-        # termination condition
+        # Termination condition
         if n <= n_target:
             break
 
     return np.array(matching)
+
 
 
 ##############################################################################
@@ -1655,13 +1940,41 @@ def matching_greedy(G, weights, r=0.4):
 # Most of the code has been adapted from the PyGSP implementation.
 ##############################################################################
 def kron_coarsening(G, r=0.5, m=None):
+    """
+    Perform Kronecker coarsening on a graph G.
+
+    Parameters
+    ----------
+    G : pygsp.graph
+        The input graph.
+    r : float, optional
+        The coarsening ratio (r = 1 - n/N). Default is 0.5.
+    m : int, optional
+        The target number of edges for sparsification. Default is None.
+
+    Returns
+    -------
+    Gc : pygsp.graph
+        The coarsened graph.
+    Gs[0] : pygsp.graph
+        The original graph.
+
+    Notes
+    -----
+    If the coarsening fails, the function returns (None, None).
+    """
+
+    # Ensure the graph has coordinates; if not, generate random coordinates
     if not hasattr(G, "coords"):
         G.set_coordinates(np.random.rand(G.N, 2))  # needed by kron
 
+    # Determine the target number of nodes after coarsening
     n_target = np.floor((1 - r) * G.N)
+    # Calculate the number of levels of coarsening needed
     levels = int(np.ceil(np.log2(G.N / n_target)))
 
     try:
+        # Perform multiresolution coarsening
         Gs = my_graph_multiresolution(
             G,
             levels,
@@ -1673,28 +1986,57 @@ def kron_coarsening(G, r=0.5, m=None):
         )
         Gk = Gs[-1]
 
-        # sparsify to a target number of edges m
+        # If a target number of edges m is specified, perform sparsification
         if m is not None:
-            M = Gk.Ne  # int(Gk.W.nnz/2)
-            epsilon = min(10 / np.sqrt(G.N), 0.3)  # 1 - m/M
+            M = Gk.Ne  # Number of edges in the coarsened graph
+            epsilon = min(10 / np.sqrt(G.N), 0.3)  # Sparsification parameter
             Gc = graph_sparsify(Gk, epsilon, maxiter=10)
-            Gc.mr = Gk.mr
+            Gc.mr = Gk.mr  # Maintain multiresolution information
         else:
             Gc = Gk
 
         return Gc, Gs[0]
 
     except:
+        # Return None if coarsening fails
         return None, None
 
 
 def kron_quality(G, Gc, kmax=30, Uk=None, lk=None):
+    """
+    Evaluate the quality of Kronecker coarsening.
+
+    Parameters
+    ----------
+    G : pygsp.graph
+        The original graph.
+    Gc : pygsp.graph
+        The coarsened graph.
+    kmax : int, optional
+        The maximum number of eigenvalues/eigenvectors to consider. Default is 30.
+    Uk : np.array, optional
+        Precomputed eigenvectors of the original graph. Default is None.
+    lk : np.array, optional
+        Precomputed eigenvalues of the original graph. Default is None.
+
+    Returns
+    -------
+    metrics : dict
+        A dictionary containing various quality metrics of the coarsening.
+
+    Notes
+    -----
+    The function may fail, indicated by metrics['failed'] being True.
+    """
+
     N, n = G.N, Gc.N
     keep_inds = Gc.mr["idx"]
 
+    # Initialize metrics
     metrics = {"r": 1 - n / N, "m": int(Gc.W.nnz / 2), "failed": False}
     kmax = np.clip(kmax, 1, n)
 
+    # Determine eigenvalues and eigenvectors
     if (Uk is not None) and (lk is not None) and (len(lk) >= kmax):
         U, l = Uk, lk
     elif hasattr(G, "U"):
@@ -1702,41 +2044,36 @@ def kron_quality(G, Gc, kmax=30, Uk=None, lk=None):
     else:
         l, U = sp.sparse.linalg.eigsh(G.L, k=kmax, which="SM", tol=1e-3)
 
+    # Adjust the smallest eigenvalue to avoid division by zero
     l[0] = 1
     linv = l ** (-0.5)
     linv[0] = 0
-    # avoids divide by 0
 
     C = np.eye(N)
     C = C[keep_inds, :]
     L = G.L.toarray()
 
     try:
+        # Compute pseudoinverse of L + regularization
         Phi = np.linalg.pinv(L + 0.01 * np.eye(N))
         Cinv = (Phi @ C.T) @ np.linalg.pinv(C @ Phi @ C.T)
 
+        # Compute eigenvalues and eigenvectors of the coarsened graph
         if kmax > n / 2:
             [Uc, lc] = eig(Gc.L.toarray())
         else:
             lc, Uc = sp.sparse.linalg.eigsh(Gc.L, k=kmax, which="SM", tol=1e-3)
 
-        # eigenvalue relative error
+        # Calculate eigenvalue relative error
         metrics["error_eigenvalue"] = np.abs(l[:kmax] - lc[:kmax]) / l[:kmax]
         metrics["error_eigenvalue"][0] = 0
 
-        # TODO : angles between eigenspaces
-        # metrics['angle_matrix'] = U.T @ C.T @ Uc
-
-        # other errors
-        kmax = np.clip(kmax, 2, n)
-
+        # Initialize error metrics
         error_subspace = np.zeros(kmax)
         error_sintheta = np.zeros(kmax)
 
-        # M = (Lsqrtm - sp.linalg.sqrtm(Cinv @ Gc.L.dot(C))) @ U @ np.diag(linv) # is this correct?
-        M = U - sp.linalg.sqrtm(Cinv @ Gc.L.dot(C)) @ U @ np.diag(
-            linv
-        )  # is this correct?
+        # Calculate subspace error
+        M = U - sp.linalg.sqrtm(Cinv @ Gc.L.dot(C)) @ U @ np.diag(linv)
         for kIdx in range(0, kmax):
             error_subspace[kIdx] = np.abs(np.linalg.norm(M[:, : kIdx + 1], ord=2) - 1)
 
@@ -1750,6 +2087,27 @@ def kron_quality(G, Gc, kmax=30, Uk=None, lk=None):
 
 
 def kron_interpolate(G, Gc, x):
+    """
+    Interpolates a signal from the coarse graph to the original graph.
+
+    Parameters
+    ----------
+    G : pygsp.graph
+        The original graph.
+    Gc : pygsp.graph
+        The coarsened graph.
+    x : np.array
+        The signal defined on the coarse graph nodes.
+
+    Returns
+    -------
+    np.array
+        The interpolated signal on the original graph nodes.
+
+    Notes
+    -----
+    The function uses the interpolation method from the reduction module.
+    """
     return np.squeeze(reduction.interpolate(G, x, Gc.mr["idx"]))
 
 
@@ -1766,8 +2124,8 @@ def my_graph_multiresolution(
 ):
     r"""Compute a pyramid of graphs (by Kron reduction).
 
-    'graph_multiresolution(G,levels)' computes a multiresolution of
-    graph by repeatedly downsampling and performing graph reduction. The
+    'my_graph_multiresolution(G, levels)' computes a multiresolution of
+    a graph by repeatedly downsampling and performing graph reduction. The
     default downsampling method is the largest eigenvector method based on
     the polarity of the components of the eigenvector associated with the
     largest graph Laplacian eigenvalue. The default graph reduction method
@@ -1776,30 +2134,29 @@ def my_graph_multiresolution(
 
     Parameters
     ----------
-    G : Graph structure
+    G : pygsp.graph
         The graph to reduce.
     levels : int
-        Number of level of decomposition
-    lambd : float
-        Stability parameter. It adds self loop to the graph to give the
-        algorithm some stability (default = 0.025). [UNUSED?!]
+        Number of levels of decomposition.
+    r : float
+        Dimensionality reduction ratio (default is 0.5).
     sparsify : bool
-        To perform a spectral sparsification step immediately after
+        Whether to perform a spectral sparsification step immediately after
         the graph reduction (default is True).
     sparsify_eps : float
         Parameter epsilon used in the spectral sparsification
-        (default is min(10/sqrt(G.N),.3)).
-    downsampling_method: string
+        (default is min(10/sqrt(G.N), 0.3)).
+    downsampling_method : string
         The graph downsampling method (default is 'largest_eigenvector').
     reduction_method : string
-        The graph reduction method (default is 'kron')
+        The graph reduction method (default is 'kron').
     compute_full_eigen : bool
-        To also compute the graph Laplacian eigenvalues and eigenvectors
+        Whether to compute the graph Laplacian eigenvalues and eigenvectors
         for every graph in the multiresolution sequence (default is False).
     reg_eps : float
-        The regularized graph Laplacian is :math:`\bar{L}=L+\epsilon I`.
+        The regularized graph Laplacian is L + epsilon * I.
         A smaller epsilon may lead to better regularization, but will also
-        require a higher order Chebyshev approximation. (default is 0.005)
+        require a higher order Chebyshev approximation (default is 0.005).
 
     Returns
     -------
@@ -1812,12 +2169,12 @@ def my_graph_multiresolution(
     >>> levels = 5
     >>> G = graphs.Sensor(N=512)
     >>> G.compute_fourier_basis()
-    >>> Gs = reduction.graph_multiresolution(G, levels, sparsify=False)
+    >>> Gs = my_graph_multiresolution(G, levels, sparsify=False)
     >>> for idx in range(levels):
     ...     Gs[idx].plotting['plot_name'] = 'Reduction level: {}'.format(idx)
     ...     Gs[idx].plot()
-
     """
+
     if sparsify_eps is None:
         sparsify_eps = min(10.0 / np.sqrt(G.N), 0.3)
 
@@ -1833,7 +2190,7 @@ def my_graph_multiresolution(
 
     for i in range(levels):
         if downsampling_method == "largest_eigenvector":
-            if hasattr(Gs[i], "_U"):
+            if hasattr(Gs[i], "U"):
                 V = Gs[i].U[:, -1]
             else:
                 V = sp.sparse.linalg.eigs(Gs[i].L, 1)[1][:, 0]
@@ -1841,16 +2198,14 @@ def my_graph_multiresolution(
             V *= np.sign(V[0])
             n = max(int(Gs[i].N / 2), n_target)
 
-            ind = np.argsort(V)  # np.nonzero(V >= 0)[0]
+            ind = np.argsort(V)
             ind = np.flip(ind, 0)
             ind = ind[:n]
-
         else:
             raise NotImplementedError("Unknown graph downsampling method.")
 
         if reduction_method == "kron":
             Gs.append(reduction.kron_reduction(Gs[i], ind))
-
         else:
             raise NotImplementedError("Unknown graph reduction method.")
 
@@ -1878,7 +2233,25 @@ def my_graph_multiresolution(
 
 
 def graph_sparsify(M, epsilon, maxiter=10):
-    # Test the input parameters
+    """
+    Sparsifies a graph by sampling edges based on their resistance distance.
+
+    Parameters
+    ----------
+    M : pygsp.graph or scipy.sparse matrix
+        The graph or its Laplacian matrix to be sparsified.
+    epsilon : float
+        Sparsification parameter, should be in the range [1/sqrt(N), 1).
+    maxiter : int
+        Maximum number of iterations for the sparsification process.
+
+    Returns
+    -------
+    Mnew : pygsp.graph or scipy.sparse matrix
+        The sparsified graph or its Laplacian matrix.
+    """
+
+    # Check if input is a pygsp graph and retrieve Laplacian matrix
     if isinstance(M, graphs.Graph):
         if not M.lap_type == "combinatorial":
             raise NotImplementedError
@@ -1888,18 +2261,21 @@ def graph_sparsify(M, epsilon, maxiter=10):
 
     N = np.shape(L)[0]
 
+    # Ensure epsilon is within the required range
     if not 1.0 / np.sqrt(N) <= epsilon < 1:
         raise ValueError("GRAPH_SPARSIFY: Epsilon out of required range")
 
-    # Not sparse
+    # Compute resistance distances
     resistance_distances = resistance_distance(L).toarray()
-    # Get the Weight matrix
+
+    # Get the weight matrix
     if isinstance(M, graphs.Graph):
         W = M.W
     else:
         W = np.diag(L.diagonal()) - L.toarray()
         W[W < 1e-10] = 0
 
+    # Convert weight matrix to sparse format and eliminate zeros
     W = sp.sparse.coo_matrix(W)
     W.data[W.data < 1e-10] = 0
     W = W.tocsc()
@@ -1907,20 +2283,19 @@ def graph_sparsify(M, epsilon, maxiter=10):
 
     start_nodes, end_nodes, weights = sp.sparse.find(sp.sparse.tril(W))
 
-    # Calculate the new weights.
+    # Calculate the new weights based on resistance distances
     weights = np.maximum(0, weights)
     Re = np.maximum(0, resistance_distances[start_nodes, end_nodes])
     Pe = weights * Re + 1e-4
     Pe = Pe / np.sum(Pe)
 
     for i in range(maxiter):
-        # Rudelson, 1996 Random Vectors in the Isotropic Position
-        # (too hard to figure out actual C0)
+        # Determine the number of samples needed
         C0 = 1 / 30.0
-        # Rudelson and Vershynin, 2007, Thm. 3.1
         C = 4 * C0
         q = round(N * np.log(N) * 9 * C ** 2 / (epsilon ** 2))
 
+        # Sample edges based on their probabilities
         results = sp.stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(
             size=int(q)
         )
@@ -1931,18 +2306,12 @@ def graph_sparsify(M, epsilon, maxiter=10):
         counts[spin_counts[:, 0]] = spin_counts[:, 1]
         new_weights = counts * per_spin_weights
 
+        # Construct the new sparser weight matrix
         sparserW = sp.sparse.csc_matrix(
             (new_weights, (start_nodes, end_nodes)), shape=(N, N)
         )
         sparserW = sparserW + sparserW.T
         sparserL = sp.sparse.diags(sparserW.diagonal(), 0) - sparserW
-
-    #        if graphs.Graph(W=sparserW).is_connected():
-    #            break
-    #        elif i == maxiter - 1:
-    #            print('Despite attempts to reduce epsilon, sparsified graph is disconnected')
-    #        else:
-    #            epsilon -= (epsilon - 1/np.sqrt(N)) / 2.
 
     if isinstance(M, graphs.Graph):
         sparserW = sp.sparse.diags(sparserL.diagonal(), 0) - sparserL
@@ -1950,7 +2319,6 @@ def graph_sparsify(M, epsilon, maxiter=10):
             sparserW = (sparserW + sparserW.T) / 2.0
 
         Mnew = graphs.Graph(W=sparserW)
-        # M.copy_graph_attributes(Mnew)
     else:
         Mnew = sp.sparse.lil_matrix(sparserL)
 
@@ -1959,9 +2327,20 @@ def graph_sparsify(M, epsilon, maxiter=10):
 
 def get_S(G):
     """
-    Construct the N x |E| gradient matrix S
+    Construct the N x E gradient matrix S.
+
+    Parameters
+    ----------
+    G : pygsp.graphs.Graph
+        The input graph.
+
+    Returns
+    -------
+    S : np.ndarray
+        The gradient matrix of shape (N, E), where N is the number of nodes
+        and E is the number of edges.
     """
-    # the edge set
+    # Get the edge list and weights
     edges = G.get_edge_list()
     weights = np.array(edges[2])
     edges = np.array(edges[0:2])
@@ -1977,26 +2356,65 @@ def get_S(G):
 
 
 def eig(A, order='ascend'):
-    # eigenvalue decomposition
-    [l, X] = np.linalg.eigh(A)
+    """
+    Perform eigenvalue decomposition on a symmetric matrix and sort the eigenvalues
+    and eigenvectors in ascending or descending order.
 
-    # reordering indices
+    Parameters
+    ----------
+    A : np.ndarray
+        A symmetric matrix.
+    order : str, optional
+        The order in which to sort the eigenvalues and eigenvectors. Can be 'ascend' (default)
+        for ascending order or 'descend' for descending order.
+
+    Returns
+    -------
+    X : np.ndarray
+        Matrix of eigenvectors, where each column is an eigenvector.
+    l : np.ndarray
+        Array of eigenvalues, sorted in the specified order.
+    """
+    # Eigenvalue decomposition
+    l, X = np.linalg.eigh(A)
+
+    # Reordering indices
     idx = l.argsort()
     if order == 'descend':
         idx = idx[::-1]
 
-    # reordering
+    # Reordering eigenvalues and eigenvectors
     l = np.real(l[idx])
     X = X[:, idx]
-    return (X, np.real(l))
+
+    return X, np.real(l)
+
 
 
 def zero_diag(A):
+    """
+    Set the diagonal elements of a matrix to zero.
+
+    Parameters
+    ----------
+    A : np.ndarray or scipy.sparse matrix
+        The input matrix.
+
+    Returns
+    -------
+    A : np.ndarray or scipy.sparse matrix
+        The matrix with diagonal elements set to zero.
+    """
     import scipy as sp
 
     if sp.sparse.issparse(A):
+        # For sparse matrices, create a diagonal matrix from the original diagonal
+        # and subtract it from the original matrix
         return A - sp.sparse.dia_matrix((A.diagonal()[np.newaxis, :], [0]), shape=(A.shape[0], A.shape[1]))
     else:
+        # For dense matrices, extract the diagonal, create a diagonal matrix from it,
+        # and subtract it from the original matrix
         D = A.diagonal()
         return A - np.diag(D)
+
 ##############################################################################

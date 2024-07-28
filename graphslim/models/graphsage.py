@@ -1,15 +1,7 @@
-from copy import deepcopy
-
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torch_geometric.loader import NeighborSampler
-
-from graphslim.dataset.convertor import dense2sparsetensor
 from graphslim.models.base import BaseGNN
 from graphslim.models.layers import SageConvolution
-from graphslim.utils import is_sparse_tensor, normalize_adj_tensor, to_tensor, accuracy
 
 
 class GraphSage(BaseGNN):
@@ -31,7 +23,6 @@ class GraphSage(BaseGNN):
                 if with_bn:
                     self.bns.append(nn.BatchNorm1d(nhid))
             self.layers.append(SageConvolution(nhid, nclass))
-
     # def fit_with_val(self, data, train_iters=200, verbose=False,
     #                  normadj=True, setting='trans', reduced=False, reindex=False,
     #                  **kwargs):

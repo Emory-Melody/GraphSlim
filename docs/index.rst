@@ -7,19 +7,35 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :maxdepth: 1
    :caption: Installation
 
-   installation
+   installation.md
 
 .. toctree::
    :maxdepth: 1
-   :caption: Usage
+   :caption: Quickstart
 
-   quickstart
+   quickstart.md
 
 .. toctree::
    :maxdepth: 1
-   :caption: Package API
+   :caption: Dataset
+   source/graphslim.dataset
 
-   API/dataset
-   API/evaluation
-   API/method
+.. toctree::
+   :maxdepth: 1
+   :caption: Models
+
+   source/graphslim.models
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Method
+
+   source/graphslim.coarsening
+   source/graphslim.condensation
+   source/graphslim.sparsification
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Evaluation
+   source/graphslim.evaluation
 

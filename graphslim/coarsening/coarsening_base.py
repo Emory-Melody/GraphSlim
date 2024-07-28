@@ -15,7 +15,48 @@ from graphslim.utils import one_hot, to_tensor
 
 
 class Coarsen:
+    """
+    Graph Coarsening
+
+    This class provides methods to coarsen a graph, which involves reducing the number of nodes while
+    preserving certain properties of the original graph.
+
+    Parameters
+    ----------
+    setting : str
+        The setting for coarsening.
+    data : object
+        The data to be coarsened.
+    args : Namespace
+        Arguments containing configurations and device information.
+    **kwargs : dict, optional
+        Additional keyword arguments.
+
+    Methods
+    -------
+    reduce(data, verbose=True, save=True)
+        Reduces the data by coarsening the graph.
+    coarsening(H)
+        Performs the coarsening process on the graph H.
+    process_coarsened(data, candidate, C_list, Gc_list)
+        Processes the coarsened graphs and returns the features, labels, masks, and edges.
+    """
+
     def __init__(self, setting, data, args, **kwargs):
+        """
+        Initializes the Coarsen object.
+
+        Parameters
+        ----------
+        setting : str
+            The setting for coarsening.
+        data : object
+            The data to be coarsened.
+        args : Namespace
+            Arguments containing configurations and device information.
+        **kwargs : dict
+            Additional keyword arguments.
+        """
         self.setting = setting
         self.args = args
         self.device = args.device
@@ -23,7 +64,23 @@ class Coarsen:
 
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):
+        """
+        Reduces the data by coarsening the graph.
 
+        Parameters
+        ----------
+        data : object
+            The data to be reduced.
+        verbose : bool, optional
+            If True, prints verbose output. Defaults to True.
+        save : bool, optional
+            If True, saves the reduced data. Defaults to True.
+
+        Returns
+        -------
+        object
+            The reduced data with updated attributes `adj_syn`, `feat_syn`, and `labels_syn`.
+        """
         args = self.args
         # setting = self.setting
         # device = self.device
@@ -54,71 +111,26 @@ class Coarsen:
 
         return data
 
-        # all_acc = []
-
-        # for i in trange(args.runs):
-        #     seed_everything(args.seed + i)
-        #     coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_val_labels, coarsen_val_mask, coarsen_edge = self.process_coarsened(
-        #         cpu_data, candidate, C_list, Gc_list)
-        #     coarsen_features = coarsen_features.to(device)
-        #     if args.save:
-        #         save_reduced(coarsen_edge, coarsen_features, coarsen_train_labels, args)
-        #     coarsen_train_labels = coarsen_train_labels.to(device)
-        #     coarsen_train_mask = coarsen_train_mask.to(device)
-        #     coarsen_val_labels = coarsen_val_labels.to(device)
-        #     coarsen_val_mask = coarsen_val_mask.to(device)
-        #     coarsen_edge = SparseTensor(row=coarsen_edge[1], col=coarsen_edge[0]).to(device)
-        #     # data = splits(data, args.split)
-        #
-        #     if args.normalize_features:
-        #         coarsen_features = F.normalize(coarsen_features, p=1)
-        #         data.x = F.normalize(data.x, p=1)
-        #
-        #     model.reset_parameters()
-        #     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
-        #
-        #     best_val_loss = float('inf')
-        #     val_loss_history = []
-        #     data.x, data.sparse_adj, data.y = to_tensor(data.x, data.sparse_adj, data.y,
-        #                                                 device=device)
-        #     # 这里可以再封装
-        #     model.fit_with_val(coarsen_features, coarsen_edge, data,
-        #                        train_iters=args.epochs, normalize=True, verbose=False, reindexed_trainset=True)
-        #     acc_test = model.test(data)
-        #     res.append(acc_test)
-        #
-        #     for epoch in range(args.epochs):
-        #
-        #         model.train()
-        #         optimizer.zero_grad()
-        #         out = model(coarsen_features, coarsen_edge)
-        #         loss = F.nll_loss(out[coarsen_train_mask], coarsen_train_labels[coarsen_train_mask])
-        #         loss.backward()
-        #         optimizer.step()
-        #
-        #         model.eval()
-        #         pred = model(coarsen_features, coarsen_edge)
-        #         val_loss = F.nll_loss(pred[coarsen_val_mask], coarsen_val_labels[coarsen_val_mask]).item()
-        #
-        #         if val_loss < best_val_loss:
-        #             best_val_loss = val_loss
-        #             pred = model(data.x, data.sparse_adj).max(1)[1]
-        #             test_acc = int(pred[data.test_mask].eq(data.y[data.test_mask]).sum().item()) / int(
-        #                 data.test_mask.sum())
-        #             all_acc.append(test_acc)
-        #
-        #         # val_loss_history.append(val_loss)
-        #         if args.early_stopping > 0:
-        #             tmp = tensor(val_loss_history[-(args.early_stopping + 1):-1])
-        #             if val_loss > tmp.mean().item():
-        #                 break
-        #
-        # print('ave_test_acc: {:.4f}'.format(np.mean(all_acc)), '+/- {:.4f}'.format(np.std(all_acc)))
-
     def coarsening(self, H):
+        """
+        Performs the coarsening process on the given graph.
+
+        Parameters
+        ----------
+        H : object
+            The graph to be coarsened.
+
+        Returns
+        -------
+        candidate : list
+            List of subgraphs sorted by size.
+        C_list : list
+            List of coarsening matrices.
+        Gc_list : list
+            List of coarsened graphs.
+        """
         if H.A.shape[-1] != H.A.shape[1]:
-            H.logger.error('Inconsistent shape to extract components. '
-                           'Square matrix required.')
+            H.logger.error('Inconsistent shape to extract components. Square matrix required.')
             return None
 
         if H.is_directed():
@@ -138,8 +150,7 @@ class Coarsen:
                     comp.append(v)
                     visited[v] = True
 
-                    stack.update(set([idx for idx in H.A[v, :].nonzero()[1]
-                                      if not visited[idx]]))
+                    stack.update(set([idx for idx in H.A[v, :].nonzero()[1] if not visited[idx]]))
 
             comp = sorted(comp)
             G = H.subgraph(comp)
@@ -161,6 +172,31 @@ class Coarsen:
         return candidate, C_list, Gc_list
 
     def process_coarsened(self, data, candidate, C_list, Gc_list):
+        """
+        Processes the coarsened graph to extract relevant features and labels.
+
+        Parameters
+        ----------
+        data : object
+            The original data.
+        candidate : list
+            List of candidate subgraphs.
+        C_list : list
+            List of coarsening matrices.
+        Gc_list : list
+            List of coarsened graphs.
+
+        Returns
+        -------
+        coarsen_features : torch.Tensor
+            The coarsened features.
+        coarsen_train_labels : torch.Tensor
+            The coarsened training labels.
+        coarsen_train_mask : torch.Tensor
+            The coarsened training mask.
+        coarsen_edge : torch.Tensor
+            The coarsened edges.
+        """
         train_mask = data.train_mask
         val_mask = data.val_mask
 
@@ -218,29 +254,10 @@ class Coarsen:
                 coarsen_node += Gc.W.shape[0]
                 print(coarsen_node)
 
-            # elif torch.sum(H_train_mask) > 0:
-            #
-            #     coarsen_features = torch.cat([coarsen_features, H_features], dim=0)
-            #     coarsen_train_labels = torch.cat([coarsen_train_labels, H_labels.float()], dim=0)
-            #     coarsen_train_mask = torch.cat([coarsen_train_mask, H_train_mask], dim=0)
-            #
-            #     if coarsen_row is None:
-            #         raise Exception('The graph does not need coarsening.')
-            #     else:
-            #         if len(H.W.tocoo().row) == 0:
-            #             current_row = np.array([coarsen_node])
-            #             current_col = np.array([coarsen_node])
-            #         else:
-            #             current_row = H.W.tocoo().row + coarsen_node
-            #             current_col = H.W.tocoo().col + coarsen_node
-            #         coarsen_row = np.concatenate([coarsen_row, current_row], axis=0)
-            #         coarsen_col = np.concatenate([coarsen_col, current_col], axis=0)
-            #     coarsen_node += H.W.shape[0]
             number += 1
-
-        # print('the size of coarsen graph features:', coarsen_features.shape)
 
         coarsen_edge = torch.from_numpy(np.array([coarsen_row, coarsen_col])).long()
         coarsen_train_labels = coarsen_train_labels.long()
 
         return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge
+

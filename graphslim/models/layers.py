@@ -58,13 +58,13 @@ class GraphConvolution(torch.nn.Module):
 
 class GATConv(MessagePassing):
     r"""The graph attentional operator from the `"Graph Attention Networks"
-    .. math::
+    math::
         \mathbf{x}^{\prime}_i = \alpha_{i,i}\mathbf{\Theta}\mathbf{x}_{i} +
         \sum_{j \in \mathcal{N}(i)} \alpha_{i,j}\mathbf{\Theta}\mathbf{x}_{j},
 
     where the attention coefficients :math:`\alpha_{i,j}` are computed as
 
-    .. math::
+    math::
         \alpha_{i,j} =
         \frac{
         \exp\left(\mathrm{LeakyReLU}\left(\mathbf{a}^{\top}
