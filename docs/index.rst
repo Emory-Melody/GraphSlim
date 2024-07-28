@@ -7,16 +7,18 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :maxdepth: 1
    :caption: Installation
 
-   Installation
+   installation
 
 .. toctree::
    :maxdepth: 1
    :caption: Usage
-   Quickstart
+
+   quickstart
 
 .. toctree::
    :maxdepth: 1
    :caption: Package API
+
    API/dataset
    API/evaluation
    API/method
