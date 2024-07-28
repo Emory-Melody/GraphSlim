@@ -1,5 +1,5 @@
 pyvis==0.3.2
-torch==2.1.2
+torch==2.2.0
 torch_geometric==2.5.3
 networkx==3.1
 matplotlib==3.7.5
