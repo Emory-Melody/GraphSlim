@@ -2,7 +2,8 @@
 
 ## Online demo
 
-You can run our examples at [Collab](https://graphslim.readthedocs.io/en/latest/?badge=latest)
+You can run our examples
+at [Collab](https://colab.research.google.com/drive/1gzYgmV2Ht6_eIdf-h1_c2qRWbQr0p-IE?usp=sharing)
 
 ## Examples
 
