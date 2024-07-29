@@ -18,5 +18,4 @@ formats:
 
 python:
   install:
-    - requirements: docs/requirements_torch.txt
     - requirements: docs/requirements.txt

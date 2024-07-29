@@ -1393,7 +1393,7 @@ Search.setIndex({
         "Installation": [[0, null], [1, "installation"]],
         "Quickstart": [[0, null]],
         "Dataset": [[0, null]],
-        "Models": [[0, null]],
+        "Model": [[0, null]],
         "Method": [[0, null]],
         "Evaluation": [[0, null]],
         "Install from pip": [[1, "install-from-pip"]],
