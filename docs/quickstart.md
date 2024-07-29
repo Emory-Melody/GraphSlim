@@ -10,14 +10,17 @@ at [Collab](https://colab.research.google.com/drive/1gzYgmV2Ht6_eIdf-h1_c2qRWbQr
 ```shell
 python examples/train_node_sparsification.py
 ```
-It will defaultly adopt `kcenter` method.
+
+It will defaultly adopt `kcenter` as sparsification method.
+
 ```shell
 python examples/train_coarsen.py
 ```
+
 It will defaultly adopt `variation_neighborhoods` as coarsening method.
 
 ```shell
 python examples/train_condense.py
 ```
-It will defaultly adopt `GCond` as coarsening method.
-t
+
+It will defaultly adopt `GCond` as condensation method.

@@ -16,8 +16,6 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class VariationCliques(Coarsen):
-    def __init__(self, setting, data, args, **kwargs):
-        super(Coarsen, self).__init__(setting, data, args, **kwargs)
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate

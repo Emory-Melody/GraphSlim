@@ -11,63 +11,10 @@ from torch_sparse import SparseTensor
 from graphslim.dataset.utils import csr2ei
 
 
-def sparsify(model_type, adj_syn, args, verbose=False):
-    """
-    Applies sparsification to the adjacency matrix based on the model type and given arguments.
 
-    This function modifies the adjacency matrix to make it sparser according to the model type and method specified.
-    For specific methods and datasets, it adjusts the threshold used for sparsification.
 
-    Parameters
-    ----------
-    model_type : str
-        The type of model used, which determines the sparsification strategy. Can be 'MLP', 'GAT', or other.
-    adj_syn : torch.Tensor
-        The adjacency matrix to be sparsified.
-    args : argparse.Namespace
-        Command-line arguments and configuration parameters which may include method-specific settings.
-    verbose : bool, optional
-        If True, prints information about the sparsity of the adjacency matrix before and after sparsification.
-        Default is False.
 
-    Returns
-    -------
-    adj_syn : torch.Tensor
-        The sparsified adjacency matrix.
-    """
-    threshold = 0
-    if model_type == 'MLP':
-        adj_syn = adj_syn - adj_syn
-        torch.diagonal(adj_syn).fill_(1)
-    elif model_type == 'GAT':
-        if args.method in ['gcond', 'doscond']:
-            if args.dataset in ['cora', 'citeseer']:
-                threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
-            else:
-                threshold = 0.1
-        elif args.method in ['msgc']:
-            threshold = args.threshold
-        else:
-            threshold = 0.5
-    else:
-        if args.method in ['gcond', 'doscond']:
-            threshold = args.threshold
-        elif args.method in ['msgc']:
-            threshold = 0
-        else:
-            threshold = 0
-    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
-        # print('Sum:', adj_syn.sum().item())
-        print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
-    # if args.method in ['sgdd']:
-    #     threshold = 0.5
-    if threshold > 0:
-        adj_syn[adj_syn < threshold] = 0
-        if verbose:
-            print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
-        # else:
-        #     print("structure free methods do not need to truncate the adjacency matrix")
-    return adj_syn
+
 
 
 def getsize_mb(elements):
@@ -126,6 +73,7 @@ def verbose_time_memory(func):
     callable
         The wrapped function with added timing and memory usage functionality.
     """
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         verbose = kwargs.get('verbose', False)

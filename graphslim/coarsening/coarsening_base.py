@@ -42,7 +42,7 @@ class Coarsen:
         Processes the coarsened graphs and returns the features, labels, masks, and edges.
     """
 
-    def __init__(self, setting, data, args, **kwargs):
+    def __init__(self, setting, data, args):
         """
         Initializes the Coarsen object.
 

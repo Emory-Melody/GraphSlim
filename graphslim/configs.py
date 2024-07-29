@@ -161,6 +161,7 @@ def method_config(args):
 @click.option('--ts', default=4, help='for tspanner', show_default=True)
 @click.option('--save_path', '--sp', default='../checkpoints', show_default=True, help='save path for synthetic graph')
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True, help='if run on whole graph')
+@click.option('--with_structure', default=1, show_default=True, help='if synthesizing structure')
 @click.pass_context
 def cli(ctx, **kwargs):
     args = dict2obj(kwargs)

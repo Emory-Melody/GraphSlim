@@ -1,7 +1,67 @@
 import os
 import sys
 from graphslim.dataset.convertor import *
+from graphslim.utils import is_sparse_tensor
 import logging
+
+
+def sparsify(model_type, adj_syn, args, verbose=False):
+    """
+    Applies sparsification to the adjacency matrix based on the model type and given arguments.
+
+    This function modifies the adjacency matrix to make it sparser according to the model type and method specified.
+    For specific methods and datasets, it adjusts the threshold used for sparsification.
+
+    Parameters
+    ----------
+    model_type : str
+        The type of model used, which determines the sparsification strategy. Can be 'MLP', 'GAT', or other.
+    adj_syn : torch.Tensor
+        The adjacency matrix to be sparsified.
+    args : argparse.Namespace
+        Command-line arguments and configuration parameters which may include method-specific settings.
+    verbose : bool, optional
+        If True, prints information about the sparsity of the adjacency matrix before and after sparsification.
+        Default is False.
+
+    Returns
+    -------
+    adj_syn : torch.Tensor
+        The sparsified adjacency matrix.
+    """
+    threshold = 0
+    if model_type == 'MLP':
+        adj_syn = adj_syn - adj_syn
+        torch.diagonal(adj_syn).fill_(1)
+    elif model_type == 'GAT':
+        if args.method in ['gcond', 'doscond']:
+            if args.dataset in ['cora', 'citeseer']:
+                threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
+            else:
+                threshold = 0.1
+        elif args.method in ['msgc']:
+            threshold = args.threshold
+        else:
+            threshold = 0.5
+    else:
+        if args.method in ['gcond', 'doscond']:
+            threshold = args.threshold
+        elif args.method in ['msgc']:
+            threshold = 0
+        else:
+            threshold = 0
+    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
+        # print('Sum:', adj_syn.sum().item())
+        print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+    # if args.method in ['sgdd']:
+    #     threshold = 0.5
+    if threshold > 0:
+        adj_syn[adj_syn < threshold] = 0
+        if verbose:
+            print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+        # else:
+        #     print("structure free methods do not need to truncate the adjacency matrix")
+    return adj_syn
 
 
 def index2mask(index, size):
@@ -90,6 +150,7 @@ def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
 
 
 def load_reduced(args, data=None):
+    flag = 0
     save_path = f'{args.save_path}/reduced_graph/{args.method}'
     if args.attack is not None and args.dataset in ['flickr']:
         save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
@@ -98,6 +159,7 @@ def load_reduced(args, data=None):
             f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
     except:
         print("find no feat, use original feature matrix instead")
+        flag += 1
         if args.setting == 'trans':
             feat_syn = data.feat_full
         else:
@@ -107,6 +169,7 @@ def load_reduced(args, data=None):
             f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
     except:
         print("find no label, use original label matrix instead")
+        flag += 1
         labels_syn = data.labels_train
 
     try:
@@ -114,10 +177,50 @@ def load_reduced(args, data=None):
             f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
     except:
         print("find no adj, use identity matrix instead")
+        flag += 1
         adj_syn = torch.eye(feat_syn.size(0), device=args.device)
     # args.logger.info(f"Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
+    assert flag < 3, "no file found, please run the reduction method first"
+
     return adj_syn, feat_syn, labels_syn
 
+
+def get_syn_data(data, args, model_type, verbose=False):
+    """
+    Loads or computes synthetic data for evaluation.
+
+    Parameters
+    ----------
+    data : Dataset
+        The dataset containing the graph data.
+    model_type : str
+        The type of model used for generating synthetic data.
+    verbose : bool, optional, default=False
+        Whether to print detailed logs.
+
+    Returns
+    -------
+    feat_syn : torch.Tensor
+        Synthetic feature matrix.
+    adj_syn : torch.Tensor
+        Synthetic adjacency matrix.
+    labels_syn : torch.Tensor
+        Synthetic labels.
+    """
+    adj_syn, feat_syn, labels_syn = load_reduced(args, data)
+
+    if labels_syn.shape[0] == data.labels_train.shape[0]:
+        return feat_syn, adj_syn, labels_syn
+
+    if is_sparse_tensor(adj_syn):
+        adj_syn = adj_syn.to_dense()
+    elif isinstance(adj_syn, torch.sparse.FloatTensor):
+        adj_syn = adj_syn.to_dense()
+    else:
+        adj_syn = adj_syn
+
+    adj_syn = sparsify(model_type, adj_syn, args, verbose=verbose)
+    return feat_syn, adj_syn, labels_syn
 # =============from graphsaint================#
 # import networkx as nx
 # import numpy as np

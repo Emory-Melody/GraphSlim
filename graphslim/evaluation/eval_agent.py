@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
-from graphslim.evaluation.utils import sparsify
+from graphslim.evaluation import *
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
@@ -47,44 +47,6 @@ class Evaluator:
         Initializes or resets model parameters.
         """
         pass
-
-    def get_syn_data(self, data, model_type, verbose=False):
-        """
-        Loads or computes synthetic data for evaluation.
-
-        Parameters
-        ----------
-        data : Dataset
-            The dataset containing the graph data.
-        model_type : str
-            The type of model used for generating synthetic data.
-        verbose : bool, optional, default=False
-            Whether to print detailed logs.
-
-        Returns
-        -------
-        feat_syn : torch.Tensor
-            Synthetic feature matrix.
-        adj_syn : torch.Tensor
-            Synthetic adjacency matrix.
-        labels_syn : torch.Tensor
-            Synthetic labels.
-        """
-        args = self.args
-        adj_syn, feat_syn, labels_syn = load_reduced(args, data)
-
-        if labels_syn.shape[0] == data.labels_train.shape[0]:
-            return feat_syn, adj_syn, labels_syn
-
-        if is_sparse_tensor(adj_syn):
-            adj_syn = adj_syn.to_dense()
-        elif isinstance(adj_syn, torch.sparse.FloatTensor):
-            adj_syn = adj_syn.to_dense()
-        else:
-            adj_syn = adj_syn
-
-        adj_syn = sparsify(model_type, adj_syn, args, verbose=verbose)
-        return feat_syn, adj_syn, labels_syn
 
     def grid_search(self, data, model_type, param_grid, reduced=True):
         """
@@ -175,8 +137,8 @@ class Evaluator:
 
             for model_type in gs_params:
                 if reduced:
-                    data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
-                                                                                     verbose=args.verbose)
+                    data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, model_type=model_type,
+                                                                                verbose=args.verbose)
                 print(f'Starting Grid Search for {model_type}')
                 best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
                 args.logger.info(
@@ -184,8 +146,8 @@ class Evaluator:
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             for model_type in eval_model_list:
-                data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
-                                                                                 verbose=args.verbose)
+                data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, model_type=model_type,
+                                                                            verbose=args.verbose)
                 best_result = self.evaluate(data, model_type=args.eval_model)
                 args.logger.info(
                     f'{model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f}')
@@ -272,12 +234,13 @@ class Evaluator:
         std_acc : float
             Standard deviation of accuracy over multiple runs.
         """
+
         args = self.args
 
         # Prepare synthetic data if required
         if reduced:
-            data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type,
-                                                                             verbose=verbose)
+            data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, args, model_type=model_type,
+                                                                        verbose=verbose)
 
         # Initialize progress bar based on verbosity
         if verbose:
@@ -327,7 +290,7 @@ class Evaluator:
         res = []
 
         # Prepare synthetic data if required
-        data.feat_syn, data.adj_syn, data.labels_syn = self.get_syn_data(data, model_type=model_type, verbose=verbose)
+        data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, model_type=model_type, verbose=verbose)
 
         # Initialize progress bar based on verbosity
         if verbose:
