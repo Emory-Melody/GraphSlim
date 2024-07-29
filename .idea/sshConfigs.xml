@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="SshConfigs">
-    <configs>
-      <sshConfig host="hpcc.msu.edu" id="a0de7093-63ed-469f-be1b-7690999343e7" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="yangji73" useOpenSSHConfig="true" />
-      <sshConfig host="v100" id="c89b26d6-c742-4171-8788-7ccb8534fc2d" keyPath="$USER_HOME$/.ssh/id_rsa" port="22" nameFormat="DESCRIPTIVE" username="jinwei2" useOpenSSHConfig="true" />
-    </configs>
-  </component>
-</project>
