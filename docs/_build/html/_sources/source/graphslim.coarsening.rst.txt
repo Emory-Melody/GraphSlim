@@ -4,6 +4,14 @@ graphslim.coarsening package
 Submodules
 ----------
 
+graphslim.coarsening.coarsening\_base module
+--------------------------------------------
+
+.. automodule:: graphslim.coarsening.coarsening_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 graphslim.coarsening.affinity\_gs module
 ----------------------------------------
 
@@ -41,14 +49,6 @@ graphslim.coarsening.clusteringagg module
 -----------------------------------------
 
 .. automodule:: graphslim.coarsening.clusteringagg
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.coarsening.coarsening\_base module
---------------------------------------------
-
-.. automodule:: graphslim.coarsening.coarsening_base
    :members:
    :undoc-members:
    :show-inheritance:
