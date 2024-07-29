@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.configs &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../" id="documentation_options"
+            src="../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html"/>
+    <link rel="search" title="Search" href="../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.configs</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.configs</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Configuration&#39;&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+                                class="o">.</span><span class="n">abspath</span><span class="p">(</span><span
+                                class="s1">&#39;..&#39;</span><span class="p">)</span> <span class="ow">not</span> <span
+                                class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span
+                                class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span
+                                class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span
+                                class="n">path</span><span class="o">.</span><span class="n">abspath</span><span
+                                class="p">(</span><span class="s1">&#39;..&#39;</span><span class="p">))</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span
+                                class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">seed_everything</span>
+
+
+<div class="viewcode-block" id="Obj"><a class="viewcode-back" href="../../source/graphslim.html#graphslim.configs.Obj">[docs]</a><span
+        class="k">class</span> <span class="nc">Obj</span><span class="p">(</span><span class="nb">object</span><span
+        class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">dict_</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span
+            class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dict_</span><span
+            class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">):</span>
+        <span class="c1"># Use pprint&#39;s pformat to print the dictionary in a pretty manner</span>
+        <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span
+            class="n">compact</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="dict2obj"><a class="viewcode-back"
+                                             href="../../source/graphslim.html#graphslim.configs.dict2obj">[docs]</a><span
+        class="k">def</span> <span class="nf">dict2obj</span><span class="p">(</span><span class="n">d</span><span
+        class="p">):</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span
+            class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span
+            class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">object_hook</span><span
+            class="o">=</span><span class="n">Obj</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="update_from_dict"><a class="viewcode-back"
+                                                     href="../../source/graphslim.html#graphslim.configs.update_from_dict">[docs]</a><span
+        class="k">def</span> <span class="nf">update_from_dict</span><span class="p">(</span><span
+        class="n">obj</span><span class="p">,</span> <span class="n">updates</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span
+            class="ow">in</span> <span class="n">updates</span><span class="o">.</span><span class="n">items</span><span
+            class="p">():</span>
+        <span class="c1"># set higher priority from command line as we explore some factors</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;init&#39;</span><span class="p">]</span> <span class="ow">and</span> <span
+            class="n">obj</span><span class="o">.</span><span class="n">init</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span
+            class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
+
+<span class="c1"># fix setting here</span>
+<div class="viewcode-block" id="setting_config"><a class="viewcode-back"
+                                                   href="../../source/graphslim.html#graphslim.configs.setting_config">[docs]</a><span
+        class="k">def</span> <span class="nf">setting_config</span><span class="p">(</span><span
+        class="n">args</span><span class="p">):</span>
+    <span class="n">representative_r</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;cora&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span
+            class="p">,</span>
+        <span class="s1">&#39;citeseer&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span
+            class="p">,</span>
+        <span class="s1">&#39;flickr&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span
+            class="p">,</span>
+        <span class="s1">&#39;reddit&#39;</span><span class="p">:</span> <span class="mf">0.001</span><span
+            class="p">,</span>
+        <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">:</span> <span class="mf">0.01</span><span
+            class="p">,</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span> <span class="o">==</span> <span class="o">-</span><span
+            class="mi">1</span><span class="p">:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">reduction_rate</span> <span
+            class="o">=</span> <span class="n">representative_r</span><span class="p">[</span><span
+            class="n">args</span><span class="o">.</span><span class="n">dataset</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;citeseer&#39;</span><span class="p">,</span> <span class="s1">&#39;pubmed&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">setting</span> <span class="o">=</span> <span
+            class="s1">&#39;trans&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">setting</span> <span class="o">=</span> <span
+            class="s1">&#39;ind&#39;</span>
+    <span class="c1"># args.pre_norm = True</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">run_inter_eval</span> <span
+            class="o">=</span> <span class="mi">3</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">eval_interval</span> <span
+            class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># if args.method not in [&#39;gcsntk&#39;]:</span>
+    <span class="c1">#     args.eval_interval = max(args.epochs // 10, 1)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">checkpoints</span> <span class="o">=</span> <span
+            class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span
+            class="p">,</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">eval_interval</span><span class="p">))</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">eval_epochs</span> <span class="o">=</span> <span
+            class="mi">300</span>
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<span class="c1"># recommend hyperparameters here</span>
+<div class="viewcode-block" id="method_config"><a class="viewcode-back"
+                                                  href="../../source/graphslim.html#graphslim.configs.method_config">[docs]</a><span
+        class="k">def</span> <span class="nf">method_config</span><span class="p">(</span><span
+        class="n">args</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conf_dt</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span
+            class="sa">f</span><span class="s1">&#39;configs/</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">/</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">.json&#39;</span><span class="p">))</span>
+        <span class="n">update_from_dict</span><span class="p">(</span><span class="n">args</span><span
+            class="p">,</span> <span class="n">conf_dt</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No config file found or error in json format.&#39;</span><span
+            class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;msgc&#39;</span><span class="p">]:</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">batch_adj</span> <span
+            class="o">=</span> <span class="mi">16</span>
+        <span class="c1"># add temporary changes here</span>
+        <span class="c1"># do not modify the config json</span>
+
+    <span class="k">return</span> <span class="n">args</span></div>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">()</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--dataset&#39;</span><span class="p">,</span> <span class="s1">&#39;-D&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+                                class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--gpu_id&#39;</span><span class="p">,</span> <span class="s1">&#39;-G&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mi">0</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;gpu id start from 0, -1 means cpu&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--setting&#39;</span><span class="p">,</span> <span
+                                class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">([</span><span
+                                class="s1">&#39;trans&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;ind&#39;</span><span class="p">]),</span> <span
+                                class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;transductive or inductive setting&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--split&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;fixed&#39;</span><span class="p">,</span> <span
+                                class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;only support public split now, do not change it&#39;</span><span
+                                class="p">)</span>  <span
+                                class="c1"># &#39;fixed&#39;, &#39;random&#39;, &#39;few&#39;</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--run_reduction&#39;</span><span class="p">,</span> <span class="n">default</span><span
+                                class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;repeat times of reduction&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--run_eval&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">10</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;repeat times of final evaluations&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--run_inter_eval&#39;</span><span class="p">,</span> <span class="n">default</span><span
+                                class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;repeat times of intermediate evaluations&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--eval_interval&#39;</span><span class="p">,</span> <span class="n">default</span><span
+                                class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--hidden&#39;</span><span class="p">,</span> <span class="s1">&#39;-H&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mi">256</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--eval_epochs&#39;</span><span class="p">,</span> <span class="s1">&#39;--ee&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mi">300</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--eval_model&#39;</span><span class="p">,</span> <span class="s1">&#39;--em&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;GCN&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;GCN&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;GAT&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;SGC&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;APPNP&#39;</span><span class="p">,</span> <span class="s1">&#39;Cheby&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GraphSage&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GAT&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;SGFormer&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--final_eval_model&#39;</span><span class="p">,</span> <span class="s1">&#39;--fem&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;GCN&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;GCN&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;GAT&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;SGC&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;APPNP&#39;</span><span class="p">,</span> <span class="s1">&#39;Cheby&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GraphSage&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GAT&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;SGFormer&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--condense_model&#39;</span><span class="p">,</span> <span class="n">default</span><span
+                                class="o">=</span><span class="s1">&#39;SGC&#39;</span><span class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;GCN&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;GAT&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;SGC&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;APPNP&#39;</span><span class="p">,</span> <span class="s1">&#39;Cheby&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GraphSage&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;GAT&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--epochs&#39;</span><span class="p">,</span> <span class="s1">&#39;-E&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mi">1000</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;number of reduction epochs&#39;</span><span
+                                class="p">)</span>
+<span class="c1"># @click.option(&#39;--valid_result&#39;, &#39;--vr&#39;, default=0.0, show_default=True)</span>
+<span class="c1"># @click.option(&#39;--patience&#39;, &#39;-P&#39;, default=20, show_default=True)  # only for msgc</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--lr&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mf">0.01</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--weight_decay&#39;</span><span class="p">,</span> <span class="s1">&#39;--wd&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mf">0.0</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># @click.option(&#39;--normalize_features&#39;, is_flag=True, show_default=True)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--pre_norm&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;pre-normalize features, forced true for arxiv, flickr and reddit&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--outer_loop&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">10</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--inner_loop&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">1</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--reduction_rate&#39;</span><span class="p">,</span> <span class="s1">&#39;-R&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=-</span><span
+                                class="mf">1.0</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;-1 means use representative reduction rate; reduction rate of training set, defined as (number of nodes in small graph)/(number of nodes in original graph)&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--seed&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;-S&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">1</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Random seed&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--nlayers&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">2</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of GNN layers of condensed model&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--verbose&#39;</span><span class="p">,</span> <span class="s1">&#39;-V&#39;</span><span
+                                class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--soft_label&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">0</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--init&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="kc">None</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;features initialization methods&#39;</span><span
+                                class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;variation_neighborhoods&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;variation_edges&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;variation_cliques&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;heavy_edge&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;algebraic_JC&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;affinity_GS&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;kron&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;vng&#39;</span><span class="p">,</span> <span class="s1">&#39;clustering&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;averaging&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;cent_d&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;cent_p&#39;</span><span class="p">,</span> <span class="s1">&#39;kcenter&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;herding&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;random&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="c1"># @click.option(&#39;--method&#39;, &#39;-M&#39;, default=&#39;kcenter&#39;,</span>
+<span class="c1">#               type=click.Choice(</span>
+<span class="c1">#                   [&#39;variation_neighborhoods&#39;, &#39;variation_edges&#39;, &#39;variation_cliques&#39;, &#39;heavy_edge&#39;, &#39;algebraic_JC&#39;,</span>
+<span class="c1">#                    &#39;affinity_GS&#39;, &#39;kron&#39;, &#39;vng&#39;, &#39;clustering&#39;, &#39;averaging&#39;,</span>
+<span class="c1">#                    &#39;gcond&#39;, &#39;doscond&#39;, &#39;gcondx&#39;, &#39;doscondx&#39;, &#39;sfgc&#39;, &#39;msgc&#39;, &#39;disco&#39;, &#39;sgdd&#39;, &#39;gcsntk&#39;, &#39;geom&#39;,</span>
+<span class="c1">#                    &#39;cent_d&#39;, &#39;cent_p&#39;, &#39;kcenter&#39;, &#39;herding&#39;, &#39;random&#39;,</span>
+<span class="c1">#                    &#39;random_edge&#39;</span>
+<span class="c1">#                    ]), show_default=True)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--method&#39;</span><span class="p">,</span> <span class="s1">&#39;-M&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;kcenter&#39;</span><span class="p">,</span> <span
+                                class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--activation&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;relu&#39;</span><span class="p">,</span> <span
+                                class="n">help</span><span class="o">=</span><span class="s1">&#39;activation function when do NAS&#39;</span><span
+                                class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;tanh&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;relu&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;softplus&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;leakyrelu&#39;</span><span
+                                class="p">,</span> <span class="s1">&#39;relu6&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;elu&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--attack&#39;</span><span class="p">,</span> <span class="s1">&#39;-A&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="kc">None</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;corruption method&#39;</span><span
+                                class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;random_adj&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;metattack&#39;</span><span class="p">,</span> <span class="s1">&#39;random_feat&#39;</span><span
+                                class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--coarsen_strategy&#39;</span><span class="p">,</span> <span class="s1">&#39;--cs&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;greedy&#39;</span><span class="p">,</span> <span
+                                class="n">help</span><span class="o">=</span><span class="s1">&#39;for edge contraction method&#39;</span><span
+                                class="p">,</span>
+              <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span
+                                class="o">.</span><span class="n">Choice</span><span class="p">(</span>
+                  <span class="p">[</span><span class="s1">&#39;optimal&#39;</span><span class="p">,</span> <span
+                                class="s1">&#39;greedy&#39;</span><span class="p">]</span>
+              <span class="p">),</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--ptb_r&#39;</span><span class="p">,</span> <span class="s1">&#39;-P&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="mf">0.25</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;perturbation rate for corruptions&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--aggpreprocess&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;use aggregation for coreset methods&#39;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--dis_metric&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;ours&#39;</span><span class="p">,</span> <span
+                                class="n">show_default</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;distance metric for all condensation methods,ours means metric used in GCond paper&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--lr_adj&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mf">1e-4</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--lr_feat&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mf">1e-4</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--optim&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="s2">&quot;Adam&quot;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--threshold&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">0</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;sparsificaiton threshold before evaluation&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--dropout&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--ntrans&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">1</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span
+                                class="s1">&#39;number of transformations in SGC and APPNP&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--with_bn&#39;</span><span class="p">,</span> <span
+                                class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--no_buff&#39;</span><span class="p">,</span> <span
+                                class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s1">&#39;skip the buffer generation and use existing in geom,sfgc&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--batch_adj&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">1</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;batch size for msgc&#39;</span><span
+                                class="p">)</span>
+<span class="c1"># model specific args</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--alpha&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;for appnp&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--mx_size&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">100</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;for gcsntk methods, avoid SVD error&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--ts&#39;</span><span class="p">,</span> <span
+                                class="n">default</span><span class="o">=</span><span class="mi">4</span><span
+                                class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;for tspanner&#39;</span><span
+                                class="p">,</span> <span class="n">show_default</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--save_path&#39;</span><span class="p">,</span> <span class="s1">&#39;--sp&#39;</span><span
+                                class="p">,</span> <span class="n">default</span><span class="o">=</span><span
+                                class="s1">&#39;../checkpoints&#39;</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;save path for synthetic graph&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span
+                                class="s1">&#39;--eval_whole&#39;</span><span class="p">,</span> <span class="s1">&#39;-W&#39;</span><span
+                                class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span
+                                class="kc">True</span><span class="p">,</span> <span class="n">show_default</span><span
+                                class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span
+                                class="o">=</span><span class="s1">&#39;if run on whole graph&#39;</span><span
+                                class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">cli</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span
+                                class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">dict2obj</span><span class="p">(</span><span
+                                class="n">kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">gpu_id</span> <span
+                                class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span
+                                class="s2">&quot;CUDA_VISIBLE_DEVICES&quot;</span><span class="p">]</span> <span
+                                class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span
+                                class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">gpu_id</span><span
+                                class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
+                                class="sa">f</span><span class="s1">&#39;cuda:0&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># if gpu_id=-1, use cpu</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
+                                class="s1">&#39;cpu&#39;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span
+                                class="n">save_path</span>
+    <span class="n">seed_everything</span><span class="p">(</span><span class="n">args</span><span
+                                class="o">.</span><span class="n">seed</span><span class="p">)</span>
+    <span class="c1"># for benchmark, we need unified settings and reduce flexibility of args</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">method_config</span><span
+                                class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="c1"># setting_config has higher priority than methods_config</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">setting_config</span><span
+                                class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span
+                                class="n">path</span><span class="o">.</span><span class="n">exists</span><span
+                                class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span
+                                class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">/logs/</span><span
+                                class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+                                class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span
+                                class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span
+                                class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">/logs/</span><span
+                                class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+                                class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span
+                                class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span
+                                class="si">}</span><span class="s1">/logs/</span><span class="si">{</span><span
+                                class="n">args</span><span class="o">.</span><span class="n">method</span><span
+                                class="si">}</span><span class="s1"> exists!&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span
+                                class="p">(</span><span class="n">filename</span><span class="o">=</span><span
+                                class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+                                class="n">path</span><span class="si">}</span><span class="s1">/logs/</span><span
+                                class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+                                class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">args</span><span
+                                class="o">.</span><span class="n">dataset</span><span class="si">}</span><span
+                                class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+                                class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+                                class="s1">.log&#39;</span><span class="p">,</span>
+                        <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span
+                                class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span
+                                class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span
+                                class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span
+                                class="si">%(levelname)s</span><span class="s1"> - </span><span
+                                class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span
+                                class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span
+                                class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
+                                class="n">addHandler</span><span class="p">(</span><span class="n">logging</span><span
+                                class="o">.</span><span class="n">StreamHandler</span><span class="p">())</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
+                                class="n">info</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">args</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span
+                                class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">cli</span><span class="p">()</span>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

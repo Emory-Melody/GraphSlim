@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.models.prbcd &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.models.prbcd</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.models.prbcd</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Robustness of Graph Neural Networks at Scale. NeurIPS 2021.</span>
+
+<span class="sd">Modified from https://github.com/sigeisler/robustness_of_gnns_at_scale/blob/main/rgnn_at_scale/attacks/prbcd.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">deeprobust.graph.defense_pyg</span> <span class="kn">import</span> <span
+                                class="n">GCN</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span
+                                class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">deeprobust.graph.utils</span> <span class="k">as</span> <span
+                                class="nn">utils</span>
+<span class="kn">import</span> <span class="nn">torch_sparse</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">coalesce</span>
+
+<div class="viewcode-block" id="PRBCD"><a class="viewcode-back"
+                                          href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD">[docs]</a><span
+        class="k">class</span> <span class="nc">PRBCD</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">model</span><span
+            class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">make_undirected</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span>
+                 <span class="n">eps</span><span class="o">=</span><span class="mf">1e-7</span><span class="p">,</span> <span
+            class="n">search_space_size</span><span class="o">=</span><span class="mi">10_000_000</span><span class="p">,</span>
+                 <span class="n">max_final_samples</span><span class="o">=</span><span class="mi">20</span><span
+            class="p">,</span>
+                 <span class="n">fine_tune_epochs</span><span class="o">=</span><span class="mi">100</span><span
+            class="p">,</span>
+                 <span class="n">epochs</span><span class="o">=</span><span class="mi">400</span><span
+            class="p">,</span> <span class="n">lr_adj</span><span class="o">=</span><span class="mf">0.1</span><span
+            class="p">,</span>
+                 <span class="n">with_early_stopping</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span>
+                 <span class="n">do_synchronize</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span>
+                 <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda&#39;</span><span
+            class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : pyg format data</span>
+<span class="sd">        model : the model to be attacked, should be models in deeprobust.graph.defense_pyg</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
+            class="n">device</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span
+            class="n">data</span>
+
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">pretrain_model</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span
+            class="n">model</span>
+        <span class="n">nnodes</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">d</span> <span class="o">=</span> <span
+            class="n">nnodes</span><span class="p">,</span> <span class="n">nnodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_undirected</span> <span
+            class="o">=</span> <span class="n">make_undirected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_final_samples</span> <span
+            class="o">=</span> <span class="n">max_final_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">search_space_size</span> <span
+            class="o">=</span> <span class="n">search_space_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span
+            class="n">eps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr_adj</span> <span class="o">=</span> <span
+            class="n">lr_adj</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span><span
+            class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">:</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">Tensor</span> <span class="o">=</span> <span
+            class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">make_undirected</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_possible_edges</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">*</span> <span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span
+            class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_possible_edges</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">**</span> <span
+            class="mi">2</span>  <span class="c1"># We filter self-loops later</span>
+
+        <span class="c1"># lr_factor = 0.1</span>
+        <span class="c1"># self.lr_factor = lr_factor * max(math.log2(self.n_possible_edges / self.search_space_size), 1.)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span> <span class="o">=</span> <span
+            class="n">epochs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">epochs_resampling</span> <span
+            class="o">=</span> <span class="n">epochs</span> <span class="o">-</span> <span
+            class="n">fine_tune_epochs</span>  <span class="c1"># TODO</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">with_early_stopping</span> <span
+            class="o">=</span> <span class="n">with_early_stopping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_synchronize</span> <span
+            class="o">=</span> <span class="n">do_synchronize</span>
+
+<div class="viewcode-block" id="PRBCD.pretrain_model"><a class="viewcode-back"
+                                                         href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.pretrain_model">[docs]</a>    <span
+        class="k">def</span> <span class="nf">pretrain_model</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">data</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span>
+        <span class="n">feat</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">nclass</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span
+            class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span
+            class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">GCN</span><span
+            class="p">(</span><span class="n">nfeat</span><span class="o">=</span><span class="n">feat</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">],</span> <span class="n">nhid</span><span class="o">=</span><span class="mi">256</span><span
+            class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">,</span>
+                        <span class="n">nlayers</span><span class="o">=</span><span class="mi">2</span><span
+            class="p">,</span> <span class="n">with_bn</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span
+            class="mf">5e-4</span><span class="p">,</span> <span class="n">nclass</span><span class="o">=</span><span
+            class="n">nclass</span><span class="p">,</span>
+                        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span
+            class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="n">train_iters</span><span
+            class="o">=</span><span class="mi">600</span><span class="p">,</span> <span class="n">patience</span><span
+            class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span
+            class="n">predict</span><span class="p">()</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span
+            class="s2">&quot;</span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span
+            class="n">name</span><span class="si">}</span><span class="s2"> Test set results:&quot;</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_perf</span><span
+            class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">labels</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">test_mask</span><span
+            class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_node_mask</span> <span
+            class="o">=</span> <span class="p">(</span><span class="n">output</span><span class="o">.</span><span
+            class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span
+            class="o">==</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="PRBCD.sample_random_block"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.sample_random_block">[docs]</a>    <span
+        class="k">def</span> <span class="nf">sample_random_block</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">n_perturbations</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">max_final_samples</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span
+            class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">n_possible_edges</span><span
+            class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">search_space_size</span><span class="p">,),</span> <span class="n">device</span><span
+            class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">current_search_space</span><span class="p">,</span> <span class="nb">sorted</span><span class="o">=</span><span
+            class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_undirected</span><span
+            class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="n">linear_to_triu_idx</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="n">linear_to_full_idx</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">)</span>
+                <span class="n">is_not_self_loop</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">modified_edge_index</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">modified_edge_index</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">current_search_space</span><span class="p">[</span><span class="n">is_not_self_loop</span><span
+            class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">modified_edge_index</span><span class="p">[:,</span> <span class="n">is_not_self_loop</span><span
+            class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span
+            class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span
+            class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">float32</span><span class="p">,</span> <span
+            class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)</span> <span class="o">&gt;=</span> <span class="n">n_perturbations</span><span
+            class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sampling random block was not successfull. Please decrease `n_perturbations`.&#39;</span><span
+            class="p">)</span></div>
+
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">sample_final_edges</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">n_perturbations</span><span
+            class="p">):</span>
+        <span class="n">best_loss</span> <span class="o">=</span> <span class="o">-</span><span
+            class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span class="p">)</span>
+        <span class="n">perturbed_edge_weight</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span>
+        <span class="n">perturbed_edge_weight</span><span class="p">[</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span
+            class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">_</span><span class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span
+            class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span
+            class="o">.</span><span class="n">y</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">max_final_samples</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">best_loss</span> <span class="o">==</span> <span
+            class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span class="p">)</span> <span
+            class="ow">or</span> <span class="n">best_loss</span> <span class="o">==</span> <span
+            class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span
+            class="p">):</span>
+                <span class="c1"># In first iteration employ top k heuristic instead of sampling</span>
+                <span class="n">sampled_edges</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">perturbed_edge_weight</span><span
+            class="p">)</span>
+                <span class="n">sampled_edges</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">topk</span><span class="p">(</span><span class="n">perturbed_edge_weight</span><span
+            class="p">,</span> <span class="n">n_perturbations</span><span class="p">)</span><span
+            class="o">.</span><span class="n">indices</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sampled_edges</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">perturbed_edge_weight</span><span
+            class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">sampled_edges</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">()</span> <span class="o">&gt;</span> <span
+            class="n">n_perturbations</span><span class="p">:</span>
+                <span class="n">n_samples</span> <span class="o">=</span> <span class="n">sampled_edges</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span
+            class="s1">&#39;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span
+            class="s1">-th sampling: too many samples </span><span class="si">{</span><span
+            class="n">n_samples</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="n">sampled_edges</span>
+
+            <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">get_modified_adj</span><span class="p">()</span>
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">no_grad</span><span class="p">():</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">forward</span><span
+            class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="n">edge_index</span><span
+            class="p">,</span> <span class="n">edge_weight</span><span class="p">)</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span
+            class="o">.</span><span class="n">val_mask</span><span class="p">],</span> <span
+            class="n">labels</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">data</span><span class="o">.</span><span class="n">val_mask</span><span class="p">])</span><span
+            class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">best_loss</span> <span class="o">&lt;</span> <span
+            class="n">loss</span><span class="p">:</span>
+                <span class="n">best_loss</span> <span class="o">=</span> <span class="n">loss</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;best_loss:&#39;</span><span
+            class="p">,</span> <span class="n">best_loss</span><span class="p">)</span>
+                <span class="n">best_edges</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span
+            class="p">()</span>
+
+        <span class="c1"># Recover best sample</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">data</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span
+            class="n">best_edges</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
+
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">get_modified_adj</span><span class="p">()</span>
+        <span class="n">edge_mask</span> <span class="o">=</span> <span class="n">edge_weight</span> <span
+            class="o">==</span> <span class="mi">1</span>
+
+        <span class="n">allowed_perturbations</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span
+            class="n">n_perturbations</span> <span class="k">if</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">make_undirected</span> <span class="k">else</span> <span class="n">n_perturbations</span>
+        <span class="n">edges_after_attack</span> <span class="o">=</span> <span class="n">edge_mask</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">clean_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">edges_after_attack</span> <span class="o">&gt;=</span> <span
+            class="n">clean_edges</span> <span class="o">-</span> <span class="n">allowed_perturbations</span>
+                <span class="ow">and</span> <span class="n">edges_after_attack</span> <span class="o">&lt;=</span> <span
+            class="n">clean_edges</span> <span class="o">+</span> <span class="n">allowed_perturbations</span><span
+            class="p">),</span> \
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">edges_after_attack</span><span
+            class="si">}</span><span class="s1"> out of range with </span><span class="si">{</span><span class="n">clean_edges</span><span
+            class="si">}</span><span class="s1"> clean edges and </span><span class="si">{</span><span class="n">n_perturbations</span><span
+            class="si">}</span><span class="s1"> pertutbations&#39;</span>
+        <span class="k">return</span> <span class="n">edge_index</span><span class="p">[:,</span> <span class="n">edge_mask</span><span
+            class="p">],</span> <span class="n">edge_weight</span><span class="p">[</span><span
+            class="n">edge_mask</span><span class="p">]</span>
+
+<div class="viewcode-block" id="PRBCD.resample_random_block"><a class="viewcode-back"
+                                                                href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.resample_random_block">[docs]</a>    <span
+        class="k">def</span> <span class="nf">resample_random_block</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">n_perturbations</span><span
+        class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keep_heuristic</span> <span
+            class="o">=</span> <span class="s1">&#39;WeightOnly&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">keep_heuristic</span> <span class="o">==</span> <span class="s1">&#39;WeightOnly&#39;</span><span
+            class="p">:</span>
+            <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">)</span>
+            <span class="n">idx_keep</span> <span class="o">=</span> <span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span class="o">&lt;=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span
+            class="n">long</span><span class="p">()</span>
+            <span class="c1"># Keep at most half of the block (i.e. resample low weights)</span>
+            <span class="k">if</span> <span class="n">idx_keep</span> <span class="o">&lt;</span> <span class="n">sorted_idx</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">idx_keep</span> <span class="o">=</span> <span class="n">sorted_idx</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span
+            class="s1">&#39;Only keep_heuristic=`WeightOnly` supported&#39;</span><span class="p">)</span>
+
+        <span class="n">sorted_idx</span> <span class="o">=</span> <span class="n">sorted_idx</span><span
+            class="p">[</span><span class="n">idx_keep</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">[</span><span class="n">sorted_idx</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">modified_edge_index</span><span class="p">[:,</span> <span class="n">sorted_idx</span><span
+            class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">perturbed_edge_weight</span><span class="p">[</span><span class="n">sorted_idx</span><span
+            class="p">]</span>
+
+        <span class="c1"># Sample until enough edges were drawn</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">max_final_samples</span><span class="p">):</span>
+            <span class="n">n_edges_resample</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">search_space_size</span> <span class="o">-</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)</span>
+            <span class="n">lin_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n_possible_edges</span><span class="p">,</span> <span
+            class="p">(</span><span class="n">n_edges_resample</span><span class="p">,),</span> <span
+            class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">,</span> <span class="n">unique_idx</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span
+            class="p">((</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">current_search_space</span><span class="p">,</span> <span class="n">lin_index</span><span
+            class="p">)),</span>
+                <span class="nb">sorted</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span>
+                <span class="n">return_inverse</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_undirected</span><span
+            class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="n">linear_to_triu_idx</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="n">linear_to_full_idx</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="p">)</span>
+
+            <span class="c1"># Merge existing weights with new edge weights</span>
+            <span class="n">perturbed_edge_weight_old</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">clone</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full_like</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">current_search_space</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">eps</span><span class="p">,</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span
+            class="p">[</span>
+                <span class="n">unique_idx</span><span class="p">[:</span><span
+            class="n">perturbed_edge_weight_old</span><span class="o">.</span><span class="n">size</span><span
+            class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">perturbed_edge_weight_old</span>  <span
+            class="c1"># unique_idx: the indices for the old edges</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">make_undirected</span><span class="p">:</span>
+                <span class="n">is_not_self_loop</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">modified_edge_index</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">modified_edge_index</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">current_search_space</span><span class="p">[</span><span class="n">is_not_self_loop</span><span
+            class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">modified_edge_index</span><span class="p">[:,</span> <span class="n">is_not_self_loop</span><span
+            class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">perturbed_edge_weight</span><span class="p">[</span><span class="n">is_not_self_loop</span><span
+            class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_search_space</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)</span> <span class="o">&gt;</span> <span class="n">n_perturbations</span><span
+            class="p">:</span>
+                <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Sampling random block was not successfull. Please decrease `n_perturbations`.&#39;</span><span
+            class="p">)</span></div>
+
+<div class="viewcode-block" id="PRBCD.project"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.project">[docs]</a>    <span
+        class="k">def</span> <span class="nf">project</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">n_perturbations</span><span class="p">,</span> <span
+        class="n">values</span><span class="p">,</span> <span class="n">eps</span><span class="p">,</span> <span
+        class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inplace</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span
+            class="n">clone</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span
+            class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="mi">0</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">()</span> <span class="o">&gt;</span> <span class="n">n_perturbations</span><span
+            class="p">:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span
+            class="n">values</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span
+            class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">values</span><span
+            class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">miu</span> <span class="o">=</span> <span class="n">bisection</span><span class="p">(</span><span
+            class="n">values</span><span class="p">,</span> <span class="n">left</span><span class="p">,</span> <span
+            class="n">right</span><span class="p">,</span> <span class="n">n_perturbations</span><span
+            class="p">)</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">data</span><span
+            class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+                <span class="n">values</span> <span class="o">-</span> <span class="n">miu</span><span
+            class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="n">eps</span><span
+            class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">1</span> <span
+            class="o">-</span> <span class="n">eps</span>
+            <span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">data</span><span
+            class="o">.</span><span class="n">copy_</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">clamp</span><span class="p">(</span>
+                <span class="n">values</span><span class="p">,</span> <span class="nb">min</span><span
+            class="o">=</span><span class="n">eps</span><span class="p">,</span> <span class="nb">max</span><span
+            class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eps</span>
+            <span class="p">))</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+
+<div class="viewcode-block" id="PRBCD.get_modified_adj"><a class="viewcode-back"
+                                                           href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.get_modified_adj">[docs]</a>    <span
+        class="k">def</span> <span class="nf">get_modified_adj</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">make_undirected</span><span class="p">:</span>
+            <span class="n">modified_edge_index</span><span class="p">,</span> <span
+            class="n">modified_edge_weight</span> <span class="o">=</span> <span class="n">to_symmetric</span><span
+            class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">modified_edge_index</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">perturbed_edge_weight</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">modified_edge_index</span><span class="p">,</span> <span
+            class="n">modified_edge_weight</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">modified_edge_index</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span>
+        <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">),</span> <span class="n">modified_edge_index</span><span class="p">),</span> <span
+            class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">edge_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">edge_weight</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">),</span> <span
+            class="n">modified_edge_weight</span><span class="p">))</span>
+
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="n">torch_sparse</span><span class="o">.</span><span
+            class="n">coalesce</span><span class="p">(</span><span class="n">edge_index</span><span
+            class="p">,</span> <span class="n">edge_weight</span><span class="p">,</span> <span class="n">m</span><span
+            class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span
+            class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span
+            class="s1">&#39;sum&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Allow removal of edges</span>
+        <span class="n">edge_weight</span><span class="p">[</span><span class="n">edge_weight</span> <span class="o">&gt;</span> <span
+            class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span
+            class="o">-</span> <span class="n">edge_weight</span><span class="p">[</span><span
+            class="n">edge_weight</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span></div>
+
+<div class="viewcode-block" id="PRBCD.update_edge_weights"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.update_edge_weights">[docs]</a>    <span
+        class="k">def</span> <span class="nf">update_edge_weights</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">n_perturbations</span><span
+        class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">gradient</span><span
+        class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_adj</span><span class="o">.</span><span
+            class="n">zero_grad</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">grad</span> <span class="o">=</span> <span class="o">-</span><span class="n">gradient</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_adj</span><span class="o">.</span><span
+            class="n">step</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">perturbed_edge_weight</span> <span class="o">&lt;</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">eps</span></div>
+
+    <span class="k">def</span> <span class="nf">_update_edge_weights</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">n_perturbations</span><span
+            class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">gradient</span><span
+            class="p">):</span>
+        <span class="n">lr_factor</span> <span class="o">=</span> <span class="n">n_perturbations</span> <span
+            class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span
+            class="o">/</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">lr_factor</span>
+        <span class="n">lr</span> <span class="o">=</span> <span class="n">lr_factor</span> <span
+            class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span
+            class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">,</span> <span class="n">epoch</span> <span class="o">-</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">epochs_resampling</span><span class="p">)</span> <span class="o">+</span> <span
+            class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">data</span><span class="o">.</span><span class="n">add_</span><span class="p">(</span><span
+            class="n">lr</span> <span class="o">*</span> <span class="n">gradient</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">perturbed_edge_weight</span> <span class="o">&lt;</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">eps</span><span class="p">]</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="PRBCD.attack"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.attack">[docs]</a>    <span
+        class="k">def</span> <span class="nf">attack</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">edge_index</span><span class="o">=</span><span class="kc">None</span><span
+        class="p">,</span> <span class="n">edge_weight</span><span class="o">=</span><span class="kc">None</span><span
+        class="p">,</span> <span class="n">ptb_rate</span><span class="o">=</span><span class="mf">0.1</span><span
+        class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">data</span>
+        <span class="n">epochs</span><span class="p">,</span> <span class="n">lr_adj</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_adj</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">model</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>  <span
+            class="c1"># should set to eval</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">labels</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">no_grad</span><span class="p">():</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="p">)</span>
+            <span class="n">pred</span> <span class="o">=</span> <span class="n">output</span><span
+            class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span>
+        <span class="n">gt_labels</span> <span class="o">=</span> <span class="n">labels</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span
+            class="o">.</span><span class="n">clone</span><span class="p">()</span>  <span class="c1"># to avoid shallow copy</span>
+        <span class="n">labels</span><span class="p">[</span><span class="o">~</span><span class="n">data</span><span
+            class="o">.</span><span class="n">train_mask</span><span class="p">]</span> <span class="o">=</span> <span
+            class="n">pred</span><span class="p">[</span><span class="o">~</span><span class="n">data</span><span
+            class="o">.</span><span class="n">train_mask</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">edge_index</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">edge_index</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_weight</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="n">n_perturbations</span> <span class="o">=</span> <span class="nb">int</span><span
+            class="p">(</span><span class="n">ptb_rate</span> <span class="o">*</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span
+            class="mi">2</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;n_perturbations:&#39;</span><span
+            class="p">,</span> <span class="n">n_perturbations</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_random_block</span><span
+            class="p">(</span><span class="n">n_perturbations</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span class="o">.</span><span
+            class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_adj</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span
+            class="o">.</span><span class="n">Adam</span><span class="p">([</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">],</span> <span
+            class="n">lr</span><span class="o">=</span><span class="n">lr_adj</span><span class="p">)</span>
+        <span class="n">best_loss_val</span> <span class="o">=</span> <span class="o">-</span><span
+            class="nb">float</span><span class="p">(</span><span class="s1">&#39;Inf&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span
+            class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">get_modified_adj</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span
+            class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">do_synchronize</span><span class="p">:</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span
+            class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span
+            class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">feat</span><span
+            class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span
+            class="n">edge_weight</span><span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">loss_attack</span><span class="p">(</span><span
+            class="n">output</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span
+            class="nb">type</span><span class="o">=</span><span class="s1">&#39;tanhMargin&#39;</span><span
+            class="p">)</span>
+            <span class="n">gradient</span> <span class="o">=</span> <span class="n">grad_with_checkpoint</span><span
+            class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">)[</span><span
+            class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span
+            class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">do_synchronize</span><span class="p">:</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span
+            class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span
+            class="o">.</span><span class="n">synchronize</span><span class="p">()</span>
+            <span class="c1"># if it % 10 == 0:</span>
+            <span class="c1">#     print(f&#39;Epoch {it}: {loss}&#39;)</span>
+
+            <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">no_grad</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">update_edge_weights</span><span
+            class="p">(</span><span class="n">n_perturbations</span><span class="p">,</span> <span
+            class="n">it</span><span class="p">,</span> <span class="n">gradient</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">project</span><span
+            class="p">(</span>
+                    <span class="n">n_perturbations</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+
+                <span class="k">del</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span>  <span
+            class="c1"># , logits</span>
+
+                <span class="k">if</span> <span class="n">it</span> <span class="o">&lt;</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">epochs_resampling</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span
+            class="n">resample_random_block</span><span class="p">(</span><span class="n">n_perturbations</span><span
+            class="p">)</span>
+
+                <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">get_modified_adj</span><span class="p">()</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">feat</span><span
+            class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span
+            class="n">edge_weight</span><span class="p">)</span>
+                <span class="n">loss_val</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">val_mask</span><span
+            class="p">],</span> <span class="n">labels</span><span class="p">[</span><span class="n">data</span><span
+            class="o">.</span><span class="n">val_mask</span><span class="p">])</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">perturbed_edge_weight</span><span
+            class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_adj</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span
+            class="o">.</span><span class="n">Adam</span><span class="p">([</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">perturbed_edge_weight</span><span class="p">],</span> <span
+            class="n">lr</span><span class="o">=</span><span class="n">lr_adj</span><span class="p">)</span>
+
+        <span class="c1"># Sample final discrete graph</span>
+        <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">sample_final_edges</span><span class="p">(</span><span class="n">n_perturbations</span><span
+            class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span
+            class="n">predict</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span><span
+            class="p">)</span>
+        <span class="c1"># print(&#39;Test:&#39;)</span>
+        <span class="c1"># self.get_perf(output, gt_labels, data.test_mask)</span>
+        <span class="c1"># print(&#39;Validatoin:&#39;)</span>
+        <span class="c1"># self.get_perf(output, gt_labels, data.val_mask)</span>
+        <span class="k">return</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span></div>
+
+<div class="viewcode-block" id="PRBCD.loss_attack"><a class="viewcode-back"
+                                                      href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.loss_attack">[docs]</a>    <span
+        class="k">def</span> <span class="nf">loss_attack</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span
+        class="n">labels</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span
+        class="s1">&#39;CE&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span
+            class="o">=</span> <span class="nb">type</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">loss_type</span> <span class="o">==</span> <span class="s1">&#39;tanhMargin&#39;</span><span
+            class="p">:</span>
+            <span class="nb">sorted</span> <span class="o">=</span> <span class="n">logits</span><span
+            class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">)</span>
+            <span class="n">best_non_target_class</span> <span class="o">=</span> <span class="nb">sorted</span><span
+            class="p">[</span><span class="nb">sorted</span> <span class="o">!=</span> <span
+            class="n">labels</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]]</span><span
+            class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">logits</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span> <span
+            class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">margin</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">logits</span><span class="p">[</span><span class="n">np</span><span
+            class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">logits</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">)),</span> <span class="n">labels</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="n">logits</span><span class="p">[</span><span
+            class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span
+            class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span
+            class="mi">0</span><span class="p">)),</span> <span class="n">best_non_target_class</span><span
+            class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="o">-</span><span
+            class="n">margin</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span
+            class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span
+            class="o">==</span> <span class="s1">&#39;MCE&#39;</span><span class="p">:</span>
+            <span class="n">not_flipped</span> <span class="o">=</span> <span class="n">logits</span><span
+            class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span
+            class="p">[</span><span class="n">not_flipped</span><span class="p">],</span> <span
+            class="n">labels</span><span class="p">[</span><span class="n">not_flipped</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_type</span> <span
+            class="o">==</span> <span class="s1">&#39;NCE&#39;</span><span class="p">:</span>
+            <span class="nb">sorted</span> <span class="o">=</span> <span class="n">logits</span><span
+            class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">)</span>
+            <span class="n">best_non_target_class</span> <span class="o">=</span> <span class="nb">sorted</span><span
+            class="p">[</span><span class="nb">sorted</span> <span class="o">!=</span> <span
+            class="n">labels</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]]</span><span
+            class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">logits</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span> <span
+            class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">F</span><span
+            class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span
+            class="n">logits</span><span class="p">,</span> <span class="n">best_non_target_class</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span
+            class="n">labels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">loss</span></div>
+
+<div class="viewcode-block" id="PRBCD.get_perf"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.models.html#graphslim.models.prbcd.PRBCD.get_perf">[docs]</a>    <span
+        class="k">def</span> <span class="nf">get_perf</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">labels</span><span
+        class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">verbose</span><span
+        class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span
+            class="n">mask</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span
+            class="n">mask</span><span class="p">])</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span
+            class="n">accuracy</span><span class="p">(</span><span class="n">output</span><span class="p">[</span><span
+            class="n">mask</span><span class="p">],</span> <span class="n">labels</span><span class="p">[</span><span
+            class="n">mask</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;loss= </span><span class="si">{:.4f}</span><span
+            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
+            class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()),</span>
+                  <span class="s2">&quot;accuracy= </span><span class="si">{:.4f}</span><span
+            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
+            class="n">acc</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
+        <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span
+            class="n">item</span><span class="p">(),</span> <span class="n">acc</span><span class="o">.</span><span
+            class="n">item</span><span class="p">()</span></div></div>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">softmax_entropy</span><span class="p">(</span><span class="n">x</span><span
+                                class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+                                class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span
+                                class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Entropy of softmax distribution from **logits**.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">x</span><span
+                                class="o">.</span><span class="n">softmax</span><span class="p">(</span><span
+                                class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span
+                                class="n">x</span><span class="o">.</span><span class="n">log_softmax</span><span
+                                class="p">(</span><span class="mi">1</span><span class="p">))</span><span
+                                class="o">.</span><span class="n">sum</span><span class="p">(</span><span
+                                class="mi">1</span><span class="p">)</span>
+
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">script</span>
+<span class="k">def</span> <span class="nf">entropy</span><span class="p">(</span><span class="n">x</span><span
+                                class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+                                class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span
+                                class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Entropy of softmax distribution from **log_softmax**.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">torch</span><span
+                                class="o">.</span><span class="n">exp</span><span class="p">(</span><span
+                                class="n">x</span><span class="p">)</span> <span class="o">*</span> <span
+                                class="n">x</span><span class="p">)</span><span class="o">.</span><span
+                                class="n">sum</span><span class="p">(</span><span class="mi">1</span><span
+                                class="p">)</span>
+
+
+<div class="viewcode-block" id="to_symmetric"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.models.html#graphslim.models.prbcd.to_symmetric">[docs]</a><span
+        class="k">def</span> <span class="nf">to_symmetric</span><span class="p">(</span><span
+        class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span><span
+        class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">op</span><span
+        class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">):</span>
+    <span class="n">symmetric_edge_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span
+            class="n">edge_index</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span
+            class="mi">0</span><span class="p">)),</span> <span class="n">dim</span><span class="o">=-</span><span
+            class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="n">symmetric_edge_weight</span> <span class="o">=</span> <span class="n">edge_weight</span><span
+            class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">2</span><span
+            class="p">)</span>
+
+    <span class="n">symmetric_edge_index</span><span class="p">,</span> <span
+            class="n">symmetric_edge_weight</span> <span class="o">=</span> <span class="n">coalesce</span><span
+            class="p">(</span>
+        <span class="n">symmetric_edge_index</span><span class="p">,</span>
+        <span class="n">symmetric_edge_weight</span><span class="p">,</span>
+        <span class="n">m</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+        <span class="n">n</span><span class="o">=</span><span class="n">n</span><span class="p">,</span>
+        <span class="n">op</span><span class="o">=</span><span class="n">op</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">symmetric_edge_index</span><span class="p">,</span> <span class="n">symmetric_edge_weight</span></div>
+
+
+<div class="viewcode-block" id="linear_to_full_idx"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.models.html#graphslim.models.prbcd.linear_to_full_idx">[docs]</a><span
+        class="k">def</span> <span class="nf">linear_to_full_idx</span><span class="p">(</span><span
+        class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lin_idx</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+    <span class="n">row_idx</span> <span class="o">=</span> <span class="n">lin_idx</span> <span
+            class="o">//</span> <span class="n">n</span>
+    <span class="n">col_idx</span> <span class="o">=</span> <span class="n">lin_idx</span> <span
+            class="o">%</span> <span class="n">n</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span
+            class="p">((</span><span class="n">row_idx</span><span class="p">,</span> <span
+            class="n">col_idx</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="linear_to_triu_idx"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.models.html#graphslim.models.prbcd.linear_to_triu_idx">[docs]</a><span
+        class="k">def</span> <span class="nf">linear_to_triu_idx</span><span class="p">(</span><span
+        class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">lin_idx</span><span
+        class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+        class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span
+        class="n">Tensor</span><span class="p">:</span>
+    <span class="n">row_idx</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">n</span>
+            <span class="o">-</span> <span class="mi">2</span>
+            <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">floor</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="mi">8</span> <span
+            class="o">*</span> <span class="n">lin_idx</span><span class="o">.</span><span class="n">double</span><span
+            class="p">()</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span
+            class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span
+            class="mi">7</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span
+            class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+    <span class="n">col_idx</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">lin_idx</span>
+            <span class="o">+</span> <span class="n">row_idx</span>
+            <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">n</span> <span
+            class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span
+            class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="o">+</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span
+            class="n">row_idx</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span
+            class="n">n</span> <span class="o">-</span> <span class="n">row_idx</span><span class="p">)</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span
+            class="mi">2</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span
+            class="p">((</span><span class="n">row_idx</span><span class="p">,</span> <span
+            class="n">col_idx</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="grad_with_checkpoint"><a class="viewcode-back"
+                                                         href="../../../source/graphslim.models.html#graphslim.models.prbcd.grad_with_checkpoint">[docs]</a><span
+        class="k">def</span> <span class="nf">grad_with_checkpoint</span><span class="p">(</span><span
+        class="n">outputs</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="p">(</span><span class="n">inputs</span><span
+            class="p">,)</span> <span class="k">if</span> <span class="nb">isinstance</span><span
+            class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="k">else</span> <span
+            class="nb">tuple</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span
+            class="n">inputs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">input</span><span class="o">.</span><span
+            class="n">is_leaf</span><span class="p">:</span>
+            <span class="nb">input</span><span class="o">.</span><span class="n">retain_grad</span><span
+            class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">autograd</span><span class="o">.</span><span
+            class="n">backward</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+    <span class="n">grad_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="nb">input</span> <span class="ow">in</span> <span
+            class="n">inputs</span><span class="p">:</span>
+        <span class="n">grad_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="nb">input</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span
+            class="n">clone</span><span class="p">())</span>
+        <span class="nb">input</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span
+            class="n">zero_</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">grad_outputs</span></div>
+
+
+<div class="viewcode-block" id="bisection"><a class="viewcode-back"
+                                              href="../../../source/graphslim.models.html#graphslim.models.prbcd.bisection">[docs]</a><span
+        class="k">def</span> <span class="nf">bisection</span><span class="p">(</span><span
+        class="n">edge_weights</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span
+        class="n">b</span><span class="p">,</span> <span class="n">n_perturbations</span><span class="p">,</span> <span
+        class="n">epsilon</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span
+        class="n">iter_max</span><span class="o">=</span><span class="mf">1e5</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">func</span><span class="p">(</span><span class="n">x</span><span
+            class="p">):</span>
+        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">clamp</span><span class="p">(</span><span class="n">edge_weights</span> <span
+            class="o">-</span> <span class="n">x</span><span class="p">,</span> <span class="mi">0</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">()</span> <span class="o">-</span> <span class="n">n_perturbations</span>
+
+    <span class="n">miu</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">iter_max</span><span
+            class="p">)):</span>
+        <span class="n">miu</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span
+            class="o">+</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span
+            class="mi">2</span>
+        <span class="c1"># Check if middle point is root</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">func</span><span class="p">(</span><span
+            class="n">miu</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span
+            class="p">):</span>
+            <span class="k">break</span>
+        <span class="c1"># Decide the side to repeat the steps</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">func</span><span class="p">(</span><span
+            class="n">miu</span><span class="p">)</span> <span class="o">*</span> <span class="n">func</span><span
+            class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&lt;</span> <span
+            class="mi">0</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">miu</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">miu</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">b</span> <span class="o">-</span> <span
+            class="n">a</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">epsilon</span><span
+            class="p">):</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">miu</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span
+                                class="p">:</span>
+    <span class="kn">from</span> <span class="nn">ogb.nodeproppred</span> <span class="kn">import</span> <span
+                                class="n">PygNodePropPredDataset</span>
+    <span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
+                                class="n">to_undirected</span>
+    <span class="kn">import</span> <span class="nn">torch_geometric.transforms</span> <span class="k">as</span> <span
+                                class="nn">T</span>
+
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">PygNodePropPredDataset</span><span
+                                class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;ogbn-arxiv&#39;</span><span
+                                class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">transform</span> <span
+                                class="o">=</span> <span class="n">T</span><span class="o">.</span><span class="n">NormalizeFeatures</span><span
+                                class="p">()</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span
+                                class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span
+                                class="n">data</span><span class="p">,</span> <span
+                                class="s1">&#39;train_mask&#39;</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">add_mask</span><span class="p">(</span><span
+                                class="n">data</span><span class="p">,</span> <span class="n">dataset</span><span
+                                class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span> <span class="o">=</span> <span
+                                class="n">to_undirected</span><span class="p">(</span><span class="n">data</span><span
+                                class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span
+                                class="n">data</span><span class="o">.</span><span class="n">num_nodes</span><span
+                                class="p">)</span>
+    <span class="n">agent</span> <span class="o">=</span> <span class="n">PRBCD</span><span class="p">(</span><span
+                                class="n">data</span><span class="p">)</span>
+    <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span> <span
+                                class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">attack</span><span
+                                class="p">()</span>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

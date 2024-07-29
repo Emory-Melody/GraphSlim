@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.models.gntk &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.models.gntk</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.models.gntk</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+
+
+<div class="viewcode-block" id="GNTK"><a class="viewcode-back"
+                                         href="../../../source/graphslim.models.html#graphslim.models.gntk.GNTK">[docs]</a><span
+        class="k">class</span> <span class="nc">GNTK</span><span class="p">(</span><span class="nb">object</span><span
+        class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    implement the Graph Neural Tangent Kernel</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span
+            class="n">num_mlp_layers</span><span class="p">,</span> <span class="n">jk</span><span
+            class="p">,</span> <span class="n">scale</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        num_layers: number of layers in the neural networks (including the input layer)</span>
+<span class="sd">        num_mlp_layers: number of MLP layers</span>
+<span class="sd">        jk: a bool variable indicating whether to add jumping knowledge</span>
+<span class="sd">        scale: the scale used aggregate neighbors [uniform, degree]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span
+            class="o">=</span> <span class="n">num_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_mlp_layers</span> <span
+            class="o">=</span> <span class="n">num_mlp_layers</span>
+        <span class="c1"># self.num_agg_layers = num_agg_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">jk</span> <span class="o">=</span> <span
+            class="n">jk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span
+            class="n">scale</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="n">scale</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;uniform&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;degree&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__next_diag</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through one normal layer, for diagonal element</span>
+<span class="sd">        S: covariance of last layer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span
+            class="n">diag</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+        <span class="c1"># tmp = diag[:, None]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span
+            class="n">diag</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span
+            class="o">/</span> <span class="n">diag</span><span class="p">[</span><span class="kc">None</span><span
+            class="p">,</span> <span class="p">:]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">clip</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span
+            class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span
+            class="p">)</span>
+        <span class="c1"># dot sigma</span>
+        <span class="n">DS</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span
+            class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">S</span><span
+            class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span
+            class="n">pi</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span> <span
+            class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span
+            class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">arccos</span><span class="p">(</span><span class="n">S</span><span class="p">))</span> <span
+            class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span
+            class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">S</span> <span
+            class="o">*</span> <span class="n">S</span><span class="p">))</span> <span class="o">/</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">*</span> <span
+            class="n">diag</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span
+            class="o">*</span> <span class="n">diag</span><span class="p">[</span><span class="kc">None</span><span
+            class="p">,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">DS</span><span
+            class="p">,</span> <span class="n">diag</span>
+
+    <span class="k">def</span> <span class="nf">__adj_diag</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span
+            class="n">adj_block</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span
+            class="n">scale_mat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through one adj layer</span>
+<span class="sd">        S: the covariance</span>
+<span class="sd">        adj_block: the adjacency relation</span>
+<span class="sd">        N: number of vertices</span>
+<span class="sd">        scale_mat: scaling matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">adj_block</span><span class="o">.</span><span class="n">dot</span><span
+            class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span
+            class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_mat</span>
+
+    <span class="k">def</span> <span class="nf">__next</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">diag1</span><span
+            class="p">,</span> <span class="n">diag2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through one normal layer, for all elements</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">/</span> <span
+            class="n">diag1</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span
+            class="o">/</span> <span class="n">diag2</span><span class="p">[</span><span class="kc">None</span><span
+            class="p">,</span> <span class="p">:]</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">clip</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span
+            class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span
+            class="p">)</span>
+        <span class="n">DS</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span
+            class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">S</span><span
+            class="p">))</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span
+            class="n">pi</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="p">(</span><span class="n">S</span> <span
+            class="o">*</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span
+            class="n">pi</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">arccos</span><span class="p">(</span><span class="n">S</span><span class="p">))</span> <span
+            class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span
+            class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">S</span> <span
+            class="o">*</span> <span class="n">S</span><span class="p">))</span> <span class="o">/</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">pi</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">S</span> <span class="o">*</span> <span
+            class="n">diag1</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span
+            class="o">*</span> <span class="n">diag2</span><span class="p">[</span><span class="kc">None</span><span
+            class="p">,</span> <span class="p">:]</span>
+        <span class="k">return</span> <span class="n">S</span><span class="p">,</span> <span class="n">DS</span>
+
+    <span class="k">def</span> <span class="nf">__adj</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">adj_block</span><span
+            class="p">,</span> <span class="n">N1</span><span class="p">,</span> <span class="n">N2</span><span
+            class="p">,</span> <span class="n">scale_mat</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        go through one adj layer, for all elements</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">adj_block</span><span class="o">.</span><span class="n">dot</span><span
+            class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">N1</span><span class="p">,</span> <span
+            class="n">N2</span><span class="p">)</span> <span class="o">*</span> <span class="n">scale_mat</span>
+
+<div class="viewcode-block" id="GNTK.show_memory"><a class="viewcode-back"
+                                                     href="../../../source/graphslim.models.html#graphslim.models.gntk.GNTK.show_memory">[docs]</a>    <span
+        class="k">def</span> <span class="nf">show_memory</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span
+        class="s1">&#39;KB&#39;</span><span class="p">,</span> <span class="n">threshold</span><span
+        class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;查看变量占用内存情况</span>
+
+<span class="sd">        :param unit: 显示的单位，可为`B`,`KB`,`MB`,`GB`</span>
+<span class="sd">        :param threshold: 仅显示内存数值大于等于threshold的变量</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">getsizeof</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="mi">1</span><span
+            class="p">,</span> <span class="s1">&#39;KB&#39;</span><span class="p">:</span> <span class="mi">1024</span><span
+            class="p">,</span> <span class="s1">&#39;MB&#39;</span><span class="p">:</span> <span
+            class="mi">1048576</span><span class="p">,</span> <span class="s1">&#39;GB&#39;</span><span
+            class="p">:</span> <span class="mi">1073741824</span><span class="p">}[</span><span
+            class="n">unit</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span
+            class="p">(</span><span class="nb">globals</span><span class="p">()</span><span class="o">.</span><span
+            class="n">keys</span><span class="p">()):</span>
+            <span class="n">memory</span> <span class="o">=</span> <span class="nb">eval</span><span
+            class="p">(</span><span class="s2">&quot;getsizeof(</span><span class="si">{}</span><span
+            class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
+            class="n">i</span><span class="p">))</span> <span class="o">//</span> <span class="n">scale</span>
+            <span class="k">if</span> <span class="n">memory</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span
+            class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span
+            class="p">,</span> <span class="n">memory</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="GNTK.diag"><a class="viewcode-back"
+                                              href="../../../source/graphslim.models.html#graphslim.models.gntk.GNTK.diag">[docs]</a>    <span
+        class="k">def</span> <span class="nf">diag</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">feat</span><span class="p">,</span> <span class="n">A</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the diagonal element of GNTK for graph `g` with adjacency matrix `A`</span>
+<span class="sd">        g: graph g</span>
+<span class="sd">        A: adjacency matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># tmp0 = np.sum(A, axis=1)</span>
+        <span class="c1"># tmp1 = np.array(np.sum(A, axis=1) * np.sum(A, axis=0))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span
+            class="o">==</span> <span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+            <span class="n">scale_mat</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_mat</span> <span class="o">=</span> <span class="mf">1.0</span> <span
+            class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span
+            class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">axis</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span
+            class="n">A</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">))</span>
+            <span class="c1"># assert False</span>
+
+        <span class="n">diag_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">adj_block</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span
+            class="n">A</span><span class="p">,</span> <span class="n">A</span><span class="p">)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span
+            class="n">feat</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="c1"># print(sigma)</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">__adj_diag</span><span class="p">(</span><span class="n">sigma</span><span
+            class="p">,</span> <span class="n">adj_block</span><span class="p">,</span> <span class="n">N</span><span
+            class="p">,</span> <span class="n">scale_mat</span><span class="p">)</span>
+        <span class="c1"># print(sigma)</span>
+        <span class="n">ntk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">copy</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">num_layers</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">mlp_layer</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">num_mlp_layers</span><span class="p">):</span>
+                <span class="n">sigma</span><span class="p">,</span> <span class="n">dot_sigma</span><span
+            class="p">,</span> <span class="n">diag</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">__next_diag</span><span class="p">(</span><span
+            class="n">sigma</span><span class="p">)</span>
+                <span class="n">diag_list</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">diag</span><span class="p">)</span>
+                <span class="n">ntk</span> <span class="o">=</span> <span class="n">ntk</span> <span class="o">*</span> <span
+            class="n">dot_sigma</span> <span class="o">+</span> <span class="n">sigma</span>
+            <span class="c1"># if not last layer</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="o">!=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># for agg_layer in range(self.num_agg_layers):</span>
+                <span class="c1">#    sigma = self.__adj_diag(sigma, adj_block, N, scale_mat)</span>
+                <span class="n">ntk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">__adj_diag</span><span class="p">(</span><span class="n">ntk</span><span class="p">,</span> <span
+            class="n">adj_block</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span
+            class="n">scale_mat</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diag_list</span></div>
+
+<div class="viewcode-block" id="GNTK.gntk"><a class="viewcode-back"
+                                              href="../../../source/graphslim.models.html#graphslim.models.gntk.GNTK.gntk">[docs]</a>    <span
+        class="k">def</span> <span class="nf">gntk</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">feat1</span><span class="p">,</span> <span class="n">feat2</span><span
+        class="p">,</span> <span class="n">diag_list1</span><span class="p">,</span> <span
+        class="n">diag_list2</span><span class="p">,</span> <span class="n">A1</span><span class="p">,</span> <span
+        class="n">A2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compute the GNTK value \Theta(g1, g2)</span>
+<span class="sd">        g1: graph1</span>
+<span class="sd">        g2: graph2</span>
+<span class="sd">        diag_list1, diag_list2: g1, g2&#39;s the diagonal elements of covariance matrix in all layers</span>
+<span class="sd">        A1, A2: g1, g2&#39;s adjacency matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n1</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">A2</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span
+            class="o">==</span> <span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+            <span class="n">scale_mat</span> <span class="o">=</span> <span class="mf">1.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scale_mat</span> <span class="o">=</span> <span class="mf">1.</span> <span
+            class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span
+            class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">(</span><span class="n">A1</span><span class="p">,</span> <span class="n">axis</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span
+            class="n">A2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">))</span>
+
+        <span class="n">adj_block</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">kron</span><span class="p">(</span><span
+            class="n">A1</span><span class="p">,</span> <span class="n">A2</span><span class="p">)</span>
+
+        <span class="n">jump_ntk</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">feat1</span><span class="p">,</span> <span
+            class="n">feat2</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">jump_ntk</span> <span class="o">+=</span> <span class="n">sigma</span>
+        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">__adj</span><span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span
+            class="n">adj_block</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span
+            class="n">n2</span><span class="p">,</span> <span class="n">scale_mat</span><span class="p">)</span>
+        <span class="n">ntk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">copy</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+
+        <span class="n">list_sigma</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_ntk</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_dotsigma</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_sigma</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">ntk</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">num_layers</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">mlp_layer</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">num_mlp_layers</span><span class="p">):</span>
+                <span class="n">sigma</span><span class="p">,</span> <span class="n">dot_sigma</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__next</span><span
+            class="p">(</span><span class="n">sigma</span><span class="p">,</span>
+                                               <span class="n">diag_list1</span><span class="p">[(</span><span
+            class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span
+            class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_mlp_layers</span> <span
+            class="o">+</span> <span class="n">mlp_layer</span><span class="p">],</span>
+                                               <span class="n">diag_list2</span><span class="p">[(</span><span
+            class="n">layer</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span
+            class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_mlp_layers</span> <span
+            class="o">+</span> <span class="n">mlp_layer</span><span class="p">])</span>
+                <span class="n">ntk</span> <span class="o">=</span> <span class="n">ntk</span> <span class="o">*</span> <span
+            class="n">dot_sigma</span> <span class="o">+</span> <span class="n">sigma</span>
+
+            <span class="n">jump_ntk</span> <span class="o">+=</span> <span class="n">ntk</span>
+            <span class="c1"># if not last layer</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="o">!=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">__adj</span><span class="p">(</span><span class="n">sigma</span><span
+            class="p">,</span> <span class="n">adj_block</span><span class="p">,</span> <span class="n">n1</span><span
+            class="p">,</span> <span class="n">n2</span><span class="p">,</span> <span class="n">scale_mat</span><span
+            class="p">)</span>
+                <span class="n">ntk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">__adj</span><span class="p">(</span><span class="n">ntk</span><span class="p">,</span> <span
+            class="n">adj_block</span><span class="p">,</span> <span class="n">n1</span><span class="p">,</span> <span
+            class="n">n2</span><span class="p">,</span> <span class="n">scale_mat</span><span class="p">)</span>
+
+            <span class="n">list_sigma</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+            <span class="n">list_ntk</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">ntk</span><span class="p">)</span>
+            <span class="n">list_dotsigma</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">dot_sigma</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">jk</span><span
+            class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="n">jump_ntk</span><span class="p">)</span> <span
+            class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">list_sigma</span><span
+            class="p">,</span> <span class="n">list_ntk</span><span class="p">,</span> <span
+            class="n">list_dotsigma</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="n">ntk</span><span class="p">)</span> <span
+            class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">list_sigma</span><span
+            class="p">,</span> <span class="n">list_ntk</span><span class="p">,</span> <span
+            class="n">list_dotsigma</span></div></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

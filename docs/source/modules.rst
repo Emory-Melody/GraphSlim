@@ -5,4 +5,3 @@ GraphSlim
    :maxdepth: 4
 
    graphslim
-   setup

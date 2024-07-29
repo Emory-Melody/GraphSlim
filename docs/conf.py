@@ -9,32 +9,44 @@ import sys
 import os
 
 # sys.path.insert(0, os.path.abspath('../../GraphSlim'))
+# sys.path.insert(0, os.path.abspath('../'))
 sys.path.insert(0, os.path.abspath('../'))
-# sys.path.append(os.path.abspath('..'))
+sys.path.append('../..')
 
 html_theme = "sphinx_rtd_theme"
 
 source_suffix = ['.rst', '.md']
 project = 'GraphSlim'
-copyright = '2024, rockcor'
-author = 'rockcor'
+copyright = '2024, Melody Group'
+author = 'Shengbo Gong, Juntong Ni, Wei Jin'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = [
-    'myst_parser',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx_rtd_theme',
-    'sphinx.ext.autosummary'
-]
+# extensions = [
+#     'myst_parser',
+#     'sphinx.ext.mathjax',
+#     'sphinx.ext.autodoc',
+#     'sphinx.ext.napoleon',
+#     'sphinx_rtd_theme',
+#     'sphinx.ext.autosummary'
+# ]
 
+extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'myst_parser',
+              'sphinx.ext.autosummary', 'sphinx.ext.mathjax', 'sphinx.ext.viewcode', 'sphinx.ext.githubpages']
+
+autodoc_mock_imports = ['torch', 'torchvision', 'texttable', 'tensorboardX',
+                        'torch_geometric', 'gensim', 'node2vec', 'deeprobust', 'sklearn']
+
+# autodoc_mock_imports = ['numpy', 'torch']
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-# html_static_path = ['_static']
+html_static_path = ['_static']
+
+add_module_names = False
+
+master_doc = 'index'

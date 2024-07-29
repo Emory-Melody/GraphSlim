@@ -2,16 +2,16 @@
 <html class="writer-html5" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>graphslim.dataset package &mdash; GraphSlim documentation</title>
-    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
-    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094"/>
 
 
     <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+      <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -21,29 +21,29 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
-    <link href="../genindex.html" rel="index" title="Index"/>
-    <link href="../search.html" rel="search" title="Search"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
 </head>
 
 <body class="wy-body-for-nav">
 <div class="wy-grid-for-nav">
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
         <div class="wy-side-scroll">
             <div class="wy-side-nav-search">
 
 
-                <a class="icon icon-home" href="../index.html">
+                <a href="../index.html" class="icon icon-home">
                     GraphSlim
                 </a>
                 <div role="search">
-                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-                        <input name="check_keywords" type="hidden" value="yes"/>
-                        <input name="area" type="hidden" value="default"/>
+                    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
                     </form>
                 </div>
             </div>
-            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
                 <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
@@ -72,17 +72,17 @@
         </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
-        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
-            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
             <a href="../index.html">GraphSlim</a>
         </nav>
 
         <div class="wy-nav-content">
             <div class="rst-content">
-                <div aria-label="Page navigation" role="navigation">
+                <div role="navigation" aria-label="Page navigation">
                     <ul class="wy-breadcrumbs">
-                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
                         <li class="breadcrumb-item active">graphslim.dataset package</li>
                         <li class="wy-breadcrumbs-aside">
                             <a href="../_sources/source/graphslim.dataset.rst.txt" rel="nofollow"> View page source</a>
@@ -90,7 +90,7 @@
                     </ul>
                     <hr/>
                 </div>
-                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
                     <div itemprop="articleBody">
 
                         <section id="graphslim-dataset-package">
@@ -100,28 +100,583 @@
                                 <h2>Submodules<a class="headerlink" href="#submodules"
                                                  title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="graphslim-dataset-attack-module">
+                            <section id="module-graphslim.dataset.attack">
+                                <span id="graphslim-dataset-attack-module"></span>
                                 <h2>graphslim.dataset.attack module<a class="headerlink"
-                                                                      href="#graphslim-dataset-attack-module"
+                                                                      href="#module-graphslim.dataset.attack"
                                                                       title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.attack.attack">
+                                        <span class="sig-name descname"><span class="pre">attack</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">args</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/attack.html#attack"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.attack.attack"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-dataset-convertor-module">
+                            <section id="module-graphslim.dataset.convertor">
+                                <span id="graphslim-dataset-convertor-module"></span>
                                 <h2>graphslim.dataset.convertor module<a class="headerlink"
-                                                                         href="#graphslim-dataset-convertor-module"
+                                                                         href="#module-graphslim.dataset.convertor"
                                                                          title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.csr2ei">
+                                        <span class="sig-name descname"><span class="pre">csr2ei</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adjacency_matrix_csr</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/convertor.html#csr2ei"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.csr2ei"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.dense2sparsetensor">
+                                        <span class="sig-name descname"><span
+                                                class="pre">dense2sparsetensor</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">mat</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">has_value</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">bool</span></span><span class="w"> </span><span class="o"><span
+                                            class="pre">=</span></span><span class="w"> </span><span
+                                            class="default_value"><span class="pre">True</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/convertor.html#dense2sparsetensor"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.dense2sparsetensor"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.ei2csr">
+                                        <span class="sig-name descname"><span class="pre">ei2csr</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">edge_index</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num_nodes</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/convertor.html#ei2csr"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.ei2csr"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.loadSparseGraph">
+                                        <span class="sig-name descname"><span
+                                                class="pre">loadSparseGraph</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">dataset_name</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/convertor.html#loadSparseGraph"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.loadSparseGraph"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Load original graph from file from paper
+                                        CHEN Y, YE H, VEDULA S, et al. Demystifying graph sparsification algorithms in
+                                        graph properties preservation[M/OL].</p>
+                                        <p>GraphSlim package only supports undirected graph and we do not distinguish
+                                            the weighted and unweighted
+                                            pyg-&gt;nt-&gt;save sparsified nt-&gt;pyg-&gt;evaluation</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>dataset_name</strong> (<em>str</em>) – dataset name
+                                                    </p></li>
+                                                    <li><p><strong>config</strong> (<em>dict</em>) – config loaded from
+                                                        json</p></li>
+                                                    <li><p><strong>undirected_only</strong>
+                                                        (<em>bool</em><em>, </em><em>optional</em>) – Set to True to
+                                                        override graph directness in config file and load undirected
+                                                        graph only.
+                                                        Defaults to False. This is used for sparsifiers that only
+                                                        support undirected graph.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>original graph</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>nk graph</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.networkit_to_pyg">
+                                        <span class="sig-name descname"><span class="pre">networkit_to_pyg</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">graph</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/convertor.html#networkit_to_pyg"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.networkit_to_pyg"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.pyg2gsp">
+                                        <span class="sig-name descname"><span class="pre">pyg2gsp</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">edge_index</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/convertor.html#pyg2gsp"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.pyg2gsp"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.convertor.pyg_to_networkit">
+                                        <span class="sig-name descname"><span class="pre">pyg_to_networkit</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">pyg_graph</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/convertor.html#pyg_to_networkit"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.convertor.pyg_to_networkit"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-dataset-loader-module">
+                            <section id="module-graphslim.dataset.loader">
+                                <span id="graphslim-dataset-loader-module"></span>
                                 <h2>graphslim.dataset.loader module<a class="headerlink"
-                                                                      href="#graphslim-dataset-loader-module"
+                                                                      href="#module-graphslim.dataset.loader"
                                                                       title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.loader.DataGraphSAINT">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span
+                                            class="pre">DataGraphSAINT</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">root</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">dataset</span></span></em>, <em class="sig-param"><span
+                                            class="o"><span class="pre">**</span></span><span class="n"><span
+                                            class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/loader.html#DataGraphSAINT"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.loader.DataGraphSAINT"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <p>datasets used in GraphSAINT paper</p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.DataGraphSAINT.get">
+                                                <span class="sig-name descname"><span class="pre">get</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">idx</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#DataGraphSAINT.get"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.DataGraphSAINT.get"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.DataGraphSAINT.process_labels">
+                                                <span class="sig-name descname"><span class="pre">process_labels</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">class_map</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#DataGraphSAINT.process_labels"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.DataGraphSAINT.process_labels"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>setup vertex property map for output classests</p>
+                                            </dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.loader.LargeDataLoader">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span
+                                            class="pre">LargeDataLoader</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="o"><span class="pre">*</span></span><span
+                                            class="n"><span class="pre">args</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">Any</span></span></em>, <em class="sig-param"><span
+                                            class="o"><span class="pre">**</span></span><span class="n"><span
+                                            class="pre">kwargs</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">Any</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/loader.html#LargeDataLoader"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.loader.LargeDataLoader"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">Module</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.GCF">
+                                                <span class="sig-name descname"><span class="pre">GCF</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">adj</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span class="pre">x</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">k</span></span><span class="o"><span
+                                                        class="pre">=</span></span><span class="default_value"><span
+                                                        class="pre">2</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.GCF"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.GCF"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>Graph convolution filter
+                                                :param adj: torch.Tensor, adjacency matrix, must be self-looped
+                                                :param x: torch.Tensor, features
+                                                :param k: int, number of hops</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p>torch.Tensor, filtered features</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.get_batch">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">get_batch</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">i</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.get_batch"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.get_batch"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.getitem">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">getitem</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">idx</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.getitem"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.getitem"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>对于给定的 idx 输出对应的 node_features, labels, sub Ajacency
+                                                matrix</p>
+                                            </dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.normalize_data">
+                                                <span class="sig-name descname"><span class="pre">normalize_data</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.normalize_data"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.normalize_data"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>normalize data
+                                                :param data: torch.Tensor, data need to be normalized</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p>torch.Tensor, normalized data</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.properties">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">properties</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.properties"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.properties"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.LargeDataLoader.split_batch">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">split_batch</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#LargeDataLoader.split_batch"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.LargeDataLoader.split_batch"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>split data into batches
+                                                :param split_method: str, method to split data, default is ‘kmeans’</p>
+                                            </dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.loader.OgbDataLoader">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">OgbDataLoader</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="o"><span
+                                            class="pre">*</span></span><span class="n"><span
+                                            class="pre">args</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">Any</span></span></em>, <em class="sig-param"><span
+                                            class="o"><span class="pre">**</span></span><span class="n"><span
+                                            class="pre">kwargs</span></span><span class="p"><span
+                                            class="pre">:</span></span><span class="w"> </span><span class="n"><span
+                                            class="pre">Any</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/loader.html#OgbDataLoader"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.loader.OgbDataLoader"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">Module</span></code></p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.loader.TransAndInd">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">TransAndInd</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">dataset</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">norm</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">True</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/loader.html#TransAndInd"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.loader.TransAndInd"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.TransAndInd.pyg_saint">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">pyg_saint</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#TransAndInd.pyg_saint"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.TransAndInd.pyg_saint"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.TransAndInd.reset">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reset</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#TransAndInd.reset"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.TransAndInd.reset"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.TransAndInd.retrieve_class">
+                                                <span class="sig-name descname"><span class="pre">retrieve_class</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">c</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">num</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">256</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#TransAndInd.retrieve_class"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.TransAndInd.retrieve_class"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.dataset.loader.TransAndInd.retrieve_class_sampler">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">retrieve_class_sampler</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">c</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">args</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">num</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">256</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/dataset/loader.html#TransAndInd.retrieve_class_sampler"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.dataset.loader.TransAndInd.retrieve_class_sampler"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py" id="graphslim.dataset.loader.TransAndInd.to">
+                                                <span class="sig-name descname"><span class="pre">to</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">device</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/dataset/loader.html#TransAndInd.to"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.dataset.loader.TransAndInd.to"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>Move data to the specified device.</p>
+                                            </dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.loader.get_dataset">
+                                        <span class="sig-name descname"><span class="pre">get_dataset</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">name</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">'cora'</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">args</span></span><span
+                                                class="o"><span class="pre">=</span></span><span
+                                                class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/loader.html#get_dataset"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.loader.get_dataset"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-dataset-utils-module">
+                            <section id="module-graphslim.dataset.utils">
+                                <span id="graphslim-dataset-utils-module"></span>
                                 <h2>graphslim.dataset.utils module<a class="headerlink"
-                                                                     href="#graphslim-dataset-utils-module"
+                                                                     href="#module-graphslim.dataset.utils"
                                                                      title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.utils.index2mask">
+                                        <span class="sig-name descname"><span class="pre">index2mask</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
+                                            class="pre">size</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/dataset/utils.html#index2mask"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.utils.index2mask"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.utils.load_reduced">
+                                        <span class="sig-name descname"><span
+                                                class="pre">load_reduced</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/utils.html#load_reduced"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.utils.load_reduced"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.utils.save_reduced">
+                                        <span class="sig-name descname"><span
+                                                class="pre">save_reduced</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj_syn</span></span><span class="o"><span class="pre">=</span></span><span
+                                            class="default_value"><span class="pre">None</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">feat_syn</span></span><span class="o"><span class="pre">=</span></span><span
+                                            class="default_value"><span class="pre">None</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">labels_syn</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">None</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">args</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/utils.html#save_reduced"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.utils.save_reduced"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.dataset.utils.splits">
+                                        <span class="sig-name descname"><span class="pre">splits</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">exp</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/dataset/utils.html#splits"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.dataset.utils.splits"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="module-contents">
-                                <h2>Module contents<a class="headerlink" href="#module-contents"
+                            <section id="module-graphslim.dataset">
+                                <span id="module-contents"></span>
+                                <h2>Module contents<a class="headerlink" href="#module-graphslim.dataset"
                                                       title="Permalink to this heading"></a></h2>
                             </section>
                         </section>
@@ -134,7 +689,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

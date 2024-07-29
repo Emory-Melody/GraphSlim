@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.dataset.utils &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.dataset.utils</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.dataset.utils</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset.convertor</span> <span class="kn">import</span> <span
+                                class="o">*</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="index2mask"><a class="viewcode-back"
+                                               href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.index2mask">[docs]</a><span
+        class="k">def</span> <span class="nf">index2mask</span><span class="p">(</span><span class="n">index</span><span
+        class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span
+            class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">bool</span><span class="p">)</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span
+            class="o">=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="splits"><a class="viewcode-back"
+                                           href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.splits">[docs]</a><span
+        class="k">def</span> <span class="nf">splits</span><span class="p">(</span><span class="n">data</span><span
+        class="p">,</span> <span class="n">exp</span><span class="p">):</span>
+    <span class="c1"># customize your split here</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span
+            class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">):</span>
+        <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">max</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y</span><span
+            class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">max</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">labels_full</span><span
+            class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span
+            class="o">+</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="s1">&#39;train_mask&#39;</span><span
+            class="p">):</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">num_classes</span><span class="p">):</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span
+            class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="p">(</span><span
+            class="n">data</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span
+            class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span
+            class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span><span
+            class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span
+            class="p">(</span><span class="n">index</span><span class="o">.</span><span class="n">size</span><span
+            class="p">(</span><span class="mi">0</span><span class="p">))]</span>
+            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">exp</span> <span class="o">==</span> <span
+            class="s1">&#39;random&#39;</span><span class="p">:</span>
+            <span class="n">train_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[:</span><span class="mi">20</span><span class="p">]</span> <span class="k">for</span> <span
+            class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">val_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="mi">20</span><span class="p">:</span><span class="mi">50</span><span
+            class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="n">indices</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>
+            <span class="n">test_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="mi">50</span><span class="p">:]</span> <span class="k">for</span> <span
+            class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">exp</span> <span class="o">==</span> <span
+            class="s1">&#39;few&#39;</span><span class="p">:</span>
+            <span class="n">train_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="k">for</span> <span
+            class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">val_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">10</span><span
+            class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="n">indices</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>
+            <span class="n">test_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="mi">10</span><span class="p">:]</span> <span class="k">for</span> <span
+            class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># if fixed but no split is provided, use the default 6/2/2 split classwise</span>
+            <span class="n">train_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">)]</span> <span
+            class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span
+            class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+            <span class="n">val_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">):</span><span
+            class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
+            class="o">*</span> <span class="mf">0.8</span><span class="p">)]</span> <span class="k">for</span> <span
+            class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">test_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
+            class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">):]</span> <span
+            class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span
+            class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+            <span class="c1"># raise NotImplementedError(&#39;Unknown split type&#39;)</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">train_mask</span> <span
+            class="o">=</span> <span class="n">index2mask</span><span class="p">(</span><span
+            class="n">train_index</span><span class="p">,</span> <span class="n">size</span><span
+            class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">num_nodes</span><span
+            class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">val_mask</span> <span
+            class="o">=</span> <span class="n">index2mask</span><span class="p">(</span><span class="n">val_index</span><span
+            class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">data</span><span
+            class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">test_mask</span> <span
+            class="o">=</span> <span class="n">index2mask</span><span class="p">(</span><span
+            class="n">test_index</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span
+            class="n">data</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">idx_train</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">train_mask</span><span class="o">.</span><span
+            class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span
+            class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">idx_val</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">val_mask</span><span class="o">.</span><span
+            class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span
+            class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">idx_test</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">test_mask</span><span class="o">.</span><span
+            class="n">nonzero</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span
+            class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="save_reduced"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.save_reduced">[docs]</a><span
+        class="k">def</span> <span class="nf">save_reduced</span><span class="p">(</span><span
+        class="n">adj_syn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span
+        class="n">feat_syn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span
+        class="n">labels_syn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span
+        class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span
+            class="s1">&#39;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/reduced_graph/</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+            class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">attack</span> <span
+            class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span
+            class="ow">and</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/corrupt_graph/</span><span class="si">{</span><span
+            class="n">args</span><span class="o">.</span><span class="n">attack</span><span class="si">}</span><span
+            class="s1">/reduced_graph/</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span
+            class="n">save_path</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+            class="n">save_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">adj_syn</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+            class="n">adj_syn</span><span class="p">,</span>
+                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/adj_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span
+            class="si">}</span><span class="s1">.pt&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">feat_syn</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+            class="n">feat_syn</span><span class="p">,</span>
+                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/feat_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span
+            class="si">}</span><span class="s1">.pt&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">labels_syn</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+            class="n">labels_syn</span><span class="p">,</span>
+                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/label_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span
+            class="si">}</span><span class="s1">.pt&#39;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
+            class="n">info</span><span class="p">(</span><span class="sa">f</span><span
+            class="s2">&quot;Saved </span><span class="si">{</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s2">/adj_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s2">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span
+            class="si">}</span><span class="s2">.pt&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_reduced"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.load_reduced">[docs]</a><span
+        class="k">def</span> <span class="nf">load_reduced</span><span class="p">(</span><span
+        class="n">args</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">):</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span
+            class="s1">&#39;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/reduced_graph/</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+            class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">attack</span> <span
+            class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span
+            class="ow">and</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">]:</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/corrupt_graph/</span><span class="si">{</span><span
+            class="n">args</span><span class="o">.</span><span class="n">attack</span><span class="si">}</span><span
+            class="s1">/reduced_graph/</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/feat_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no feat, use original feature matrix instead&quot;</span><span
+            class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
+            class="p">:</span>
+            <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">feat_full</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">feat_train</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/label_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no label, use original label matrix instead&quot;</span><span
+            class="p">)</span>
+        <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_train</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/adj_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no adj, use identity matrix instead&quot;</span><span
+            class="p">)</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">feat_syn</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
+            class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="c1"># args.logger.info(f&quot;Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt&quot;)</span>
+    <span class="k">return</span> <span class="n">adj_syn</span><span class="p">,</span> <span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">labels_syn</span></div>
+
+<span class="c1"># =============from graphsaint================#</span>
+<span class="c1"># import networkx as nx</span>
+<span class="c1"># import numpy as np</span>
+<span class="c1"># import os</span>
+<span class="c1"># import scipy as sp</span>
+<span class="c1"># import tempfile</span>
+<span class="c1"># import zipfile</span>
+<span class="c1"># from pygsp import graphs</span>
+<span class="c1"># from scipy import sparse</span>
+<span class="c1"># from urllib import request</span>
+<span class="c1">#</span>
+<span class="c1"># _YEAST_URL = &quot;http://nrvis.com/download/data/bio/bio-yeast.zip&quot;</span>
+<span class="c1"># _MOZILLA_HEADERS = [(&quot;User-Agent&quot;, &quot;Mozilla/5.0&quot;)]</span>
+<span class="c1">#</span>
+<span class="c1"># def download_yeast():</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#     A convenience method for loading a network of protein-to-protein interactions in budding yeast.</span>
+<span class="c1">#</span>
+<span class="c1">#     http://networkrepository.com/bio-yeast.php</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     with tempfile.TemporaryDirectory() as tempdir:</span>
+<span class="c1">#         zip_filename = os.path.join(tempdir, &quot;bio-yeast.zip&quot;)</span>
+<span class="c1">#         with open(zip_filename, &quot;wb&quot;) as zip_handle:</span>
+<span class="c1">#             opener = request.build_opener()</span>
+<span class="c1">#             opener.addheaders = _MOZILLA_HEADERS</span>
+<span class="c1">#             request.install_opener(opener)</span>
+<span class="c1">#             with request.urlopen(_YEAST_URL) as url_handle:</span>
+<span class="c1">#                 zip_handle.write(url_handle.read())</span>
+<span class="c1">#         with zipfile.ZipFile(zip_filename) as zip_handle:</span>
+<span class="c1">#             zip_handle.extractall(tempdir)</span>
+<span class="c1">#         mtx_filename = os.path.join(tempdir, &quot;bio-yeast.mtx&quot;)</span>
+<span class="c1">#         with open(mtx_filename, &quot;r&quot;) as mtx_handle:</span>
+<span class="c1">#             _ = next(mtx_handle)  # header</span>
+<span class="c1">#             n_rows, n_cols, _ = next(mtx_handle).split(&quot; &quot;)</span>
+<span class="c1">#             E = np.loadtxt(mtx_handle)</span>
+<span class="c1">#     E = E.astype(int) - 1</span>
+<span class="c1">#     W = sparse.lil_matrix((int(n_rows), int(n_cols)))</span>
+<span class="c1">#     W[(E[:, 0], E[:, 1])] = 1</span>
+<span class="c1">#     W = W.tocsr()</span>
+<span class="c1">#     W += W.T</span>
+<span class="c1">#     return W</span>
+<span class="c1">#</span>
+<span class="c1"># def real(N, graph_name, connected=True):</span>
+<span class="c1">#     r&quot;&quot;&quot;</span>
+<span class="c1">#     A convenience method for loading toy graphs that have been collected from the internet.</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters:</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     N : int</span>
+<span class="c1">#         The number of nodes. Set N=-1 to return the entire graph.</span>
+<span class="c1">#</span>
+<span class="c1">#     graph_name : a string</span>
+<span class="c1">#         Use to select which graph is returned. Choices include</span>
+<span class="c1">#             * airfoil</span>
+<span class="c1">#                 Graph from airflow simulation</span>
+<span class="c1">#                 http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.50.9217&amp;rep=rep1&amp;type=pdf</span>
+<span class="c1">#                 http://networkrepository.com/airfoil1.php</span>
+<span class="c1">#             * yeast</span>
+<span class="c1">#                 Network of protein-to-protein interactions in budding yeast.</span>
+<span class="c1">#                 http://networkrepository.com/bio-yeast.php</span>
+<span class="c1">#             * minnesota</span>
+<span class="c1">#                 Minnesota road network.</span>
+<span class="c1">#                 I am using the version provided by the PyGSP software package (initially taken from the MatlabBGL library.)</span>
+<span class="c1">#             * bunny</span>
+<span class="c1">#                 The Stanford bunny is a computer graphics 3D test model developed by Greg Turk and Marc Levoy in 1994 at Stanford University</span>
+<span class="c1">#                 I am using the version provided by the PyGSP software package.</span>
+<span class="c1">#     connected : Boolean</span>
+<span class="c1">#         Set to True if only the giant component is to be returned.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     directory = os.path.join(</span>
+<span class="c1">#         os.path.dirname(os.path.dirname(__file__)), &quot;data&quot;</span>
+<span class="c1">#     )</span>
+<span class="c1">#</span>
+<span class="c1">#     tries = 0</span>
+<span class="c1">#     while True:</span>
+<span class="c1">#         tries = tries + 1</span>
+<span class="c1">#</span>
+<span class="c1">#         if graph_name == &quot;airfoil&quot;:</span>
+<span class="c1">#             G = graphs.Airfoil()</span>
+<span class="c1">#             G = graphs.Graph(W=G.W[0:N, 0:N], coords=G.coords[0:N, :])</span>
+<span class="c1">#</span>
+<span class="c1">#         elif graph_name == &quot;yeast&quot;:</span>
+<span class="c1">#             W = download_yeast()</span>
+<span class="c1">#             G = graphs.Graph(W=W[0:N, 0:N])</span>
+<span class="c1">#</span>
+<span class="c1">#         elif graph_name == &quot;minnesota&quot;:</span>
+<span class="c1">#             G = graphs.Minnesota()</span>
+<span class="c1">#             W = G.W.astype(np.float)</span>
+<span class="c1">#             G = graphs.Graph(W=W[0:N, 0:N], coords=G.coords[0:N, :])</span>
+<span class="c1">#</span>
+<span class="c1">#         elif graph_name == &quot;bunny&quot;:</span>
+<span class="c1">#             G = graphs.Bunny()</span>
+<span class="c1">#             W = G.W.astype(np.float)</span>
+<span class="c1">#             G = graphs.Graph(W=W[0:N, 0:N], coords=G.coords[0:N, :])</span>
+<span class="c1">#</span>
+<span class="c1">#         if connected == False or G.is_connected():</span>
+<span class="c1">#             break</span>
+<span class="c1">#         if tries &gt; 1:</span>
+<span class="c1">#             print(&quot;WARNING: Disconnected graph. Using the giant component.&quot;)</span>
+<span class="c1">#             G, _ = get_giant_component(G)</span>
+<span class="c1">#             break</span>
+<span class="c1">#</span>
+<span class="c1">#     if not hasattr(G, &#39;coords&#39;):</span>
+<span class="c1">#         try:</span>
+<span class="c1">#             import networkx as nx</span>
+<span class="c1">#             graph = nx.from_scipy_sparse_matrix(G.W)</span>
+<span class="c1">#             pos = nx.nx_agraph.graphviz_layout(graph, prog=&#39;neato&#39;)</span>
+<span class="c1">#             G.set_coordinates(np.array(list(pos.values())))</span>
+<span class="c1">#         except ImportError:</span>
+<span class="c1">#             G.set_coordinates()</span>
+<span class="c1">#</span>
+<span class="c1">#     return G</span>
+<span class="c1">#</span>
+<span class="c1"># def models(N, graph_name, connected=True, default_params=False, k=12, sigma=0.5):</span>
+<span class="c1">#     tries = 0</span>
+<span class="c1">#     while True:</span>
+<span class="c1">#         tries = tries + 1</span>
+<span class="c1">#         if graph_name == &quot;regular&quot;:</span>
+<span class="c1">#             if default_params:</span>
+<span class="c1">#                 k = 10</span>
+<span class="c1">#             offsets = []</span>
+<span class="c1">#             for i in range(1, int(k / 2) + 1):</span>
+<span class="c1">#                 offsets.append(i)</span>
+<span class="c1">#                 offsets.append(-(N - i))</span>
+<span class="c1">#</span>
+<span class="c1">#             offsets = np.array(offsets)</span>
+<span class="c1">#             vals = np.ones_like(offsets)</span>
+<span class="c1">#             W = sp.sparse.diags(</span>
+<span class="c1">#                 vals, offsets, shape=(N, N), format=&quot;csc&quot;, dtype=np.float</span>
+<span class="c1">#             )</span>
+<span class="c1">#             W = (W + W.T) / 2</span>
+<span class="c1">#             G = graphs.Graph(W=W)</span>
+<span class="c1">#</span>
+<span class="c1">#         else:</span>
+<span class="c1">#             print(&quot;ERROR: uknown model&quot;)</span>
+<span class="c1">#             return</span>
+<span class="c1">#</span>
+<span class="c1">#         if connected == False or G.is_connected():</span>
+<span class="c1">#             break</span>
+<span class="c1">#         if tries &gt; 1:</span>
+<span class="c1">#             print(&quot;WARNING: disconnected graph.. trying to use the giant component&quot;)</span>
+<span class="c1">#             G = get_giant_component(G)</span>
+<span class="c1">#             break</span>
+<span class="c1">#     return G</span>
+<span class="c1">#</span>
+<span class="c1"># def to_networkx(G):</span>
+<span class="c1">#     return nx.from_scipy_sparse_matrix(G.W)</span>
+<span class="c1">#</span>
+<span class="c1"># def get_neighbors(G, i):</span>
+<span class="c1">#     return G.A[i, :].indices</span>
+<span class="c1">#     # return np.arange(G.N)[np.array((G.W[i,:] &gt; 0).todense())[0]]</span>
+<span class="c1">#</span>
+<span class="c1"># def get_giant_component(G):</span>
+<span class="c1">#     [ncomp, labels] = sp.sparse.connected_components(G.W, directed=False, return_labels=True)</span>
+<span class="c1">#</span>
+<span class="c1">#     W_g = np.array((0, 0))</span>
+<span class="c1">#     coords_g = np.array((0, 2))</span>
+<span class="c1">#     keep = np.array(0)</span>
+<span class="c1">#</span>
+<span class="c1">#     for i in range(0, ncomp):</span>
+<span class="c1">#</span>
+<span class="c1">#         idx = np.where(labels != i)</span>
+<span class="c1">#         idx = idx[0]</span>
+<span class="c1">#</span>
+<span class="c1">#         if G.N - len(idx) &gt; W_g.shape[0]:</span>
+<span class="c1">#             W_g = G.W.toarray()</span>
+<span class="c1">#             W_g = np.delete(W_g, idx, axis=0)</span>
+<span class="c1">#             W_g = np.delete(W_g, idx, axis=1)</span>
+<span class="c1">#             if hasattr(G, &#39;coords&#39;):</span>
+<span class="c1">#                 coords_g = np.delete(G.coords, idx, axis=0)</span>
+<span class="c1">#             keep = np.delete(np.arange(G.N), idx)</span>
+<span class="c1">#</span>
+<span class="c1">#     if not hasattr(G, &#39;coords&#39;):</span>
+<span class="c1">#         # print(W_g.shape)</span>
+<span class="c1">#         G_g = graphs.Graph(W=W_g)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         G_g = graphs.Graph(W=W_g, coords=coords_g)</span>
+<span class="c1">#</span>
+<span class="c1">#     return (G_g, keep)</span>
+<span class="c1">#</span>
+<span class="c1"># def get_S(G):</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     Construct the N x |E| gradient matrix S</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     # the edge set</span>
+<span class="c1">#     edges = G.get_edge_list()</span>
+<span class="c1">#     weights = np.array(edges[2])</span>
+<span class="c1">#     edges = np.array(edges[0:2])</span>
+<span class="c1">#     M = edges.shape[1]</span>
+<span class="c1">#</span>
+<span class="c1">#     # Construct the N x |E| gradient matrix S</span>
+<span class="c1">#     S = np.zeros((G.N, M))</span>
+<span class="c1">#     for e in np.arange(M):</span>
+<span class="c1">#         S[edges[0, e], e] = np.sqrt(weights[e])</span>
+<span class="c1">#         S[edges[1, e], e] = -np.sqrt(weights[e])</span>
+<span class="c1">#</span>
+<span class="c1">#     return S</span>
+<span class="c1">#</span>
+<span class="c1"># # Compare the spectum of L and Lc</span>
+
+<span class="c1">#</span>
+
+<span class="c1">#</span>
+<span class="c1"># def is_symmetric(As):</span>
+<span class="c1">#     &quot;&quot;&quot;Check if a sparse matrix is symmetric</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     As : array or sparse matrix</span>
+<span class="c1">#         A square matrix.</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     check : bool</span>
+<span class="c1">#         The check result.</span>
+<span class="c1">#</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     from scipy import sparse</span>
+<span class="c1">#</span>
+<span class="c1">#     if As.shape[0] != As.shape[1]:</span>
+<span class="c1">#         return False</span>
+<span class="c1">#</span>
+<span class="c1">#     if not isinstance(As, sparse.coo_matrix):</span>
+<span class="c1">#         As = sparse.coo_matrix(As)</span>
+<span class="c1">#</span>
+<span class="c1">#     r, c, v = As.row, As.col, As.data</span>
+<span class="c1">#     tril_no_diag = r &gt; c</span>
+<span class="c1">#     triu_no_diag = c &gt; r</span>
+<span class="c1">#</span>
+<span class="c1">#     if triu_no_diag.sum() != tril_no_diag.sum():</span>
+<span class="c1">#         return False</span>
+<span class="c1">#</span>
+<span class="c1">#     rl = r[tril_no_diag]</span>
+<span class="c1">#     cl = c[tril_no_diag]</span>
+<span class="c1">#     vl = v[tril_no_diag]</span>
+<span class="c1">#     ru = r[triu_no_diag]</span>
+<span class="c1">#     cu = c[triu_no_diag]</span>
+<span class="c1">#     vu = v[triu_no_diag]</span>
+<span class="c1">#</span>
+<span class="c1">#     sortl = np.lexsort((cl, rl))</span>
+<span class="c1">#     sortu = np.lexsort((ru, cu))</span>
+<span class="c1">#     vl = vl[sortl]</span>
+<span class="c1">#     vu = vu[sortu]</span>
+<span class="c1">#</span>
+<span class="c1">#     check = np.allclose(vl, vu)</span>
+<span class="c1">#</span>
+<span class="c1">#     return check</span>
+<span class="c1"># if transform is not None and normalize_features:</span>
+<span class="c1">#     dataset.transform = T.Compose([T.NormalizeFeatures(), transform])</span>
+<span class="c1"># elif normalize_features:</span>
+<span class="c1">#     dataset.transform = T.NormalizeFeatures()</span>
+<span class="c1"># elif transform is not None:</span>
+<span class="c1">#     dataset.transform = transform</span>
+
+<span class="c1"># def get_mnist(data_path):</span>
+<span class="c1">#     channel = 1</span>
+<span class="c1">#     im_size = (28, 28)</span>
+<span class="c1">#     num_classes = 10</span>
+<span class="c1">#     mean = [0.1307]</span>
+<span class="c1">#     std = [0.3081]</span>
+<span class="c1">#     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=mean, std=std)])</span>
+<span class="c1">#     dst_train = datasets.MNIST(data_path, train=True, download=True, transform=transform)  # no        augmentation</span>
+<span class="c1">#     dst_test = datasets.MNIST(data_path, train=False, download=True, transform=transform)</span>
+<span class="c1">#     class_names = [str(c) for c in range(num_classes)]</span>
+<span class="c1">#</span>
+<span class="c1">#     labels = []</span>
+<span class="c1">#     feat = []</span>
+<span class="c1">#     for x, y in dst_train:</span>
+<span class="c1">#         feat.append(x.view(1, -1))</span>
+<span class="c1">#         labels.append(y)</span>
+<span class="c1">#     feat = torch.cat(feat, axis=0).numpy()</span>
+<span class="c1">#     adj = sp.eye(len(feat))</span>
+<span class="c1">#     idx = np.arange(len(feat))</span>
+<span class="c1">#     dpr_data = GraphData(adj - adj, feat, labels, idx, idx, idx)</span>
+<span class="c1">#     return Dpr2Pyg(dpr_data)</span>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

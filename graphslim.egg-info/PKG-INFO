@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: graphslim
+Version: 1.0.4
+Summary: Slimming the graph data for graph learning
+Author: Rockcor
+Author-email: jshmhsb@gmail.com
+License: MIT
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Education
+Classifier: Intended Audience :: Science/Research
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Topic :: Scientific/Engineering :: Mathematics
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Libraries
+Requires-Python: >=3.7

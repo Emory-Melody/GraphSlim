@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.coarsening.coarsening_base &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.coarsening.coarsening_base</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.coarsening.coarsening_base</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">pygsp</span> <span class="kn">import</span> <span class="n">graphs</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
+                                class="n">to_dense_adj</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.coarsening.utils</span> <span class="kn">import</span> <span
+                                class="n">contract_variation_edges</span><span class="p">,</span> <span class="n">contract_variation_linear</span><span
+                                class="p">,</span> <span class="n">get_proximity_measure</span><span class="p">,</span> \
+    <span class="n">matching_optimal</span><span class="p">,</span> <span class="n">matching_greedy</span><span
+                                class="p">,</span> <span class="n">get_coarsening_matrix</span><span class="p">,</span> <span
+                                class="n">coarsen_matrix</span><span class="p">,</span> <span
+                                class="n">coarsen_vector</span><span class="p">,</span> <span class="n">zero_diag</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset.convertor</span> <span class="kn">import</span> <span
+                                class="n">pyg2gsp</span><span class="p">,</span> <span class="n">csr2ei</span><span
+                                class="p">,</span> <span class="n">ei2csr</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
+                                class="n">save_reduced</span>
+<span class="kn">from</span> <span class="nn">graphslim.evaluation</span> <span class="kn">import</span> <span
+                                class="o">*</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">one_hot</span><span
+                                class="p">,</span> <span class="n">to_tensor</span>
+
+
+<div class="viewcode-block" id="Coarsen"><a class="viewcode-back"
+                                            href="../../../source/graphslim.coarsening.html#graphslim.coarsening.coarsening_base.Coarsen">[docs]</a><span
+        class="k">class</span> <span class="nc">Coarsen</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Graph Coarsening</span>
+
+<span class="sd">    This class provides methods to coarsen a graph, which involves reducing the number of nodes while</span>
+<span class="sd">    preserving certain properties of the original graph.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    setting : str</span>
+<span class="sd">        The setting for coarsening.</span>
+<span class="sd">    data : object</span>
+<span class="sd">        The data to be coarsened.</span>
+<span class="sd">    args : Namespace</span>
+<span class="sd">        Arguments containing configurations and device information.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    reduce(data, verbose=True, save=True)</span>
+<span class="sd">        Reduces the data by coarsening the graph.</span>
+<span class="sd">    coarsening(H)</span>
+<span class="sd">        Performs the coarsening process on the graph H.</span>
+<span class="sd">    process_coarsened(data, candidate, C_list, Gc_list)</span>
+<span class="sd">        Processes the coarsened graphs and returns the features, labels, masks, and edges.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Coarsen object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        setting : str</span>
+<span class="sd">            The setting for coarsening.</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The data to be coarsened.</span>
+<span class="sd">        args : Namespace</span>
+<span class="sd">            Arguments containing configurations and device information.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setting</span> <span
+            class="o">=</span> <span class="n">setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span
+            class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">device</span>
+        <span class="c1"># pass data for initialization</span>
+
+<div class="viewcode-block" id="Coarsen.reduce"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.coarsening.html#graphslim.coarsening.coarsening_base.Coarsen.reduce">[docs]</a>    <span
+        class="nd">@verbose_time_memory</span>
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduces the data by coarsening the graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The data to be reduced.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints verbose output. Defaults to True.</span>
+<span class="sd">        save : bool, optional</span>
+<span class="sd">            If True, saves the reduced data. Defaults to True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        object</span>
+<span class="sd">            The reduced data with updated attributes `adj_syn`, `feat_syn`, and `labels_syn`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span>
+        <span class="c1"># setting = self.setting</span>
+        <span class="c1"># device = self.device</span>
+
+        <span class="n">cpu_data</span> <span class="o">=</span> <span class="n">copy</span><span
+            class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span
+            class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
+            class="p">:</span>
+            <span class="n">gps_graph</span> <span class="o">=</span> <span class="n">graphs</span><span
+            class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">W</span><span
+            class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">)</span>
+            <span class="n">candidate</span><span class="p">,</span> <span class="n">C_list</span><span
+            class="p">,</span> <span class="n">Gc_list</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">coarsening</span><span class="p">(</span><span
+            class="n">gps_graph</span><span class="p">)</span>
+            <span class="n">coarsen_features</span><span class="p">,</span> <span
+            class="n">coarsen_train_labels</span><span class="p">,</span> <span class="n">coarsen_train_mask</span><span
+            class="p">,</span> <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">process_coarsened</span><span class="p">(</span>
+                <span class="n">cpu_data</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span
+            class="n">C_list</span><span class="p">,</span> <span class="n">Gc_list</span><span class="p">)</span>
+
+            <span class="n">train_idx</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span
+            class="n">coarsen_train_mask</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">coarsen_features</span> <span class="o">=</span> <span
+            class="n">coarsen_features</span><span class="p">[</span><span class="n">train_idx</span><span
+            class="p">]</span>
+            <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="n">ei2csr</span><span
+            class="p">(</span><span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_train_mask</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">])[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span
+            class="p">(</span><span class="n">train_idx</span><span class="p">,</span> <span
+            class="n">train_idx</span><span class="p">)]</span>
+            <span class="n">coarsen_train_labels</span> <span class="o">=</span> <span
+            class="n">coarsen_train_labels</span><span class="p">[</span><span class="n">train_idx</span><span
+            class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gps_graph</span> <span class="o">=</span> <span class="n">graphs</span><span
+            class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">W</span><span
+            class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">)</span>
+            <span class="n">candidate</span><span class="p">,</span> <span class="n">C_list</span><span
+            class="p">,</span> <span class="n">Gc_list</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">coarsening</span><span class="p">(</span><span
+            class="n">gps_graph</span><span class="p">)</span>
+            <span class="n">coarsen_features</span><span class="p">,</span> <span
+            class="n">coarsen_train_labels</span><span class="p">,</span> <span class="n">coarsen_train_mask</span><span
+            class="p">,</span> <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">process_coarsened</span><span class="p">(</span>
+                <span class="n">cpu_data</span><span class="p">,</span> <span class="n">candidate</span><span class="p">,</span> <span
+            class="n">C_list</span><span class="p">,</span> <span class="n">Gc_list</span><span class="p">)</span>
+
+            <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="n">ei2csr</span><span
+            class="p">(</span><span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_train_mask</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">])</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
+            class="o">=</span> <span class="n">to_tensor</span><span class="p">(</span><span
+            class="n">coarsen_edge</span><span class="p">),</span> <span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">coarsen_train_labels</span>
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">save_reduced</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_syn</span><span class="p">,</span> <span class="n">args</span><span
+            class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="Coarsen.coarsening"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.coarsening.html#graphslim.coarsening.coarsening_base.Coarsen.coarsening">[docs]</a>    <span
+        class="k">def</span> <span class="nf">coarsening</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">H</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs the coarsening process on the given graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        H : object</span>
+<span class="sd">            The graph to be coarsened.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        candidate : list</span>
+<span class="sd">            List of subgraphs sorted by size.</span>
+<span class="sd">        C_list : list</span>
+<span class="sd">            List of coarsening matrices.</span>
+<span class="sd">        Gc_list : list</span>
+<span class="sd">            List of coarsened graphs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">H</span><span class="o">.</span><span class="n">A</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">H</span><span
+            class="o">.</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">H</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
+            class="n">error</span><span class="p">(</span><span class="s1">&#39;Inconsistent shape to extract components. Square matrix required.&#39;</span><span
+            class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">H</span><span class="o">.</span><span
+            class="n">is_directed</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span
+            class="s1">&#39;Directed graphs not supported yet.&#39;</span><span class="p">)</span>
+
+        <span class="n">graphs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">visited</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">(</span><span class="n">H</span><span class="o">.</span><span
+            class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">visited</span><span
+            class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">stack</span> <span class="o">=</span> <span class="nb">set</span><span
+            class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span
+            class="p">(</span><span class="o">~</span><span class="n">visited</span><span class="p">)[</span><span
+            class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]])</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span
+            class="p">):</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">stack</span><span
+            class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">visited</span><span
+            class="p">[</span><span class="n">v</span><span class="p">]:</span>
+                    <span class="n">comp</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">v</span><span class="p">)</span>
+                    <span class="n">visited</span><span class="p">[</span><span class="n">v</span><span
+            class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+                    <span class="n">stack</span><span class="o">.</span><span class="n">update</span><span
+            class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">idx</span> <span
+            class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">H</span><span
+            class="o">.</span><span class="n">A</span><span class="p">[</span><span class="n">v</span><span
+            class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">nonzero</span><span
+            class="p">()[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span
+            class="ow">not</span> <span class="n">visited</span><span class="p">[</span><span class="n">idx</span><span
+            class="p">]]))</span>
+
+            <span class="n">comp</span> <span class="o">=</span> <span class="nb">sorted</span><span
+            class="p">(</span><span class="n">comp</span><span class="p">)</span>
+            <span class="n">G</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span
+            class="n">subgraph</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span
+            class="p">{</span><span class="s1">&#39;orig_idx&#39;</span><span class="p">:</span> <span
+            class="n">comp</span><span class="p">}</span>
+            <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span
+            class="s1">&#39;the number of subgraphs is&#39;</span><span class="p">,</span> <span
+            class="nb">len</span><span class="p">(</span><span class="n">graphs</span><span class="p">))</span>
+        <span class="n">candidate</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span
+            class="n">graphs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span
+            class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">info</span><span
+            class="p">[</span><span class="s1">&#39;orig_idx&#39;</span><span class="p">]),</span> <span class="n">reverse</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">C_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">Gc_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">number</span> <span class="o">&lt;</span> <span
+            class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">candidate</span><span
+            class="p">[</span><span class="n">number</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span
+            class="o">.</span><span class="n">info</span><span class="p">[</span><span
+            class="s1">&#39;orig_idx&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span><span
+            class="p">:</span>
+                <span class="n">C</span><span class="p">,</span> <span class="n">Gc</span><span class="p">,</span> <span
+            class="n">Call</span><span class="p">,</span> <span class="n">Gall</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">coarsen</span><span class="p">(</span><span
+            class="n">H</span><span class="p">)</span>
+                <span class="n">C_list</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">C</span><span class="p">)</span>
+                <span class="n">Gc_list</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">Gc</span><span class="p">)</span>
+            <span class="n">number</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">candidate</span><span class="p">,</span> <span
+            class="n">C_list</span><span class="p">,</span> <span class="n">Gc_list</span></div>
+
+<div class="viewcode-block" id="Coarsen.process_coarsened"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.coarsening.html#graphslim.coarsening.coarsening_base.Coarsen.process_coarsened">[docs]</a>    <span
+        class="k">def</span> <span class="nf">process_coarsened</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
+        class="n">candidate</span><span class="p">,</span> <span class="n">C_list</span><span class="p">,</span> <span
+        class="n">Gc_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the coarsened graph to extract relevant features and labels.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The original data.</span>
+<span class="sd">        candidate : list</span>
+<span class="sd">            List of candidate subgraphs.</span>
+<span class="sd">        C_list : list</span>
+<span class="sd">            List of coarsening matrices.</span>
+<span class="sd">        Gc_list : list</span>
+<span class="sd">            List of coarsened graphs.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        coarsen_features : torch.Tensor</span>
+<span class="sd">            The coarsened features.</span>
+<span class="sd">        coarsen_train_labels : torch.Tensor</span>
+<span class="sd">            The coarsened training labels.</span>
+<span class="sd">        coarsen_train_mask : torch.Tensor</span>
+<span class="sd">            The coarsened training mask.</span>
+<span class="sd">        coarsen_edge : torch.Tensor</span>
+<span class="sd">            The coarsened edges.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">train_mask</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">train_mask</span>
+        <span class="n">val_mask</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">val_mask</span>
+
+        <span class="n">n_classes</span> <span class="o">=</span> <span class="nb">max</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y</span><span
+            class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">setting</span> <span class="o">==</span> <span
+            class="s1">&#39;trans&#39;</span><span class="p">:</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">y</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="p">[</span><span class="n">train_mask</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">train_mask</span><span
+            class="p">]</span>
+        <span class="n">coarsen_node</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">number</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">coarsen_row</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">coarsen_col</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">coarsen_features</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Tensor</span><span class="p">([])</span>
+        <span class="n">coarsen_train_labels</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Tensor</span><span class="p">([])</span>
+        <span class="n">coarsen_train_mask</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Tensor</span><span class="p">([])</span><span class="o">.</span><span
+            class="n">bool</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="n">number</span> <span class="o">&lt;</span> <span
+            class="nb">len</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+            <span class="n">H</span> <span class="o">=</span> <span class="n">candidate</span><span
+            class="p">[</span><span class="n">number</span><span class="p">]</span>
+            <span class="n">keep</span> <span class="o">=</span> <span class="n">H</span><span class="o">.</span><span
+            class="n">info</span><span class="p">[</span><span class="s1">&#39;orig_idx&#39;</span><span
+            class="p">]</span>
+            <span class="n">H_features</span> <span class="o">=</span> <span class="n">features</span><span
+            class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="n">H_labels</span> <span class="o">=</span> <span class="n">labels</span><span
+            class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span><span class="o">.</span><span class="n">setting</span> <span class="o">==</span> <span
+            class="s2">&quot;trans&quot;</span><span class="p">:</span>
+                <span class="n">H_train_mask</span> <span class="o">=</span> <span class="n">train_mask</span><span
+            class="p">[</span><span class="n">keep</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">H_train_mask</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">size</span><span
+            class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">H_labels</span><span class="p">),))</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">H</span><span
+            class="o">.</span><span class="n">info</span><span class="p">[</span><span
+            class="s1">&#39;orig_idx&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">10</span> <span
+            class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">(</span><span class="n">H_train_mask</span><span class="p">)</span> <span
+            class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">train_labels</span> <span class="o">=</span> <span class="n">one_hot</span><span
+            class="p">(</span><span class="n">H_labels</span><span class="p">,</span> <span
+            class="n">n_classes</span><span class="p">)</span>  <span
+            class="c1"># Shape: (H_labels.shape[0], n_classes)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span><span class="o">.</span><span class="n">setting</span> <span class="o">==</span> <span
+            class="s2">&quot;trans&quot;</span><span class="p">:</span>
+                    <span class="n">train_labels</span><span class="p">[</span><span class="o">~</span><span class="n">H_train_mask</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">Tensor</span><span class="p">([</span><span class="mi">0</span> <span class="k">for</span> <span
+            class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span
+            class="n">n_classes</span><span class="p">)])</span>
+                <span class="n">C</span> <span class="o">=</span> <span class="n">C_list</span><span
+            class="p">[</span><span class="n">number</span><span class="p">]</span>
+                <span class="n">Gc</span> <span class="o">=</span> <span class="n">Gc_list</span><span
+            class="p">[</span><span class="n">number</span><span class="p">]</span>
+
+                <span class="n">new_train_mask</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">BoolTensor</span><span class="p">(</span><span class="n">np</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span
+            class="n">dot</span><span class="p">(</span><span class="n">train_labels</span><span
+            class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">))</span>
+                <span class="n">mix_label</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">C</span><span
+            class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">train_labels</span><span
+            class="p">))</span>
+                <span class="n">mix_label</span><span class="p">[</span><span class="n">mix_label</span> <span
+            class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">1</span>
+                <span class="n">mix_mask</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mix_label</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span>
+                <span class="n">new_train_mask</span><span class="p">[</span><span class="n">mix_mask</span> <span
+            class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span
+            class="kc">False</span>
+
+                <span class="n">coarsen_features</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">FloatTensor</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span
+            class="n">dot</span><span class="p">(</span><span class="n">H_features</span><span
+            class="p">))],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+                <span class="n">coarsen_train_labels</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">coarsen_train_labels</span><span class="p">,</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span
+            class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span
+            class="n">train_labels</span><span class="p">)),</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+                <span class="n">coarsen_train_mask</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span
+            class="n">coarsen_train_mask</span><span class="p">,</span> <span class="n">new_train_mask</span><span
+            class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+
+                <span class="k">if</span> <span class="n">coarsen_row</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+                    <span class="n">coarsen_row</span> <span class="o">=</span> <span class="n">Gc</span><span
+            class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tocoo</span><span
+            class="p">()</span><span class="o">.</span><span class="n">row</span>
+                    <span class="n">coarsen_col</span> <span class="o">=</span> <span class="n">Gc</span><span
+            class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tocoo</span><span
+            class="p">()</span><span class="o">.</span><span class="n">col</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">current_row</span> <span class="o">=</span> <span class="n">Gc</span><span
+            class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tocoo</span><span
+            class="p">()</span><span class="o">.</span><span class="n">row</span> <span class="o">+</span> <span
+            class="n">coarsen_node</span>
+                    <span class="n">current_col</span> <span class="o">=</span> <span class="n">Gc</span><span
+            class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">tocoo</span><span
+            class="p">()</span><span class="o">.</span><span class="n">col</span> <span class="o">+</span> <span
+            class="n">coarsen_node</span>
+                    <span class="n">coarsen_row</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span
+            class="n">coarsen_row</span><span class="p">,</span> <span class="n">current_row</span><span
+            class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+                    <span class="n">coarsen_col</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span
+            class="n">coarsen_col</span><span class="p">,</span> <span class="n">current_col</span><span
+            class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+                <span class="n">coarsen_node</span> <span class="o">+=</span> <span class="n">Gc</span><span
+            class="o">.</span><span class="n">W</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">coarsen_node</span><span class="p">)</span>
+
+            <span class="n">number</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">np</span><span
+            class="o">.</span><span class="n">array</span><span class="p">([</span><span
+            class="n">coarsen_row</span><span class="p">,</span> <span class="n">coarsen_col</span><span
+            class="p">]))</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+        <span class="n">coarsen_train_labels</span> <span class="o">=</span> <span class="n">coarsen_train_labels</span><span
+            class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">coarsen_features</span><span class="p">,</span> <span class="n">coarsen_train_labels</span><span
+            class="p">,</span> <span class="n">coarsen_train_mask</span><span class="p">,</span> <span class="n">coarsen_edge</span></div></div>
+
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

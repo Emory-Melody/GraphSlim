@@ -2,16 +2,16 @@
 <html class="writer-html5" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>graphslim.sparsification package &mdash; GraphSlim documentation</title>
-    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
-    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094"/>
 
 
     <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+      <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -21,30 +21,30 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
-    <link href="../genindex.html" rel="index" title="Index"/>
-    <link href="../search.html" rel="search" title="Search"/>
-    <link href="graphslim.condensation.html" rel="prev" title="graphslim.condensation package"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="prev" title="graphslim.condensation package" href="graphslim.condensation.html"/>
 </head>
 
 <body class="wy-body-for-nav">
 <div class="wy-grid-for-nav">
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
         <div class="wy-side-scroll">
             <div class="wy-side-nav-search">
 
 
-                <a class="icon icon-home" href="../index.html">
+                <a href="../index.html" class="icon icon-home">
                     GraphSlim
                 </a>
                 <div role="search">
-                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-                        <input name="check_keywords" type="hidden" value="yes"/>
-                        <input name="area" type="hidden" value="default"/>
+                    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
                     </form>
                 </div>
             </div>
-            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
                 <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
@@ -70,67 +70,330 @@
                         <ul>
                             <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-cent-degree-module">graphslim.sparsification.cent_degree
+                                                      href="#module-graphslim.sparsification.cent_degree">graphslim.sparsification.cent_degree
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.cent_degree.CentD"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">CentD</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.cent_degree.CentD.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">CentD.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.cent_pagerank">graphslim.sparsification.cent_pagerank
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.cent_pagerank.CentP"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">CentP</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.cent_pagerank.CentP.pagerank_algorithm"><code
+                                                    class="docutils literal notranslate"><span class="pre">CentP.pagerank_algorithm()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.cent_pagerank.CentP.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">CentP.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.coreset_base">graphslim.sparsification.coreset_base
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.coreset_base.CoreSet"><code
+                                            class="docutils literal notranslate"><span class="pre">CoreSet</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.coreset_base.CoreSet.prepare_select"><code
+                                                    class="docutils literal notranslate"><span class="pre">CoreSet.prepare_select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.edge_sparsification_base">graphslim.sparsification.edge_sparsification_base
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">EdgeSparsifier.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.g_spar">graphslim.sparsification.g_spar
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.g_spar.GSpar"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">GSpar</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.g_spar.GSpar.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">GSpar.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.herding">graphslim.sparsification.herding
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.herding.Herding"><code
+                                            class="docutils literal notranslate"><span class="pre">Herding</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.herding.Herding.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">Herding.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.herding_agg">graphslim.sparsification.herding_agg
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.herding_agg.HerdingAgg"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">HerdingAgg</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.herding_agg.HerdingAgg.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">HerdingAgg.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.kcenter">graphslim.sparsification.kcenter
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.kcenter.KCenter"><code
+                                            class="docutils literal notranslate"><span class="pre">KCenter</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.kcenter.KCenter.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">KCenter.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.kcenter_agg">graphslim.sparsification.kcenter_agg
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.kcenter_agg.KCenterAgg"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">KCenterAgg</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.kcenter_agg.KCenterAgg.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">KCenterAgg.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.kcenter_sample">graphslim.sparsification.kcenter_sample
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.kcenter_sample.KCenterSample"><code
+                                            class="docutils literal notranslate"><span class="pre">KCenterSample</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.kcenter_sample.KCenterSample.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">KCenterSample.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.local_degree">graphslim.sparsification.local_degree
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.local_degree.LocalDegree"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">LocalDegree</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.local_degree.LocalDegree.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">LocalDegree.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.model_based_coreset_base">graphslim.sparsification.model_based_coreset_base
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">MBCoreSet</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">MBCoreSet.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.model_free_coreset_base">graphslim.sparsification.model_free_coreset_base
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">MFCoreSet</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">MFCoreSet.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.random">graphslim.sparsification.random
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.random.Random"><code
+                                            class="docutils literal notranslate"><span class="pre">Random</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.random.Random.select"><code
+                                                    class="docutils literal notranslate"><span class="pre">Random.select()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.random_edge">graphslim.sparsification.random_edge
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.random_edge.RandomEdge"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">RandomEdge</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.random_edge.RandomEdge.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">RandomEdge.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.rank_degree">graphslim.sparsification.rank_degree
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.rank_degree.RankDegree"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">RankDegree</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.rank_degree.RankDegree.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">RankDegree.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.scan">graphslim.sparsification.scan
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.scan.Scan"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">Scan</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.scan.Scan.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">Scan.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.spanning_forest">graphslim.sparsification.spanning_forest
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.spanning_forest.SpanningForest"><code
+                                            class="docutils literal notranslate"><span class="pre">SpanningForest</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.spanning_forest.SpanningForest.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">SpanningForest.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.t_spanner">graphslim.sparsification.t_spanner
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.sparsification.t_spanner.TSpanner"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">TSpanner</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.sparsification.t_spanner.TSpanner.edge_cutter"><code
+                                                    class="docutils literal notranslate"><span class="pre">TSpanner.edge_cutter()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.sparsification.utils">graphslim.sparsification.utils
                                 module</a></li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-cent-pagerank-module">graphslim.sparsification.cent_pagerank
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-coreset-base-module">graphslim.sparsification.coreset_base
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-edge-sparsification-base-module">graphslim.sparsification.edge_sparsification_base
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-g-spar-module">graphslim.sparsification.g_spar
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-herding-module">graphslim.sparsification.herding
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-herding-agg-module">graphslim.sparsification.herding_agg
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-kcenter-module">graphslim.sparsification.kcenter
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-kcenter-agg-module">graphslim.sparsification.kcenter_agg
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-kcenter-sample-module">graphslim.sparsification.kcenter_sample
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-local-degree-module">graphslim.sparsification.local_degree
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-model-based-coreset-base-module">graphslim.sparsification.model_based_coreset_base
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-model-free-coreset-base-module">graphslim.sparsification.model_free_coreset_base
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-random-module">graphslim.sparsification.random
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-random-edge-module">graphslim.sparsification.random_edge
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-rank-degree-module">graphslim.sparsification.rank_degree
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-scan-module">graphslim.sparsification.scan
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-spanning-forest-module">graphslim.sparsification.spanning_forest
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-t-spanner-module">graphslim.sparsification.t_spanner
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-sparsification-utils-module">graphslim.sparsification.utils
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal" href="#module-contents">Module
-                                contents</a></li>
+                                                      href="#module-graphslim.sparsification">Module contents</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -139,17 +402,17 @@
         </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
-        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
-            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
             <a href="../index.html">GraphSlim</a>
         </nav>
 
         <div class="wy-nav-content">
             <div class="rst-content">
-                <div aria-label="Page navigation" role="navigation">
+                <div role="navigation" aria-label="Page navigation">
                     <ul class="wy-breadcrumbs">
-                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
                         <li class="breadcrumb-item active">graphslim.sparsification package</li>
                         <li class="wy-breadcrumbs-aside">
                             <a href="../_sources/source/graphslim.sparsification.rst.txt" rel="nofollow"> View page
@@ -158,7 +421,7 @@
                     </ul>
                     <hr/>
                 </div>
-                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
                     <div itemprop="articleBody">
 
                         <section id="graphslim-sparsification-package">
@@ -169,126 +432,949 @@
                                 <h2>Submodules<a class="headerlink" href="#submodules"
                                                  title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="graphslim-sparsification-cent-degree-module">
+                            <section id="module-graphslim.sparsification.cent_degree">
+                                <span id="graphslim-sparsification-cent-degree-module"></span>
                                 <h2>graphslim.sparsification.cent_degree module<a class="headerlink"
-                                                                                  href="#graphslim-sparsification-cent-degree-module"
+                                                                                  href="#module-graphslim.sparsification.cent_degree"
                                                                                   title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.cent_degree.CentD">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">CentD</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/cent_degree.html#CentD"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.cent_degree.CentD"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                                     title="graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MFCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.cent_degree.CentD.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embedds</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/cent_degree.html#CentD.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.cent_degree.CentD.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-cent-pagerank-module">
+                            <section id="module-graphslim.sparsification.cent_pagerank">
+                                <span id="graphslim-sparsification-cent-pagerank-module"></span>
                                 <h2>graphslim.sparsification.cent_pagerank module<a class="headerlink"
-                                                                                    href="#graphslim-sparsification-cent-pagerank-module"
+                                                                                    href="#module-graphslim.sparsification.cent_pagerank"
                                                                                     title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.cent_pagerank.CentP">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">CentP</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/cent_pagerank.html#CentP"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.cent_pagerank.CentP"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                                     title="graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MFCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.cent_pagerank.CentP.pagerank_algorithm">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">pagerank_algorithm</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">damping_factor</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">0.85</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">max_iterations</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">100</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">convergence_threshold</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span
+                                                    class="pre">0.0001</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/cent_pagerank.html#CentP.pagerank_algorithm"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.cent_pagerank.CentP.pagerank_algorithm"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.cent_pagerank.CentP.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embedds</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/cent_pagerank.html#CentP.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.cent_pagerank.CentP.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-coreset-base-module">
+                            <section id="module-graphslim.sparsification.coreset_base">
+                                <span id="graphslim-sparsification-coreset-base-module"></span>
                                 <h2>graphslim.sparsification.coreset_base module<a class="headerlink"
-                                                                                   href="#graphslim-sparsification-coreset-base-module"
+                                                                                   href="#module-graphslim.sparsification.coreset_base"
                                                                                    title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.coreset_base.CoreSet">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">CoreSet</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/coreset_base.html#CoreSet"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.coreset_base.CoreSet"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.coreset_base.CoreSet.prepare_select">
+                                                <span class="sig-name descname"><span class="pre">prepare_select</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">args</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/coreset_base.html#CoreSet.prepare_select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.coreset_base.CoreSet.prepare_select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-edge-sparsification-base-module">
+                            <section id="module-graphslim.sparsification.edge_sparsification_base">
+                                <span id="graphslim-sparsification-edge-sparsification-base-module"></span>
                                 <h2>graphslim.sparsification.edge_sparsification_base module<a class="headerlink"
-                                                                                               href="#graphslim-sparsification-edge-sparsification-base-module"
+                                                                                               href="#module-graphslim.sparsification.edge_sparsification_base"
                                                                                                title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span
+                                            class="pre">EdgeSparsifier</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/edge_sparsification_base.html#EdgeSparsifier"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">False</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span
+                                                        class="default_value"><span
+                                                        class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/edge_sparsification_base.html#EdgeSparsifier.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-g-spar-module">
+                            <section id="module-graphslim.sparsification.g_spar">
+                                <span id="graphslim-sparsification-g-spar-module"></span>
                                 <h2>graphslim.sparsification.g_spar module<a class="headerlink"
-                                                                             href="#graphslim-sparsification-g-spar-module"
+                                                                             href="#module-graphslim.sparsification.g_spar"
                                                                              title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.g_spar.GSpar">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GSpar</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/g_spar.html#GSpar"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.g_spar.GSpar"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.g_spar.GSpar.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/g_spar.html#GSpar.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.g_spar.GSpar.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-herding-module">
+                            <section id="module-graphslim.sparsification.herding">
+                                <span id="graphslim-sparsification-herding-module"></span>
                                 <h2>graphslim.sparsification.herding module<a class="headerlink"
-                                                                              href="#graphslim-sparsification-herding-module"
+                                                                              href="#module-graphslim.sparsification.herding"
                                                                               title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.herding.Herding">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">Herding</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwarg</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/herding.html#Herding"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.herding.Herding"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet"
+                                                     title="graphslim.sparsification.model_based_coreset_base.MBCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MBCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.herding.Herding.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embeds</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/herding.html#Herding.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.herding.Herding.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-herding-agg-module">
+                            <section id="module-graphslim.sparsification.herding_agg">
+                                <span id="graphslim-sparsification-herding-agg-module"></span>
                                 <h2>graphslim.sparsification.herding_agg module<a class="headerlink"
-                                                                                  href="#graphslim-sparsification-herding-agg-module"
+                                                                                  href="#module-graphslim.sparsification.herding_agg"
                                                                                   title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.herding_agg.HerdingAgg">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">HerdingAgg</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/herding_agg.html#HerdingAgg"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.herding_agg.HerdingAgg"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                                     title="graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MFCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.herding_agg.HerdingAgg.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embeds</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/herding_agg.html#HerdingAgg.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.herding_agg.HerdingAgg.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-kcenter-module">
+                            <section id="module-graphslim.sparsification.kcenter">
+                                <span id="graphslim-sparsification-kcenter-module"></span>
                                 <h2>graphslim.sparsification.kcenter module<a class="headerlink"
-                                                                              href="#graphslim-sparsification-kcenter-module"
+                                                                              href="#module-graphslim.sparsification.kcenter"
                                                                               title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.kcenter.KCenter">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">KCenter</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwarg</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/kcenter.html#KCenter"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.kcenter.KCenter"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet"
+                                                     title="graphslim.sparsification.model_based_coreset_base.MBCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MBCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.kcenter.KCenter.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embeds</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/kcenter.html#KCenter.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.kcenter.KCenter.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-kcenter-agg-module">
+                            <section id="module-graphslim.sparsification.kcenter_agg">
+                                <span id="graphslim-sparsification-kcenter-agg-module"></span>
                                 <h2>graphslim.sparsification.kcenter_agg module<a class="headerlink"
-                                                                                  href="#graphslim-sparsification-kcenter-agg-module"
+                                                                                  href="#module-graphslim.sparsification.kcenter_agg"
                                                                                   title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.kcenter_agg.KCenterAgg">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">KCenterAgg</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/kcenter_agg.html#KCenterAgg"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.kcenter_agg.KCenterAgg"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                                     title="graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MFCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.kcenter_agg.KCenterAgg.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embeds</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/kcenter_agg.html#KCenterAgg.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.kcenter_agg.KCenterAgg.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-kcenter-sample-module">
+                            <section id="module-graphslim.sparsification.kcenter_sample">
+                                <span id="graphslim-sparsification-kcenter-sample-module"></span>
                                 <h2>graphslim.sparsification.kcenter_sample module<a class="headerlink"
-                                                                                     href="#graphslim-sparsification-kcenter-sample-module"
+                                                                                     href="#module-graphslim.sparsification.kcenter_sample"
                                                                                      title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.kcenter_sample.KCenterSample">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">KCenterSample</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwarg</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/kcenter_sample.html#KCenterSample"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.sparsification.kcenter_sample.KCenterSample"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet"
+                                                     title="graphslim.sparsification.model_based_coreset_base.MBCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MBCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.kcenter_sample.KCenterSample.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embeds</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/kcenter_sample.html#KCenterSample.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.kcenter_sample.KCenterSample.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-local-degree-module">
+                            <section id="module-graphslim.sparsification.local_degree">
+                                <span id="graphslim-sparsification-local-degree-module"></span>
                                 <h2>graphslim.sparsification.local_degree module<a class="headerlink"
-                                                                                   href="#graphslim-sparsification-local-degree-module"
+                                                                                   href="#module-graphslim.sparsification.local_degree"
                                                                                    title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.local_degree.LocalDegree">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">LocalDegree</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/local_degree.html#LocalDegree"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.local_degree.LocalDegree"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.local_degree.LocalDegree.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/local_degree.html#LocalDegree.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.local_degree.LocalDegree.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-model-based-coreset-base-module">
+                            <section id="module-graphslim.sparsification.model_based_coreset_base">
+                                <span id="graphslim-sparsification-model-based-coreset-base-module"></span>
                                 <h2>graphslim.sparsification.model_based_coreset_base module<a class="headerlink"
-                                                                                               href="#graphslim-sparsification-model-based-coreset-base-module"
+                                                                                               href="#module-graphslim.sparsification.model_based_coreset_base"
                                                                                                title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.model_based_coreset_base.MBCoreSet">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">MBCoreSet</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwarg</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/model_based_coreset_base.html#MBCoreSet"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.coreset_base.CoreSet"
+                                                     title="graphslim.sparsification.coreset_base.CoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">CoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.model_based_coreset_base.MBCoreSet.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">False</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span
+                                                        class="default_value"><span
+                                                        class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/model_based_coreset_base.html#MBCoreSet.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.model_based_coreset_base.MBCoreSet.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-model-free-coreset-base-module">
+                            <section id="module-graphslim.sparsification.model_free_coreset_base">
+                                <span id="graphslim-sparsification-model-free-coreset-base-module"></span>
                                 <h2>graphslim.sparsification.model_free_coreset_base module<a class="headerlink"
-                                                                                              href="#graphslim-sparsification-model-free-coreset-base-module"
+                                                                                              href="#module-graphslim.sparsification.model_free_coreset_base"
                                                                                               title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.model_free_coreset_base.MFCoreSet">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">MFCoreSet</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/model_free_coreset_base.html#MFCoreSet"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.coreset_base.CoreSet"
+                                                     title="graphslim.sparsification.coreset_base.CoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">CoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.model_free_coreset_base.MFCoreSet.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">False</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span
+                                                        class="default_value"><span
+                                                        class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/model_free_coreset_base.html#MFCoreSet.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-random-module">
+                            <section id="module-graphslim.sparsification.random">
+                                <span id="graphslim-sparsification-random-module"></span>
                                 <h2>graphslim.sparsification.random module<a class="headerlink"
-                                                                             href="#graphslim-sparsification-random-module"
+                                                                             href="#module-graphslim.sparsification.random"
                                                                              title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.random.Random">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">Random</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/random.html#Random"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.random.Random"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.model_free_coreset_base.MFCoreSet"
+                                                     title="graphslim.sparsification.model_free_coreset_base.MFCoreSet"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">MFCoreSet</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.random.Random.select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">select</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">embedds</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/random.html#Random.select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.random.Random.select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-random-edge-module">
+                            <section id="module-graphslim.sparsification.random_edge">
+                                <span id="graphslim-sparsification-random-edge-module"></span>
                                 <h2>graphslim.sparsification.random_edge module<a class="headerlink"
-                                                                                  href="#graphslim-sparsification-random-edge-module"
+                                                                                  href="#module-graphslim.sparsification.random_edge"
                                                                                   title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.random_edge.RandomEdge">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">RandomEdge</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/random_edge.html#RandomEdge"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.random_edge.RandomEdge"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.random_edge.RandomEdge.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/random_edge.html#RandomEdge.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.random_edge.RandomEdge.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-rank-degree-module">
+                            <section id="module-graphslim.sparsification.rank_degree">
+                                <span id="graphslim-sparsification-rank-degree-module"></span>
                                 <h2>graphslim.sparsification.rank_degree module<a class="headerlink"
-                                                                                  href="#graphslim-sparsification-rank-degree-module"
+                                                                                  href="#module-graphslim.sparsification.rank_degree"
                                                                                   title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.rank_degree.RankDegree">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">RankDegree</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/rank_degree.html#RankDegree"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.rank_degree.RankDegree"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.rank_degree.RankDegree.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/rank_degree.html#RankDegree.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.rank_degree.RankDegree.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-scan-module">
+                            <section id="module-graphslim.sparsification.scan">
+                                <span id="graphslim-sparsification-scan-module"></span>
                                 <h2>graphslim.sparsification.scan module<a class="headerlink"
-                                                                           href="#graphslim-sparsification-scan-module"
+                                                                           href="#module-graphslim.sparsification.scan"
                                                                            title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.scan.Scan">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">Scan</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/scan.html#Scan"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.scan.Scan"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.scan.Scan.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/scan.html#Scan.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.scan.Scan.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-spanning-forest-module">
+                            <section id="module-graphslim.sparsification.spanning_forest">
+                                <span id="graphslim-sparsification-spanning-forest-module"></span>
                                 <h2>graphslim.sparsification.spanning_forest module<a class="headerlink"
-                                                                                      href="#graphslim-sparsification-spanning-forest-module"
+                                                                                      href="#module-graphslim.sparsification.spanning_forest"
                                                                                       title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.sparsification.spanning_forest.SpanningForest">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span
+                                            class="pre">SpanningForest</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/spanning_forest.html#SpanningForest"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.sparsification.spanning_forest.SpanningForest"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.spanning_forest.SpanningForest.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/spanning_forest.html#SpanningForest.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.spanning_forest.SpanningForest.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-t-spanner-module">
+                            <section id="module-graphslim.sparsification.t_spanner">
+                                <span id="graphslim-sparsification-t-spanner-module"></span>
                                 <h2>graphslim.sparsification.t_spanner module<a class="headerlink"
-                                                                                href="#graphslim-sparsification-t-spanner-module"
+                                                                                href="#module-graphslim.sparsification.t_spanner"
                                                                                 title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.sparsification.t_spanner.TSpanner">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">TSpanner</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/sparsification/t_spanner.html#TSpanner"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.sparsification.t_spanner.TSpanner"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"
+                                                     title="graphslim.sparsification.edge_sparsification_base.EdgeSparsifier"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">EdgeSparsifier</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.sparsification.t_spanner.TSpanner.edge_cutter">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">edge_cutter</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">G</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/sparsification/t_spanner.html#TSpanner.edge_cutter"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.sparsification.t_spanner.TSpanner.edge_cutter"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-sparsification-utils-module">
+                            <section id="module-graphslim.sparsification.utils">
+                                <span id="graphslim-sparsification-utils-module"></span>
                                 <h2>graphslim.sparsification.utils module<a class="headerlink"
-                                                                            href="#graphslim-sparsification-utils-module"
+                                                                            href="#module-graphslim.sparsification.utils"
                                                                             title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="module-contents">
-                                <h2>Module contents<a class="headerlink" href="#module-contents"
+                            <section id="module-graphslim.sparsification">
+                                <span id="module-contents"></span>
+                                <h2>Module contents<a class="headerlink" href="#module-graphslim.sparsification"
                                                       title="Permalink to this heading"></a></h2>
                             </section>
                         </section>
@@ -297,16 +1383,16 @@
                     </div>
                 </div>
                 <footer>
-                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-                        <a accesskey="p" class="btn btn-neutral float-left"
-                           href="graphslim.condensation.html" rel="prev" title="graphslim.condensation package"><span
-                                aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+                    <div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+                        <a href="graphslim.condensation.html" class="btn btn-neutral float-left"
+                           title="graphslim.condensation package" accesskey="p" rel="prev"><span
+                                class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
                     </div>
 
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

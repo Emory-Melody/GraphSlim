@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.models.reparam_module &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.models.reparam_module</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.models.reparam_module</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+
+
+<div class="viewcode-block" id="ReparamModule"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule">[docs]</a><span
+        class="k">class</span> <span class="nc">ReparamModule</span><span class="p">(</span><span
+        class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_module_from_name</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">mn</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">mn</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span
+            class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">mn</span><span
+            class="o">.</span><span class="n">split</span><span class="p">(</span><span
+            class="s1">&#39;.&#39;</span><span class="p">):</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="nb">getattr</span><span
+            class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">p</span><span
+            class="p">)</span>
+        <span class="k">return</span> <span class="n">m</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">module</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ReparamModule</span><span
+            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span
+            class="n">module</span>
+
+        <span class="n">param_infos</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># (module name/path, param name)</span>
+        <span class="n">shared_param_memo</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">shared_param_infos</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># (module name/path, param name, src module name/path, src param_name)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">param_numels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">param_shapes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">m</span> <span
+            class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">named_modules</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span> <span
+            class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">named_parameters</span><span
+            class="p">(</span><span class="n">recurse</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">):</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">shared_param_memo</span><span
+            class="p">:</span>
+                        <span class="n">shared_mn</span><span class="p">,</span> <span class="n">shared_n</span> <span
+            class="o">=</span> <span class="n">shared_param_memo</span><span class="p">[</span><span
+            class="n">p</span><span class="p">]</span>
+                        <span class="n">shared_param_infos</span><span class="o">.</span><span
+            class="n">append</span><span class="p">((</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">,</span> <span class="n">shared_mn</span><span class="p">,</span> <span
+            class="n">shared_n</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">shared_param_memo</span><span class="p">[</span><span class="n">p</span><span
+            class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">mn</span><span
+            class="p">,</span> <span class="n">n</span><span class="p">)</span>
+                        <span class="n">param_infos</span><span class="o">.</span><span class="n">append</span><span
+            class="p">((</span><span class="n">mn</span><span class="p">,</span> <span class="n">n</span><span
+            class="p">))</span>
+                        <span class="n">params</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">detach</span><span
+            class="p">())</span>
+                        <span class="n">param_numels</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span
+            class="p">())</span>
+                        <span class="n">param_shapes</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">size</span><span
+            class="p">())</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span
+            class="nb">set</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span
+            class="n">dtype</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span
+            class="n">params</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="mi">1</span><span
+            class="p">,</span> \
+            <span class="s2">&quot;expects all parameters in module to have same dtype&quot;</span>
+
+        <span class="c1"># store the info for unflatten</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_infos</span> <span class="o">=</span> <span
+            class="nb">tuple</span><span class="p">(</span><span class="n">param_infos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shared_param_infos</span> <span
+            class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span
+            class="n">shared_param_infos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_numels</span> <span
+            class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span
+            class="n">param_numels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_param_shapes</span> <span
+            class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span
+            class="n">param_shapes</span><span class="p">)</span>
+
+        <span class="c1"># flatten</span>
+        <span class="n">flat_param</span> <span class="o">=</span> <span class="n">nn</span><span
+            class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">p</span><span
+            class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span
+            class="ow">in</span> <span class="n">params</span><span class="p">],</span> <span class="mi">0</span><span
+            class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_parameter</span><span
+            class="p">(</span><span class="s1">&#39;flat_param&#39;</span><span class="p">,</span> <span class="n">flat_param</span><span
+            class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param_numel</span> <span class="o">=</span> <span
+            class="n">flat_param</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
+        <span class="k">del</span> <span class="n">params</span>
+        <span class="k">del</span> <span class="n">shared_param_memo</span>
+
+        <span class="c1"># deregister the names as parameters</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">n</span> <span
+            class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_infos</span><span
+            class="p">:</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">n</span><span
+            class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span
+            class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_shared_param_infos</span><span class="p">:</span>
+            <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="c1"># register the views as plain attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unflatten_param</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">flat_param</span><span
+            class="p">)</span>
+
+        <span class="c1"># now buffers</span>
+        <span class="c1"># they are not reparametrized. just store info as (module, name, buffer)</span>
+        <span class="n">buffer_infos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">m</span> <span
+            class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">named_modules</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">b</span> <span
+            class="ow">in</span> <span class="n">m</span><span class="o">.</span><span
+            class="n">named_buffers</span><span class="p">(</span><span class="n">recurse</span><span class="o">=</span><span
+            class="kc">False</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">b</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">buffer_infos</span><span class="o">.</span><span class="n">append</span><span
+            class="p">((</span><span class="n">mn</span><span class="p">,</span> <span class="n">n</span><span
+            class="p">,</span> <span class="n">b</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_buffer_infos</span> <span
+            class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span
+            class="n">buffer_infos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_traced_self</span> <span class="o">=</span> <span
+            class="kc">None</span>
+
+<div class="viewcode-block" id="ReparamModule.trace"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule.trace">[docs]</a>    <span
+        class="k">def</span> <span class="nf">trace</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">example_input</span><span class="p">,</span> <span class="o">**</span><span
+        class="n">trace_kwargs</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_traced_self</span> <span class="ow">is</span> <span class="kc">None</span><span
+            class="p">,</span> <span class="s1">&#39;This ReparamModule is already traced&#39;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">example_input</span><span
+            class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span
+            class="p">):</span>
+            <span class="n">example_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">example_input</span><span
+            class="p">,)</span>
+        <span class="n">example_input</span> <span class="o">=</span> <span class="nb">tuple</span><span
+            class="p">(</span><span class="n">example_input</span><span class="p">)</span>
+        <span class="n">example_param</span> <span class="o">=</span> <span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">flat_param</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span
+            class="p">(),)</span>
+        <span class="n">example_buffers</span> <span class="o">=</span> <span class="p">(</span><span
+            class="nb">tuple</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">clone</span><span
+            class="p">()</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span
+            class="n">_</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">_buffer_infos</span><span class="p">),)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_traced_self</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span
+            class="n">trace_module</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">_forward_with_param</span><span class="o">=</span><span
+            class="n">example_param</span> <span class="o">+</span> <span class="n">example_input</span><span class="p">,</span>
+                <span class="n">_forward_with_param_and_buffers</span><span class="o">=</span><span class="n">example_param</span> <span
+            class="o">+</span> <span class="n">example_buffers</span> <span class="o">+</span> <span class="n">example_input</span><span
+            class="p">,</span>
+            <span class="p">),</span>
+            <span class="o">**</span><span class="n">trace_kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forward_with_param</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_traced_self</span><span class="o">.</span><span class="n">_forward_with_param</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forward_with_param_and_buffers</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_traced_self</span><span class="o">.</span><span class="n">_forward_with_param_and_buffers</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="ReparamModule.clear_views"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule.clear_views">[docs]</a>    <span
+        class="k">def</span> <span class="nf">clear_views</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">n</span> <span
+            class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_param_infos</span><span
+            class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="kc">None</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_apply</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span
+            class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_traced_self</span> <span class="ow">is</span> <span class="ow">not</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_traced_self</span><span
+            class="o">.</span><span class="n">_apply</span><span class="p">(</span><span class="o">*</span><span
+            class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span
+            class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span
+            class="n">ReparamModule</span><span class="p">,</span> <span class="bp">self</span><span
+            class="p">)</span><span class="o">.</span><span class="n">_apply</span><span class="p">(</span><span
+            class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_unflatten_param</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">flat_param</span><span class="p">):</span>
+        <span class="n">ps</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span><span
+            class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">s</span><span
+            class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">t</span><span
+            class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="ow">in</span> <span
+            class="nb">zip</span><span class="p">(</span><span class="n">flat_param</span><span class="o">.</span><span
+            class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_param_numels</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">_param_shapes</span><span class="p">))</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">),</span> <span class="n">p</span> <span class="ow">in</span> <span
+            class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_param_infos</span><span class="p">,</span> <span class="n">ps</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="n">p</span><span class="p">)</span>  <span class="c1"># This will set as plain attr</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">,</span> <span class="n">shared_mn</span><span class="p">,</span> <span
+            class="n">shared_n</span><span class="p">)</span> <span class="ow">in</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">_shared_param_infos</span><span
+            class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_get_module_from_name</span><span class="p">(</span><span class="n">shared_mn</span><span
+            class="p">),</span> <span class="n">shared_n</span><span class="p">))</span>
+
+<div class="viewcode-block" id="ReparamModule.unflattened_param"><a class="viewcode-back"
+                                                                    href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule.unflattened_param">[docs]</a>    <span
+        class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">unflattened_param</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">flat_param</span><span class="p">):</span>
+        <span class="n">saved_views</span> <span class="o">=</span> <span class="p">[</span><span
+            class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_get_module_from_name</span><span class="p">(</span><span class="n">mn</span><span
+            class="p">),</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span
+            class="n">mn</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">_param_infos</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unflatten_param</span><span
+            class="p">(</span><span class="n">flat_param</span><span class="p">)</span>
+        <span class="k">yield</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">),</span> <span class="n">p</span> <span class="ow">in</span> <span
+            class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_param_infos</span><span class="p">,</span> <span class="n">saved_views</span><span
+            class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="n">p</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">,</span> <span class="n">shared_mn</span><span class="p">,</span> <span
+            class="n">shared_n</span><span class="p">)</span> <span class="ow">in</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">_shared_param_infos</span><span
+            class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">_get_module_from_name</span><span class="p">(</span><span class="n">shared_mn</span><span
+            class="p">),</span> <span class="n">shared_n</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="ReparamModule.replaced_buffers"><a class="viewcode-back"
+                                                                   href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule.replaced_buffers">[docs]</a>    <span
+        class="nd">@contextmanager</span>
+    <span class="k">def</span> <span class="nf">replaced_buffers</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">buffers</span><span class="p">):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">mn</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span
+            class="n">new_b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">_buffer_infos</span><span
+            class="p">,</span> <span class="n">buffers</span><span class="p">):</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="n">new_b</span><span class="p">)</span>
+        <span class="k">yield</span>
+        <span class="k">for</span> <span class="n">mn</span><span class="p">,</span> <span class="n">n</span><span
+            class="p">,</span> <span class="n">old_b</span> <span class="ow">in</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">_buffer_infos</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">_get_module_from_name</span><span class="p">(</span><span
+            class="n">mn</span><span class="p">),</span> <span class="n">n</span><span class="p">,</span> <span
+            class="n">old_b</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_forward_with_param_and_buffers</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">flat_param</span><span
+            class="p">,</span> <span class="n">buffers</span><span class="p">,</span> <span class="o">*</span><span
+            class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwinputs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">unflattened_param</span><span
+            class="p">(</span><span class="n">flat_param</span><span class="p">):</span>
+            <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">replaced_buffers</span><span
+            class="p">(</span><span class="n">buffers</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">module</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span
+            class="p">,</span> <span class="o">**</span><span class="n">kwinputs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_forward_with_param</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">flat_param</span><span
+            class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span
+            class="o">**</span><span class="n">kwinputs</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">unflattened_param</span><span
+            class="p">(</span><span class="n">flat_param</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">module</span><span class="p">(</span><span class="o">*</span><span class="n">inputs</span><span
+            class="p">,</span> <span class="o">**</span><span class="n">kwinputs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReparamModule.forward"><a class="viewcode-back"
+                                                          href="../../../source/graphslim.models.html#graphslim.models.reparam_module.ReparamModule.forward">[docs]</a>    <span
+        class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span
+        class="n">flat_param</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span
+        class="n">buffers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span
+        class="o">**</span><span class="n">kwinputs</span><span class="p">):</span>
+        <span class="n">flat_param</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span
+            class="n">flat_param</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">flat_param</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="n">flat_param</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">flat_param</span>
+        <span class="k">if</span> <span class="n">buffers</span> <span class="ow">is</span> <span class="kc">None</span><span
+            class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_with_param</span><span
+            class="p">(</span><span class="n">flat_param</span><span class="p">,</span> <span class="o">*</span><span
+            class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwinputs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forward_with_param_and_buffers</span><span
+            class="p">(</span><span class="n">flat_param</span><span class="p">,</span> <span
+            class="nb">tuple</span><span class="p">(</span><span class="n">buffers</span><span class="p">),</span> <span
+            class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwinputs</span><span class="p">)</span></div></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

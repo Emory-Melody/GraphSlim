@@ -2,16 +2,16 @@
 <html class="writer-html5" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>graphslim.evaluation package &mdash; GraphSlim documentation</title>
-    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
-    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094"/>
 
 
     <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+      <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -21,29 +21,29 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
-    <link href="../genindex.html" rel="index" title="Index"/>
-    <link href="../search.html" rel="search" title="Search"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
 </head>
 
 <body class="wy-body-for-nav">
 <div class="wy-grid-for-nav">
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
         <div class="wy-side-scroll">
             <div class="wy-side-nav-search">
 
 
-                <a class="icon icon-home" href="../index.html">
+                <a href="../index.html" class="icon icon-home">
                     GraphSlim
                 </a>
                 <div role="search">
-                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-                        <input name="check_keywords" type="hidden" value="yes"/>
-                        <input name="area" type="hidden" value="default"/>
+                    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
                     </form>
                 </div>
             </div>
-            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
                 <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
@@ -72,17 +72,17 @@
         </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
-        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
-            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
             <a href="../index.html">GraphSlim</a>
         </nav>
 
         <div class="wy-nav-content">
             <div class="rst-content">
-                <div aria-label="Page navigation" role="navigation">
+                <div role="navigation" aria-label="Page navigation">
                     <ul class="wy-breadcrumbs">
-                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
                         <li class="breadcrumb-item active">graphslim.evaluation package</li>
                         <li class="wy-breadcrumbs-aside">
                             <a href="../_sources/source/graphslim.evaluation.rst.txt" rel="nofollow"> View page
@@ -91,7 +91,7 @@
                     </ul>
                     <hr/>
                 </div>
-                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
                     <div itemprop="articleBody">
 
                         <section id="graphslim-evaluation-package">
@@ -101,29 +101,457 @@
                                 <h2>Submodules<a class="headerlink" href="#submodules"
                                                  title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="graphslim-evaluation-eval-agent-module">
+                            <section id="module-graphslim.evaluation.eval_agent">
+                                <span id="graphslim-evaluation-eval-agent-module"></span>
                                 <h2>graphslim.evaluation.eval_agent module<a class="headerlink"
-                                                                             href="#graphslim-evaluation-eval-agent-module"
+                                                                             href="#module-graphslim.evaluation.eval_agent"
                                                                              title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.eval_agent.Evaluator">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">Evaluator</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em>, <em class="sig-param"><span
+                                            class="o"><span class="pre">**</span></span><span class="n"><span
+                                            class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.eval_agent.Evaluator"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.evaluate">
+                                                <span class="sig-name descname"><span class="pre">evaluate</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">model_type</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">verbose</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">True</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">reduced</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">mode</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">'eval'</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.evaluate"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.evaluate"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.get_syn_data">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">get_syn_data</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">model_type</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">verbose</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">False</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.get_syn_data"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.get_syn_data"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.grid_search">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">grid_search</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">model_type</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">param_grid</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">reduced</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.grid_search"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.grid_search"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.nas_evaluate">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">nas_evaluate</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">model_type</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">verbose</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">False</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">reduced</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.nas_evaluate"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.nas_evaluate"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.reset_parameters">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reset_parameters</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.reset_parameters"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.reset_parameters"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.test">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">test</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">model_type</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">verbose</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">True</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">reduced</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">mode</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">'eval'</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.test"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.test"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.train_cross">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">train_cross</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">grid_search</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">True</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">reduced</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.train_cross"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.train_cross"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-evaluation-nas-eval-module">
+                            <section id="module-graphslim.evaluation.nas_eval">
+                                <span id="graphslim-evaluation-nas-eval-module"></span>
                                 <h2>graphslim.evaluation.nas_eval module<a class="headerlink"
-                                                                           href="#graphslim-evaluation-nas-eval-module"
+                                                                           href="#module-graphslim.evaluation.nas_eval"
                                                                            title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.NasEvaluator">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">NasEvaluator</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.nas_eval.NasEvaluator"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">cal_pearson</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.cal_pearson"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.evaluate_ori">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">evaluate_ori</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.evaluate_ori"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_ori"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.evaluate_syn">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">evaluate_syn</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.evaluate_syn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_syn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.get_rank">
+                                                <span class="sig-name descname"><span class="pre">get_rank</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">results</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.get_rank"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.get_rank"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.test_params_ori">
+                                                <span class="sig-name descname"><span class="pre">test_params_ori</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.test_params_ori"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_ori"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.nas_eval.NasEvaluator.test_params_syn">
+                                                <span class="sig-name descname"><span class="pre">test_params_syn</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/nas_eval.html#NasEvaluator.test_params_syn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_syn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_csv">
+                                        <span class="sig-name descname"><span class="pre">load_csv</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/nas_eval.html#load_csv"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.nas_eval.load_csv"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_pkl">
+                                        <span class="sig-name descname"><span class="pre">load_pkl</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/nas_eval.html#load_pkl"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.nas_eval.load_pkl"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_csv">
+                                        <span class="sig-name descname"><span class="pre">save_csv</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">file_path</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/evaluation/nas_eval.html#save_csv"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.nas_eval.save_csv"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_pkl">
+                                        <span class="sig-name descname"><span class="pre">save_pkl</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">file_path</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/evaluation/nas_eval.html#save_pkl"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.nas_eval.save_pkl"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-evaluation-utils-module">
+                            <section id="module-graphslim.evaluation.utils">
+                                <span id="graphslim-evaluation-utils-module"></span>
                                 <h2>graphslim.evaluation.utils module<a class="headerlink"
-                                                                        href="#graphslim-evaluation-utils-module"
+                                                                        href="#module-graphslim.evaluation.utils"
                                                                         title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.utils.calc_f1">
+                                        <span class="sig-name descname"><span class="pre">calc_f1</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">y_true</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">y_pred</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">is_sigmoid</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/evaluation/utils.html#calc_f1"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.utils.calc_f1"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.utils.evaluate">
+                                        <span class="sig-name descname"><span class="pre">evaluate</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">output</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">labels</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">args</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/utils.html#evaluate"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.utils.evaluate"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.utils.getsize_mb">
+                                        <span class="sig-name descname"><span class="pre">getsize_mb</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">elements</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/utils.html#getsize_mb"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.utils.getsize_mb"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.utils.sparsify">
+                                        <span class="sig-name descname"><span class="pre">sparsify</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">model_type</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj_syn</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">verbose</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">False</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/utils.html#sparsify"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.utils.sparsify"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.evaluation.utils.verbose_time_memory">
+                                        <span class="sig-name descname"><span
+                                                class="pre">verbose_time_memory</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">func</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/evaluation/utils.html#verbose_time_memory"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.evaluation.utils.verbose_time_memory"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-evaluation-vis-module">
+                            <section id="module-graphslim.evaluation.vis">
+                                <span id="graphslim-evaluation-vis-module"></span>
                                 <h2>graphslim.evaluation.vis module<a class="headerlink"
-                                                                      href="#graphslim-evaluation-vis-module"
+                                                                      href="#module-graphslim.evaluation.vis"
                                                                       title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="module-contents">
-                                <h2>Module contents<a class="headerlink" href="#module-contents"
+                            <section id="module-graphslim.evaluation">
+                                <span id="module-contents"></span>
+                                <h2>Module contents<a class="headerlink" href="#module-graphslim.evaluation"
                                                       title="Permalink to this heading"></a></h2>
                             </section>
                         </section>
@@ -136,7 +564,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

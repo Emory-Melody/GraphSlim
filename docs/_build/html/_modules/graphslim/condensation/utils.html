@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.condensation.utils &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.condensation.utils</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.condensation.utils</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span
+                                class="o">*</span>
+<span class="kn">import</span> <span class="nn">torch_geometric</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<div class="viewcode-block" id="match_loss"><a class="viewcode-back"
+                                               href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.match_loss">[docs]</a><span
+        class="k">def</span> <span class="nf">match_loss</span><span class="p">(</span><span
+        class="n">gw_syn</span><span class="p">,</span> <span class="n">gw_real</span><span class="p">,</span> <span
+        class="n">args</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+    <span class="n">dis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dis_metric</span> <span
+            class="o">==</span> <span class="s1">&#39;ours&#39;</span><span class="p">:</span>
+
+        <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">gw_real</span><span class="p">)):</span>
+            <span class="n">gwr</span> <span class="o">=</span> <span class="n">gw_real</span><span
+            class="p">[</span><span class="n">ig</span><span class="p">]</span>
+            <span class="n">gws</span> <span class="o">=</span> <span class="n">gw_syn</span><span
+            class="p">[</span><span class="n">ig</span><span class="p">]</span>
+            <span class="n">dis</span> <span class="o">+=</span> <span class="n">distance_wb</span><span
+            class="p">(</span><span class="n">gwr</span><span class="p">,</span> <span class="n">gws</span><span
+            class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dis_metric</span> <span class="o">==</span> <span class="s1">&#39;mse&#39;</span><span
+            class="p">:</span>
+        <span class="n">gw_real_vec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gw_syn_vec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">gw_real</span><span class="p">)):</span>
+            <span class="n">gw_real_vec</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">gw_real</span><span class="p">[</span><span class="n">ig</span><span
+            class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">gw_syn_vec</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">gw_syn</span><span class="p">[</span><span class="n">ig</span><span
+            class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="n">gw_real_vec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">(</span><span class="n">gw_real_vec</span><span class="p">,</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">gw_syn_vec</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">gw_syn_vec</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+        <span class="n">dis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">((</span><span class="n">gw_syn_vec</span> <span
+            class="o">-</span> <span class="n">gw_real_vec</span><span class="p">)</span> <span
+            class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dis_metric</span> <span class="o">==</span> <span class="s1">&#39;cos&#39;</span><span
+            class="p">:</span>
+        <span class="n">gw_real_vec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gw_syn_vec</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ig</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">gw_real</span><span class="p">)):</span>
+            <span class="n">gw_real_vec</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">gw_real</span><span class="p">[</span><span class="n">ig</span><span
+            class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">gw_syn_vec</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">gw_syn</span><span class="p">[</span><span class="n">ig</span><span
+            class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+        <span class="n">gw_real_vec</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">(</span><span class="n">gw_real_vec</span><span class="p">,</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">gw_syn_vec</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">gw_syn_vec</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+        <span class="n">dis</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span
+            class="n">gw_real_vec</span> <span class="o">*</span> <span class="n">gw_syn_vec</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span
+            class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">norm</span><span
+            class="p">(</span><span class="n">gw_real_vec</span><span class="p">,</span> <span class="n">dim</span><span
+            class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span
+            class="n">gw_syn_vec</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span
+            class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.000001</span><span
+            class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">exit</span><span class="p">(</span><span class="s1">&#39;DC error: unknown distance function&#39;</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dis</span></div>
+
+
+<div class="viewcode-block" id="distance_wb"><a class="viewcode-back"
+                                                href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.distance_wb">[docs]</a><span
+        class="k">def</span> <span class="nf">distance_wb</span><span class="p">(</span><span class="n">gwr</span><span
+        class="p">,</span> <span class="n">gws</span><span class="p">):</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
+            class="n">shape</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gwr</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span
+            class="mi">2</span><span class="p">:</span>
+        <span class="n">gwr</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
+            class="n">T</span>
+        <span class="n">gws</span> <span class="o">=</span> <span class="n">gws</span><span class="o">.</span><span
+            class="n">T</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span
+            class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>  <span
+            class="c1"># conv, out*in*h*w</span>
+        <span class="n">gwr</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span
+            class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span
+            class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">gws</span> <span class="o">=</span> <span class="n">gws</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span
+            class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span
+            class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span
+            class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>  <span
+            class="c1"># layernorm, C*h*w</span>
+        <span class="n">gwr</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span
+            class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">gws</span> <span class="o">=</span> <span class="n">gws</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span
+            class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span
+            class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span
+            class="c1"># linear, out*in</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="s1">&#39;do nothing&#39;</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shape</span><span
+            class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span
+            class="c1"># batchnorm/instancenorm, C; groupnorm x, bias</span>
+        <span class="n">gwr</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">gws</span> <span class="o">=</span> <span class="n">gws</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="n">dis_weight</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span>
+        <span class="mi">1</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="n">gwr</span> <span class="o">*</span> <span
+            class="n">gws</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span
+            class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span
+            class="n">gwr</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span
+            class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">gws</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span
+            class="p">)</span> <span class="o">+</span> <span class="mf">0.000001</span><span class="p">))</span>
+    <span class="n">dis</span> <span class="o">=</span> <span class="n">dis_weight</span>
+    <span class="k">return</span> <span class="n">dis</span></div>
+
+
+<span class="c1"># GCSNTK utils</span>
+<div class="viewcode-block" id="sub_E"><a class="viewcode-back"
+                                          href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.sub_E">[docs]</a><span
+        class="k">def</span> <span class="nf">sub_E</span><span class="p">(</span><span class="n">idx</span><span
+        class="p">,</span> <span class="n">A</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    output the sparse adjacency matrix of subgraph of idx</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n_neig</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span
+            class="n">idx</span><span class="p">)</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span
+            class="n">n_neig</span><span class="p">])</span>
+    <span class="n">operator</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">n_neig</span><span class="p">)]</span> <span
+            class="o">=</span> <span class="mi">1</span>
+    <span class="n">sub_A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span
+            class="n">t</span><span class="p">(),</span> <span class="n">A</span><span class="p">),</span> <span
+            class="n">operator</span><span class="p">)</span>
+
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">where</span><span class="p">(</span><span class="n">sub_A</span> <span class="o">!=</span> <span
+            class="mi">0</span><span class="p">)</span>
+    <span class="n">inds</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">([</span><span class="n">ind</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">ind</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]))</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">ind</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">sub_E</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">inds</span><span
+            class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="n">n_neig</span><span
+            class="p">,</span> <span class="n">n_neig</span><span class="p">]))</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sub_E</span></div>
+
+
+<div class="viewcode-block" id="update_E"><a class="viewcode-back"
+                                             href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.update_E">[docs]</a><span
+        class="k">def</span> <span class="nf">update_E</span><span class="p">(</span><span class="n">x_s</span><span
+        class="p">,</span> <span class="n">neig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    x_s is the features</span>
+<span class="sd">    neig is the average number of the neighbors of each node</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">x_s</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">empty</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">)</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span
+            class="n">n</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">):</span>
+            <span class="n">K</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span
+            class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x_s</span><span
+            class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">x_s</span><span
+            class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">K</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span
+            class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">K</span><span class="p">[</span><span
+            class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+    <span class="n">edge</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span
+            class="n">n</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">round</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="n">neig</span> <span class="o">*</span> <span
+            class="n">n</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">edge</span> <span class="o">%</span> <span
+            class="mi">2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span
+            class="p">:</span>
+        <span class="n">edge</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">Simil</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">flatten</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span
+            class="n">Simil</span><span class="p">)</span>
+    <span class="n">A</span><span class="p">[</span><span class="n">indices</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">:</span><span class="n">edge</span><span class="p">]]</span> <span
+            class="o">=</span> <span class="mi">1</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span
+            class="p">)</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">where</span><span class="p">(</span><span class="n">A</span> <span class="o">==</span> <span
+            class="mi">1</span><span class="p">)</span>
+
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">([</span><span class="n">ind</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">],</span> <span class="n">ind</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">edge</span><span
+            class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">ones</span><span class="p">(</span><span class="n">edge</span><span class="p">)</span>
+    <span class="n">E</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span
+            class="n">values</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">Size</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="n">x_s</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">E</span></div>
+
+
+<span class="c1"># utils for GCSNTK</span>
+<div class="viewcode-block" id="normalize_data"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.normalize_data">[docs]</a><span
+        class="k">def</span> <span class="nf">normalize_data</span><span class="p">(</span><span
+        class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    normalize data</span>
+<span class="sd">    parameters:</span>
+<span class="sd">        data: torch.Tensor, data need to be normalized</span>
+<span class="sd">    return:</span>
+<span class="sd">        torch.Tensor, normalized data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>
+    <span class="n">std</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>
+    <span class="n">std</span><span class="p">[</span><span class="n">std</span> <span class="o">==</span> <span
+            class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">normalized_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span
+            class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span
+            class="n">std</span>
+    <span class="k">return</span> <span class="n">normalized_data</span></div>
+
+
+<div class="viewcode-block" id="GCF"><a class="viewcode-back"
+                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.GCF">[docs]</a><span
+        class="k">def</span> <span class="nf">GCF</span><span class="p">(</span><span class="n">adj</span><span
+        class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span><span
+        class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Graph convolution filter</span>
+<span class="sd">    parameters:</span>
+<span class="sd">        adj: torch.Tensor, adjacency matrix, must be self-looped</span>
+<span class="sd">        x: torch.Tensor, features</span>
+<span class="sd">        k: int, number of hops</span>
+<span class="sd">    return:</span>
+<span class="sd">        torch.Tensor, filtered features</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">pow</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span
+            class="o">-</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">diag</span><span class="p">(</span><span class="n">D</span><span class="p">)</span>
+
+    <span class="nb">filter</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span
+            class="n">adj</span><span class="p">),</span> <span class="n">D</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="n">k</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">matmul</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span
+            class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span></div>
+
+
+<span class="c1"># geom</span>
+<div class="viewcode-block" id="neighborhood_difficulty_measurer"><a class="viewcode-back"
+                                                                     href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.neighborhood_difficulty_measurer">[docs]</a><span
+        class="k">def</span> <span class="nf">neighborhood_difficulty_measurer</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
+            class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span
+            class="n">indices</span><span class="p">()</span>
+    <span class="n">edge_value</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
+            class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span
+            class="p">()</span>
+
+    <span class="n">neighbor_label</span><span class="p">,</span> <span class="n">_</span> <span
+            class="o">=</span> <span class="n">torch_geometric</span><span class="o">.</span><span
+            class="n">utils</span><span class="o">.</span><span class="n">add_self_loops</span><span
+            class="p">(</span><span class="n">edge_index</span><span class="p">)</span>  <span class="c1"># [[1, 1, 1, 1],[2, 3, 4, 5]]</span>
+
+    <span class="n">neighbor_label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span
+            class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="n">neighbor_label</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]]</span>  <span class="c1"># [[1, 1, 1, 1],[40, 20, 19, 21]]</span>
+
+    <span class="n">neighbor_label</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">transpose</span><span class="p">(</span><span
+            class="n">neighbor_label</span><span class="p">,</span> <span class="mi">0</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># [[1, 40], [1, 20], [1, 19], [1, 21]]</span>
+
+    <span class="n">index</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span
+            class="n">neighbor_label</span><span class="p">,</span> <span class="nb">sorted</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
+            class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">index</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span
+            class="n">count</span><span class="p">)</span>
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">neighbor_class</span><span class="o">.</span><span
+            class="n">to_dense</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()</span>
+
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">neighbor_class</span><span class="p">[</span><span
+            class="n">data</span><span class="o">.</span><span class="n">idx_train</span><span class="p">]</span>
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">normalize</span><span class="p">(</span><span class="n">neighbor_class</span><span
+            class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1</span><span
+            class="p">)</span>
+    <span class="n">neighbor_entropy</span> <span class="o">=</span> <span class="o">-</span><span
+            class="mi">1</span> <span class="o">*</span> <span class="n">neighbor_class</span> <span class="o">*</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span
+            class="n">neighbor_class</span> <span class="o">+</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">20</span><span class="p">)))</span>  <span class="c1"># 防止log里面是0出现异常</span>
+    <span class="n">local_difficulty</span> <span class="o">=</span> <span class="n">neighbor_entropy</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">local_difficulty</span></div>
+
+
+<div class="viewcode-block" id="difficulty_measurer"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.difficulty_measurer">[docs]</a><span
+        class="k">def</span> <span class="nf">difficulty_measurer</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">local_difficulty</span> <span class="o">=</span> <span
+            class="n">neighborhood_difficulty_measurer</span><span class="p">(</span><span class="n">data</span><span
+            class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">label</span><span
+            class="p">)</span>
+    <span class="c1"># global_difficulty = feature_difficulty_measurer(data, label, embedding)</span>
+    <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">local_difficulty</span>
+    <span class="k">return</span> <span class="n">node_difficulty</span></div>
+
+
+<div class="viewcode-block" id="sort_training_nodes"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.sort_training_nodes">[docs]</a><span
+        class="k">def</span> <span class="nf">sort_training_nodes</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">difficulty_measurer</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">adj</span><span
+            class="p">,</span> <span class="n">label</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span
+            class="n">node_difficulty</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
+    <span class="n">sorted_trainset</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">idx_train</span><span class="p">[</span><span
+            class="n">indices</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">sorted_trainset</span></div>
+
+
+<div class="viewcode-block" id="neighborhood_difficulty_measurer_in"><a class="viewcode-back"
+                                                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.neighborhood_difficulty_measurer_in">[docs]</a><span
+        class="k">def</span> <span class="nf">neighborhood_difficulty_measurer_in</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
+            class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span
+            class="n">indices</span><span class="p">()</span>
+    <span class="n">edge_value</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
+            class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span
+            class="p">()</span>
+
+    <span class="n">neighbor_label</span><span class="p">,</span> <span class="n">_</span> <span
+            class="o">=</span> <span class="n">torch_geometric</span><span class="o">.</span><span
+            class="n">utils</span><span class="o">.</span><span class="n">add_self_loops</span><span
+            class="p">(</span><span class="n">edge_index</span><span class="p">)</span>  <span class="c1"># [[1, 1, 1, 1],[2, 3, 4, 5]]</span>
+
+    <span class="n">neighbor_label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span
+            class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="n">neighbor_label</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]]</span>  <span class="c1"># [[1, 1, 1, 1],[40, 20, 19, 21]]</span>
+
+    <span class="n">neighbor_label</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">transpose</span><span class="p">(</span><span
+            class="n">neighbor_label</span><span class="p">,</span> <span class="mi">0</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># [[1, 40], [1, 20], [1, 19], [1, 21]]</span>
+
+    <span class="n">index</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span
+            class="n">neighbor_label</span><span class="p">,</span> <span class="nb">sorted</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
+            class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">index</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span
+            class="n">count</span><span class="p">)</span>
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">neighbor_class</span><span class="o">.</span><span
+            class="n">to_dense</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()</span>
+
+    <span class="n">neighbor_class</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">normalize</span><span class="p">(</span><span class="n">neighbor_class</span><span
+            class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">1</span><span
+            class="p">)</span>
+    <span class="n">neighbor_entropy</span> <span class="o">=</span> <span class="o">-</span><span
+            class="mi">1</span> <span class="o">*</span> <span class="n">neighbor_class</span> <span class="o">*</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span
+            class="n">neighbor_class</span> <span class="o">+</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">20</span><span class="p">)))</span>  <span class="c1"># 防止log里面是0出现异常</span>
+    <span class="n">local_difficulty</span> <span class="o">=</span> <span class="n">neighbor_entropy</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">local_difficulty</span></div>
+
+
+<div class="viewcode-block" id="difficulty_measurer_in"><a class="viewcode-back"
+                                                           href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.difficulty_measurer_in">[docs]</a><span
+        class="k">def</span> <span class="nf">difficulty_measurer_in</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">local_difficulty</span> <span class="o">=</span> <span
+            class="n">neighborhood_difficulty_measurer_in</span><span class="p">(</span><span class="n">data</span><span
+            class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">label</span><span
+            class="p">)</span>
+    <span class="c1"># global_difficulty = feature_difficulty_measurer(data, label, embedding)</span>
+    <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">local_difficulty</span>
+    <span class="k">return</span> <span class="n">node_difficulty</span></div>
+
+
+<div class="viewcode-block" id="sort_training_nodes_in"><a class="viewcode-back"
+                                                           href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.sort_training_nodes_in">[docs]</a><span
+        class="k">def</span> <span class="nf">sort_training_nodes_in</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">difficulty_measurer_in</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">adj</span><span
+            class="p">,</span> <span class="n">label</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span
+            class="n">node_difficulty</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">indices</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
+    <span class="k">return</span> <span class="n">indices</span></div>
+
+<div class="viewcode-block" id="training_scheduler"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.training_scheduler">[docs]</a><span
+        class="k">def</span> <span class="nf">training_scheduler</span><span class="p">(</span><span
+        class="n">lam</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span
+        class="n">T</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span
+        class="s1">&#39;geom&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">scheduler</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span
+            class="p">:</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">,</span> <span class="n">lam</span> <span class="o">+</span> <span class="p">(</span><span
+            class="mi">1</span> <span class="o">-</span> <span class="n">lam</span><span class="p">)</span> <span
+            class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">T</span><span
+            class="p">)</span>
+    <span class="k">elif</span> <span class="n">scheduler</span> <span class="o">==</span> <span class="s1">&#39;root&#39;</span><span
+            class="p">:</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span
+            class="p">(</span><span class="n">lam</span> <span class="o">**</span> <span class="mi">2</span> <span
+            class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span
+            class="n">lam</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span
+            class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span class="n">T</span><span
+            class="p">))</span>
+    <span class="k">elif</span> <span class="n">scheduler</span> <span class="o">==</span> <span class="s1">&#39;geom&#39;</span><span
+            class="p">:</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span
+            class="n">math</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span
+            class="n">lam</span><span class="p">)</span> <span class="o">-</span> <span class="n">math</span><span
+            class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">lam</span><span
+            class="p">)</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span
+            class="n">T</span><span class="p">))</span></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

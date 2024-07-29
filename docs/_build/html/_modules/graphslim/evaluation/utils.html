@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.evaluation.utils &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.evaluation.utils</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.evaluation.utils</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span
+                                class="n">wraps</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span
+                                class="nn">F</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span><span
+                                class="p">,</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
+                                class="n">csr2ei</span>
+
+
+<div class="viewcode-block" id="sparsify"><a class="viewcode-back"
+                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.sparsify">[docs]</a><span
+        class="k">def</span> <span class="nf">sparsify</span><span class="p">(</span><span
+        class="n">model_type</span><span class="p">,</span> <span class="n">adj_syn</span><span class="p">,</span> <span
+        class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
+        class="kc">False</span><span class="p">):</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span
+            class="s1">&#39;MLP&#39;</span><span class="p">:</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span> <span class="o">-</span> <span
+            class="n">adj_syn</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span
+            class="n">adj_syn</span><span class="p">)</span><span class="o">.</span><span class="n">fill_</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;GAT&#39;</span><span
+            class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcond&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;doscond&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;citeseer&#39;</span><span class="p">]:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Make the graph sparser as GAT does not work well on dense graph</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;msgc&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">threshold</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcond&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;doscond&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">threshold</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;msgc&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcondx&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;doscondx&#39;</span><span class="p">,</span> <span class="s1">&#39;sfgc&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;geom&#39;</span><span class="p">,</span> <span class="s1">&#39;gcsntk&#39;</span><span
+            class="p">]:</span>
+        <span class="c1"># print(&#39;Sum:&#39;, adj_syn.sum().item())</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Sparsity:&#39;</span><span class="p">,</span> <span
+            class="n">adj_syn</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">/</span> <span class="n">adj_syn</span><span class="o">.</span><span
+            class="n">numel</span><span class="p">())</span>
+    <span class="c1"># if args.method in [&#39;sgdd&#39;]:</span>
+    <span class="c1">#     threshold = 0.5</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="o">&gt;</span> <span
+            class="mi">0</span><span class="p">:</span>
+        <span class="n">adj_syn</span><span class="p">[</span><span class="n">adj_syn</span> <span class="o">&lt;</span> <span
+            class="n">threshold</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span
+            class="s1">&#39;Sparsity after truncating:&#39;</span><span class="p">,</span> <span
+            class="n">adj_syn</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">/</span> <span class="n">adj_syn</span><span class="o">.</span><span
+            class="n">numel</span><span class="p">())</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     print(&quot;structure free methods do not need to truncate the adjacency matrix&quot;)</span>
+    <span class="k">return</span> <span class="n">adj_syn</span></div>
+
+
+<div class="viewcode-block" id="getsize_mb"><a class="viewcode-back"
+                                               href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.getsize_mb">[docs]</a><span
+        class="k">def</span> <span class="nf">getsize_mb</span><span class="p">(</span><span
+        class="n">elements</span><span class="p">):</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span
+            class="p">:</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span
+            class="p">)</span> <span class="o">==</span> <span class="n">SparseTensor</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span
+            class="n">value</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span
+            class="n">coo</span><span class="p">()</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="n">row</span><span
+            class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span
+            class="o">*</span> <span class="n">row</span><span class="o">.</span><span class="n">nelement</span><span
+            class="p">()</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="n">col</span><span
+            class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span
+            class="o">*</span> <span class="n">col</span><span class="o">.</span><span class="n">nelement</span><span
+            class="p">()</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="n">value</span><span
+            class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span
+            class="o">*</span> <span class="n">value</span><span class="o">.</span><span class="n">nelement</span><span
+            class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span
+            class="n">e</span><span class="p">,</span> <span class="n">sp</span><span class="o">.</span><span class="n">csr_matrix</span><span
+            class="p">):</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">csr2ei</span><span class="p">(</span><span
+            class="n">e</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">+=</span> <span class="n">e</span><span class="o">.</span><span
+            class="n">element_size</span><span class="p">()</span> <span class="o">*</span> <span
+            class="n">e</span><span class="o">.</span><span class="n">nelement</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">+=</span> <span class="n">e</span><span
+            class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span
+            class="o">*</span> <span class="n">e</span><span class="o">.</span><span class="n">nelement</span><span
+            class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">e</span><span
+            class="p">)</span>
+                <span class="n">size</span> <span class="o">+=</span> <span class="n">e</span><span
+            class="o">.</span><span class="n">element_size</span><span class="p">()</span> <span
+            class="o">*</span> <span class="n">e</span><span class="o">.</span><span class="n">nelement</span><span
+            class="p">()</span>
+    <span class="k">return</span> <span class="n">size</span> <span class="o">/</span> <span
+            class="mi">1024</span> <span class="o">/</span> <span class="mi">1024</span></div>
+
+
+<div class="viewcode-block" id="verbose_time_memory"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.verbose_time_memory">[docs]</a><span
+        class="k">def</span> <span class="nf">verbose_time_memory</span><span class="p">(</span><span
+        class="n">func</span><span class="p">):</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span
+            class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span
+            class="p">):</span>
+        <span class="n">verbose</span> <span class="o">=</span> <span class="n">kwargs</span><span
+            class="o">.</span><span class="n">get</span><span class="p">(</span><span
+            class="s1">&#39;verbose&#39;</span><span class="p">,</span> <span class="kc">False</span><span
+            class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span
+            class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span
+            class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span
+            class="n">perf_counter</span><span class="p">()</span>
+            <span class="n">runTime</span> <span class="o">=</span> <span class="n">end</span> <span class="o">-</span> <span
+            class="n">start</span>
+            <span class="n">runTime_ms</span> <span class="o">=</span> <span class="n">runTime</span> <span
+            class="o">*</span> <span class="mi">1000</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Function Time:&quot;</span><span
+            class="p">,</span> <span class="n">runTime</span><span class="p">,</span> <span
+            class="s2">&quot;s&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Function Time:&quot;</span><span
+            class="p">,</span> <span class="n">runTime_ms</span><span class="p">,</span> <span
+            class="s2">&quot;ms&quot;</span><span class="p">)</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">kwargs</span><span
+            class="o">.</span><span class="n">get</span><span class="p">(</span><span
+            class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="kc">None</span><span
+            class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span
+            class="n">args</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">arg</span><span class="p">,</span> <span class="s1">&#39;feat_train&#39;</span><span
+            class="p">)</span> <span class="ow">or</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">arg</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">):</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">arg</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span
+            class="s2">&quot;The function must be called with &#39;data&#39; as an argument.&quot;</span><span
+            class="p">)</span>
+
+            <span class="k">if</span> <span class="s1">&#39;setting&#39;</span> <span class="ow">in</span> <span
+            class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span
+            class="p">[</span><span class="s1">&#39;setting&#39;</span><span class="p">]</span> <span
+            class="o">==</span> <span class="s1">&#39;trans&#39;</span><span class="p">:</span>
+                <span class="n">origin_storage</span> <span class="o">=</span> <span class="n">getsize_mb</span><span
+            class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">x</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span><span
+            class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">origin_storage</span> <span class="o">=</span> <span class="n">getsize_mb</span><span
+            class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">feat_train</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_train</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span
+            class="s1">&#39;feat_syn&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s1">&#39;setting&#39;</span> <span class="ow">in</span> <span
+            class="n">kwargs</span> <span class="ow">and</span> <span class="n">kwargs</span><span
+            class="p">[</span><span class="s1">&#39;setting&#39;</span><span class="p">]</span> <span
+            class="o">==</span> <span class="s1">&#39;trans&#39;</span><span class="p">:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_full</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_train</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span
+            class="s1">&#39;adj_syn&#39;</span><span class="p">):</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span
+            class="s1">&#39;labels_syn&#39;</span><span class="p">):</span>
+                <span class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">labels_train</span>
+            <span class="n">condensed_storage</span> <span class="o">=</span> <span class="n">getsize_mb</span><span
+            class="p">([</span><span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">labels_syn</span><span
+            class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Original graph:</span><span
+            class="si">{</span><span class="n">origin_storage</span><span class="si">:</span><span class="s1">.2f</span><span
+            class="si">}</span><span class="s1"> Mb  Condensed graph:</span><span class="si">{</span><span class="n">condensed_storage</span><span
+            class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> Mb&#39;</span><span
+            class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<span class="c1"># from deeprobust.graph.utils import accuracy</span>
+
+
+<div class="viewcode-block" id="calc_f1"><a class="viewcode-back"
+                                            href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.calc_f1">[docs]</a><span
+        class="k">def</span> <span class="nf">calc_f1</span><span class="p">(</span><span class="n">y_true</span><span
+        class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">is_sigmoid</span><span
+        class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_sigmoid</span><span class="p">:</span>
+        <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">argmax</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span
+            class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_pred</span><span class="p">[</span><span class="n">y_pred</span> <span
+            class="o">&gt;</span> <span class="mf">0.5</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">1</span>
+        <span class="n">y_pred</span><span class="p">[</span><span class="n">y_pred</span> <span class="o">&lt;=</span> <span
+            class="mf">0.5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">f1_score</span><span class="p">(</span><span
+            class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span
+            class="n">average</span><span class="o">=</span><span class="s2">&quot;micro&quot;</span><span
+            class="p">),</span> <span class="n">f1_score</span><span class="p">(</span><span
+            class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span
+            class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span
+            class="p">)</span></div>
+
+
+<div class="viewcode-block" id="evaluate"><a class="viewcode-back"
+                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.evaluate">[docs]</a><span
+        class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">output</span><span
+        class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">args</span><span
+        class="p">):</span>
+    <span class="n">data_graphsaint</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yelp&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;ppi&#39;</span><span class="p">,</span> <span class="s1">&#39;ppi-large&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;amazon&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="n">data_graphsaint</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span
+            class="mi">1</span><span class="p">:</span>
+            <span class="n">micro</span><span class="p">,</span> <span class="n">macro</span> <span
+            class="o">=</span> <span class="n">calc_f1</span><span class="p">(</span><span class="n">labels</span><span
+            class="p">,</span> <span class="n">output</span><span class="p">,</span> <span
+            class="n">is_sigmoid</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">micro</span><span class="p">,</span> <span class="n">macro</span> <span
+            class="o">=</span> <span class="n">calc_f1</span><span class="p">(</span><span class="n">labels</span><span
+            class="p">,</span> <span class="n">output</span><span class="p">,</span> <span
+            class="n">is_sigmoid</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set results:&quot;</span><span
+            class="p">,</span> <span class="s2">&quot;F1-micro= </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span
+            class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">micro</span><span
+            class="p">),</span>
+              <span class="s2">&quot;F1-macro= </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span
+            class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">macro</span><span
+            class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loss_test</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span
+            class="n">labels</span><span class="p">)</span>
+        <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy_score</span><span
+            class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">labels</span><span
+            class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set results:&quot;</span><span
+            class="p">,</span>
+              <span class="s2">&quot;loss= </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span
+            class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loss_test</span><span
+            class="o">.</span><span class="n">item</span><span class="p">()),</span>
+              <span class="s2">&quot;accuracy= </span><span class="si">{:.4f}</span><span class="s2">&quot;</span><span
+            class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">acc_test</span><span
+            class="o">.</span><span class="n">item</span><span class="p">()))</span>
+    <span class="k">return</span></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

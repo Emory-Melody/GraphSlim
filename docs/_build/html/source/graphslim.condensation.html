@@ -2,16 +2,16 @@
 <html class="writer-html5" lang="en">
 <head>
     <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>graphslim.condensation package &mdash; GraphSlim documentation</title>
-    <link href="../_static/pygments.css?v=80d5e7a1" rel="stylesheet" type="text/css"/>
-    <link href="../_static/css/theme.css?v=19f00094" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094"/>
 
 
     <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+      <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -21,31 +21,31 @@
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/js/theme.js"></script>
-    <link href="../genindex.html" rel="index" title="Index"/>
-    <link href="../search.html" rel="search" title="Search"/>
-    <link href="graphslim.sparsification.html" rel="next" title="graphslim.sparsification package"/>
-    <link href="graphslim.coarsening.html" rel="prev" title="graphslim.coarsening package"/>
+    <link rel="index" title="Index" href="../genindex.html"/>
+    <link rel="search" title="Search" href="../search.html"/>
+    <link rel="next" title="graphslim.sparsification package" href="graphslim.sparsification.html"/>
+    <link rel="prev" title="graphslim.coarsening package" href="graphslim.coarsening.html"/>
 </head>
 
 <body class="wy-body-for-nav">
 <div class="wy-grid-for-nav">
-    <nav class="wy-nav-side" data-toggle="wy-nav-shift">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
         <div class="wy-side-scroll">
             <div class="wy-side-nav-search">
 
 
-                <a class="icon icon-home" href="../index.html">
+                <a href="../index.html" class="icon icon-home">
                     GraphSlim
                 </a>
                 <div role="search">
-                    <form action="../search.html" class="wy-form" id="rtd-search-form" method="get">
-                        <input aria-label="Search docs" name="q" placeholder="Search docs" type="text"/>
-                        <input name="check_keywords" type="hidden" value="yes"/>
-                        <input name="area" type="hidden" value="default"/>
+                    <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
                     </form>
                 </div>
             </div>
-            <div aria-label="Navigation menu" class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation">
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
                 <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a>
@@ -69,39 +69,314 @@
                         <ul>
                             <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-doscond-module">graphslim.condensation.doscond
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.doscond">graphslim.condensation.doscond
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.doscond.DosCond"><code
+                                            class="docutils literal notranslate"><span class="pre">DosCond</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.doscond.DosCond.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">DosCond.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-doscondx-module">graphslim.condensation.doscondx
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.doscondx">graphslim.condensation.doscondx
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.doscondx.DosCondX"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">DosCondX</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.doscondx.DosCondX.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">DosCondX.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-gcond-module">graphslim.condensation.gcond
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.gcond">graphslim.condensation.gcond
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.gcond.GCond"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">GCond</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond.GCond.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCond.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-gcond-base-module">graphslim.condensation.gcond_base
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.gcond_base">graphslim.condensation.gcond_base
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">GCondBase</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.check_bn"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.check_bn()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.generate_labels_syn"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.generate_labels_syn()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.get_loops"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.get_loops()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.init"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.init()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.intermediate_evaluation"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.intermediate_evaluation()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.reset_parameters"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.reset_parameters()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.test_with_val"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.test_with_val()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcond_base.GCondBase.train_class"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondBase.train_class()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-gcondx-module">graphslim.condensation.gcondx
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.gcondx">graphslim.condensation.gcondx
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.gcondx.GCondX"><code
+                                            class="docutils literal notranslate"><span class="pre">GCondX</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcondx.GCondX.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCondX.reduce()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-gcsntk-module">graphslim.condensation.gcsntk
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.gcsntk">graphslim.condensation.gcsntk
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.gcsntk.GCSNTK"><code
+                                            class="docutils literal notranslate"><span class="pre">GCSNTK</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcsntk.GCSNTK.reduce"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCSNTK.reduce()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcsntk.GCSNTK.test"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">GCSNTK.test()</span></code></a></li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.gcsntk.GCSNTK.train"><code
+                                                    class="docutils literal notranslate"><span class="pre">GCSNTK.train()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-geom-module">graphslim.condensation.geom
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.geom">graphslim.condensation.geom
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.geom.GEOM"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">GEOM</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.buffer_cl"><code
+                                                    class="docutils literal notranslate"><span class="pre">GEOM.buffer_cl()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.expert_load"><code
+                                                    class="docutils literal notranslate"><span class="pre">GEOM.expert_load()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.get_coreset_init"><code
+                                                    class="docutils literal notranslate"><span class="pre">GEOM.get_coreset_init()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.init_coreset_select"><code
+                                                    class="docutils literal notranslate"><span class="pre">GEOM.init_coreset_select()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.reduce"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">GEOM.reduce()</span></code></a></li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.geom.GEOM.synset_save"><code
+                                                    class="docutils literal notranslate"><span class="pre">GEOM.synset_save()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-msgc-module">graphslim.condensation.msgc
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.msgc">graphslim.condensation.msgc
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.msgc.FixLenList"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">FixLenList</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.msgc.FixLenList.append"><code
+                                                    class="docutils literal notranslate"><span class="pre">FixLenList.append()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.msgc.MSGC"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">MSGC</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.msgc.MSGC.generate_labels_syn"><code
+                                                    class="docutils literal notranslate"><span class="pre">MSGC.generate_labels_syn()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.msgc.MSGC.get_adj_t_syn"><code
+                                                    class="docutils literal notranslate"><span class="pre">MSGC.get_adj_t_syn()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.msgc.MSGC.reduce"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">MSGC.reduce()</span></code></a></li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.msgc.MSGC.reset_adj_batch"><code
+                                                    class="docutils literal notranslate"><span class="pre">MSGC.reset_adj_batch()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-sfgc-module">graphslim.condensation.sfgc
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.sfgc">graphslim.condensation.sfgc
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.sfgc.SFGC"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">SFGC</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.sfgc.SFGC.expert_load"><code
+                                                    class="docutils literal notranslate"><span class="pre">SFGC.expert_load()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.sfgc.SFGC.reduce"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">SFGC.reduce()</span></code></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-sgdd-module">graphslim.condensation.sgdd
-                                module</a></li>
+                                                      href="#module-graphslim.condensation.sgdd">graphslim.condensation.sgdd
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.sgdd.SGDD"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">SGDD</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.condensation.sgdd.SGDD.reduce"><code
+                                                    class="docutils literal notranslate"><span
+                                                    class="pre">SGDD.reduce()</span></code></a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#graphslim-condensation-utils-module">graphslim.condensation.utils
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal" href="#module-contents">Module
+                                                      href="#module-graphslim.condensation.utils">graphslim.condensation.utils
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.GCF"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">GCF()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.difficulty_measurer"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">difficulty_measurer()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.difficulty_measurer_in"><code
+                                            class="docutils literal notranslate"><span class="pre">difficulty_measurer_in()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.distance_wb"><code
+                                            class="docutils literal notranslate"><span class="pre">distance_wb()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.match_loss"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">match_loss()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.neighborhood_difficulty_measurer"><code
+                                            class="docutils literal notranslate"><span class="pre">neighborhood_difficulty_measurer()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.neighborhood_difficulty_measurer_in"><code
+                                            class="docutils literal notranslate"><span class="pre">neighborhood_difficulty_measurer_in()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.normalize_data"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">normalize_data()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.sort_training_nodes"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">sort_training_nodes()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.sort_training_nodes_in"><code
+                                            class="docutils literal notranslate"><span class="pre">sort_training_nodes_in()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.sub_E"><code
+                                            class="docutils literal notranslate"><span class="pre">sub_E()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.training_scheduler"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">training_scheduler()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.update_E"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">update_E()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal" href="#module-graphslim.condensation">Module
                                 contents</a></li>
                         </ul>
                     </li>
@@ -113,17 +388,17 @@
         </div>
     </nav>
 
-    <section class="wy-nav-content-wrap" data-toggle="wy-nav-shift">
-        <nav aria-label="Mobile navigation menu" class="wy-nav-top">
-            <i class="fa fa-bars" data-toggle="wy-nav-top"></i>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
             <a href="../index.html">GraphSlim</a>
         </nav>
 
         <div class="wy-nav-content">
             <div class="rst-content">
-                <div aria-label="Page navigation" role="navigation">
+                <div role="navigation" aria-label="Page navigation">
                     <ul class="wy-breadcrumbs">
-                        <li><a aria-label="Home" class="icon icon-home" href="../index.html"></a></li>
+                        <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
                         <li class="breadcrumb-item active">graphslim.condensation package</li>
                         <li class="wy-breadcrumbs-aside">
                             <a href="../_sources/source/graphslim.condensation.rst.txt" rel="nofollow"> View page
@@ -132,7 +407,7 @@
                     </ul>
                     <hr/>
                 </div>
-                <div class="document" itemscope="itemscope" itemtype="http://schema.org/Article" role="main">
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
                     <div itemprop="articleBody">
 
                         <section id="graphslim-condensation-package">
@@ -143,65 +418,1085 @@
                                 <h2>Submodules<a class="headerlink" href="#submodules"
                                                  title="Permalink to this heading"></a></h2>
                             </section>
-                            <section id="graphslim-condensation-doscond-module">
+                            <section id="module-graphslim.condensation.doscond">
+                                <span id="graphslim-condensation-doscond-module"></span>
                                 <h2>graphslim.condensation.doscond module<a class="headerlink"
-                                                                            href="#graphslim-condensation-doscond-module"
+                                                                            href="#module-graphslim.condensation.doscond"
                                                                             title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.doscond.DosCond">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">DosCond</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/doscond.html#DosCond"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.doscond.DosCond"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.doscond.DosCond.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/doscond.html#DosCond.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.doscond.DosCond.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-doscondx-module">
+                            <section id="module-graphslim.condensation.doscondx">
+                                <span id="graphslim-condensation-doscondx-module"></span>
                                 <h2>graphslim.condensation.doscondx module<a class="headerlink"
-                                                                             href="#graphslim-condensation-doscondx-module"
+                                                                             href="#module-graphslim.condensation.doscondx"
                                                                              title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.doscondx.DosCondX">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">DosCondX</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/doscondx.html#DosCondX"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.doscondx.DosCondX"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.doscondx.DosCondX.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/doscondx.html#DosCondX.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.doscondx.DosCondX.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-gcond-module">
+                            <section id="module-graphslim.condensation.gcond">
+                                <span id="graphslim-condensation-gcond-module"></span>
                                 <h2>graphslim.condensation.gcond module<a class="headerlink"
-                                                                          href="#graphslim-condensation-gcond-module"
+                                                                          href="#module-graphslim.condensation.gcond"
                                                                           title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.gcond.GCond">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GCond</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/gcond.html#GCond"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.gcond.GCond"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond.GCond.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond.html#GCond.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.gcond.GCond.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-gcond-base-module">
+                            <section id="module-graphslim.condensation.gcond_base">
+                                <span id="graphslim-condensation-gcond-base-module"></span>
                                 <h2>graphslim.condensation.gcond_base module<a class="headerlink"
-                                                                               href="#graphslim-condensation-gcond-base-module"
+                                                                               href="#module-graphslim.condensation.gcond_base"
                                                                                title="Permalink to this heading"></a>
                                 </h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.gcond_base.GCondBase">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GCondBase</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/gcond_base.html#GCondBase"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.gcond_base.GCondBase"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.check_bn">
+                                                <span class="sig-name descname"><span class="pre">check_bn</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">model</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.check_bn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.check_bn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.generate_labels_syn">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">generate_labels_syn</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.generate_labels_syn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.generate_labels_syn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.get_loops">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">get_loops</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">args</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.get_loops"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.get_loops"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.init">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">init</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">with_adj</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span
+                                                    class="pre">False</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.init"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.init"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.intermediate_evaluation">
+                                                <span class="sig-name descname"><span class="pre">intermediate_evaluation</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">best_val</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span class="pre">loss_avg</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span
+                                                        class="default_value"><span
+                                                        class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.intermediate_evaluation"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.intermediate_evaluation"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.reset_parameters">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reset_parameters</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.reset_parameters"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.reset_parameters"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.test_with_val">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">test_with_val</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">False</span></span></em>,
+                                                <em class="sig-param"><span class="n"><span
+                                                        class="pre">setting</span></span><span class="o"><span
+                                                        class="pre">=</span></span><span class="default_value"><span
+                                                        class="pre">'trans'</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">iters</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">200</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.test_with_val"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.test_with_val"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcond_base.GCondBase.train_class">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">train_class</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">model</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">features</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">labels</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">labels_syn</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">args</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.train_class"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcond_base.GCondBase.train_class"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-gcondx-module">
+                            <section id="module-graphslim.condensation.gcondx">
+                                <span id="graphslim-condensation-gcondx-module"></span>
                                 <h2>graphslim.condensation.gcondx module<a class="headerlink"
-                                                                           href="#graphslim-condensation-gcondx-module"
+                                                                           href="#module-graphslim.condensation.gcondx"
                                                                            title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.gcondx.GCondX">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GCondX</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/gcondx.html#GCondX"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.gcondx.GCondX"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcondx.GCondX.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcondx.html#GCondX.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcondx.GCondX.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-gcsntk-module">
+                            <section id="module-graphslim.condensation.gcsntk">
+                                <span id="graphslim-condensation-gcsntk-module"></span>
                                 <h2>graphslim.condensation.gcsntk module<a class="headerlink"
-                                                                           href="#graphslim-condensation-gcsntk-module"
+                                                                           href="#module-graphslim.condensation.gcsntk"
                                                                            title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.gcsntk.GCSNTK">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GCSNTK</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/gcsntk.html#GCSNTK"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.gcsntk.GCSNTK"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcsntk.GCSNTK.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcsntk.html#GCSNTK.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcsntk.GCSNTK.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcsntk.GCSNTK.test">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">test</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">KRR</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">G_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">G_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">y_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">y_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">E_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">E_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">loss_fn</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcsntk.html#GCSNTK.test"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.gcsntk.GCSNTK.test"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.gcsntk.GCSNTK.train">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">train</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">KRR</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">G_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">G_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">y_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">y_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">E_t</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">E_s</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">loss_fn</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">optimizer</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">accumulate_steps</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">None</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">i</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">None</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">TRAIN_K</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcsntk.html#GCSNTK.train"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.gcsntk.GCSNTK.train"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-geom-module">
+                            <section id="module-graphslim.condensation.geom">
+                                <span id="graphslim-condensation-geom-module"></span>
                                 <h2>graphslim.condensation.geom module<a class="headerlink"
-                                                                         href="#graphslim-condensation-geom-module"
+                                                                         href="#module-graphslim.condensation.geom"
                                                                          title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.geom.GEOM">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">GEOM</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/geom.html#GEOM"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.geom.GEOM"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.geom.GEOM.buffer_cl">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">buffer_cl</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/geom.html#GEOM.buffer_cl"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.geom.GEOM.buffer_cl"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.geom.GEOM.expert_load">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">expert_load</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/geom.html#GEOM.expert_load"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.geom.GEOM.expert_load"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.geom.GEOM.get_coreset_init">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">get_coreset_init</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">features</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">labels</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/geom.html#GEOM.get_coreset_init"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.geom.GEOM.get_coreset_init"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.geom.GEOM.init_coreset_select">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">init_coreset_select</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/geom.html#GEOM.init_coreset_select"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.geom.GEOM.init_coreset_select"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py" id="graphslim.condensation.geom.GEOM.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/geom.html#GEOM.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.geom.GEOM.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.geom.GEOM.synset_save">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">synset_save</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/geom.html#GEOM.synset_save"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.geom.GEOM.synset_save"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-msgc-module">
+                            <section id="module-graphslim.condensation.msgc">
+                                <span id="graphslim-condensation-msgc-module"></span>
                                 <h2>graphslim.condensation.msgc module<a class="headerlink"
-                                                                         href="#graphslim-condensation-msgc-module"
+                                                                         href="#module-graphslim.condensation.msgc"
                                                                          title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.msgc.FixLenList">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">FixLenList</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">lenth</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/msgc.html#FixLenList"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.msgc.FixLenList"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
+                                            class="pre">object</span></code></p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.msgc.FixLenList.append">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">append</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">element</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/msgc.html#FixLenList.append"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.msgc.FixLenList.append"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.msgc.MSGC">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">MSGC</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/msgc.html#MSGC"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.msgc.MSGC"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.msgc.MSGC.generate_labels_syn">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">generate_labels_syn</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/msgc.html#MSGC.generate_labels_syn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.msgc.MSGC.generate_labels_syn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.msgc.MSGC.get_adj_t_syn">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">get_adj_t_syn</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/msgc.html#MSGC.get_adj_t_syn"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.msgc.MSGC.get_adj_t_syn"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py" id="graphslim.condensation.msgc.MSGC.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/msgc.html#MSGC.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.msgc.MSGC.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.msgc.MSGC.reset_adj_batch">
+                                                <span class="sig-name descname"><span class="pre">reset_adj_batch</span></span><span
+                                                    class="sig-paren">(</span><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/msgc.html#MSGC.reset_adj_batch"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.msgc.MSGC.reset_adj_batch"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-sfgc-module">
+                            <section id="module-graphslim.condensation.sfgc">
+                                <span id="graphslim-condensation-sfgc-module"></span>
                                 <h2>graphslim.condensation.sfgc module<a class="headerlink"
-                                                                         href="#graphslim-condensation-sfgc-module"
+                                                                         href="#module-graphslim.condensation.sfgc"
                                                                          title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.sfgc.SFGC">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">SFGC</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/sfgc.html#SFGC"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.sfgc.SFGC"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.condensation.sfgc.SFGC.expert_load">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">expert_load</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">expert_dir</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/sfgc.html#SFGC.expert_load"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.condensation.sfgc.SFGC.expert_load"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>randomly select one expert from expert files</p>
+                                            </dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py" id="graphslim.condensation.sfgc.SFGC.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/sfgc.html#SFGC.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.sfgc.SFGC.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-sgdd-module">
+                            <section id="module-graphslim.condensation.sgdd">
+                                <span id="graphslim-condensation-sgdd-module"></span>
                                 <h2>graphslim.condensation.sgdd module<a class="headerlink"
-                                                                         href="#graphslim-condensation-sgdd-module"
+                                                                         href="#module-graphslim.condensation.sgdd"
                                                                          title="Permalink to this heading"></a></h2>
+                                <dl class="py class">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.sgdd.SGDD">
+                                        <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-name descname"><span class="pre">SGDD</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">setting</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="o"><span class="pre">**</span></span><span
+                                                class="n"><span class="pre">kwargs</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/sgdd.html#SGDD"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.sgdd.SGDD"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Bases: <a class="reference internal"
+                                                     href="#graphslim.condensation.gcond_base.GCondBase"
+                                                     title="graphslim.condensation.gcond_base.GCondBase"><code
+                                            class="xref py py-class docutils literal notranslate"><span class="pre">GCondBase</span></code></a>
+                                    </p>
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py" id="graphslim.condensation.sgdd.SGDD.reduce">
+                                                <span class="sig-name descname"><span
+                                                        class="pre">reduce</span></span><span class="sig-paren">(</span><em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">data</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">verbose</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">True</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/sgdd.html#SGDD.reduce"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink" href="#graphslim.condensation.sgdd.SGDD.reduce"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd></dd>
+                                        </dl>
+
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="graphslim-condensation-utils-module">
+                            <section id="module-graphslim.condensation.utils">
+                                <span id="graphslim-condensation-utils-module"></span>
                                 <h2>graphslim.condensation.utils module<a class="headerlink"
-                                                                          href="#graphslim-condensation-utils-module"
+                                                                          href="#module-graphslim.condensation.utils"
                                                                           title="Permalink to this heading"></a></h2>
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.GCF">
+                                        <span class="sig-name descname"><span class="pre">GCF</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">adj</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">x</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">k</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">1</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#GCF"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.GCF"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>Graph convolution filter
+                                        :param adj: torch.Tensor, adjacency matrix, must be self-looped
+                                        :param x: torch.Tensor, features
+                                        :param k: int, number of hops</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>torch.Tensor, filtered features</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.difficulty_measurer">
+                                        <span class="sig-name descname"><span
+                                                class="pre">difficulty_measurer</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#difficulty_measurer"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.difficulty_measurer"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.condensation.utils.difficulty_measurer_in">
+                                        <span class="sig-name descname"><span class="pre">difficulty_measurer_in</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#difficulty_measurer_in"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.condensation.utils.difficulty_measurer_in"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.distance_wb">
+                                        <span class="sig-name descname"><span class="pre">distance_wb</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">gwr</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">gws</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#distance_wb"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.distance_wb"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.match_loss">
+                                        <span class="sig-name descname"><span class="pre">match_loss</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">gw_syn</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">gw_real</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">args</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">device</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#match_loss"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.match_loss"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.condensation.utils.neighborhood_difficulty_measurer">
+                                        <span class="sig-name descname"><span class="pre">neighborhood_difficulty_measurer</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#neighborhood_difficulty_measurer"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.condensation.utils.neighborhood_difficulty_measurer"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.condensation.utils.neighborhood_difficulty_measurer_in">
+                                        <span class="sig-name descname"><span class="pre">neighborhood_difficulty_measurer_in</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#neighborhood_difficulty_measurer_in"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.condensation.utils.neighborhood_difficulty_measurer_in"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.normalize_data">
+                                        <span class="sig-name descname"><span
+                                                class="pre">normalize_data</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#normalize_data"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.normalize_data"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>normalize data
+                                        :param data: torch.Tensor, data need to be normalized</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>torch.Tensor, normalized data</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.sort_training_nodes">
+                                        <span class="sig-name descname"><span
+                                                class="pre">sort_training_nodes</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#sort_training_nodes"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.sort_training_nodes"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.condensation.utils.sort_training_nodes_in">
+                                        <span class="sig-name descname"><span class="pre">sort_training_nodes_in</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">data</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">adj</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#sort_training_nodes_in"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.condensation.utils.sort_training_nodes_in"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.sub_E">
+                                        <span class="sig-name descname"><span class="pre">sub_E</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">idx</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">A</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#sub_E"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.sub_E"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>output the sparse adjacency matrix of subgraph of idx</p>
+                                    </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.training_scheduler">
+                                        <span class="sig-name descname"><span
+                                                class="pre">training_scheduler</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">lam</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">t</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">T</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span
+                                                class="pre">scheduler</span></span><span class="o"><span
+                                                class="pre">=</span></span><span class="default_value"><span
+                                                class="pre">'geom'</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#training_scheduler"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.training_scheduler"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.update_E">
+                                        <span class="sig-name descname"><span class="pre">update_E</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">x_s</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">neig</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#update_E"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.update_E"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd><p>x_s is the features
+                                        neig is the average number of the neighbors of each node</p>
+                                    </dd>
+                                </dl>
+
                             </section>
-                            <section id="module-contents">
-                                <h2>Module contents<a class="headerlink" href="#module-contents"
+                            <section id="module-graphslim.condensation">
+                                <span id="module-contents"></span>
+                                <h2>Module contents<a class="headerlink" href="#module-graphslim.condensation"
                                                       title="Permalink to this heading"></a></h2>
                             </section>
                         </section>
@@ -210,19 +1505,19 @@
                     </div>
                 </div>
                 <footer>
-                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
-                        <a accesskey="p" class="btn btn-neutral float-left"
-                           href="graphslim.coarsening.html" rel="prev" title="graphslim.coarsening package"><span
-                                aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
-                        <a accesskey="n" class="btn btn-neutral float-right"
-                           href="graphslim.sparsification.html" rel="next" title="graphslim.sparsification package">Next <span
-                                aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+                    <div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+                        <a href="graphslim.coarsening.html" class="btn btn-neutral float-left"
+                           title="graphslim.coarsening package" accesskey="p" rel="prev"><span
+                                class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+                        <a href="graphslim.sparsification.html" class="btn btn-neutral float-right"
+                           title="graphslim.sparsification package" accesskey="n" rel="next">Next <span
+                                class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
                     </div>
 
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

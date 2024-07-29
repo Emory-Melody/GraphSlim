@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.coarsening.vng &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.coarsening.vng</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.coarsening.vng</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
+                                class="n">save_reduced</span>
+<span class="kn">from</span> <span class="nn">graphslim.evaluation.utils</span> <span class="kn">import</span> <span
+                                class="n">verbose_time_memory</span>
+<span class="kn">from</span> <span class="nn">graphslim.models</span> <span class="kn">import</span> <span
+                                class="n">GCN</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">one_hot</span>
+
+
+<div class="viewcode-block" id="VNG"><a class="viewcode-back"
+                                        href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG">[docs]</a><span
+        class="k">class</span> <span class="nc">VNG</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setting</span> <span
+            class="o">=</span> <span class="n">setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span
+            class="n">args</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">device</span>
+        <span class="c1"># pass data for initialization</span>
+
+<div class="viewcode-block" id="VNG.reduce"><a class="viewcode-back"
+                                               href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG.reduce">[docs]</a>    <span
+        class="nd">@verbose_time_memory</span>
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span>
+        <span class="n">setting</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">setting</span>
+        <span class="c1"># device = self.device</span>
+
+        <span class="n">cpu_data</span> <span class="o">=</span> <span class="n">copy</span><span
+            class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span
+            class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
+            class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span
+            class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">eval_model</span><span
+            class="p">)(</span><span class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">nclass</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">fit_with_val</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span
+            class="n">train_iters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
+            class="n">eval_epochs</span><span class="p">,</span> <span class="n">normadj</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                               <span class="n">setting</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="n">reduced</span><span
+            class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">embeds</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">feat_full</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">adj_full</span><span class="p">,</span> <span class="n">output_layer_features</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">embeds</span> <span class="o">=</span> <span class="p">[</span><span
+            class="n">embed</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span
+            class="n">train_mask</span><span class="p">]</span> <span class="k">for</span> <span class="n">embed</span> <span
+            class="ow">in</span> <span class="n">embeds</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">one_hot</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">nclass</span><span class="p">)</span>
+
+            <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">coarsen_labels</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">vng</span><span class="p">(</span><span
+            class="n">embeds</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">adj_train</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span
+            class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">eval_model</span><span
+            class="p">)(</span><span class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">nclass</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+            <span class="n">model</span><span class="o">.</span><span class="n">fit_with_val</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span
+            class="n">train_iters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
+            class="n">eval_epochs</span><span class="p">,</span> <span class="n">normadj</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+                               <span class="n">setting</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="n">reduced</span><span
+            class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reindex</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">embeds</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">feat_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">adj_train</span><span class="p">,</span> <span class="n">output_layer_features</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">embeds</span> <span class="o">=</span> <span class="p">[</span><span class="n">embed</span> <span
+            class="k">for</span> <span class="n">embed</span> <span class="ow">in</span> <span
+            class="n">embeds</span><span class="p">]</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">one_hot</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">nclass</span><span class="p">)</span>
+
+            <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">coarsen_labels</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">vng</span><span class="p">(</span><span
+            class="n">embeds</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">adj_train</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
+            class="o">=</span> <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">coarsen_labels</span>
+
+        <span class="n">save_reduced</span><span class="p">(</span><span class="n">coarsen_edge</span><span
+            class="p">,</span> <span class="n">coarsen_features</span><span class="p">,</span> <span class="n">coarsen_labels</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="VNG.vng"><a class="viewcode-back"
+                                            href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG.vng">[docs]</a>    <span
+        class="k">def</span> <span class="nf">vng</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">embeds</span><span class="p">,</span> <span class="n">adj</span><span
+        class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">verbose</span><span
+        class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">X_tr_head</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">embeds</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span
+            class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+
+        <span class="n">X_tr_0</span> <span class="o">=</span> <span class="n">embeds</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span
+            class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span
+            class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="n">A_tr</span> <span class="o">=</span> <span class="n">adj</span>
+
+        <span class="n">column_sum</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">A_tr</span><span
+            class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+        <span class="n">column_sum</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">asarray</span><span class="p">(</span><span
+            class="n">column_sum</span><span class="p">)</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span
+            class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">X_tr_0</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span
+            class="c1"># 防止出现column_sum等于0的情况</span>
+            <span class="k">if</span> <span class="n">column_sum</span><span class="p">[</span><span
+            class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span
+            class="p">:</span>
+                <span class="n">column_sum</span><span class="p">[</span><span class="n">i</span><span
+            class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">num_coarsen_node</span> <span class="o">=</span> <span class="nb">int</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span> <span class="o">*</span> <span
+            class="n">X_tr_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">])</span>
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        PROPAGATION FROM VIRTUAL REPRESENTATIVE NODES TO TESTING NODES</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span
+            class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span
+            class="n">num_coarsen_node</span><span class="p">,</span> <span class="n">random_state</span><span
+            class="o">=</span><span class="mi">2024</span><span class="p">,</span> <span class="n">n_init</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span
+            class="n">X_tr_head</span><span class="p">,</span> <span class="n">sample_weight</span><span
+            class="o">=</span><span class="n">column_sum</span><span class="p">)</span>
+
+        <span class="n">E</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">((</span><span class="n">num_coarsen_node</span><span
+            class="p">,</span> <span class="n">X_tr_0</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">((</span><span class="n">num_coarsen_node</span><span
+            class="p">,</span> <span class="n">X_tr_0</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">X_tr_0</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">cluster_label</span> <span class="o">=</span> <span class="n">kmeans</span><span
+            class="o">.</span><span class="n">labels_</span><span class="p">[</span><span class="n">i</span><span
+            class="p">]</span>
+            <span class="n">E</span><span class="p">[</span><span class="n">cluster_label</span><span class="p">,</span> <span
+            class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">column_sum</span><span
+            class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">M</span><span class="p">[</span><span class="n">cluster_label</span><span class="p">,</span> <span
+            class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">row_sums</span> <span class="o">=</span> <span class="n">E</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span
+            class="mi">1</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">E</span> <span class="o">/</span> <span
+            class="n">row_sums</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">newaxis</span><span class="p">]</span>
+
+        <span class="n">X_vr_0</span> <span class="o">=</span> <span class="n">E</span> <span class="o">@</span> <span
+            class="n">X_tr_0</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E: &quot;</span><span class="p">,</span> <span
+            class="n">E</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_vr_0: &quot;</span><span
+            class="p">,</span> <span class="n">X_vr_0</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">)</span>
+
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        PROPAGATION BETWEEN VIRTUAL REPRESENTATIVE NODES</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">P</span> <span class="o">=</span> <span class="n">E</span> <span class="o">@</span> <span
+            class="n">X_tr_head</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">E</span> <span class="o">@</span> <span
+            class="n">A_tr</span> <span class="o">@</span> <span class="n">X_tr_head</span>
+        <span class="n">Up</span><span class="p">,</span> <span class="n">Sp</span><span class="p">,</span> <span
+            class="n">Vtp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span
+            class="n">P</span><span class="p">,</span> <span class="n">full_matrices</span><span class="o">=</span><span
+            class="kc">False</span><span class="p">)</span>
+        <span class="n">A_vr</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">@</span> <span
+            class="n">Vtp</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span
+            class="mi">1</span> <span class="o">/</span> <span class="n">Sp</span><span class="p">)</span> <span
+            class="o">@</span> <span class="n">Up</span><span class="o">.</span><span class="n">T</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;P: &quot;</span><span class="p">,</span> <span
+            class="n">P</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Q: &quot;</span><span class="p">,</span> <span
+            class="n">Q</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Up: &quot;</span><span
+            class="p">,</span> <span class="n">Up</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sp: &quot;</span><span
+            class="p">,</span> <span class="n">Sp</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Vtp: &quot;</span><span
+            class="p">,</span> <span class="n">Vtp</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Vp: &quot;</span><span
+            class="p">,</span> <span class="n">Vtp</span><span class="o">.</span><span class="n">T</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A_vr Sparsity&quot;</span><span
+            class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span
+            class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">A_vr</span><span
+            class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span
+            class="n">A_vr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span
+            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;A_vr: &quot;</span><span
+            class="p">,</span> <span class="n">A_vr</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">)</span>
+
+        <span class="n">coarsen_features</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span
+            class="n">X_vr_0</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()</span>
+        <span class="n">coarsen_edge</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">A_vr</span><span
+            class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+        <span class="n">coarsen_labels</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">FloatTensor</span><span class="p">(</span><span class="n">M</span><span
+            class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">labels</span><span
+            class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span><span class="o">.</span><span class="n">long</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
+            class="p">,</span> <span class="n">coarsen_labels</span></div></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

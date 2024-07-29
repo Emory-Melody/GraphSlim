@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.models.graphsage &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.models.graphsage</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.models.graphsage</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.models.base</span> <span class="kn">import</span> <span
+                                class="n">BaseGNN</span>
+<span class="kn">from</span> <span class="nn">graphslim.models.layers</span> <span class="kn">import</span> <span
+                                class="n">SageConvolution</span>
+
+
+<div class="viewcode-block" id="GraphSage"><a class="viewcode-back"
+                                              href="../../../source/graphslim.models.html#graphslim.models.graphsage.GraphSage">[docs]</a><span
+        class="k">class</span> <span class="nc">GraphSage</span><span class="p">(</span><span
+        class="n">BaseGNN</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">nfeat</span><span class="p">,</span> <span class="n">nhid</span><span
+            class="p">,</span> <span class="n">nclass</span><span class="p">,</span> <span class="n">args</span><span
+            class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
+            class="s1">&#39;train&#39;</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">GraphSage</span><span
+            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">(</span><span class="n">nfeat</span><span class="p">,</span> <span
+            class="n">nhid</span><span class="p">,</span> <span class="n">nclass</span><span class="p">,</span> <span
+            class="n">args</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+        <span class="n">with_bn</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">with_bn</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">SageConvolution</span><span class="p">(</span><span class="n">nfeat</span><span class="p">,</span> <span
+            class="n">nclass</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">with_bn</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bns</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span
+            class="n">ModuleList</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bns</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span
+            class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">nhid</span><span
+            class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">SageConvolution</span><span class="p">(</span><span class="n">nfeat</span><span class="p">,</span> <span
+            class="n">nhid</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nlayers</span> <span
+            class="o">-</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">SageConvolution</span><span class="p">(</span><span class="n">nhid</span><span class="p">,</span> <span
+            class="n">nhid</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">with_bn</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bns</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span
+            class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">nhid</span><span
+            class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">SageConvolution</span><span class="p">(</span><span class="n">nhid</span><span class="p">,</span> <span
+            class="n">nclass</span><span class="p">))</span></div>
+
+    <span class="c1"># def fit_with_val(self, data, train_iters=200, verbose=False,</span>
+    <span class="c1">#                  normadj=True, setting=&#39;trans&#39;, reduced=False, reindex=False,</span>
+    <span class="c1">#                  **kwargs):</span>
+    <span class="c1">#</span>
+    <span class="c1">#     self.initialize()</span>
+    <span class="c1">#     # data for training</span>
+    <span class="c1">#     if reduced:</span>
+    <span class="c1">#         adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,</span>
+    <span class="c1">#                                                       label2=data.labels_val,</span>
+    <span class="c1">#                                                       device=self.device)</span>
+    <span class="c1">#     elif setting == &#39;trans&#39;:</span>
+    <span class="c1">#         adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, data.labels_train,</span>
+    <span class="c1">#                                                       data.labels_val, device=self.device)</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, data.labels_train,</span>
+    <span class="c1">#                                                       data.labels_val, device=self.device)</span>
+    <span class="c1">#     if normadj:</span>
+    <span class="c1">#         adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if len(data.labels_full.shape) &gt; 1:</span>
+    <span class="c1">#         self.multi_label = True</span>
+    <span class="c1">#         self.loss = torch.nn.BCELoss()</span>
+    <span class="c1">#     elif len(labels.shape) &gt; 1:  # for GCSNTK, use MSE for training</span>
+    <span class="c1">#         # print(&quot;MSE loss&quot;)</span>
+    <span class="c1">#         self.float_label = True</span>
+    <span class="c1">#         self.loss = torch.nn.MSELoss()</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         self.multi_label = False</span>
+    <span class="c1">#         self.loss = F.nll_loss</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if reduced or setting == &#39;ind&#39;:</span>
+    <span class="c1">#         reindex = True</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if verbose:</span>
+    <span class="c1">#         print(&#39;=== training GNN model ===&#39;)</span>
+    <span class="c1">#     optimizer = optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.weight_decay)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     best_acc_val = 0</span>
+    <span class="c1">#     # data for validation</span>
+    <span class="c1">#     if setting == &#39;ind&#39;:</span>
+    <span class="c1">#         feat_full, adj_full = data.feat_val, data.adj_val</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         feat_full, adj_full = data.feat_full, data.adj_full</span>
+    <span class="c1">#     feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)</span>
+    <span class="c1">#     if normadj:</span>
+    <span class="c1">#         adj_full = normalize_adj_tensor(adj_full, sparse=is_sparse_tensor(adj_full))</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if self.args.method not in [&#39;msgc&#39;]:</span>
+    <span class="c1">#         # adj -&gt; adj (SparseTensor)</span>
+    <span class="c1">#         # msgc cannot use sampling</span>
+    <span class="c1">#         adj = dense2sparsetensor(adj)</span>
+    <span class="c1">#         if adj.density() &gt; 0.5:  # if the weighted graph is too dense, we need a larger neighborhood size</span>
+    <span class="c1">#             sizes = [30, 20]</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             sizes = [5, 5]</span>
+    <span class="c1">#         if reduced:</span>
+    <span class="c1">#             node_idx = torch.arange(data.labels_syn.size(0), device=self.device)</span>
+    <span class="c1">#         elif setting == &#39;ind&#39;:</span>
+    <span class="c1">#             node_idx = torch.arange(data.labels_train.size(0), device=self.device)</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             node_idx = torch.arange(data.labels_full.size(0), device=self.device)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         train_loader = NeighborSampler(adj,</span>
+    <span class="c1">#                                        node_idx=node_idx,</span>
+    <span class="c1">#                                        sizes=sizes, batch_size=len(node_idx),</span>
+    <span class="c1">#                                        num_workers=8, return_e_id=False,</span>
+    <span class="c1">#                                        num_nodes=adj.size(0),</span>
+    <span class="c1">#                                        shuffle=True)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     best_acc_val = 0</span>
+    <span class="c1">#     self.train()</span>
+    <span class="c1">#</span>
+    <span class="c1">#     for i in range(train_iters):</span>
+    <span class="c1">#         if i == train_iters // 2:</span>
+    <span class="c1">#             lr = self.lr * 0.1</span>
+    <span class="c1">#             optimizer = optim.Adam(self.parameters(), lr=lr, weight_decay=self.weight_decay)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         if self.args.method == &#39;msgc&#39;:</span>
+    <span class="c1">#             optimizer.zero_grad()</span>
+    <span class="c1">#             output = self.forward(features, adj)</span>
+    <span class="c1">#             loss_train = self.loss(output if reindex else output[data.idx_train], labels)</span>
+    <span class="c1">#</span>
+    <span class="c1">#             loss_train.backward()</span>
+    <span class="c1">#             optimizer.step()</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             for batch_size, n_id, adjs in train_loader:</span>
+    <span class="c1">#                 adjs = [adj[0].to(self.device) for adj in adjs]</span>
+    <span class="c1">#                 optimizer.zero_grad()</span>
+    <span class="c1">#                 out = self.forward(features[n_id], adjs)</span>
+    <span class="c1">#                 loss_train = self.loss(out, labels[n_id[:batch_size]])</span>
+    <span class="c1">#                 loss_train.backward()</span>
+    <span class="c1">#                 optimizer.step()</span>
+    <span class="c1">#</span>
+    <span class="c1">#         if verbose and i + 1 % 100 == 0:</span>
+    <span class="c1">#             print(&#39;Epoch {}, training loss: {}&#39;.format(i, loss_train.item()))</span>
+    <span class="c1">#</span>
+    <span class="c1">#         with torch.no_grad():</span>
+    <span class="c1">#             self.eval()</span>
+    <span class="c1">#             output = self.forward(feat_full, adj_full)</span>
+    <span class="c1">#             if setting == &#39;ind&#39;:</span>
+    <span class="c1">#                 # loss_val = F.nll_loss(output, labels_val)</span>
+    <span class="c1">#                 acc_val = accuracy(output, labels_val)</span>
+    <span class="c1">#             else:</span>
+    <span class="c1">#                 # loss_val = F.nll_loss(output[data.idx_val], labels_val)</span>
+    <span class="c1">#                 acc_val = accuracy(output[data.idx_val], labels_val)</span>
+    <span class="c1">#</span>
+    <span class="c1">#             if acc_val &gt; best_acc_val:</span>
+    <span class="c1">#                 best_acc_val = acc_val</span>
+    <span class="c1">#                 self.output = output</span>
+    <span class="c1">#                 weights = deepcopy(self.state_dict())</span>
+    <span class="c1">#</span>
+    <span class="c1">#     if verbose:</span>
+    <span class="c1">#         print(&#39;=== picking the best model according to the performance on validation ===&#39;)</span>
+    <span class="c1">#     self.load_state_dict(weights)</span>
+    <span class="c1">#     return best_acc_val</span>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

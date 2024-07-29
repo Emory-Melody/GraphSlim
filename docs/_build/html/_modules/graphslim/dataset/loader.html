@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.dataset.loader &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.dataset.loader</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.dataset.loader</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">osp</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span
+                                class="nn">F</span>
+<span class="kn">from</span> <span class="nn">ogb.nodeproppred</span> <span class="kn">import</span> <span class="n">PygNodePropPredDataset</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span
+                                class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.datasets</span> <span class="kn">import</span> <span
+                                class="n">Planetoid</span><span class="p">,</span> <span class="n">Coauthor</span><span
+                                class="p">,</span> <span class="n">CitationFull</span><span class="p">,</span> <span
+                                class="n">Amazon</span><span class="p">,</span> <span class="n">Flickr</span><span
+                                class="p">,</span> <span class="n">Reddit2</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span
+                                class="n">NeighborSampler</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
+                                class="n">to_undirected</span><span class="p">,</span> <span
+                                class="n">add_self_loops</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.dataset.convertor</span> <span class="kn">import</span> <span
+                                class="n">ei2csr</span><span class="p">,</span> <span class="n">csr2ei</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
+                                class="n">splits</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">index_to_mask</span><span
+                                class="p">,</span> <span class="n">to_tensor</span>
+
+
+<div class="viewcode-block" id="get_dataset"><a class="viewcode-back"
+                                                href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.get_dataset">[docs]</a><span
+        class="k">def</span> <span class="nf">get_dataset</span><span class="p">(</span><span class="n">name</span><span
+        class="o">=</span><span class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+        class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span
+            class="n">join</span><span class="p">(</span><span class="s1">&#39;../../data&#39;</span><span
+            class="p">)</span>
+    <span class="c1"># Create a dictionary that maps standard names to normalized names</span>
+    <span class="n">standard_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;dblp&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;cora_ml&#39;</span><span class="p">,</span> <span class="s1">&#39;physics&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;cs&#39;</span><span class="p">,</span> <span class="s1">&#39;cora&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;citeseer&#39;</span><span class="p">,</span> <span class="s1">&#39;pubmed&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;photo&#39;</span><span class="p">,</span>
+                      <span class="s1">&#39;computers&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-products&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;ogbn-proteins&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-papers100m&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]</span>
+    <span class="c1"># TODO: Add sythesize graph</span>
+    <span class="n">normalized_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span
+            class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span
+            class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span
+            class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span
+            class="ow">in</span> <span class="n">standard_names</span><span class="p">]</span>
+    <span class="n">name_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span
+            class="nb">zip</span><span class="p">(</span><span class="n">normalized_names</span><span class="p">,</span> <span
+            class="n">standard_names</span><span class="p">))</span>
+
+    <span class="c1"># Normalize the name input</span>
+    <span class="n">normalized_name</span> <span class="o">=</span> <span class="n">name</span><span
+            class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span
+            class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span
+            class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalized_name</span> <span class="ow">in</span> <span class="n">name_dict</span><span
+            class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name_dict</span><span
+            class="p">[</span><span class="n">normalized_name</span><span class="p">]</span>  <span class="c1"># Transfer to standard name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;flickr&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Flickr</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span> <span
+            class="o">+</span> <span class="s1">&#39;/flickr&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;reddit&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Reddit2</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span> <span
+            class="o">+</span> <span class="s1">&#39;/reddit&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;dblp&#39;</span><span class="p">,</span> <span class="s1">&#39;cora_ml&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;cora_full&#39;</span><span class="p">,</span> <span class="s1">&#39;citeseer_full&#39;</span><span
+            class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">CitationFull</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;physics&#39;</span><span class="p">,</span> <span class="s1">&#39;cs&#39;</span><span
+            class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Coauthor</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;cora&#39;</span><span class="p">,</span> <span class="s1">&#39;citeseer&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;pubmed&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Planetoid</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;photo&#39;</span><span class="p">,</span> <span class="s1">&#39;computers&#39;</span><span
+            class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">Amazon</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataGraphSAINT</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span> <span
+            class="o">=</span> <span class="mi">40</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;ogbn-products&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;ogbn-proteins&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;ogbn-papers100m&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">PygNodePropPredDataset</span><span
+            class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">root</span><span
+            class="o">=</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset name not recognized.&quot;</span><span
+            class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># pyg2TransAndInd: add splits</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">splits</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">split</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">TransAndInd</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">pre_norm</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">nclass</span> <span class="o">=</span> <span
+            class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span>
+
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="TransAndInd"><a class="viewcode-back"
+                                                href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd">[docs]</a><span
+        class="k">class</span> <span class="nc">TransAndInd</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">dataset</span><span
+            class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_dict</span> <span
+            class="o">=</span> <span class="kc">None</span>  <span class="c1"># sample the training data per class when initializing synthetic graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_dict2</span> <span class="o">=</span> <span
+            class="kc">None</span>  <span class="c1"># sample from the same class when training</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sparse_adj</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_full</span> <span class="o">=</span> <span
+            class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">num_nodes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_mask</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_mask</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">test_mask</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">train_mask</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">val_mask</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">test_mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pyg_saint</span><span
+            class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">in</span> <span
+            class="p">[</span><span class="s1">&#39;flickr&#39;</span><span class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">to_undirected</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span
+            class="p">)</span>
+            <span class="n">feat_train</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">data</span><span
+            class="o">.</span><span class="n">idx_train</span><span class="p">]</span>
+            <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+            <span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span
+            class="n">feat_train</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span
+            class="n">transform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">x</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">from_numpy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">feat_full</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()</span>
+        <span class="k">if</span> <span class="n">norm</span> <span class="ow">and</span> <span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;citeseer&#39;</span><span class="p">,</span> <span class="s1">&#39;pubmed&#39;</span><span
+            class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">idx_test</span>
+        <span class="c1"># self.nclass = max(self.labels_full).item() + 1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_train</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_val</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_test</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ix_</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_train</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">labels_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_val</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">labels_full</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">idx_val</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_test</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">labels_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_train</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_val</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_test</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">]</span>
+
+<div class="viewcode-block" id="TransAndInd.to"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd.to">[docs]</a>    <span
+        class="k">def</span> <span class="nf">to</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<span class="w">        </span><span
+            class="sd">&quot;&quot;&quot;Move data to the specified device.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_full</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">labels_full</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+            class="n">device</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_train</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">feat_train</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span
+            class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_val</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_val</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_test</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_test</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
+            class="p">)</span>
+
+        <span class="c1"># self.labels_train = self.labels_train.to(device)</span>
+        <span class="c1"># self.labels_val = self.labels_val.to(device)</span>
+        <span class="c1"># self.labels_test = self.labels_test.to(device)</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="TransAndInd.pyg_saint"><a class="viewcode-back"
+                                                          href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd.pyg_saint">[docs]</a>    <span
+        class="k">def</span> <span class="nf">pyg_saint</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="c1"># reference type</span>
+        <span class="c1"># pyg format use x,y,edge_index</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labels_full</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">y</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span class="o">=</span> <span
+            class="n">ei2csr</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparse_adj</span> <span
+            class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">from_edge_index</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">)</span>
+        <span class="c1"># saint format use feat,labels,adj</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="s1">&#39;feat_full&#39;</span><span
+            class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">adj_full</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_full</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">labels_full</span> <span
+            class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">labels_full</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">csr2ei</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">adj_full</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sparse_adj</span> <span
+            class="o">=</span> <span class="n">SparseTensor</span><span class="o">.</span><span class="n">from_edge_index</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">edge_index</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">feat_full</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">labels_full</span>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="TransAndInd.retrieve_class"><a class="viewcode-back"
+                                                               href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd.retrieve_class">[docs]</a>    <span
+        class="k">def</span> <span class="nf">retrieve_class</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">num</span><span
+        class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="c1"># change the initialization strategy here</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_dict</span> <span
+            class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">class_dict</span> <span
+            class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nclass</span><span
+            class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">class_dict</span><span
+            class="p">[</span><span class="s1">&#39;class_</span><span class="si">%s</span><span class="s1">&#39;</span> <span
+            class="o">%</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">labels_train</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">labels_train</span><span class="p">))</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">class_dict</span><span class="p">[</span><span
+            class="s1">&#39;class_</span><span class="si">%s</span><span class="s1">&#39;</span> <span
+            class="o">%</span> <span class="n">c</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">random</span><span class="o">.</span><span class="n">permutation</span><span
+            class="p">(</span><span class="n">idx</span><span class="p">)[:</span><span class="n">num</span><span
+            class="p">]</span></div>
+
+<div class="viewcode-block" id="TransAndInd.retrieve_class_sampler"><a class="viewcode-back"
+                                                                       href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd.retrieve_class_sampler">[docs]</a>    <span
+        class="k">def</span> <span class="nf">retrieve_class_sampler</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">adj</span><span
+        class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">num</span><span
+        class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_dict2</span> <span
+            class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">class_dict2</span> <span
+            class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nclass</span><span
+            class="p">):</span>
+                <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
+            class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">idx_train</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">labels_train</span> <span class="o">==</span> <span
+            class="n">i</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="p">))[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">labels_train</span> <span class="o">==</span> <span
+            class="n">i</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">class_dict2</span><span
+            class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">idx</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span
+            class="mi">15</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;reddit&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span class="p">]:</span>
+                <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">15</span><span
+            class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span
+            class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+            <span class="c1"># sizes = [-1, -1]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span
+            class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span
+            class="mi">5</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span
+            class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span
+            class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">nlayers</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span
+            class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span
+            class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span
+            class="mi">5</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">samplers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span> <span class="o">=</span> <span
+            class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nclass</span><span
+            class="p">):</span>
+                <span class="n">node_idx</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">LongTensor</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">class_dict2</span><span class="p">[</span><span class="n">i</span><span
+            class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span><span
+            class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">NeighborSampler</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span>
+                                                     <span class="n">node_idx</span><span class="o">=</span><span
+            class="n">node_idx</span><span class="p">,</span>
+                                                     <span class="n">sizes</span><span class="o">=</span><span
+            class="n">sizes</span><span class="p">,</span> <span class="n">batch_size</span><span
+            class="o">=</span><span class="n">num</span><span class="p">,</span>
+                                                     <span class="n">num_workers</span><span class="o">=</span><span
+            class="mi">8</span><span class="p">,</span> <span class="n">return_e_id</span><span class="o">=</span><span
+            class="kc">False</span><span class="p">,</span>
+                                                     <span class="n">num_nodes</span><span class="o">=</span><span
+            class="n">adj</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span
+            class="mi">0</span><span class="p">),</span>
+                                                     <span class="n">shuffle</span><span class="o">=</span><span
+            class="kc">True</span><span class="p">))</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">random</span><span class="o">.</span><span class="n">permutation</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">class_dict2</span><span class="p">[</span><span class="n">c</span><span class="p">])[:</span><span
+            class="n">num</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">samplers</span><span class="p">[</span><span class="n">c</span><span class="p">]</span><span
+            class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">batch</span><span
+            class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span
+            class="o">.</span><span class="n">int64</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="TransAndInd.reset"><a class="viewcode-back"
+                                                      href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.TransAndInd.reset">[docs]</a>    <span
+        class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span> <span
+            class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_dict2</span> <span class="o">=</span> <span
+            class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_syn</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_syn</span> <span
+            class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span
+            class="p">,</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="LargeDataLoader"><a class="viewcode-back"
+                                                    href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader">[docs]</a><span
+        class="k">class</span> <span class="nc">LargeDataLoader</span><span class="p">(</span><span
+        class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">name</span><span class="o">=</span><span
+            class="s1">&#39;Flickr&#39;</span><span class="p">,</span> <span class="n">split</span><span
+            class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">,</span> <span
+            class="n">batch_size</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span
+            class="n">split_method</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span
+            class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">LargeDataLoader</span><span
+            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">()</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span
+            class="n">join</span><span class="p">(</span><span class="s1">&#39;../../data&#39;</span><span
+            class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataGraphSAINT</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span><span
+            class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">name</span><span
+            class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span> <span
+            class="o">=</span> <span class="mi">40</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span class="o">.</span><span
+            class="n">shape</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_full</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">to_tensor</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span
+            class="p">)</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">csr2ei</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">edge_index</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">])</span>
+            <span class="n">Adj</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">values</span><span
+            class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span
+            class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span
+            class="p">]))</span>
+            <span class="n">sparse_eye</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span><span
+            class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">2</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">),</span>
+                                                 <span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Adj</span> <span
+            class="o">=</span> <span class="n">Adj</span> <span class="o">+</span> <span class="n">sparse_eye</span>
+
+            <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span
+            class="n">features</span><span class="p">)</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">GCF</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">Adj</span><span class="p">,</span> <span class="n">features</span><span
+            class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_idx</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_split</span> <span class="o">=</span> <span
+            class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">split_idx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n_split</span> <span class="o">/</span> <span
+            class="n">batch_size</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_feat</span> <span
+            class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">split_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_label</span> <span
+            class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">split_idx</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_method</span> <span
+            class="o">=</span> <span class="n">split_method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes</span> <span
+            class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;flickr&#39;</span><span
+            class="p">:</span>
+                <span class="kn">from</span> <span class="nn">torch_geometric.datasets</span> <span
+            class="kn">import</span> <span class="n">Flickr</span> <span class="k">as</span> <span
+            class="n">DataSet</span>
+            <span class="k">elif</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;reddit&#39;</span><span
+            class="p">:</span>
+                <span class="kn">from</span> <span class="nn">torch_geometric.datasets</span> <span
+            class="kn">import</span> <span class="n">Reddit2</span> <span class="k">as</span> <span
+            class="n">DataSet</span>
+
+            <span class="n">Dataset</span> <span class="o">=</span> <span class="n">DataSet</span><span
+            class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">path</span> <span
+            class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span
+            class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span
+            class="n">Dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span
+            class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">split</span> <span
+            class="o">+</span> <span class="s1">&#39;_mask&#39;</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">Dataset</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span
+            class="n">x</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">Dataset</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span
+            class="n">y</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">Dataset</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">edge_index</span>
+
+            <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">edge_index</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">])</span>
+            <span class="n">Adj</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">values</span><span
+            class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Size</span><span
+            class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span
+            class="p">]))</span>
+            <span class="n">sparse_eye</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span><span
+            class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="mi">2</span><span
+            class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">),</span>
+                                                 <span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Adj</span> <span
+            class="o">=</span> <span class="n">Adj</span> <span class="o">+</span> <span class="n">sparse_eye</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">normalize_data</span><span class="p">(</span><span
+            class="n">features</span><span class="p">)</span>
+            <span class="c1"># features      = self.GCF(self.Adj, features, k=2)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_idx</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">where</span><span
+            class="p">(</span><span class="n">Dataset</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">][</span><span class="n">mask</span><span class="p">])[</span><span class="mi">0</span><span
+            class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_split</span> <span class="o">=</span> <span
+            class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">split_idx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">n_split</span> <span class="o">/</span> <span
+            class="n">batch_size</span><span class="p">))</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">int</span><span
+            class="p">)</span>
+
+            <span class="c1"># Masked Adjacency Matrix</span>
+            <span class="n">optor_index</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">split_idx</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">n_split</span><span class="p">),</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">range</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_split</span><span
+            class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span
+            class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">n_split</span><span class="p">)),</span>
+                <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">optor_value</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n_split</span><span class="p">)</span>
+            <span class="n">optor_shape</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Size</span><span class="p">([</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">n_split</span><span class="p">])</span>
+            <span class="n">optor</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">optor_index</span><span
+            class="p">,</span> <span class="n">optor_value</span><span class="p">,</span> <span
+            class="n">optor_shape</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Adj_mask</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span
+            class="n">mm</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span
+            class="n">optor</span><span class="o">.</span><span class="n">t</span><span class="p">(),</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">Adj</span><span class="p">),</span> <span
+            class="n">optor</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_feat</span> <span
+            class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">split_idx</span><span class="p">]</span>
+            <span class="c1"># self.split_feat   = self.GCF(self.Adj_mask, self.split_feat, k = 2)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_label</span> <span
+            class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">split_idx</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split_method</span> <span
+            class="o">=</span> <span class="n">split_method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_classes</span> <span
+            class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">num_classes</span>
+
+<div class="viewcode-block" id="LargeDataLoader.normalize_data"><a class="viewcode-back"
+                                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.normalize_data">[docs]</a>    <span
+        class="k">def</span> <span class="nf">normalize_data</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        normalize data</span>
+<span class="sd">        parameters:</span>
+<span class="sd">            data: torch.Tensor, data need to be normalized</span>
+<span class="sd">        return:</span>
+<span class="sd">            torch.Tensor, normalized data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>  <span class="c1"># 沿第0维（即样本维）求均值</span>
+        <span class="n">std</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">std</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span
+            class="mi">0</span><span class="p">)</span>  <span class="c1"># 沿第0维（即样本维）求标准差</span>
+        <span class="n">std</span><span class="p">[</span><span class="n">std</span> <span class="o">==</span> <span
+            class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span
+            class="c1"># 将std中的0值替换为1，以避免分母为0的情况</span>
+        <span class="n">normalized_data</span> <span class="o">=</span> <span class="p">(</span><span
+            class="n">data</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span
+            class="o">/</span> <span class="n">std</span>  <span class="c1"># 对数据进行归一化处理</span>
+        <span class="k">return</span> <span class="n">normalized_data</span></div>
+
+<div class="viewcode-block" id="LargeDataLoader.GCF"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.GCF">[docs]</a>    <span
+        class="k">def</span> <span class="nf">GCF</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">x</span><span
+        class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span
+        class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Graph convolution filter</span>
+<span class="sd">        parameters:</span>
+<span class="sd">            adj: torch.Tensor, adjacency matrix, must be self-looped</span>
+<span class="sd">            x: torch.Tensor, features</span>
+<span class="sd">            k: int, number of hops</span>
+<span class="sd">        return:</span>
+<span class="sd">            torch.Tensor, filtered features</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span
+            class="n">n</span><span class="p">))</span><span class="o">.</span><span class="n">repeat</span><span
+            class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span
+            class="p">)</span>
+        <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span> <span class="o">+</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">sparse_coo_tensor</span><span
+            class="p">(</span><span class="n">ind</span><span class="p">,</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n</span><span
+            class="p">),</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span
+            class="n">n</span><span class="p">))</span>
+
+        <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">pow</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span
+            class="n">adj</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span
+            class="o">.</span><span class="n">to_dense</span><span class="p">(),</span> <span class="o">-</span><span
+            class="mf">0.5</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">ind</span><span class="p">,</span> <span
+            class="n">D</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span
+            class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+        <span class="nb">filter</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">mm</span><span
+            class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sparse</span><span
+            class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">D</span><span
+            class="p">,</span> <span class="n">adj</span><span class="p">),</span> <span class="n">D</span><span
+            class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span
+            class="nb">filter</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span></div>
+
+<div class="viewcode-block" id="LargeDataLoader.properties"><a class="viewcode-back"
+                                                               href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.properties">[docs]</a>    <span
+        class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_split</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_classes</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span
+            class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span></div>
+
+<div class="viewcode-block" id="LargeDataLoader.split_batch"><a class="viewcode-back"
+                                                                href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.split_batch">[docs]</a>    <span
+        class="k">def</span> <span class="nf">split_batch</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        split data into batches</span>
+<span class="sd">        parameters:</span>
+<span class="sd">            split_method: str, method to split data, default is &#39;kmeans&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">split_method</span> <span class="o">==</span> <span class="s1">&#39;kmeans&#39;</span><span
+            class="p">:</span>
+            <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span
+            class="n">n_clusters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">k</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span
+            class="n">n_init</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+            <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">split_feat</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">batch_labels</span> <span
+            class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">predict</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">split_feat</span><span
+            class="o">.</span><span class="n">numpy</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="LargeDataLoader.getitem"><a class="viewcode-back"
+                                                            href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.getitem">[docs]</a>    <span
+        class="k">def</span> <span class="nf">getitem</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        对于给定的 idx 输出对应的 node_features, labels, sub Ajacency matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># idx   = [idx]</span>
+        <span class="n">n_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span
+            class="n">idx</span><span class="p">)</span>
+        <span class="n">idx_raw</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">split_idx</span><span class="p">[</span><span class="n">idx</span><span
+            class="p">]</span>
+        <span class="n">feat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">split_feat</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">split_label</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="c1"># idx   = idx.tolist()</span>
+
+        <span class="n">optor_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">((</span><span class="n">idx_raw</span><span class="o">.</span><span
+            class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span
+            class="n">n_idx</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span
+            class="n">n_idx</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_idx</span><span
+            class="p">)),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+        <span class="n">optor_value</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">ones</span><span class="p">(</span><span class="n">n_idx</span><span class="p">)</span>
+        <span class="n">optor_shape</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">Size</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">n</span><span class="p">,</span> <span class="n">n_idx</span><span class="p">])</span>
+        <span class="n">optor</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">optor_index</span><span class="p">,</span> <span
+            class="n">optor_value</span><span class="p">,</span> <span class="n">optor_shape</span><span
+            class="p">)</span>
+        <span class="n">sub_A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span
+            class="n">mm</span><span class="p">(</span><span class="n">optor</span><span class="o">.</span><span
+            class="n">t</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">Adj</span><span class="p">),</span> <span class="n">optor</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">feat</span><span class="p">,</span> <span
+            class="n">label</span><span class="p">,</span> <span class="n">sub_A</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LargeDataLoader.get_batch"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.LargeDataLoader.get_batch">[docs]</a>    <span
+        class="k">def</span> <span class="nf">get_batch</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">where</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">batch_labels</span><span class="p">)</span> <span class="o">==</span> <span
+            class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">batch_i</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">getitem</span><span class="p">(</span><span class="n">idx</span><span
+            class="p">)</span>
+        <span class="k">return</span> <span class="n">batch_i</span></div></div>
+
+
+<div class="viewcode-block" id="OgbDataLoader"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.OgbDataLoader">[docs]</a><span
+        class="k">class</span> <span class="nc">OgbDataLoader</span><span class="p">(</span><span
+        class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s1">&#39;ogbn-arxiv&#39;</span><span
+            class="p">,</span> <span class="n">split</span><span class="o">=</span><span
+            class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">batch_size</span><span
+            class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span
+            class="n">split_method</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span
+            class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OgbDataLoader</span><span
+            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="DataGraphSAINT"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.DataGraphSAINT">[docs]</a><span
+        class="k">class</span> <span class="nc">DataGraphSAINT</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;datasets used in GraphSAINT paper&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">dataset</span><span
+            class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">gdown</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span
+            class="o">.</span><span class="n">replace</span><span class="p">(</span><span
+            class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span
+            class="p">)</span>
+        <span class="n">dataset_str</span> <span class="o">=</span> <span class="n">root</span> <span class="o">+</span> <span
+            class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">dataset</span> <span
+            class="o">+</span> <span class="s1">&#39;/raw/&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">osp</span><span class="o">.</span><span
+            class="n">exists</span><span class="p">(</span><span class="n">dataset_str</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span
+            class="p">(</span><span class="n">dataset_str</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span
+            class="s1">&#39;Downloading dataset&#39;</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa&#39;</span>  <span
+            class="c1"># Change this to your actual file ID</span>
+            <span class="n">gdown</span><span class="o">.</span><span class="n">download_folder</span><span
+            class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">url</span><span
+            class="p">,</span> <span class="n">output</span><span class="o">=</span><span
+            class="n">dataset_str</span><span class="p">,</span> <span class="n">quiet</span><span
+            class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dataset</span> <span class="o">==</span> <span class="s1">&#39;ogbn_arxiv&#39;</span><span
+            class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span class="o">=</span> <span
+            class="n">sp</span><span class="o">.</span><span class="n">load_npz</span><span class="p">(</span><span
+            class="n">dataset_str</span> <span class="o">+</span> <span class="s1">&#39;adj_full.npz&#39;</span><span
+            class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span class="o">=</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span class="o">+</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span class="o">.</span><span
+            class="n">T</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span> <span
+            class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adj_full</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span>
+
+        <span class="n">role</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span
+            class="n">dataset_str</span> <span class="o">+</span> <span class="s1">&#39;role.json&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_train</span> <span
+            class="o">=</span> <span class="n">role</span><span class="p">[</span><span
+            class="s1">&#39;tr&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_test</span> <span
+            class="o">=</span> <span class="n">role</span><span class="p">[</span><span
+            class="s1">&#39;te&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idx_val</span> <span
+            class="o">=</span> <span class="n">role</span><span class="p">[</span><span
+            class="s1">&#39;va&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_mask</span> <span
+            class="o">=</span> <span class="n">index_to_mask</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">idx_train</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_mask</span> <span
+            class="o">=</span> <span class="n">index_to_mask</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">idx_test</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_mask</span> <span
+            class="o">=</span> <span class="n">index_to_mask</span><span class="p">(</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">idx_val</span><span class="p">,</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">num_nodes</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_full</span> <span
+            class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span
+            class="p">(</span><span class="n">dataset_str</span> <span class="o">+</span> <span class="s1">&#39;feats.npy&#39;</span><span
+            class="p">)</span>
+        <span class="c1"># ---- normalize feat ----</span>
+
+        <span class="n">class_map</span> <span class="o">=</span> <span class="n">json</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span
+            class="p">(</span><span class="n">dataset_str</span> <span class="o">+</span> <span class="s1">&#39;class_map.json&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels_full</span> <span class="o">=</span> <span
+            class="n">to_tensor</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">process_labels</span><span
+            class="p">(</span><span class="n">class_map</span><span class="p">))</span>
+
+<div class="viewcode-block" id="DataGraphSAINT.process_labels"><a class="viewcode-back"
+                                                                  href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.DataGraphSAINT.process_labels">[docs]</a>    <span
+        class="k">def</span> <span class="nf">process_labels</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">class_map</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        setup vertex property map for output classests</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">num_vertices</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">num_nodes</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">list</span><span
+            class="p">(</span><span class="n">class_map</span><span class="o">.</span><span class="n">values</span><span
+            class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span
+            class="p">):</span>
+            <span class="n">num_classes</span> <span class="o">=</span> <span class="nb">len</span><span
+            class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">class_map</span><span
+            class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span
+            class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nclass</span> <span
+            class="o">=</span> <span class="n">num_classes</span>
+            <span class="n">class_arr</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">zeros</span><span class="p">((</span><span
+            class="n">num_vertices</span><span class="p">,</span> <span class="n">num_classes</span><span
+            class="p">))</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span
+            class="ow">in</span> <span class="n">class_map</span><span class="o">.</span><span
+            class="n">items</span><span class="p">():</span>
+                <span class="n">class_arr</span><span class="p">[</span><span class="nb">int</span><span
+            class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span
+            class="n">v</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">class_arr</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">zeros</span><span class="p">(</span><span
+            class="n">num_vertices</span><span class="p">,</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span
+            class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span
+            class="ow">in</span> <span class="n">class_map</span><span class="o">.</span><span
+            class="n">items</span><span class="p">():</span>
+                <span class="n">class_arr</span><span class="p">[</span><span class="nb">int</span><span
+            class="p">(</span><span class="n">k</span><span class="p">)]</span> <span class="o">=</span> <span
+            class="n">v</span>
+            <span class="n">class_arr</span> <span class="o">=</span> <span class="n">class_arr</span> <span
+            class="o">-</span> <span class="n">class_arr</span><span class="o">.</span><span class="n">min</span><span
+            class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nclass</span> <span
+            class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">class_arr</span><span
+            class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">class_arr</span></div>
+
+<div class="viewcode-block" id="DataGraphSAINT.get"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.dataset.html#graphslim.dataset.loader.DataGraphSAINT.get">[docs]</a>    <span
+        class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span
+            class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">get</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>

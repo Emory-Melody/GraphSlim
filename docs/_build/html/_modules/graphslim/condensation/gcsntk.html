@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>graphslim.condensation.gcsntk &mdash; GraphSlim documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1"/>
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094"/>
+
+
+    <!--[if lt IE 9]>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+
+    <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+    <script data-url_root="../../../" id="documentation_options"
+            src="../../../_static/documentation_options.js?v=b3ba4146"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html"/>
+    <link rel="search" title="Search" href="../../../search.html"/>
+</head>
+
+<body class="wy-body-for-nav">
+<div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+        <div class="wy-side-scroll">
+            <div class="wy-side-nav-search">
+
+
+                <a href="../../../index.html" class="icon icon-home">
+                    GraphSlim
+                </a>
+                <div role="search">
+                    <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+                        <input type="text" name="q" placeholder="Search docs" aria-label="Search docs"/>
+                        <input type="hidden" name="check_keywords" value="yes"/>
+                        <input type="hidden" name="area" value="default"/>
+                    </form>
+                </div>
+            </div>
+            <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Models</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Method</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.coarsening.html">graphslim.coarsening
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.condensation.html">graphslim.condensation
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+        <nav class="wy-nav-top" aria-label="Mobile navigation menu">
+            <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+            <a href="../../../index.html">GraphSlim</a>
+        </nav>
+
+        <div class="wy-nav-content">
+            <div class="rst-content">
+                <div role="navigation" aria-label="Page navigation">
+                    <ul class="wy-breadcrumbs">
+                        <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+                        <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+                        <li class="breadcrumb-item active">graphslim.condensation.gcsntk</li>
+                        <li class="wy-breadcrumbs-aside">
+                        </li>
+                    </ul>
+                    <hr/>
+                </div>
+                <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+                    <div itemprop="articleBody">
+
+                        <h1>Source code for graphslim.condensation.gcsntk</h1>
+                        <div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span
+                                class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+
+<span class="kn">from</span> <span class="nn">graphslim.condensation.utils</span> <span class="kn">import</span> <span
+                                class="n">normalize_data</span><span class="p">,</span> <span class="n">GCF</span>
+<span class="kn">from</span> <span class="nn">graphslim.condensation.utils</span> <span class="kn">import</span> <span
+                                class="n">sub_E</span><span class="p">,</span> <span class="n">update_E</span>
+<span class="kn">from</span> <span class="nn">graphslim.condensation.gcond_base</span> <span
+                                class="kn">import</span> <span class="n">GCondBase</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset</span> <span class="kn">import</span> <span class="n">LargeDataLoader</span>
+<span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
+                                class="n">save_reduced</span>
+<span class="kn">from</span> <span class="nn">graphslim.evaluation.utils</span> <span class="kn">import</span> <span
+                                class="n">verbose_time_memory</span>
+<span class="kn">from</span> <span class="nn">graphslim.models</span> <span class="kn">import</span> <span class="n">StructureBasedNeuralTangentKernel</span><span
+                                class="p">,</span> <span class="n">KernelRidgeRegression</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">trange</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">seed_everything</span>
+
+
+<div class="viewcode-block" id="GCSNTK"><a class="viewcode-back"
+                                           href="../../../source/graphslim.condensation.html#graphslim.condensation.gcsntk.GCSNTK">[docs]</a><span
+        class="k">class</span> <span class="nc">GCSNTK</span><span class="p">(</span><span
+        class="n">GCondBase</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GCSNTK</span><span class="p">,</span> <span
+            class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span
+            class="p">(</span><span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">k</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">k</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">K</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ridge</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">ridge</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">L</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">L</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">scale</span>
+
+<div class="viewcode-block" id="GCSNTK.train"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.condensation.html#graphslim.condensation.gcsntk.GCSNTK.train">[docs]</a>    <span
+        class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">KRR</span><span class="p">,</span> <span class="n">G_t</span><span class="p">,</span> <span
+        class="n">G_s</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">y_s</span><span
+        class="p">,</span> <span class="n">E_t</span><span class="p">,</span> <span class="n">E_s</span><span class="p">,</span> <span
+        class="n">loss_fn</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span
+        class="n">accumulate_steps</span><span class="o">=</span><span class="kc">None</span><span
+        class="p">,</span> <span class="n">i</span><span class="o">=</span><span class="kc">None</span><span
+        class="p">,</span> <span class="n">TRAIN_K</span><span class="o">=</span><span class="kc">None</span><span
+        class="p">):</span>
+        <span class="n">pred</span><span class="p">,</span> <span class="n">acc</span> <span class="o">=</span> <span
+            class="n">KRR</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span
+            class="n">G_t</span><span class="p">,</span> <span class="n">G_s</span><span class="p">,</span> <span
+            class="n">y_t</span><span class="p">,</span> <span class="n">y_s</span><span class="p">,</span> <span
+            class="n">E_t</span><span class="p">,</span> <span class="n">E_s</span><span class="p">)</span>
+
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">pred</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">float32</span><span class="p">)</span>
+        <span class="n">y_t</span> <span class="o">=</span> <span class="n">y_t</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">float32</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span
+            class="n">pred</span><span class="p">,</span> <span class="n">y_t</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">float32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">accumulate_steps</span> <span class="ow">is</span> <span class="kc">None</span><span
+            class="p">:</span>
+            <span class="c1"># with torch.autograd.detect_anomaly():</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span
+            class="p">()</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span
+            class="o">/</span> <span class="n">accumulate_steps</span>
+            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span
+            class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">accumulate_steps</span> <span
+            class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span
+            class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">i</span> <span class="o">==</span> <span
+            class="n">TRAIN_K</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span
+            class="p">()</span>
+                <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span><span class="o">.</span><span
+            class="n">item</span><span class="p">()</span>
+
+        <span class="c1"># print(f&quot;Training loss: {loss:&gt;7f} Training Acc: {acc:&gt;7f}&quot;, end=&#39; &#39;)</span>
+        <span class="k">return</span> <span class="n">G_s</span><span class="p">,</span> <span class="n">y_s</span><span
+            class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">acc</span> <span
+            class="o">*</span> <span class="mi">100</span></div>
+
+<div class="viewcode-block" id="GCSNTK.test"><a class="viewcode-back"
+                                                href="../../../source/graphslim.condensation.html#graphslim.condensation.gcsntk.GCSNTK.test">[docs]</a>    <span
+        class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">KRR</span><span class="p">,</span> <span class="n">G_t</span><span class="p">,</span> <span
+        class="n">G_s</span><span class="p">,</span> <span class="n">y_t</span><span class="p">,</span> <span class="n">y_s</span><span
+        class="p">,</span> <span class="n">E_t</span><span class="p">,</span> <span class="n">E_s</span><span class="p">,</span> <span
+        class="n">loss_fn</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span
+            class="n">y_t</span><span class="p">)</span>
+        <span class="n">test_loss</span><span class="p">,</span> <span class="n">correct</span> <span class="o">=</span> <span
+            class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">no_grad</span><span class="p">():</span>
+            <span class="n">pred</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span
+            class="n">KRR</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span
+            class="n">G_t</span><span class="p">,</span> <span class="n">G_s</span><span class="p">,</span> <span
+            class="n">y_t</span><span class="p">,</span> <span class="n">y_s</span><span class="p">,</span> <span
+            class="n">E_t</span><span class="p">,</span> <span class="n">E_s</span><span class="p">)</span>
+            <span class="n">test_loss</span> <span class="o">+=</span> <span class="n">loss_fn</span><span
+            class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">y_t</span><span
+            class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+            <span class="n">correct</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pred</span><span
+            class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span> <span class="o">==</span> <span class="n">y_t</span><span class="o">.</span><span
+            class="n">argmax</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span
+            class="o">.</span><span class="n">type</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span
+            class="p">()</span>
+        <span class="n">correct</span> <span class="o">/=</span> <span class="n">size</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span
+            class="s2">&quot;Val Acc: </span><span class="si">{</span><span class="p">(</span><span
+            class="mi">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span
+            class="n">correct</span><span class="p">)</span><span class="si">:</span><span
+            class="s2">&gt;0.1f</span><span class="si">}</span><span class="s2">%, Avg loss: </span><span
+            class="si">{</span><span class="n">test_loss</span><span class="si">:</span><span
+            class="s2">&gt;8f</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;</span><span
+            class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">test_loss</span><span class="p">,</span> <span
+            class="n">correct</span> <span class="o">*</span> <span class="mi">100</span></div>
+
+<div class="viewcode-block" id="GCSNTK.reduce"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.condensation.html#graphslim.condensation.gcsntk.GCSNTK.reduce">[docs]</a>    <span
+        class="nd">@verbose_time_memory</span>
+    <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span
+            class="p">]:</span>
+            <span class="n">train_loader</span> <span class="o">=</span> <span class="n">LargeDataLoader</span><span
+            class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="p">,</span> <span class="n">split</span><span class="o">=</span><span
+            class="s1">&#39;train&#39;</span><span class="p">,</span> <span class="n">batch_size</span><span
+            class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+                                           <span class="n">split_method</span><span class="o">=</span><span class="s1">&#39;kmeans&#39;</span><span
+            class="p">)</span>
+            <span class="n">TRAIN_K</span><span class="p">,</span> <span class="n">n_train</span><span
+            class="p">,</span> <span class="n">n_class</span><span class="p">,</span> <span class="n">dim</span><span
+            class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span
+            class="n">train_loader</span><span class="o">.</span><span class="n">properties</span><span
+            class="p">()</span>
+            <span class="n">train_loader</span><span class="o">.</span><span class="n">split_batch</span><span
+            class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edge_index</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">edge_index</span>
+            <span class="n">n_class</span> <span class="o">=</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">y</span><span
+            class="p">))</span>
+            <span class="n">n</span><span class="p">,</span> <span class="n">dim</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span
+            class="n">shape</span>
+
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span
+            class="n">coo_matrix</span><span class="p">((</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">edge_index</span><span
+            class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span
+            class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span><span class="o">.</span><span
+            class="n">toarray</span><span class="p">()</span>
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">adj</span><span
+            class="p">)</span>
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span> <span
+            class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span
+            class="p">(</span><span class="n">adj</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="n">idx_train</span><span class="p">,</span> <span class="n">idx_val</span><span
+            class="p">,</span> <span class="n">idx_test</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">idx_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">idx_val</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">idx_test</span>
+            <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span><span class="p">,</span> <span
+            class="n">y_test</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_val</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_test</span>
+            <span class="n">y_one_hot</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">n_class</span><span
+            class="p">)</span>
+            <span class="n">y_train_one_hot</span> <span class="o">=</span> <span class="n">y_one_hot</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">train_mask</span><span
+            class="p">]</span>
+
+            <span class="n">n_train</span> <span class="o">=</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="n">Cond_size</span> <span class="o">=</span> <span class="nb">round</span><span
+            class="p">(</span><span class="n">n_train</span> <span class="o">*</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="p">)</span>
+        <span class="c1"># fixed initialization by gaussian</span>
+        <span class="n">x_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">rand</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span
+            class="n">Cond_size</span><span class="p">),</span> <span class="n">dim</span><span class="p">,</span> <span
+            class="n">device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
+        <span class="n">y_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">rand</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span
+            class="n">Cond_size</span><span class="p">),</span> <span class="n">n_class</span><span
+            class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">x_s</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span
+            class="kc">True</span>
+        <span class="n">y_s</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span
+            class="kc">True</span>
+        <span class="n">idx_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span
+            class="n">Cond_size</span><span class="p">))</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span
+            class="p">([</span><span class="n">x_s</span><span class="p">,</span> <span class="n">y_s</span><span
+            class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">lr</span><span
+            class="p">)</span>
+
+        <span class="n">SNTK</span> <span class="o">=</span> <span
+            class="n">StructureBasedNeuralTangentKernel</span><span class="p">(</span><span class="n">K</span><span
+            class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">K</span><span
+            class="p">,</span> <span class="n">L</span><span class="o">=</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">L</span><span class="p">,</span> <span class="n">scale</span><span
+            class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span
+            class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">ridge</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">ridge</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="n">KRR</span> <span class="o">=</span> <span class="n">KernelRidgeRegression</span><span class="p">(</span><span
+            class="n">SNTK</span><span class="o">.</span><span class="n">nodes_gram</span><span class="p">,</span> <span
+            class="n">ridge</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="n">MSEloss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span
+            class="n">MSELoss</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span
+            class="p">]:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span><span class="o">.</span><span class="n">adj</span><span class="p">:</span>
+                <span class="n">feat</span> <span class="o">=</span> <span class="n">x_s</span><span
+            class="o">.</span><span class="n">data</span>
+                <span class="n">A_s</span> <span class="o">=</span> <span class="n">update_E</span><span
+            class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="mi">3</span><span
+            class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">A_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">idx_s</span><span
+            class="p">,</span> <span class="n">idx_s</span><span class="p">],</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Cond_size</span><span
+            class="p">),</span>
+                                              <span class="n">torch</span><span class="o">.</span><span
+            class="n">Size</span><span class="p">([</span><span class="n">Cond_size</span><span class="p">,</span> <span
+            class="n">Cond_size</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="n">x_s</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+            <span class="n">A_s</span> <span class="o">=</span> <span class="n">A_s</span><span class="o">.</span><span
+            class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
+
+            <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span
+            class="p">([</span><span class="n">x_s</span><span class="p">,</span> <span class="n">y_s</span><span
+            class="p">],</span> <span class="n">lr</span><span class="o">=</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">lr</span><span
+            class="p">)</span>
+
+            <span class="n">best_val</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span
+            class="n">trange</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span
+            class="n">epochs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">TRAIN_K</span><span class="p">):</span>
+                    <span class="n">x_train</span><span class="p">,</span> <span class="n">label</span><span
+            class="p">,</span> <span class="n">sub_A_t</span> <span class="o">=</span> <span
+            class="n">train_loader</span><span class="o">.</span><span class="n">get_batch</span><span
+            class="p">(</span><span class="n">i</span><span class="p">)</span>
+                    <span class="n">y_train_one_hot</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">one_hot</span><span class="p">(</span><span class="n">label</span><span
+            class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">),</span> <span class="n">n_class</span><span class="p">)</span>
+
+                    <span class="n">x_train</span> <span class="o">=</span> <span class="n">x_train</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">y_train_one_hot</span> <span class="o">=</span> <span
+            class="n">y_train_one_hot</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+                    <span class="n">sub_A_t</span> <span class="o">=</span> <span class="n">sub_A_t</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+                    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span
+            class="p">,</span> <span class="n">training_loss</span><span class="p">,</span> <span class="n">train_correct</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">train</span><span
+            class="p">(</span><span class="n">KRR</span><span class="p">,</span> <span class="n">x_train</span><span
+            class="p">,</span> <span class="n">x_s</span><span class="p">,</span> <span class="n">y_train_one_hot</span><span
+            class="p">,</span> <span class="n">y_s</span><span class="p">,</span> <span class="n">sub_A_t</span><span
+            class="p">,</span>
+                                                                    <span class="n">A_s</span><span class="p">,</span>
+                                                                    <span class="n">MSEloss</span><span
+            class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">accumulate_steps</span><span class="p">,</span> <span
+            class="n">i</span><span class="p">,</span>
+                                                                    <span class="n">TRAIN_K</span><span
+            class="p">)</span>
+                <span class="k">if</span> <span class="n">it</span> <span class="ow">in</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">checkpoints</span><span class="p">:</span>
+                    <span class="c1"># y_long = torch.argmax(y_s, dim=1)</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">A_s</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to_dense</span><span
+            class="p">(),</span> <span class="n">x_s</span><span class="o">.</span><span class="n">detach</span><span
+            class="p">(),</span> <span class="n">y_s</span><span class="o">.</span><span class="n">detach</span><span
+            class="p">()</span>
+                    <span class="n">best_val</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">intermediate_evaluation</span><span class="p">(</span><span class="n">best_val</span><span
+            class="p">,</span> <span class="n">training_loss</span><span class="p">)</span>
+
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">E_train</span> <span class="o">=</span> <span class="n">sub_E</span><span class="p">(</span><span
+            class="n">idx_train</span><span class="p">,</span> <span class="n">adj</span><span class="p">)</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">y_train_one_hot</span> <span class="o">=</span> <span class="n">y_train_one_hot</span><span
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">x_train</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">feat_train</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span><span class="o">.</span><span class="n">adj</span><span class="p">:</span>
+                <span class="n">feat</span> <span class="o">=</span> <span class="n">x_s</span><span
+            class="o">.</span><span class="n">data</span>
+                <span class="n">A_s</span> <span class="o">=</span> <span class="n">update_E</span><span
+            class="p">(</span><span class="n">feat</span><span class="p">,</span> <span class="mi">4</span><span
+            class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">A_s</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">sparse_coo_tensor</span><span class="p">(</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">idx_s</span><span
+            class="p">,</span> <span class="n">idx_s</span><span class="p">],</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">Cond_size</span><span
+            class="p">),</span>
+                                              <span class="n">torch</span><span class="o">.</span><span
+            class="n">Size</span><span class="p">([</span><span class="n">Cond_size</span><span class="p">,</span> <span
+            class="n">Cond_size</span><span class="p">]))</span><span class="o">.</span><span class="n">to</span><span
+            class="p">(</span><span class="n">x_s</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+
+            <span class="n">best_val</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">it</span> <span class="ow">in</span> <span
+            class="n">trange</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span
+            class="n">epochs</span><span class="p">):</span>
+
+                <span class="n">x_s</span><span class="p">,</span> <span class="n">y_s</span><span
+            class="p">,</span> <span class="n">training_loss</span><span class="p">,</span> <span
+            class="n">training_acc</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">KRR</span><span
+            class="p">,</span> <span class="n">x_train</span><span class="p">,</span> <span class="n">x_s</span><span
+            class="p">,</span> <span class="n">y_train_one_hot</span><span class="p">,</span> <span class="n">y_s</span><span
+            class="p">,</span> <span class="n">E_train</span><span class="p">,</span>
+                                                                   <span class="n">A_s</span><span
+            class="p">,</span> <span class="n">MSEloss</span><span class="p">,</span> <span
+            class="n">optimizer</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">it</span> <span class="ow">in</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">checkpoints</span><span class="p">:</span>
+                    <span class="c1"># y_long = torch.argmax(y_s, dim=1)</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">A_s</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to_dense</span><span
+            class="p">(),</span> <span class="n">x_s</span><span class="o">.</span><span class="n">detach</span><span
+            class="p">(),</span> <span class="n">y_s</span><span class="o">.</span><span class="n">detach</span><span
+            class="p">()</span>
+                    <span class="n">best_val</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">intermediate_evaluation</span><span class="p">(</span><span class="n">best_val</span><span
+            class="p">,</span> <span class="n">training_loss</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">data</span></div></div>
+</pre>
+                        </div>
+
+                    </div>
+                </div>
+                <footer>
+
+                    <hr/>
+
+                    <div role="contentinfo">
+                        <p>&#169; Copyright 2024, rockcor.</p>
+                    </div>
+
+                    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+                    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+                    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+                </footer>
+            </div>
+        </div>
+    </section>
+</div>
+<script>
+    jQuery(function () {
+        SphinxRtdTheme.Navigation.enable(true);
+    });
+</script>
+
+</body>
+</html>
