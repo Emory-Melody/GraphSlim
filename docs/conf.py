@@ -38,7 +38,7 @@ extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc', 's
 
 autodoc_mock_imports = ['torch', 'torchvision', 'texttable', 'tensorboardX',
                         'torch_geometric', 'gensim', 'node2vec', 'deeprobust',
-                        'sklearn', 'torch_sparse', 'torch_scatter', 'ogb']
+                        'sklearn', 'torch_sparse', 'torch_scatter', 'ogb', 'pygsp']
 
 # autodoc_mock_imports = ['numpy', 'torch']
 templates_path = ['_templates']
