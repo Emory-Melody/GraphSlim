@@ -8,7 +8,8 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.abspath('../../GraphSlim'))
+# sys.path.insert(0, os.path.abspath('../../GraphSlim'))
+sys.path.insert(0, os.path.abspath('../'))
 # sys.path.append(os.path.abspath('..'))
 
 html_theme = "sphinx_rtd_theme"
@@ -36,4 +37,4 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_static_path = ['_static']
+# html_static_path = ['_static']
