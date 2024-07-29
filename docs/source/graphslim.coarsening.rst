@@ -1,10 +1,7 @@
 graphslim.coarsening package
 ============================
 
-Submodules
-----------
-
-graphslim.coarsening.coarsening\_base module
+graphslim.coarsening.coarsening\_base
 --------------------------------------------
 
 .. automodule:: graphslim.coarsening.coarsening_base
@@ -29,30 +26,6 @@ graphslim.coarsening.algebraic\_jc module
    :undoc-members:
    :show-inheritance:
 
-graphslim.coarsening.averaging module
--------------------------------------
-
-.. automodule:: graphslim.coarsening.averaging
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.coarsening.clustering module
---------------------------------------
-
-.. automodule:: graphslim.coarsening.clustering
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.coarsening.clusteringagg module
------------------------------------------
-
-.. automodule:: graphslim.coarsening.clusteringagg
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 
 graphslim.coarsening.heavy\_edge module
 ---------------------------------------
@@ -66,14 +39,6 @@ graphslim.coarsening.kron module
 --------------------------------
 
 .. automodule:: graphslim.coarsening.kron
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.coarsening.utils module
----------------------------------
-
-.. automodule:: graphslim.coarsening.utils
    :members:
    :undoc-members:
    :show-inheritance:
@@ -102,6 +67,30 @@ graphslim.coarsening.variation\_neighborhoods module
    :undoc-members:
    :show-inheritance:
 
+graphslim.coarsening.averaging module
+-------------------------------------
+
+.. automodule:: graphslim.coarsening.averaging
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.coarsening.clustering module
+--------------------------------------
+
+.. automodule:: graphslim.coarsening.clustering
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.coarsening.clusteringagg module
+-----------------------------------------
+
+.. automodule:: graphslim.coarsening.clusteringagg
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 graphslim.coarsening.vng module
 -------------------------------
 
@@ -110,10 +99,10 @@ graphslim.coarsening.vng module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+graphslim.coarsening.utils module
+---------------------------------
 
-.. automodule:: graphslim.coarsening
+.. automodule:: graphslim.coarsening.utils
    :members:
    :undoc-members:
    :show-inheritance:

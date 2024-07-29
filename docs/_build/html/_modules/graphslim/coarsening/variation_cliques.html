@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -141,39 +141,19 @@
                                                      href="../../../source/graphslim.coarsening.html#graphslim.coarsening.variation_cliques.VariationCliques">[docs]</a><span
         class="k">class</span> <span class="nc">VariationCliques</span><span class="p">(</span><span
         class="n">Coarsen</span><span class="p">):</span>
-
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
+            class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Coarsen</span><span
+            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">(</span><span class="n">setting</span><span
+            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">args</span><span
+            class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 <div class="viewcode-block" id="VariationCliques.coarsen"><a class="viewcode-back"
                                                              href="../../../source/graphslim.coarsening.html#graphslim.coarsening.variation_cliques.VariationCliques.coarsen">[docs]</a>    <span
         class="k">def</span> <span class="nf">coarsen</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">G</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function provides a common interface for coarsening algorithms that contract subgraphs</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        G : pygsp Graph</span>
-<span class="sd">        K : int</span>
-<span class="sd">            The size of the subspace we are interested in preserving.</span>
-<span class="sd">        r : float between (0,1)</span>
-<span class="sd">            The desired reduction defined as 1 - n/N.</span>
-<span class="sd">        method : String</span>
-<span class="sd">            [&#39;variation_neighborhoods&#39;, &#39;variation_edges&#39;, &#39;variation_cliques&#39;, &#39;heavy_edge&#39;, &#39;algebraic_JC&#39;, &#39;affinity_GS&#39;, &#39;kron&#39;]</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        C : np.array of size n x N</span>
-<span class="sd">            The coarsening matrix.</span>
-<span class="sd">        Gc : pygsp Graph</span>
-<span class="sd">            The smaller graph.</span>
-<span class="sd">        Call : list of np.arrays</span>
-<span class="sd">            Coarsening matrices for each level</span>
-<span class="sd">        Gall : list of (n_levels+1) pygsp Graphs</span>
-<span class="sd">            All graphs involved in the multilevel coarsening</span>
-
-<span class="sd">        Example</span>
-<span class="sd">        -------</span>
-<span class="sd">        C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">K</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span><span class="o">.</span><span class="n">reduction_rate</span>
@@ -366,7 +346,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

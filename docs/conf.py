@@ -18,7 +18,7 @@ html_theme = "sphinx_rtd_theme"
 
 source_suffix = ['.rst', '.md']
 project = 'GraphSlim'
-copyright = '2024, Melody Group'
+copyright = '2024, Emory Melody Group'
 author = 'Shengbo Gong, Juntong Ni, Wei Jin'
 
 # -- General configuration ---------------------------------------------------

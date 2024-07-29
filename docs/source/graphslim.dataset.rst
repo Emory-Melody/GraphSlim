@@ -1,9 +1,6 @@
 graphslim.dataset package
 =========================
 
-Submodules
-----------
-
 graphslim.dataset.attack module
 -------------------------------
 
@@ -36,10 +33,3 @@ graphslim.dataset.utils module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: graphslim.dataset
-   :members:
-   :undoc-members:
-   :show-inheritance:

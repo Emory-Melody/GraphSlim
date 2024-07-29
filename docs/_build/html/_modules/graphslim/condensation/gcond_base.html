@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -130,11 +130,38 @@
 <div class="viewcode-block" id="GCondBase"><a class="viewcode-back"
                                               href="../../../source/graphslim.condensation.html#graphslim.condensation.gcond_base.GCondBase">[docs]</a><span
         class="k">class</span> <span class="nc">GCondBase</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A base class for graph condition generation and training.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    setting : str</span>
+<span class="sd">        The setting for the graph condensation process.</span>
+<span class="sd">    data : object</span>
+<span class="sd">        The data object containing the dataset.</span>
+<span class="sd">    args : Namespace</span>
+<span class="sd">        Arguments and hyperparameters for the model and training process.</span>
+<span class="sd">    **kwargs : keyword arguments</span>
+<span class="sd">        Additional arguments for initialization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
             class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a GCondBase instance.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        setting : str</span>
+<span class="sd">            The type of experimental setting.</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The graph data object, which includes features, adjacency matrix, labels, etc.</span>
+<span class="sd">        args : Namespace</span>
+<span class="sd">            Arguments object containing hyperparameters for training and model.</span>
+<span class="sd">        **kwargs : keyword arguments</span>
+<span class="sd">            Additional optional parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span
             class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span
@@ -228,6 +255,9 @@
                                                                href="../../../source/graphslim.condensation.html#graphslim.condensation.gcond_base.GCondBase.reset_parameters">[docs]</a>    <span
         class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span
         class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resets the parameters of the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">feat_syn</span><span class="o">.</span><span
             class="n">data</span><span class="o">.</span><span class="n">copy_</span><span class="p">(</span><span
             class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span
@@ -240,6 +270,19 @@
                                                                   href="../../../source/graphslim.condensation.html#graphslim.condensation.gcond_base.GCondBase.generate_labels_syn">[docs]</a>    <span
         class="k">def</span> <span class="nf">generate_labels_syn</span><span class="p">(</span><span
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates synthetic labels to match the target number of samples.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The graph data object, which includes features, adjacency matrix, labels, etc.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            A numpy array of synthetic labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span
             class="p">(</span><span class="n">data</span><span class="o">.</span><span
             class="n">labels_train</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
@@ -311,6 +354,19 @@
         class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">with_adj</span><span class="o">=</span><span class="kc">False</span><span
         class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes synthetic features and (optionally) adjacency matrix.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        with_adj : bool, optional</span>
+<span class="sd">            Whether to initialize the adjacency matrix (default is False).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing the synthetic features and (optionally) the adjacency matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">init</span> <span
@@ -383,6 +439,29 @@
         class="n">adj</span><span class="p">,</span> <span class="n">features</span><span class="p">,</span> <span
         class="n">labels</span><span class="p">,</span> <span class="n">labels_syn</span><span class="p">,</span> <span
         class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains the model and computes the loss.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : torch.nn.Module</span>
+<span class="sd">            The model object.</span>
+<span class="sd">        adj : torch.Tensor</span>
+<span class="sd">            The adjacency matrix.</span>
+<span class="sd">        features : torch.Tensor</span>
+<span class="sd">            The feature matrix.</span>
+<span class="sd">        labels : torch.Tensor</span>
+<span class="sd">            The actual labels.</span>
+<span class="sd">        labels_syn : torch.Tensor</span>
+<span class="sd">            The synthetic labels.</span>
+<span class="sd">        args : Namespace</span>
+<span class="sd">            Arguments object containing hyperparameters for training and model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.Tensor</span>
+<span class="sd">            The computed loss value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">data</span>
         <span class="n">feat_syn</span> <span class="o">=</span> <span class="bp">self</span><span
@@ -458,7 +537,19 @@
         class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="c1"># Get the two hyper-parameters of outer-loop and inner-loop.</span>
         <span class="c1"># The following values are empirically good.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the outer-loop and inner-loop hyperparameters.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args : Namespace</span>
+<span class="sd">            Arguments object containing hyperparameters for training and model.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Outer-loop and inner-loop hyperparameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span
             class="n">outer_loop</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span
             class="n">inner_loop</span></div>
@@ -467,6 +558,19 @@
                                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.gcond_base.GCondBase.check_bn">[docs]</a>    <span
         class="k">def</span> <span class="nf">check_bn</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">model</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if the model contains BatchNorm layers and fixes their mean and variance after training.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model : torch.nn.Module</span>
+<span class="sd">            The model object.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        torch.nn.Module</span>
+<span class="sd">            The model with BatchNorm layers fixed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">BN_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">model</span><span
             class="o">.</span><span class="n">modules</span><span class="p">():</span>
@@ -493,6 +597,23 @@
         class="p">,</span> <span class="n">best_val</span><span class="p">,</span> <span class="n">loss_avg</span><span
         class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span
         class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs intermediate evaluation and saves the best model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        best_val : float</span>
+<span class="sd">            The best validation accuracy observed so far.</span>
+<span class="sd">        loss_avg : float</span>
+<span class="sd">            The average loss.</span>
+<span class="sd">        save : bool, optional</span>
+<span class="sd">            Whether to save the model (default is True).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The updated best validation accuracy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">data</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
@@ -545,6 +666,23 @@
         class="kc">False</span><span class="p">,</span> <span class="n">setting</span><span class="o">=</span><span
         class="s1">&#39;trans&#39;</span><span class="p">,</span> <span class="n">iters</span><span
         class="o">=</span><span class="mi">200</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Conducts validation testing and returns results.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            Whether to print verbose output (default is False).</span>
+<span class="sd">        setting : str, optional</span>
+<span class="sd">            The setting type (default is &#39;trans&#39;).</span>
+<span class="sd">        iters : int, optional</span>
+<span class="sd">            Number of iterations for validation testing (default is 200).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list containing validation results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">args</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
@@ -600,7 +738,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

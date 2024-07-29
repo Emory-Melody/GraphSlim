@@ -11,7 +11,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../_static/js/html5shiv.min.js"></script>
+      <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html"/>
     <link rel="search" title="Search" href="../search.html"/>
-    <link rel="prev" title="graphslim.sparsification package" href="graphslim.sparsification.html"/>
+    <link rel="prev" title="graphslim.condensation package" href="graphslim.condensation.html"/>
 </head>
 
 <body class="wy-body-for-nav">
@@ -66,11 +66,11 @@
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -78,7 +78,6 @@
                     <li class="toctree-l1 current"><a class="current reference internal" href="#">graphslim.evaluation
                         package</a>
                         <ul>
-                            <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
                             <li class="toctree-l2"><a class="reference internal"
                                                       href="#module-graphslim.evaluation.eval_agent">graphslim.evaluation.eval_agent
                                 module</a>
@@ -116,12 +115,16 @@
                                                                       href="#graphslim.evaluation.eval_agent.Evaluator.train_cross"><code
                                                     class="docutils literal notranslate"><span class="pre">Evaluator.train_cross()</span></code></a>
                                             </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.vis"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.vis()</span></code></a>
+                                            </li>
                                         </ul>
                                     </li>
                                 </ul>
                             </li>
                             <li class="toctree-l2"><a class="reference internal"
-                                                      href="#module-graphslim.evaluation.nas_eval">graphslim.evaluation.nas_eval
+                                                      href="#graphslim-evaluation-nas-eval-module">graphslim.evaluation.nas_eval
                                 module</a>
                                 <ul>
                                     <li class="toctree-l3"><a class="reference internal"
@@ -155,22 +158,6 @@
                                             </li>
                                         </ul>
                                     </li>
-                                    <li class="toctree-l3"><a class="reference internal"
-                                                              href="#graphslim.evaluation.nas_eval.load_csv"><code
-                                            class="docutils literal notranslate"><span
-                                            class="pre">load_csv()</span></code></a></li>
-                                    <li class="toctree-l3"><a class="reference internal"
-                                                              href="#graphslim.evaluation.nas_eval.load_pkl"><code
-                                            class="docutils literal notranslate"><span
-                                            class="pre">load_pkl()</span></code></a></li>
-                                    <li class="toctree-l3"><a class="reference internal"
-                                                              href="#graphslim.evaluation.nas_eval.save_csv"><code
-                                            class="docutils literal notranslate"><span
-                                            class="pre">save_csv()</span></code></a></li>
-                                    <li class="toctree-l3"><a class="reference internal"
-                                                              href="#graphslim.evaluation.nas_eval.save_pkl"><code
-                                            class="docutils literal notranslate"><span
-                                            class="pre">save_pkl()</span></code></a></li>
                                 </ul>
                             </li>
                             <li class="toctree-l2"><a class="reference internal"
@@ -199,11 +186,6 @@
                                             class="pre">verbose_time_memory()</span></code></a></li>
                                 </ul>
                             </li>
-                            <li class="toctree-l2"><a class="reference internal"
-                                                      href="#module-graphslim.evaluation.vis">graphslim.evaluation.vis
-                                module</a></li>
-                            <li class="toctree-l2"><a class="reference internal" href="#module-graphslim.evaluation">Module
-                                contents</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -237,10 +219,6 @@
                         <section id="graphslim-evaluation-package">
                             <h1>graphslim.evaluation package<a class="headerlink" href="#graphslim-evaluation-package"
                                                                title="Permalink to this heading"></a></h1>
-                            <section id="submodules">
-                                <h2>Submodules<a class="headerlink" href="#submodules"
-                                                 title="Permalink to this heading"></a></h2>
-                            </section>
                             <section id="module-graphslim.evaluation.eval_agent">
                                 <span id="graphslim-evaluation-eval-agent-module"></span>
                                 <h2>graphslim.evaluation.eval_agent module<a class="headerlink"
@@ -263,6 +241,19 @@
                                             title="Permalink to this definition"></a></dt>
                                     <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
                                             class="pre">object</span></code></p>
+                                        <p>A class to evaluate different models and their hyperparameters on graph
+                                            data.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>args</strong> (<em>argparse.Namespace</em>) –
+                                                        Command-line arguments and configuration parameters.</p></li>
+                                                    <li><p><strong>**kwargs</strong> (<em>keyword arguments</em>) –
+                                                        Additional parameters.</p></li>
+                                                </ul>
+                                            </dd>
+                                        </dl>
                                         <dl class="py method">
                                             <dt class="sig sig-object py"
                                                 id="graphslim.evaluation.eval_agent.Evaluator.evaluate">
@@ -288,7 +279,39 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.evaluate"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Evaluates a model over multiple runs and returns mean and standard
+                                                deviation of accuracy.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>model_type</strong> (<em>str</em>) – The type
+                                                                of model to evaluate.</p></li>
+                                                            <li><p><strong>verbose</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to print detailed logs.</p></li>
+                                                            <li><p><strong>reduced</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to use synthetic data.</p></li>
+                                                            <li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default='eval'</em>)
+                                                                – The mode for the model (e.g., ‘eval’ or ‘cross’).</p>
+                                                            </li>
+                                                        </ul>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>mean_acc</strong> (<em>float</em>) – Mean
+                                                                accuracy over multiple runs.</p></li>
+                                                            <li><p><strong>std_acc</strong> (<em>float</em>) – Standard
+                                                                deviation of accuracy over multiple runs.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -310,7 +333,34 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.get_syn_data"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Loads or computes synthetic data for evaluation.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>model_type</strong> (<em>str</em>) – The type
+                                                                of model used for generating synthetic data.</p></li>
+                                                            <li><p><strong>verbose</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=False</em>)
+                                                                – Whether to print detailed logs.</p></li>
+                                                        </ul>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>feat_syn</strong> (<em>torch.Tensor</em>) –
+                                                                Synthetic feature matrix.</p></li>
+                                                            <li><p><strong>adj_syn</strong> (<em>torch.Tensor</em>) –
+                                                                Synthetic adjacency matrix.</p></li>
+                                                            <li><p><strong>labels_syn</strong> (<em>torch.Tensor</em>) –
+                                                                Synthetic labels.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -334,7 +384,36 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.grid_search"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Performs a grid search over hyperparameters.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>model_type</strong> (<em>str</em>) – The type
+                                                                of model used for evaluation.</p></li>
+                                                            <li><p><strong>param_grid</strong> (<em>dict</em>) – A
+                                                                dictionary containing parameter grids for grid search.
+                                                            </p></li>
+                                                            <li><p><strong>reduced</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to use synthetic data.</p></li>
+                                                        </ul>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>best_test_result</strong> (<em>tuple</em>) –
+                                                                Best test result as (mean_accuracy, std_accuracy).</p>
+                                                            </li>
+                                                            <li><p><strong>best_params</strong> (<em>dict</em>) – Best
+                                                                parameters found during grid search.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -359,7 +438,37 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.nas_evaluate"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Evaluates a model for neural architecture search (NAS) and returns
+                                                mean and standard deviation of validation accuracy.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>model_type</strong> (<em>str</em>) – The type
+                                                                of model to evaluate.</p></li>
+                                                            <li><p><strong>verbose</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=False</em>)
+                                                                – Whether to print detailed logs.</p></li>
+                                                            <li><p><strong>reduced</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=None</em>)
+                                                                – Whether to use synthetic data.</p></li>
+                                                        </ul>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>mean_acc_val</strong> (<em>float</em>) – Mean
+                                                                validation accuracy over multiple runs.</p></li>
+                                                            <li><p><strong>std_acc_val</strong> (<em>float</em>) –
+                                                                Standard deviation of validation accuracy over multiple
+                                                                runs.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -374,7 +483,8 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.reset_parameters"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Initializes or resets model parameters.</p>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -403,7 +513,38 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.test"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Tests a model and returns accuracy and loss.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>model_type</strong> (<em>str</em>) – The type
+                                                                of model to test.</p></li>
+                                                            <li><p><strong>verbose</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to print detailed logs.</p></li>
+                                                            <li><p><strong>reduced</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to use synthetic data.</p></li>
+                                                            <li><p><strong>mode</strong> (<em>str</em><em>, </em><em>optional</em><em>, </em><em>default='eval'</em>)
+                                                                – The mode for the model (e.g., ‘eval’ or ‘cross’).</p>
+                                                            </li>
+                                                        </ul>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>best_acc_val</strong> (<em>float</em>) – Best
+                                                                accuracy on validation set.</p></li>
+                                                            <li><p><strong>acc_test</strong> (<em>float</em>) – Accuracy
+                                                                on test set.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -426,17 +567,62 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.eval_agent.Evaluator.train_cross"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Trains models and performs grid search if required.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                            <li><p><strong>grid_search</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to perform grid search over hyperparameters.
+                                                            </p></li>
+                                                            <li><p><strong>reduced</strong>
+                                                                (<em>bool</em><em>, </em><em>optional</em><em>, </em><em>default=True</em>)
+                                                                – Whether to use synthetic data.</p></li>
+                                                        </ul>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
+                                        </dl>
+
+                                        <dl class="py method">
+                                            <dt class="sig sig-object py"
+                                                id="graphslim.evaluation.eval_agent.Evaluator.vis">
+                                                <span class="sig-name descname"><span class="pre">vis</span></span><span
+                                                    class="sig-paren">(</span><em class="sig-param"><span
+                                                    class="n"><span class="pre">data</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/evaluation/eval_agent.html#Evaluator.vis"><span
+                                                    class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                                    class="headerlink"
+                                                    href="#graphslim.evaluation.eval_agent.Evaluator.vis"
+                                                    title="Permalink to this definition"></a></dt>
+                                            <dd><p>Visualizes synthetic and original data using t-SNE and saves the plot
+                                                as a PDF file.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd">
+                                                        <ul class="simple">
+                                                            <li><p><strong>args</strong> (<em>argparse.Namespace</em>) –
+                                                                Command-line arguments and configuration parameters.</p>
+                                                            </li>
+                                                            <li><p><strong>data</strong> (<em>Dataset</em>) – The
+                                                                dataset containing the graph data.</p></li>
+                                                        </ul>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                     </dd>
                                 </dl>
 
                             </section>
-                            <section id="module-graphslim.evaluation.nas_eval">
-                                <span id="graphslim-evaluation-nas-eval-module"></span>
+                            <section id="graphslim-evaluation-nas-eval-module">
                                 <h2>graphslim.evaluation.nas_eval module<a class="headerlink"
-                                                                           href="#module-graphslim.evaluation.nas_eval"
+                                                                           href="#graphslim-evaluation-nas-eval-module"
                                                                            title="Permalink to this heading"></a></h2>
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.NasEvaluator">
@@ -452,6 +638,8 @@
                                             title="Permalink to this definition"></a></dt>
                                     <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span
                                             class="pre">object</span></code></p>
+                                        <p>Class for evaluating neural architecture search (NAS) performance on original
+                                            and synthetic graphs.</p>
                                         <dl class="py method">
                                             <dt class="sig sig-object py"
                                                 id="graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson">
@@ -464,7 +652,21 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Calculates Pearson correlation coefficients between synthetic and
+                                                original results.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p>
+                                                        <ul class="simple">
+                                                            <li><p><strong>pearson_corr_acc</strong> (<em>float</em>) –
+                                                                Pearson correlation coefficient of accuracies.</p></li>
+                                                            <li><p><strong>pearson_corr_rank</strong> (<em>float</em>) –
+                                                                Pearson correlation coefficient of ranks.</p></li>
+                                                        </ul>
+                                                        </p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -480,7 +682,15 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_ori"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Evaluates various architectures on the original graph and identifies
+                                                the best one.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p><strong>data</strong> (<em>Dataset</em>) –
+                                                        The dataset containing the graph data.</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -496,7 +706,15 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_syn"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Evaluates various architectures on the synthetic graph and identifies
+                                                the best one.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p><strong>data</strong> (<em>Dataset</em>) –
+                                                        The dataset containing the graph data.</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -511,7 +729,21 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.get_rank"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Ranks results based on their values.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p><strong>results</strong> (<em>list</em><em>
+                                                        of </em><em>float</em>) – The list of results to rank.</p>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p><strong>ranks</strong> – The list of ranks
+                                                        corresponding to the results.</p>
+                                                    </dd>
+                                                    <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p>list of int</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -526,7 +758,15 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_ori"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Tests the best architecture on the original graph using the best
+                                                parameters.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p><strong>data</strong> (<em>Dataset</em>) –
+                                                        The dataset containing the graph data.</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                         <dl class="py method">
@@ -541,68 +781,25 @@
                                                     class="headerlink"
                                                     href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_syn"
                                                     title="Permalink to this definition"></a></dt>
-                                            <dd></dd>
+                                            <dd><p>Tests the best architecture on the synthetic graph using the best
+                                                parameters.</p>
+                                                <dl class="field-list simple">
+                                                    <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p><strong>data</strong> (<em>Dataset</em>) –
+                                                        The dataset containing the graph data.</p>
+                                                    </dd>
+                                                    <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                                    <dd class="field-even"><p><strong>acc_test_syn</strong> – The test
+                                                        accuracy on the synthetic graph.</p>
+                                                    </dd>
+                                                    <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                                    <dd class="field-odd"><p>float</p>
+                                                    </dd>
+                                                </dl>
+                                            </dd>
                                         </dl>
 
                                     </dd>
-                                </dl>
-
-                                <dl class="py function">
-                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_csv">
-                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
-                                            class="sig-name descname"><span class="pre">load_csv</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                            class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
-                                            class="reference internal"
-                                            href="../_modules/graphslim/evaluation/nas_eval.html#load_csv"><span
-                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
-                                            class="headerlink" href="#graphslim.evaluation.nas_eval.load_csv"
-                                            title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
-                                </dl>
-
-                                <dl class="py function">
-                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_pkl">
-                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
-                                            class="sig-name descname"><span class="pre">load_pkl</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                            class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
-                                            class="reference internal"
-                                            href="../_modules/graphslim/evaluation/nas_eval.html#load_pkl"><span
-                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
-                                            class="headerlink" href="#graphslim.evaluation.nas_eval.load_pkl"
-                                            title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
-                                </dl>
-
-                                <dl class="py function">
-                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_csv">
-                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
-                                            class="sig-name descname"><span class="pre">save_csv</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                            class="pre">file_path</span></span></em>, <em class="sig-param"><span
-                                            class="n"><span class="pre">num</span></span></em><span
-                                            class="sig-paren">)</span><a class="reference internal"
-                                                                         href="../_modules/graphslim/evaluation/nas_eval.html#save_csv"><span
-                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
-                                            class="headerlink" href="#graphslim.evaluation.nas_eval.save_csv"
-                                            title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
-                                </dl>
-
-                                <dl class="py function">
-                                    <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_pkl">
-                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
-                                            class="sig-name descname"><span class="pre">save_pkl</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                            class="pre">file_path</span></span></em>, <em class="sig-param"><span
-                                            class="n"><span class="pre">data</span></span></em><span
-                                            class="sig-paren">)</span><a class="reference internal"
-                                                                         href="../_modules/graphslim/evaluation/nas_eval.html#save_pkl"><span
-                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
-                                            class="headerlink" href="#graphslim.evaluation.nas_eval.save_pkl"
-                                            title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
                                 </dl>
 
                             </section>
@@ -624,7 +821,45 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.evaluation.utils.calc_f1"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>Calculate the F1 score for binary or multi-class classification.</p>
+                                        <p>This function calculates both the micro-averaged and macro-averaged F1
+                                            scores.
+                                            The <cite>y_pred</cite> values are processed differently based on whether
+                                            the classification
+                                            uses sigmoid activation or not.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>y_true</strong> (<em>array-like</em><em>, </em><em>shape</em><em>
+                                                        (</em><em>n_samples</em><em>,</em><em>)</em>) – True labels or
+                                                        ground truth values.</p></li>
+                                                    <li><p><strong>y_pred</strong> (<em>array-like</em><em>, </em><em>shape</em><em>
+                                                        (</em><em>n_samples</em><em>,</em><em>) or </em><em>(</em><em>n_samples</em><em>, </em><em>n_classes</em><em>)</em>)
+                                                        – Predicted labels or probabilities. If <cite>is_sigmoid</cite>
+                                                        is True, this should be probabilities.
+                                                        Otherwise, it should be class predictions.</p></li>
+                                                    <li><p><strong>is_sigmoid</strong> (<em>bool</em>) – Flag indicating
+                                                        whether the classification uses sigmoid activation (binary
+                                                        classification)
+                                                        or not (multi-class classification). If True,
+                                                        <cite>y_pred</cite> contains probabilities; if False,
+                                                        <cite>y_pred</cite> contains class predictions.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>
+                                                <ul class="simple">
+                                                    <li><p>micro-averaged F1 score.</p></li>
+                                                    <li><p>macro-averaged F1 score.</p></li>
+                                                </ul>
+                                                </p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>tuple of float</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
                                 </dl>
 
                                 <dl class="py function">
@@ -641,7 +876,28 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.evaluation.utils.evaluate"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>Evaluate the model performance based on the output and labels.</p>
+                                        <p>This function computes performance metrics depending on the type of dataset.
+                                            For certain datasets, it calculates F1 scores. For others, it computes loss
+                                            and accuracy.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>output</strong> (<em>torch.Tensor</em>) – The model’s
+                                                        output logits or probabilities.</p></li>
+                                                    <li><p><strong>labels</strong> (<em>torch.Tensor</em>) – The ground
+                                                        truth labels.</p></li>
+                                                    <li><p><strong>args</strong> (<em>Namespace</em>) – Arguments that
+                                                        include dataset information to determine which metrics to use.
+                                                    </p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>None</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
                                 </dl>
 
                                 <dl class="py function">
@@ -703,7 +959,39 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.evaluation.utils.sparsify"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>Applies sparsification to the adjacency matrix based on the model type and
+                                        given arguments.</p>
+                                        <p>This function modifies the adjacency matrix to make it sparser according to
+                                            the model type and method specified.
+                                            For specific methods and datasets, it adjusts the threshold used for
+                                            sparsification.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>model_type</strong> (<em>str</em>) – The type of
+                                                        model used, which determines the sparsification strategy. Can be
+                                                        ‘MLP’, ‘GAT’, or other.</p></li>
+                                                    <li><p><strong>adj_syn</strong> (<em>torch.Tensor</em>) – The
+                                                        adjacency matrix to be sparsified.</p></li>
+                                                    <li><p><strong>args</strong> (<em>argparse.Namespace</em>) –
+                                                        Command-line arguments and configuration parameters which may
+                                                        include method-specific settings.</p></li>
+                                                    <li><p><strong>verbose</strong> (<em>bool</em><em>, </em><em>optional</em>)
+                                                        – If True, prints information about the sparsity of the
+                                                        adjacency matrix before and after sparsification.
+                                                        Default is False.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>adj_syn</strong> – The sparsified
+                                                adjacency matrix.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>torch.Tensor</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
                                 </dl>
 
                                 <dl class="py function">
@@ -718,20 +1006,28 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.evaluation.utils.verbose_time_memory"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>A decorator that measures and prints the execution time and memory usage of
+                                        the decorated function.</p>
+                                        <p>This decorator prints the time taken by the function to execute in both
+                                            seconds and milliseconds,
+                                            and the memory usage of the data before and after the function call if
+                                            verbose mode is enabled.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>func</strong> (<em>callable</em>) – The
+                                                function to be decorated.</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p>The wrapped function with added timing and memory
+                                                usage functionality.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>callable</p>
+                                            </dd>
+                                        </dl>
+                                    </dd>
                                 </dl>
 
-                            </section>
-                            <section id="module-graphslim.evaluation.vis">
-                                <span id="graphslim-evaluation-vis-module"></span>
-                                <h2>graphslim.evaluation.vis module<a class="headerlink"
-                                                                      href="#module-graphslim.evaluation.vis"
-                                                                      title="Permalink to this heading"></a></h2>
-                            </section>
-                            <section id="module-graphslim.evaluation">
-                                <span id="module-contents"></span>
-                                <h2>Module contents<a class="headerlink" href="#module-graphslim.evaluation"
-                                                      title="Permalink to this heading"></a></h2>
                             </section>
                         </section>
 
@@ -740,15 +1036,15 @@
                 </div>
                 <footer>
                     <div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-                        <a href="graphslim.sparsification.html" class="btn btn-neutral float-left"
-                           title="graphslim.sparsification package" accesskey="p" rel="prev"><span
+                        <a href="graphslim.condensation.html" class="btn btn-neutral float-left"
+                           title="graphslim.condensation package" accesskey="p" rel="prev"><span
                                 class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
                     </div>
 
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

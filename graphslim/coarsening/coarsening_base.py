@@ -261,3 +261,27 @@ class Coarsen:
 
         return coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge
 
+    def coarsen(self, G):
+        """
+        This function provides a common interface for coarsening algorithms that contract subgraphs.
+
+        Parameters
+        ----------
+        G : pygsp Graph
+            The graph to be coarsened.
+
+        Returns
+        -------
+        C : np.array of size n x N
+            The coarsening matrix.
+        Gc : pygsp Graph
+            The smaller, coarsened graph.
+        Call : list of np.arrays
+            Coarsening matrices for each level.
+        Gall : list of pygsp Graphs
+            All graphs involved in the multilevel coarsening.
+
+        Example
+        -------
+        >>> C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)
+        """

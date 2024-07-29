@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -126,9 +126,22 @@
                                             href="../../../source/graphslim.coarsening.html#graphslim.coarsening.averaging.Average">[docs]</a><span
         class="k">class</span> <span class="nc">Average</span><span class="p">(</span><span
         class="n">Coarsen</span><span class="p">):</span>
-    <span class="c1"># a structure free coarsening method</span>
-    <span class="c1"># also serve as initialization for condensation methods</span>
-    <span class="c1"># output: feat_syn, label_syn</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A structure-free coarsening method that also serves as initialization for condensation methods.</span>
+<span class="sd">    Outputs synthesized features (`feat_syn`) and labels (`label_syn`).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    setting : str</span>
+<span class="sd">        Configuration setting.</span>
+<span class="sd">    data : object</span>
+<span class="sd">        Data object containing the graph and feature information.</span>
+<span class="sd">    args : object</span>
+<span class="sd">        Arguments containing various settings for the coarsening process.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
@@ -146,6 +159,23 @@
             class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span
             class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save</span><span
             class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduces the data by averaging features for each class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The data to be reduced.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints verbose output. Defaults to True.</span>
+<span class="sd">        save : bool, optional</span>
+<span class="sd">            If True, saves the reduced data. Defaults to True.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        object</span>
+<span class="sd">            The reduced data with synthesized features and labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">n_classes</span> <span class="o">=</span> <span class="n">data</span><span
@@ -166,6 +196,7 @@
             class="n">x_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">prepare_select</span><span class="p">(</span><span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
         <span class="n">x_syn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
             class="n">zeros</span><span class="p">(</span><span class="n">y_syn</span><span class="o">.</span><span
             class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span
@@ -180,6 +211,7 @@
             class="o">==</span> <span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span
             class="n">x_c</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span
             class="mi">0</span><span class="p">)</span>
+
         <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
             class="o">=</span> <span class="n">x_syn</span><span class="o">.</span><span class="n">to</span><span
@@ -189,12 +221,14 @@
             class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span
             class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="o">.</span><span
             class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
         <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
             <span class="n">save_reduced</span><span class="p">(</span><span class="n">data</span><span
             class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span class="n">data</span><span
             class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span class="n">data</span><span
             class="o">.</span><span class="n">labels_syn</span><span class="p">,</span> <span class="n">args</span><span
             class="p">)</span>
+
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="Average.prepare_select"><a class="viewcode-back"
@@ -202,18 +236,37 @@
         class="k">def</span> <span class="nf">prepare_select</span><span class="p">(</span><span
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
         class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares and selects synthetic labels and features for coarsening.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The data to be processed.</span>
+<span class="sd">        args : object</span>
+<span class="sd">            Arguments containing various settings for the coarsening process.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing:</span>
+<span class="sd">            - labels_syn : ndarray</span>
+<span class="sd">                Synthesized labels.</span>
+<span class="sd">            - labels_train : tensor</span>
+<span class="sd">                Training labels.</span>
+<span class="sd">            - feat_train : tensor</span>
+<span class="sd">                Training features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">num_class_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">syn_class_indices</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">feat_train</span> <span class="o">=</span> <span class="n">data</span><span
             class="o">.</span><span class="n">feat_train</span>
-
         <span class="n">labels_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
             class="n">labels_train</span>
-        <span class="c1"># d = data.feat_train.shape[1]</span>
+
         <span class="n">counter</span> <span class="o">=</span> <span class="n">Counter</span><span
             class="p">(</span><span class="n">data</span><span class="o">.</span><span
             class="n">labels_train</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-        <span class="c1"># n = len(data.labels_train)</span>
         <span class="n">sorted_counter</span> <span class="o">=</span> <span class="nb">sorted</span><span
             class="p">(</span><span class="n">counter</span><span class="o">.</span><span class="n">items</span><span
             class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span
@@ -221,6 +274,7 @@
             class="p">])</span>
         <span class="n">sum_</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">labels_syn</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="p">(</span><span
             class="n">c</span><span class="p">,</span> <span class="n">num</span><span class="p">)</span> <span
             class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span
@@ -241,12 +295,14 @@
             <span class="n">labels_syn</span> <span class="o">+=</span> <span class="p">[</span><span class="n">c</span><span
             class="p">]</span> <span class="o">*</span> <span class="n">num_class_dict</span><span
             class="p">[</span><span class="n">c</span><span class="p">]</span>
+
         <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">np</span><span
             class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels_syn</span><span
             class="p">)</span>
 
         <span class="k">return</span> <span class="n">labels_syn</span><span class="p">,</span> <span class="n">labels_train</span><span
             class="p">,</span> <span class="n">feat_train</span></div></div>
+
 </pre>
                         </div>
 
@@ -257,7 +313,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

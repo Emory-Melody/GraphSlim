@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -118,6 +118,25 @@
         class="k">def</span> <span class="nf">match_loss</span><span class="p">(</span><span
         class="n">gw_syn</span><span class="p">,</span> <span class="n">gw_real</span><span class="p">,</span> <span
         class="n">args</span><span class="p">,</span> <span class="n">device</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the loss between synthetic and real gradients based on the specified distance metric.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gw_syn : list of torch.Tensor</span>
+<span class="sd">        List of synthetic gradients for different model parameters.</span>
+<span class="sd">    gw_real : list of torch.Tensor</span>
+<span class="sd">        List of real gradients for different model parameters.</span>
+<span class="sd">    args : Namespace</span>
+<span class="sd">        Arguments object containing hyperparameters for training and model.</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Device (CPU or GPU) on which computations are performed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        The computed distance (loss) between synthetic and real gradients.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dis</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
             class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span><span
             class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span
@@ -212,6 +231,21 @@
                                                 href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.distance_wb">[docs]</a><span
         class="k">def</span> <span class="nf">distance_wb</span><span class="p">(</span><span class="n">gwr</span><span
         class="p">,</span> <span class="n">gws</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the distance between two tensors representing gradients using cosine similarity.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gwr : torch.Tensor</span>
+<span class="sd">        The real gradient tensor.</span>
+<span class="sd">    gws : torch.Tensor</span>
+<span class="sd">        The synthetic gradient tensor.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        The computed distance between the real and synthetic gradients.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">gwr</span><span class="o">.</span><span
             class="n">shape</span>
 
@@ -288,7 +322,19 @@
         class="k">def</span> <span class="nf">sub_E</span><span class="p">(</span><span class="n">idx</span><span
         class="p">,</span> <span class="n">A</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    output the sparse adjacency matrix of subgraph of idx</span>
+<span class="sd">    Generates a sparse adjacency matrix of the subgraph defined by the given indices.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    idx : torch.Tensor</span>
+<span class="sd">        A tensor containing the indices of the nodes that define the subgraph.</span>
+<span class="sd">    A : torch.Tensor</span>
+<span class="sd">        The original adjacency matrix of the graph.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.sparse_coo_tensor</span>
+<span class="sd">        The sparse adjacency matrix of the subgraph.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span
             class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -334,10 +380,21 @@
                                              href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.update_E">[docs]</a><span
         class="k">def</span> <span class="nf">update_E</span><span class="p">(</span><span class="n">x_s</span><span
         class="p">,</span> <span class="n">neig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    x_s is the features</span>
-<span class="sd">    neig is the average number of the neighbors of each node</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update the adjacency matrix based on the features of the nodes and the average number of neighbors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x_s : torch.Tensor</span>
+<span class="sd">        A tensor containing the feature vectors of the nodes.</span>
+<span class="sd">    neig : float</span>
+<span class="sd">        The average number of neighbors each node should have.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.sparse_coo_tensor</span>
+<span class="sd">        The sparse adjacency matrix based on the updated similarities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">x_s</span><span class="o">.</span><span class="n">shape</span><span
             class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">K</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
@@ -413,11 +470,17 @@
         class="k">def</span> <span class="nf">normalize_data</span><span class="p">(</span><span
         class="n">data</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    normalize data</span>
-<span class="sd">    parameters:</span>
-<span class="sd">        data: torch.Tensor, data need to be normalized</span>
-<span class="sd">    return:</span>
-<span class="sd">        torch.Tensor, normalized data</span>
+<span class="sd">    Normalize the input data using mean and standard deviation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : torch.Tensor</span>
+<span class="sd">        The data to be normalized. Each column represents a feature, and normalization is applied to each feature independently.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        The normalized data where each feature has zero mean and unit variance.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mean</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
             class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span
@@ -439,13 +502,23 @@
         class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">k</span><span
         class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Graph convolution filter</span>
-<span class="sd">    parameters:</span>
-<span class="sd">        adj: torch.Tensor, adjacency matrix, must be self-looped</span>
-<span class="sd">        x: torch.Tensor, features</span>
-<span class="sd">        k: int, number of hops</span>
-<span class="sd">    return:</span>
-<span class="sd">        torch.Tensor, filtered features</span>
+<span class="sd">    Apply Graph Convolution Filter (GCF) to features using the adjacency matrix.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Adjacency matrix of the graph. It must include self-loops. Shape: (N, N), where N is the number of nodes.</span>
+
+<span class="sd">    x : torch.Tensor</span>
+<span class="sd">        Node features. Shape: (N, F), where F is the number of features for each node.</span>
+
+<span class="sd">    k : int, optional</span>
+<span class="sd">        Number of hops (or layers) to apply the filter. Default is 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Filtered features after applying the graph convolution. Shape: (N, F).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">D</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
             class="n">sum</span><span class="p">(</span><span class="n">adj</span><span class="p">,</span> <span
@@ -474,6 +547,25 @@
         class="k">def</span> <span class="nf">neighborhood_difficulty_measurer</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure the difficulty of neighborhoods in the graph based on the label distribution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph. The shape is (N, N) where N is the number of nodes.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node. Shape: (N,)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Difficulty scores for each node. Higher scores indicate more difficult neighborhoods.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">edge_index</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
             class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span
             class="n">indices</span><span class="p">()</span>
@@ -536,6 +628,25 @@
         class="k">def</span> <span class="nf">difficulty_measurer</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure the difficulty of nodes in the graph based on their neighborhood label distribution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph. The shape is (N, N) where N is the number of nodes.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node. Shape: (N,)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Difficulty scores for each node. Higher scores indicate more difficult nodes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_difficulty</span> <span class="o">=</span> <span
             class="n">neighborhood_difficulty_measurer</span><span class="p">(</span><span class="n">data</span><span
             class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">label</span><span
@@ -550,6 +661,25 @@
         class="k">def</span> <span class="nf">sort_training_nodes</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sort training nodes based on their difficulty measured by neighborhood label distribution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node (shape: N,).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        Indices of the training nodes sorted by their difficulty, from easiest to hardest.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">difficulty_measurer</span><span
             class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">adj</span><span
             class="p">,</span> <span class="n">label</span><span class="p">)</span>
@@ -570,6 +700,25 @@
         class="k">def</span> <span class="nf">neighborhood_difficulty_measurer_in</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure the difficulty of each node in a graph based on the entropy of neighbor labels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node (shape: N,).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Tensor of local difficulty scores for each node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">edge_index</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
             class="n">coalesce</span><span class="p">()</span><span class="o">.</span><span
             class="n">indices</span><span class="p">()</span>
@@ -630,6 +779,25 @@
         class="k">def</span> <span class="nf">difficulty_measurer_in</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measure the difficulty of each node in a graph based on local entropy of neighbor labels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node (shape: N,).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Tensor of local difficulty scores for each node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">local_difficulty</span> <span class="o">=</span> <span
             class="n">neighborhood_difficulty_measurer_in</span><span class="p">(</span><span class="n">data</span><span
             class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">label</span><span
@@ -644,6 +812,25 @@
         class="k">def</span> <span class="nf">sort_training_nodes_in</span><span class="p">(</span><span
         class="n">data</span><span class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span
         class="n">label</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sort training nodes based on their difficulty scores in ascending order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Data</span>
+<span class="sd">        PyG Data object containing node features and labels.</span>
+
+<span class="sd">    adj : torch.Tensor</span>
+<span class="sd">        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.</span>
+
+<span class="sd">    label : torch.Tensor</span>
+<span class="sd">        Tensor containing the label of each node (shape: N,).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        Indices of training nodes sorted by difficulty scores.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">node_difficulty</span> <span class="o">=</span> <span class="n">difficulty_measurer_in</span><span
             class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">adj</span><span
             class="p">,</span> <span class="n">label</span><span class="p">)</span>
@@ -661,6 +848,29 @@
         class="n">lam</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span
         class="n">T</span><span class="p">,</span> <span class="n">scheduler</span><span class="o">=</span><span
         class="s1">&#39;geom&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Adjust the value of a parameter based on the chosen scheduling strategy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lam : float</span>
+<span class="sd">        The initial value or a baseline value for the parameter (0 &lt;= lam &lt;= 1).</span>
+
+<span class="sd">    t : int</span>
+<span class="sd">        The current training iteration or epoch.</span>
+
+<span class="sd">    T : int</span>
+<span class="sd">        The total number of training iterations or epochs.</span>
+
+<span class="sd">    scheduler : str, optional</span>
+<span class="sd">        The type of scheduling strategy to use. Options are &#39;linear&#39;, &#39;root&#39;, or &#39;geom&#39;.</span>
+<span class="sd">        Default is &#39;geom&#39;.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        The adjusted value of the parameter at iteration `t` based on the scheduling strategy.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">scheduler</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span
             class="p">:</span>
         <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span
@@ -696,7 +906,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -1,21 +1,26 @@
 graphslim.models package
 ========================
 
-Submodules
-----------
+graphslim.models.base module
+----------------------------
+
+.. automodule:: graphslim.models.base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.gcn module
+---------------------------
+
+.. automodule:: graphslim.models.gcn
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 graphslim.models.appnp module
 -----------------------------
 
 .. automodule:: graphslim.models.appnp
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.models.base module
-----------------------------
-
-.. automodule:: graphslim.models.base
    :members:
    :undoc-members:
    :show-inheritance:
@@ -36,14 +41,6 @@ graphslim.models.gat module
    :undoc-members:
    :show-inheritance:
 
-graphslim.models.gcn module
----------------------------
-
-.. automodule:: graphslim.models.gcn
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 graphslim.models.gntk module
 ----------------------------
 
@@ -56,6 +53,30 @@ graphslim.models.graphsage module
 ---------------------------------
 
 .. automodule:: graphslim.models.graphsage
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.sgc module
+---------------------------
+
+.. automodule:: graphslim.models.sgc
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.layers module
+------------------------------
+
+.. automodule:: graphslim.models.layers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.sgformer module
+--------------------------------
+
+.. automodule:: graphslim.models.sgformer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -76,34 +97,10 @@ graphslim.models.krr module
    :undoc-members:
    :show-inheritance:
 
-graphslim.models.layers module
-------------------------------
-
-.. automodule:: graphslim.models.layers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.models.parametrized\_adj module
------------------------------------------
-
-.. automodule:: graphslim.models.parametrized_adj
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 graphslim.models.prbcd module
 -----------------------------
 
 .. automodule:: graphslim.models.prbcd
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.models.random\_attack module
---------------------------------------
-
-.. automodule:: graphslim.models.random_attack
    :members:
    :undoc-members:
    :show-inheritance:
@@ -116,22 +113,6 @@ graphslim.models.reparam\_module module
    :undoc-members:
    :show-inheritance:
 
-graphslim.models.sgc module
----------------------------
-
-.. automodule:: graphslim.models.sgc
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.models.sgformer module
---------------------------------
-
-.. automodule:: graphslim.models.sgformer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 graphslim.models.sntk module
 ----------------------------
 
@@ -140,10 +121,18 @@ graphslim.models.sntk module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+graphslim.models.random\_attack module
+--------------------------------------
 
-.. automodule:: graphslim.models
+.. automodule:: graphslim.models.random_attack
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.parametrized\_adj module
+-----------------------------------------
+
+.. automodule:: graphslim.models.parametrized_adj
    :members:
    :undoc-members:
    :show-inheritance:

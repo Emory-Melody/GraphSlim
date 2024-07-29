@@ -17,6 +17,9 @@ from graphslim.utils import seed_everything
 
 
 class GCSNTK(GCondBase):
+    """
+    "GFast Graph Conensation with Structure-based Neural Tangent Kernel" https://arxiv.org/pdf/2310.11046
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(GCSNTK, self).__init__(setting, data, args, **kwargs)
         self.k = args.k

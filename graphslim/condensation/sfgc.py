@@ -16,6 +16,9 @@ from torch.optim import Adam, SGD
 
 
 class SFGC(GCondBase):
+    """
+    "Structure-free Graph Condensation: From Large-scale Graphs to Condensed Graph-free Data." https://arxiv.org/pdf/2306.02664.pdf
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(SFGC, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs

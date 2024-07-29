@@ -8,6 +8,9 @@ from graphslim.utils import *
 
 
 class DosCondX(GCondBase):
+    """
+    A structure-free variant of DosCond. "Condensing Graphs via One-Step Gradient Matching" https://arxiv.org/abs/2206.07746
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(DosCondX, self).__init__(setting, data, args, **kwargs)
 

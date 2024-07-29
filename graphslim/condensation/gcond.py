@@ -8,13 +8,14 @@ from graphslim.models import *
 
 
 class GCond(GCondBase):
-
+    """
+    "Graph Condensation for Graph Neural Networks" https://cse.msu.edu/~jinwei2/files/GCond.pdf
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(GCond, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
-
         args = self.args
         pge = self.pge
         feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)

@@ -12,7 +12,9 @@ from graphslim.utils import *
 
 
 class MSGC(GCondBase):
-
+    """
+    "Multiple sparse graphs condensation" https://www.sciencedirect.com/science/article/pii/S0950705123006548
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(MSGC, self).__init__(setting, data, args, **kwargs)
         x_channels = data.feat_train.shape[1]

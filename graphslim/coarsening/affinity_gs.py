@@ -13,39 +13,6 @@ class AffinityGs(Coarsen):
         super(Coarsen, self).__init__(setting, data, args, **kwargs)
 
     def coarsen(self, G):
-        """
-        This function provides a common interface for coarsening algorithms that contract subgraphs.
-
-        Parameters
-        ----------
-        G : pygsp Graph
-            The graph to be coarsened.
-        K : int, optional (default=10)
-            The size of the subspace we are interested in preserving.
-        r : float, optional (default=0.5)
-            The desired reduction defined as 1 - n/N.
-        method : str, optional (default='affinity_GS')
-            The coarsening method to use. Options include:
-            ['variation_neighborhoods', 'variation_edges', 'variation_cliques',
-             'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron']
-        algorithm : str, optional (default='greedy')
-            The algorithm to use for coarsening. Options include ['optimal', 'greedy'].
-
-        Returns
-        -------
-        C : np.array of size n x N
-            The coarsening matrix.
-        Gc : pygsp Graph
-            The smaller, coarsened graph.
-        Call : list of np.arrays
-            Coarsening matrices for each level.
-        Gall : list of pygsp Graphs
-            All graphs involved in the multilevel coarsening.
-
-        Example
-        -------
-        C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)
-        """
         K = 10
         r = 0.5
         max_levels = 10

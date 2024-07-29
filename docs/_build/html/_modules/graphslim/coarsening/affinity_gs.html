@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -142,39 +142,6 @@
                                                        href="../../../source/graphslim.coarsening.html#graphslim.coarsening.affinity_gs.AffinityGs.coarsen">[docs]</a>    <span
         class="k">def</span> <span class="nf">coarsen</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">G</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        This function provides a common interface for coarsening algorithms that contract subgraphs.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        G : pygsp Graph</span>
-<span class="sd">            The graph to be coarsened.</span>
-<span class="sd">        K : int, optional (default=10)</span>
-<span class="sd">            The size of the subspace we are interested in preserving.</span>
-<span class="sd">        r : float, optional (default=0.5)</span>
-<span class="sd">            The desired reduction defined as 1 - n/N.</span>
-<span class="sd">        method : str, optional (default=&#39;affinity_GS&#39;)</span>
-<span class="sd">            The coarsening method to use. Options include:</span>
-<span class="sd">            [&#39;variation_neighborhoods&#39;, &#39;variation_edges&#39;, &#39;variation_cliques&#39;,</span>
-<span class="sd">             &#39;heavy_edge&#39;, &#39;algebraic_JC&#39;, &#39;affinity_GS&#39;, &#39;kron&#39;]</span>
-<span class="sd">        algorithm : str, optional (default=&#39;greedy&#39;)</span>
-<span class="sd">            The algorithm to use for coarsening. Options include [&#39;optimal&#39;, &#39;greedy&#39;].</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        C : np.array of size n x N</span>
-<span class="sd">            The coarsening matrix.</span>
-<span class="sd">        Gc : pygsp Graph</span>
-<span class="sd">            The smaller, coarsened graph.</span>
-<span class="sd">        Call : list of np.arrays</span>
-<span class="sd">            Coarsening matrices for each level.</span>
-<span class="sd">        Gall : list of pygsp Graphs</span>
-<span class="sd">            All graphs involved in the multilevel coarsening.</span>
-
-<span class="sd">        Example</span>
-<span class="sd">        -------</span>
-<span class="sd">        C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">K</span> <span class="o">=</span> <span class="mi">10</span>
         <span class="n">r</span> <span class="o">=</span> <span class="mf">0.5</span>
         <span class="n">max_levels</span> <span class="o">=</span> <span class="mi">10</span>
@@ -307,7 +274,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

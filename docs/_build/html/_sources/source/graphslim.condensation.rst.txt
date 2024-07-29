@@ -1,8 +1,29 @@
 graphslim.condensation package
 ==============================
 
-Submodules
-----------
+graphslim.condensation.gcond\_base module
+-----------------------------------------
+
+.. automodule:: graphslim.condensation.gcond_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.condensation.gcond module
+-----------------------------------
+
+.. automodule:: graphslim.condensation.gcond
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.condensation.gcondx module
+------------------------------------
+
+.. automodule:: graphslim.condensation.gcondx
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 graphslim.condensation.doscond module
 -------------------------------------
@@ -20,29 +41,6 @@ graphslim.condensation.doscondx module
    :undoc-members:
    :show-inheritance:
 
-graphslim.condensation.gcond module
------------------------------------
-
-.. automodule:: graphslim.condensation.gcond
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.condensation.gcond\_base module
------------------------------------------
-
-.. automodule:: graphslim.condensation.gcond_base
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-graphslim.condensation.gcondx module
-------------------------------------
-
-.. automodule:: graphslim.condensation.gcondx
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 graphslim.condensation.gcsntk module
 ------------------------------------
@@ -88,14 +86,6 @@ graphslim.condensation.utils module
 -----------------------------------
 
 .. automodule:: graphslim.condensation.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: graphslim.condensation
    :members:
    :undoc-members:
    :show-inheritance:

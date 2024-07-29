@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -126,6 +126,22 @@
 <div class="viewcode-block" id="VNG"><a class="viewcode-back"
                                         href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG">[docs]</a><span
         class="k">class</span> <span class="nc">VNG</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that implements Virtual Node Graph (VNG) reduction for coarsening graphs.</span>
+<span class="sd">    Refer to paper &quot;Serving Graph Compression for Graph Neural Networks&quot; https://openreview.net/forum?id=T-qVtA3pAxG.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    setting : str</span>
+<span class="sd">        Configuration setting.</span>
+<span class="sd">    data : object</span>
+<span class="sd">        Data object containing the graph and feature information.</span>
+<span class="sd">    args : object</span>
+<span class="sd">        Arguments containing various settings for the coarsening process.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional keyword arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
@@ -136,7 +152,7 @@
             class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
             class="n">args</span><span class="o">.</span><span class="n">device</span>
-        <span class="c1"># pass data for initialization</span>
+        <span class="c1"># Pass data for initialization</span>
 
 <div class="viewcode-block" id="VNG.reduce"><a class="viewcode-back"
                                                href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG.reduce">[docs]</a>    <span
@@ -144,12 +160,25 @@
     <span class="k">def</span> <span class="nf">reduce</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">verbose</span><span
             class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reduces the data by applying Virtual Node Graph (VNG) method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : object</span>
+<span class="sd">            The data to be reduced.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints verbose output. Defaults to False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        object</span>
+<span class="sd">            The reduced data with synthesized adjacency, features, and labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">setting</span> <span class="o">=</span> <span class="bp">self</span><span
             class="o">.</span><span class="n">setting</span>
-        <span class="c1"># device = self.device</span>
-
         <span class="n">cpu_data</span> <span class="o">=</span> <span class="n">copy</span><span
             class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">data</span><span
             class="p">)</span>
@@ -164,18 +193,18 @@
             class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">nclass</span><span
             class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="o">.</span><span
-            class="n">to</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
-            class="p">)</span>
+            class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">fit_with_val</span><span
             class="p">(</span><span class="n">data</span><span class="p">,</span> <span
             class="n">train_iters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
             class="n">eval_epochs</span><span class="p">,</span> <span class="n">normadj</span><span
             class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span
-            class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                               <span class="n">setting</span><span class="o">=</span><span class="n">args</span><span
-            class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="n">reduced</span><span
-            class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">setting</span><span
+            class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">setting</span><span
+            class="p">,</span>
+                               <span class="n">reduced</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">)</span>
             <span class="n">embeds</span> <span class="o">=</span> <span class="n">model</span><span
             class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
             class="o">.</span><span class="n">feat_full</span><span class="p">,</span> <span class="n">data</span><span
@@ -204,20 +233,19 @@
             class="p">],</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">nclass</span><span
             class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="o">.</span><span
-            class="n">to</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span
-            class="p">)</span>
-
+            class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">fit_with_val</span><span
             class="p">(</span><span class="n">data</span><span class="p">,</span> <span
             class="n">train_iters</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
             class="n">eval_epochs</span><span class="p">,</span> <span class="n">normadj</span><span
             class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span
-            class="o">=</span><span class="n">verbose</span><span class="p">,</span>
-                               <span class="n">setting</span><span class="o">=</span><span class="n">args</span><span
-            class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="n">reduced</span><span
-            class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reindex</span><span
-            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">setting</span><span
+            class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">setting</span><span
+            class="p">,</span>
+                               <span class="n">reduced</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">,</span> <span class="n">reindex</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
             <span class="n">embeds</span> <span class="o">=</span> <span class="n">model</span><span
             class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
@@ -256,18 +284,42 @@
         class="p">,</span> <span class="n">embeds</span><span class="p">,</span> <span class="n">adj</span><span
         class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">verbose</span><span
         class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Virtual Node Graph (VNG) method to coarsen the graph.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        embeds : list of tensors</span>
+<span class="sd">            List of embeddings.</span>
+<span class="sd">        adj : tensor</span>
+<span class="sd">            Adjacency matrix.</span>
+<span class="sd">        labels : tensor</span>
+<span class="sd">            One-hot encoded labels.</span>
+<span class="sd">        verbose : bool, optional</span>
+<span class="sd">            If True, prints verbose output. Defaults to False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple containing:</span>
+
+<span class="sd">            - coarsen_edge : tensor</span>
+<span class="sd">                Coarsened adjacency matrix.</span>
+<span class="sd">            - coarsen_features : tensor</span>
+<span class="sd">                Coarsened features.</span>
+<span class="sd">            - coarsen_labels : tensor</span>
+<span class="sd">                Coarsened labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">X_tr_head</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">embeds</span><span
             class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
             class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span
             class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span
             class="n">numpy</span><span class="p">()</span>
-
         <span class="n">X_tr_0</span> <span class="o">=</span> <span class="n">embeds</span><span
             class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span
             class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span
             class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-
         <span class="n">A_tr</span> <span class="o">=</span> <span class="n">adj</span>
 
         <span class="n">column_sum</span> <span class="o">=</span> <span class="n">np</span><span
@@ -282,7 +334,7 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
             class="nb">range</span><span class="p">(</span><span class="n">X_tr_0</span><span class="o">.</span><span
             class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>  <span
-            class="c1"># 防止出现column_sum等于0的情况</span>
+            class="c1"># Prevent column_sum from being zero</span>
             <span class="k">if</span> <span class="n">column_sum</span><span class="p">[</span><span
             class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span
             class="p">:</span>
@@ -295,10 +347,7 @@
             class="n">X_tr_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
             class="mi">0</span><span class="p">])</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        PROPAGATION FROM VIRTUAL REPRESENTATIVE NODES TO TESTING NODES</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
+        <span class="c1"># PROPAGATION FROM VIRTUAL REPRESENTATIVE NODES TO TESTING NODES</span>
         <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span
             class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span
             class="n">num_coarsen_node</span><span class="p">,</span> <span class="n">random_state</span><span
@@ -344,10 +393,7 @@
             class="p">,</span> <span class="n">X_vr_0</span><span class="o">.</span><span class="n">shape</span><span
             class="p">)</span>
 
-<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        PROPAGATION BETWEEN VIRTUAL REPRESENTATIVE NODES</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
+        <span class="c1"># PROPAGATION BETWEEN VIRTUAL REPRESENTATIVE NODES</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">E</span> <span class="o">@</span> <span
             class="n">X_tr_head</span>
         <span class="n">Q</span> <span class="o">=</span> <span class="n">E</span> <span class="o">@</span> <span
@@ -407,6 +453,7 @@
 
         <span class="k">return</span> <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
             class="p">,</span> <span class="n">coarsen_labels</span></div></div>
+
 </pre>
                         </div>
 
@@ -417,7 +464,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

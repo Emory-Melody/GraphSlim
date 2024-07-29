@@ -57,29 +57,31 @@ class GraphConvolution(torch.nn.Module):
 
 
 class GATConv(MessagePassing):
-    r"""The graph attentional operator from the `"Graph Attention Networks"
-    math::
-        \mathbf{x}^{\prime}_i = \alpha_{i,i}\mathbf{\Theta}\mathbf{x}_{i} +
-        \sum_{j \in \mathcal{N}(i)} \alpha_{i,j}\mathbf{\Theta}\mathbf{x}_{j},
+    r"""
+    The graph attentional operator from the `"Graph Attention Networks"`_:
 
-    where the attention coefficients :math:`\alpha_{i,j}` are computed as
+        .. math::
+            \mathbf{x}^{\prime}_i = \alpha_{i,i}\mathbf{\Theta}\mathbf{x}_{i} +
+            \sum_{j \in \mathcal{N}(i)} \alpha_{i,j}\mathbf{\Theta}\mathbf{x}_{j}
 
-    math::
-        \alpha_{i,j} =
-        \frac{
-        \exp\left(\mathrm{LeakyReLU}\left(\mathbf{a}^{\top}
-        [\mathbf{\Theta}\mathbf{x}_i \, \Vert \, \mathbf{\Theta}\mathbf{x}_j]
-        \right)\right)}
-        {\sum_{k \in \mathcal{N}(i) \cup \{ i \}}
-        \exp\left(\mathrm{LeakyReLU}\left(\mathbf{a}^{\top}
-        [\mathbf{\Theta}\mathbf{x}_i \, \Vert \, \mathbf{\Theta}\mathbf{x}_k]
-        \right)\right)}.
+        where the attention coefficients :math:`\alpha_{i,j}` are computed as:
+
+        .. math::
+            \alpha_{i,j} =
+            \frac{
+            \exp\left(\mathrm{LeakyReLU}\left(\mathbf{a}^{\top}
+            [\mathbf{\Theta}\mathbf{x}_i \, \Vert \, \mathbf{\Theta}\mathbf{x}_j]
+            \right)\right)}
+            {\sum_{k \in \mathcal{N}(i) \cup \{ i \}}
+            \exp\left(\mathrm{LeakyReLU}\left(\mathbf{a}^{\top}
+            [\mathbf{\Theta}\mathbf{x}_i \, \Vert \, \mathbf{\Theta}\mathbf{x}_k]
+            \right)\right)}
 
     Args:
         in_channels (int or tuple): Size of each input sample. A tuple
             corresponds to the sizes of source and target dimensionalities.
         out_channels (int): Size of each output sample.
-        heads (int, optional): Number of multi-head-attentions.
+        heads (int, optional): Number of multi-head attentions.
             (default: :obj:`1`)
         concat (bool, optional): If set to :obj:`False`, the multi-head
             attentions are averaged instead of concatenated.
@@ -93,9 +95,14 @@ class GATConv(MessagePassing):
             self-loops to the input graph. (default: :obj:`True`)
         bias (bool, optional): If set to :obj:`False`, the layer will not learn
             an additive bias. (default: :obj:`True`)
-        **kwargs (optional): Additional arguments of
+        **kwargs (optional): Additional arguments for
             :class:`torch_geometric.nn.conv.MessagePassing`.
+
+    References
+    ----------
+    .. [1] Velickovic, P., Cucurull, G., Casanova, A., Romero, A., Lio, P., & Bengio, Y. (2018). Graph Attention Networks. In *International Conference on Learning Representations (ICLR)*. https://arxiv.org/abs/1710.10903
     """
+
     _alpha: OptTensor
 
     def __init__(self, in_channels: Union[int, Tuple[int, int]],

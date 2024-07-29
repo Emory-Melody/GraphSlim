@@ -12,6 +12,29 @@ from graphslim.dataset.utils import csr2ei
 
 
 def sparsify(model_type, adj_syn, args, verbose=False):
+    """
+    Applies sparsification to the adjacency matrix based on the model type and given arguments.
+
+    This function modifies the adjacency matrix to make it sparser according to the model type and method specified.
+    For specific methods and datasets, it adjusts the threshold used for sparsification.
+
+    Parameters
+    ----------
+    model_type : str
+        The type of model used, which determines the sparsification strategy. Can be 'MLP', 'GAT', or other.
+    adj_syn : torch.Tensor
+        The adjacency matrix to be sparsified.
+    args : argparse.Namespace
+        Command-line arguments and configuration parameters which may include method-specific settings.
+    verbose : bool, optional
+        If True, prints information about the sparsity of the adjacency matrix before and after sparsification.
+        Default is False.
+
+    Returns
+    -------
+    adj_syn : torch.Tensor
+        The sparsified adjacency matrix.
+    """
     threshold = 0
     if model_type == 'MLP':
         adj_syn = adj_syn - adj_syn
@@ -87,6 +110,22 @@ def getsize_mb(elements):
 
 
 def verbose_time_memory(func):
+    """
+    A decorator that measures and prints the execution time and memory usage of the decorated function.
+
+    This decorator prints the time taken by the function to execute in both seconds and milliseconds,
+    and the memory usage of the data before and after the function call if verbose mode is enabled.
+
+    Parameters
+    ----------
+    func : callable
+        The function to be decorated.
+
+    Returns
+    -------
+    callable
+        The wrapped function with added timing and memory usage functionality.
+    """
     @wraps(func)
     def wrapper(*args, **kwargs):
         verbose = kwargs.get('verbose', False)
@@ -136,6 +175,31 @@ def verbose_time_memory(func):
 
 
 def calc_f1(y_true, y_pred, is_sigmoid):
+    """
+    Calculate the F1 score for binary or multi-class classification.
+
+    This function calculates both the micro-averaged and macro-averaged F1 scores.
+    The `y_pred` values are processed differently based on whether the classification
+    uses sigmoid activation or not.
+
+    Parameters
+    ----------
+    y_true : array-like, shape (n_samples,)
+        True labels or ground truth values.
+    y_pred : array-like, shape (n_samples,) or (n_samples, n_classes)
+        Predicted labels or probabilities. If `is_sigmoid` is True, this should be probabilities.
+        Otherwise, it should be class predictions.
+    is_sigmoid : bool
+        Flag indicating whether the classification uses sigmoid activation (binary classification)
+        or not (multi-class classification). If True, `y_pred` contains probabilities; if False,
+        `y_pred` contains class predictions.
+
+    Returns
+    -------
+    tuple of float
+        - micro-averaged F1 score.
+        - macro-averaged F1 score.
+    """
     if not is_sigmoid:
         y_pred = np.argmax(y_pred, axis=1)
     else:
@@ -145,6 +209,25 @@ def calc_f1(y_true, y_pred, is_sigmoid):
 
 
 def evaluate(output, labels, args):
+    """
+    Evaluate the model performance based on the output and labels.
+
+    This function computes performance metrics depending on the type of dataset.
+    For certain datasets, it calculates F1 scores. For others, it computes loss and accuracy.
+
+    Parameters
+    ----------
+    output : torch.Tensor
+        The model's output logits or probabilities.
+    labels : torch.Tensor
+        The ground truth labels.
+    args : Namespace
+        Arguments that include dataset information to determine which metrics to use.
+
+    Returns
+    -------
+    None
+    """
     data_graphsaint = ['yelp', 'ppi', 'ppi-large', 'flickr', 'reddit', 'amazon']
     if args.dataset in data_graphsaint:
         labels = labels.cpu().numpy()

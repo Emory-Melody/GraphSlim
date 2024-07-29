@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -123,73 +123,74 @@
                                 class="kn">import</span> <span class="n">Evaluator</span>
 
 
-<div class="viewcode-block" id="save_csv"><a class="viewcode-back"
-                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.save_csv">[docs]</a><span
-        class="k">def</span> <span class="nf">save_csv</span><span class="p">(</span><span
-        class="n">file_path</span><span class="p">,</span> <span class="n">num</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_csv</span><span class="p">(</span><span class="n">file_path</span><span
+                                class="p">,</span> <span class="n">num</span><span class="p">):</span>
     <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">)</span>
+                                class="n">file_path</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">file_path</span><span class="o">.</span><span class="n">open</span><span
-            class="p">(</span><span class="n">mode</span><span class="o">=</span><span
-            class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span
-            class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span
-            class="n">file</span><span class="p">:</span>
+                                class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span
+                                class="p">,</span> <span class="n">newline</span><span class="o">=</span><span
+                                class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span
+                                class="n">file</span><span class="p">:</span>
         <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span
-            class="n">writer</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                                class="n">writer</span><span class="p">(</span><span class="n">file</span><span
+                                class="p">)</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span
-            class="p">(</span><span class="n">num</span><span class="p">)</span>
+                                class="p">(</span><span class="n">num</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;saved csv&quot;</span><span
-            class="p">,</span> <span class="n">file_path</span><span class="p">)</span></div>
+                                class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="load_csv"><a class="viewcode-back"
-                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.load_csv">[docs]</a><span
-        class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span
-        class="n">file_path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span><span class="n">file_path</span><span
+                                class="p">):</span>
     <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">)</span>
+                                class="n">file_path</span><span class="p">)</span>
     <span class="k">with</span> <span class="n">file_path</span><span class="o">.</span><span class="n">open</span><span
-            class="p">(</span><span class="n">mode</span><span class="o">=</span><span
-            class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span
-            class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span
-            class="n">file</span><span class="p">:</span>
+                                class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span
+                                class="p">,</span> <span class="n">newline</span><span class="o">=</span><span
+                                class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">as</span> <span
+                                class="n">file</span><span class="p">:</span>
         <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span
-            class="n">reader</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                                class="n">reader</span><span class="p">(</span><span class="n">file</span><span
+                                class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span
-            class="n">reader</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span></div>
+                                class="n">reader</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
-<div class="viewcode-block" id="save_pkl"><a class="viewcode-back"
-                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.save_pkl">[docs]</a><span
-        class="k">def</span> <span class="nf">save_pkl</span><span class="p">(</span><span
-        class="n">file_path</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">save_pkl</span><span class="p">(</span><span class="n">file_path</span><span
+                                class="p">,</span> <span class="n">data</span><span class="p">):</span>
     <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">)</span>
+                                class="n">file_path</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span
-            class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                class="n">file_path</span><span class="p">,</span> <span
+                                class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span
+                                class="n">f</span><span class="p">:</span>
         <span class="n">pkl</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span
-            class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+                                class="n">data</span><span class="p">,</span> <span class="n">f</span><span
+                                class="p">)</span>
 
 
-<div class="viewcode-block" id="load_pkl"><a class="viewcode-back"
-                                             href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.load_pkl">[docs]</a><span
-        class="k">def</span> <span class="nf">load_pkl</span><span class="p">(</span><span
-        class="n">file_path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">load_pkl</span><span class="p">(</span><span class="n">file_path</span><span
+                                class="p">):</span>
     <span class="n">file_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">)</span>
+                                class="n">file_path</span><span class="p">)</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span
-            class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span
-            class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                                class="n">file_path</span><span class="p">,</span> <span
+                                class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span
+                                class="n">f</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">pkl</span><span class="o">.</span><span
-            class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span></div>
+                                class="n">load</span><span class="p">(</span><span class="n">f</span><span
+                                class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span>
 
 
 <div class="viewcode-block" id="NasEvaluator"><a class="viewcode-back"
                                                  href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator">[docs]</a><span
         class="k">class</span> <span class="nc">NasEvaluator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for evaluating neural architecture search (NAS) performance on original and synthetic graphs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">args</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span
@@ -202,7 +203,7 @@
             class="p">,</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">results_ori</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
 
-        <span class="c1"># Construct parameter combinations as different architecture</span>
+        <span class="c1"># Define possible values for parameters to search over</span>
         <span class="n">ks</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span
             class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span
             class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span
@@ -217,12 +218,12 @@
             class="p">,</span> <span class="s1">&#39;tanh&#39;</span><span class="p">,</span> <span class="s1">&#39;relu&#39;</span><span
             class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;softplus&#39;</span><span
             class="p">,</span> <span class="s1">&#39;leakyrelu&#39;</span><span class="p">,</span> <span class="s1">&#39;relu6&#39;</span><span
-            class="p">,</span>
-                       <span class="s1">&#39;elu&#39;</span><span class="p">]</span>
+            class="p">,</span> <span class="s1">&#39;elu&#39;</span><span class="p">]</span>
         <span class="c1"># ks = [2, 4, 6]</span>
         <span class="c1"># nhids = [16, 32]</span>
         <span class="c1"># alphas = [0.1]</span>
         <span class="c1"># activations = [&#39;relu&#39;]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span> <span
             class="o">=</span> <span class="sa">f</span><span class="s1">&#39;checkpoints/nas/</span><span
             class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
@@ -233,6 +234,7 @@
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span
             class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span
             class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">parameter_combinations</span> <span
             class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">product</span><span
             class="p">(</span><span class="n">ks</span><span class="p">,</span> <span class="n">nhids</span><span
@@ -243,9 +245,15 @@
                                                               href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_ori">[docs]</a>    <span
         class="k">def</span> <span class="nf">evaluate_ori</span><span class="p">(</span><span
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="c1"># train and eval model architecture</span>
-        <span class="n">best_acc_val_syn</span><span class="p">,</span> <span class="n">best_acc_val_ori</span> <span
-            class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates various architectures on the original graph and identifies the best one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">best_acc_val_ori</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span
             class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
             class="n">parameter_combinations</span><span class="p">):</span>
@@ -262,6 +270,7 @@
             class="o">=</span> <span class="mi">600</span>
             <span class="n">args</span><span class="o">.</span><span class="n">ntrans</span> <span
             class="o">=</span> <span class="mi">2</span>
+
             <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span
             class="p">(</span><span class="n">args</span><span class="p">)</span>
             <span class="n">acc_val_ori</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span
@@ -273,14 +282,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">results_ori</span><span
             class="o">.</span><span class="n">append</span><span class="p">(</span><span
             class="n">acc_val_ori</span><span class="p">)</span>
-            <span class="c1"># record best architecture (params) based on val results</span>
+
+            <span class="c1"># Update best architecture based on validation accuracy</span>
             <span class="k">if</span> <span class="n">acc_val_ori</span> <span class="o">&gt;</span> <span class="n">best_acc_val_ori</span><span
             class="p">:</span>
                 <span class="n">best_acc_val_ori</span> <span class="o">=</span> <span class="n">acc_val_ori</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_params_ori</span> <span
             class="o">=</span> <span class="n">params</span>
 
-        <span class="c1"># save the eval result</span>
+        <span class="c1"># Save results to files</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
             class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span
             class="si">}</span><span class="s1">/results_ori.csv&#39;</span>
@@ -296,9 +306,15 @@
                                                               href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_syn">[docs]</a>    <span
         class="k">def</span> <span class="nf">evaluate_syn</span><span class="p">(</span><span
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="c1"># train and eval model architecture</span>
-        <span class="n">best_acc_val_syn</span><span class="p">,</span> <span class="n">best_acc_val_ori</span> <span
-            class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates various architectures on the synthetic graph and identifies the best one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">best_acc_val_syn</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span
             class="n">tqdm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
             class="n">parameter_combinations</span><span class="p">):</span>
@@ -313,6 +329,7 @@
             class="n">activation</span> <span class="o">=</span> <span class="n">params</span>
             <span class="n">args</span><span class="o">.</span><span class="n">ntrans</span> <span
             class="o">=</span> <span class="mi">2</span>
+
             <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span
             class="p">(</span><span class="n">args</span><span class="p">)</span>
             <span class="n">acc_val_syn</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span
@@ -324,13 +341,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">results_syn</span><span
             class="o">.</span><span class="n">append</span><span class="p">(</span><span
             class="n">acc_val_syn</span><span class="p">)</span>
-            <span class="c1"># record best architecture (params) based on val results</span>
+
+            <span class="c1"># Update best architecture based on validation accuracy</span>
             <span class="k">if</span> <span class="n">acc_val_syn</span> <span class="o">&gt;</span> <span class="n">best_acc_val_syn</span><span
             class="p">:</span>
                 <span class="n">best_acc_val_syn</span> <span class="o">=</span> <span class="n">acc_val_syn</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">best_params_syn</span> <span
             class="o">=</span> <span class="n">params</span>
 
+        <span class="c1"># Save results to files</span>
         <span class="n">file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
             class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span
             class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="bp">self</span><span
@@ -350,6 +369,14 @@
                                                                  href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.test_params_ori">[docs]</a>    <span
         class="k">def</span> <span class="nf">test_params_ori</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests the best architecture on the original graph using the best parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">best_params_ori</span> <span class="ow">is</span> <span class="kc">None</span><span
             class="p">:</span>
@@ -359,17 +386,26 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">best_params_ori</span> <span
             class="o">=</span> <span class="n">load_pkl</span><span class="p">(</span><span
             class="n">file_path</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;best_params_ori: </span><span class="si">{</span><span class="bp">self</span><span
-            class="o">.</span><span class="n">best_params_ori</span><span class="si">}</span><span
-            class="s2">&quot;</span><span class="p">)</span>
+            class="sa">f</span><span class="s2">&quot;Best parameters for original graph: </span><span
+            class="si">{</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">best_params_ori</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">nlayers</span><span class="p">,</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">hidden</span><span class="p">,</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span> <span
+            class="n">args</span><span class="o">.</span><span class="n">activation</span> <span
+            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">best_params_ori</span>
         <span class="n">args</span><span class="o">.</span><span class="n">eval_epochs</span> <span
             class="o">=</span> <span class="mi">600</span>
         <span class="n">args</span><span class="o">.</span><span class="n">ntrans</span> <span class="o">=</span> <span
             class="mi">2</span>
+
         <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span
             class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="n">acc_test_ori</span><span class="p">,</span> <span class="n">_</span> <span
@@ -381,7 +417,7 @@
             class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;NAS: test accuracy on ori graph: </span><span
+            class="sa">f</span><span class="s2">&quot;Test accuracy on original graph: </span><span
             class="si">{</span><span class="n">acc_test_ori</span><span class="si">}</span><span
             class="s2">&quot;</span><span class="p">)</span></div>
 
@@ -389,6 +425,19 @@
                                                                  href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.test_params_syn">[docs]</a>    <span
         class="k">def</span> <span class="nf">test_params_syn</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests the best architecture on the synthetic graph using the best parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        acc_test_syn : float</span>
+<span class="sd">            The test accuracy on the synthetic graph.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">best_params_syn</span> <span class="ow">is</span> <span class="kc">None</span><span
             class="p">:</span>
@@ -400,11 +449,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">best_params_syn</span> <span
             class="o">=</span> <span class="n">load_pkl</span><span class="p">(</span><span
             class="n">file_path</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;best_params_syn: </span><span class="si">{</span><span class="bp">self</span><span
-            class="o">.</span><span class="n">best_params_syn</span><span class="si">}</span><span
-            class="s2">&quot;</span><span class="p">)</span>
+            class="sa">f</span><span class="s2">&quot;Best parameters for synthetic graph: </span><span
+            class="si">{</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">best_params_syn</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">)</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">args</span><span class="o">.</span><span class="n">nlayers</span><span class="p">,</span> <span
@@ -417,20 +468,20 @@
             class="o">=</span> <span class="mi">600</span>
         <span class="n">args</span><span class="o">.</span><span class="n">ntrans</span> <span class="o">=</span> <span
             class="mi">2</span>
+
         <span class="n">evaluator</span> <span class="o">=</span> <span class="n">Evaluator</span><span
             class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="n">acc_test_syn</span><span class="p">,</span> <span class="n">_</span> <span
             class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span
             class="n">evaluate</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span
             class="n">model_type</span><span class="o">=</span><span class="s1">&#39;APPNP&#39;</span><span
-            class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span
             class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span
             class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;NAS: test accuracy on syn graph: </span><span
-            class="si">{</span><span class="n">acc_test_syn</span><span class="si">}</span><span
-            class="s2">&quot;</span><span class="p">)</span>
+            class="sa">f</span><span class="s2">&quot;Test accuracy on synthetic graph: </span><span class="si">{</span><span
+            class="n">acc_test_syn</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">acc_test_syn</span></div>
 
@@ -438,6 +489,19 @@
                                                           href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.get_rank">[docs]</a>    <span
         class="k">def</span> <span class="nf">get_rank</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">results</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ranks results based on their values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        results : list of float</span>
+<span class="sd">            The list of results to rank.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ranks : list of int</span>
+<span class="sd">            The list of ranks corresponding to the results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sorted_tuples</span> <span class="o">=</span> <span class="nb">sorted</span><span
             class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span
             class="n">results</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span
@@ -466,6 +530,16 @@
                                                              href="../../../source/graphslim.evaluation.html#graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson">[docs]</a>    <span
         class="k">def</span> <span class="nf">cal_pearson</span><span class="p">(</span><span
         class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculates Pearson correlation coefficients between synthetic and original results.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pearson_corr_acc : float</span>
+<span class="sd">            Pearson correlation coefficient of accuracies.</span>
+<span class="sd">        pearson_corr_rank : float</span>
+<span class="sd">            Pearson correlation coefficient of ranks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span
             class="o">.</span><span class="n">results_syn</span><span class="p">)</span> <span class="o">==</span> <span
             class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span
@@ -474,13 +548,12 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">results_syn</span> <span
             class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span
             class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span
-            class="ow">in</span> <span class="n">load_csv</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
-            class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="si">}</span><span
-            class="s1">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span
-            class="n">args</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span
-            class="s1">_results_syn.csv&#39;</span><span class="p">)[</span><span class="mi">0</span><span
-            class="p">]]</span>
+            class="ow">in</span> <span class="n">load_csv</span><span class="p">(</span><span class="sa">f</span><span
+            class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
+            class="n">method</span><span class="si">}</span><span class="s1">_results_syn.csv&#39;</span><span
+            class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">results_ori</span> <span
             class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span
             class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span
@@ -488,15 +561,16 @@
             class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span
             class="n">save_path</span><span class="si">}</span><span class="s1">/results_ori.csv&#39;</span><span
             class="p">)[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">pearson_corr_acc</span><span class="p">,</span> <span class="n">p_value</span> <span
+
+        <span class="n">pearson_corr_acc</span><span class="p">,</span> <span class="n">_</span> <span
             class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="bp">self</span><span
             class="o">.</span><span class="n">results_syn</span><span class="p">,</span> <span
             class="bp">self</span><span class="o">.</span><span class="n">results_ori</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;pearson score of accuracy:, </span><span class="si">{</span><span
-            class="n">pearson_corr_acc</span><span class="si">}</span><span class="s2">&quot;</span><span
-            class="p">)</span>
+            class="sa">f</span><span class="s2">&quot;Pearson correlation of accuracy: </span><span
+            class="si">{</span><span class="n">pearson_corr_acc</span><span class="si">}</span><span
+            class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">results_syn_ranked</span> <span class="o">=</span> <span class="bp">self</span><span
             class="o">.</span><span class="n">get_rank</span><span class="p">(</span><span class="bp">self</span><span
@@ -504,12 +578,13 @@
         <span class="n">results_ori_ranked</span> <span class="o">=</span> <span class="bp">self</span><span
             class="o">.</span><span class="n">get_rank</span><span class="p">(</span><span class="bp">self</span><span
             class="o">.</span><span class="n">results_ori</span><span class="p">)</span>
-        <span class="n">pearson_corr_rank</span><span class="p">,</span> <span class="n">p_value</span> <span class="o">=</span> <span
-            class="n">pearsonr</span><span class="p">(</span><span class="n">results_syn_ranked</span><span
-            class="p">,</span> <span class="n">results_ori_ranked</span><span class="p">)</span>
+        <span class="n">pearson_corr_rank</span><span class="p">,</span> <span class="n">_</span> <span
+            class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span
+            class="n">results_syn_ranked</span><span class="p">,</span> <span class="n">results_ori_ranked</span><span
+            class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
             class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span
-            class="sa">f</span><span class="s2">&quot;pearson score of rank:, </span><span class="si">{</span><span
+            class="sa">f</span><span class="s2">&quot;Pearson correlation of rank: </span><span class="si">{</span><span
             class="n">pearson_corr_rank</span><span class="si">}</span><span class="s2">&quot;</span><span
             class="p">)</span>
 
@@ -524,7 +599,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

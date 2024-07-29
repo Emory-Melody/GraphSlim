@@ -16,36 +16,10 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class HeavyEdge(Coarsen):
+    def __init__(self, setting, data, args, **kwargs):
+        super(Coarsen, self).__init__(setting, data, args, **kwargs)
 
-    def coarsen(self, G):
-        """
-        This function provides a common interface for coarsening algorithms that contract subgraphs
-
-        Parameters
-        ----------
-        G : pygsp Graph
-        K : int
-            The size of the subspace we are interested in preserving.
-        r : float between (0,1)
-            The desired reduction defined as 1 - n/N.
-        method : String
-            ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC', 'affinity_GS', 'kron']
-
-        Returns
-        -------
-        C : np.array of size n x N
-            The coarsening matrix.
-        Gc : pygsp Graph
-            The smaller graph.
-        Call : list of np.arrays
-            Coarsening matrices for each level
-        Gall : list of (n_levels+1) pygsp Graphs
-            All graphs involved in the multilevel coarsening
-
-        Example
-        -------
-        C, Gc, Call, Gall = coarsen(G, K=10, r=0.8)
-        """
+    def coarsen(self, G, method):
         K = 10
         r = 0.5
         max_levels = 10
@@ -64,8 +38,8 @@ class HeavyEdge(Coarsen):
 
         Call, Gall = [], []
         Gall.append(G)
-        method = "heavy_edge"
-        algorithm=self.args.coarsen_strategy
+        method = 'heavy_edge'
+        algorithm = self.args.coarsen_strategy
         # algorithm = "greedy"
         for level in range(1, max_levels + 1):
 

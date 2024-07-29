@@ -31,9 +31,10 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :maxdepth: 1
    :caption: Method
 
+   source/graphslim.sparsification
    source/graphslim.coarsening
    source/graphslim.condensation
-   source/graphslim.sparsification
+
 
 .. toctree::
    :maxdepth: 1

@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
+      <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -131,6 +131,29 @@
         class="n">model_type</span><span class="p">,</span> <span class="n">adj_syn</span><span class="p">,</span> <span
         class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
         class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies sparsification to the adjacency matrix based on the model type and given arguments.</span>
+
+<span class="sd">    This function modifies the adjacency matrix to make it sparser according to the model type and method specified.</span>
+<span class="sd">    For specific methods and datasets, it adjusts the threshold used for sparsification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_type : str</span>
+<span class="sd">        The type of model used, which determines the sparsification strategy. Can be &#39;MLP&#39;, &#39;GAT&#39;, or other.</span>
+<span class="sd">    adj_syn : torch.Tensor</span>
+<span class="sd">        The adjacency matrix to be sparsified.</span>
+<span class="sd">    args : argparse.Namespace</span>
+<span class="sd">        Command-line arguments and configuration parameters which may include method-specific settings.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, prints information about the sparsity of the adjacency matrix before and after sparsification.</span>
+<span class="sd">        Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    adj_syn : torch.Tensor</span>
+<span class="sd">        The sparsified adjacency matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span
             class="s1">&#39;MLP&#39;</span><span class="p">:</span>
@@ -272,6 +295,22 @@
                                                         href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.verbose_time_memory">[docs]</a><span
         class="k">def</span> <span class="nf">verbose_time_memory</span><span class="p">(</span><span
         class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A decorator that measures and prints the execution time and memory usage of the decorated function.</span>
+
+<span class="sd">    This decorator prints the time taken by the function to execute in both seconds and milliseconds,</span>
+<span class="sd">    and the memory usage of the data before and after the function call if verbose mode is enabled.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable</span>
+<span class="sd">        The function to be decorated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    callable</span>
+<span class="sd">        The wrapped function with added timing and memory usage functionality.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span
             class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span
@@ -386,6 +425,31 @@
         class="k">def</span> <span class="nf">calc_f1</span><span class="p">(</span><span class="n">y_true</span><span
         class="p">,</span> <span class="n">y_pred</span><span class="p">,</span> <span class="n">is_sigmoid</span><span
         class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the F1 score for binary or multi-class classification.</span>
+
+<span class="sd">    This function calculates both the micro-averaged and macro-averaged F1 scores.</span>
+<span class="sd">    The `y_pred` values are processed differently based on whether the classification</span>
+<span class="sd">    uses sigmoid activation or not.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_true : array-like, shape (n_samples,)</span>
+<span class="sd">        True labels or ground truth values.</span>
+<span class="sd">    y_pred : array-like, shape (n_samples,) or (n_samples, n_classes)</span>
+<span class="sd">        Predicted labels or probabilities. If `is_sigmoid` is True, this should be probabilities.</span>
+<span class="sd">        Otherwise, it should be class predictions.</span>
+<span class="sd">    is_sigmoid : bool</span>
+<span class="sd">        Flag indicating whether the classification uses sigmoid activation (binary classification)</span>
+<span class="sd">        or not (multi-class classification). If True, `y_pred` contains probabilities; if False,</span>
+<span class="sd">        `y_pred` contains class predictions.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple of float</span>
+<span class="sd">        - micro-averaged F1 score.</span>
+<span class="sd">        - macro-averaged F1 score.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">is_sigmoid</span><span class="p">:</span>
         <span class="n">y_pred</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
             class="n">argmax</span><span class="p">(</span><span class="n">y_pred</span><span class="p">,</span> <span
@@ -410,6 +474,25 @@
         class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">output</span><span
         class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">args</span><span
         class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluate the model performance based on the output and labels.</span>
+
+<span class="sd">    This function computes performance metrics depending on the type of dataset.</span>
+<span class="sd">    For certain datasets, it calculates F1 scores. For others, it computes loss and accuracy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output : torch.Tensor</span>
+<span class="sd">        The model&#39;s output logits or probabilities.</span>
+<span class="sd">    labels : torch.Tensor</span>
+<span class="sd">        The ground truth labels.</span>
+<span class="sd">    args : Namespace</span>
+<span class="sd">        Arguments that include dataset information to determine which metrics to use.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">data_graphsaint</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;yelp&#39;</span><span
             class="p">,</span> <span class="s1">&#39;ppi&#39;</span><span class="p">,</span> <span class="s1">&#39;ppi-large&#39;</span><span
             class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span
@@ -467,7 +550,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

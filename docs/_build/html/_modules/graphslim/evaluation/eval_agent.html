@@ -65,13 +65,13 @@
                 <p class="caption" role="heading"><span class="caption-text">Method</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                    <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.coarsening.html">graphslim.coarsening
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.condensation.html">graphslim.condensation
-                        package</a></li>
-                    <li class="toctree-l1"><a class="reference internal"
-                                              href="../../../source/graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
                 </ul>
                 <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
@@ -117,6 +117,9 @@
                                 class="n">trange</span><span class="p">,</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span
                                 class="n">ParameterGrid</span>
+<span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span
+                                class="nn">plt</span>
 
 <span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
                                 class="n">dense_to_sparse</span>
@@ -138,27 +141,45 @@
 <div class="viewcode-block" id="Evaluator"><a class="viewcode-back"
                                               href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator">[docs]</a><span
         class="k">class</span> <span class="nc">Evaluator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to evaluate different models and their hyperparameters on graph data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args : argparse.Namespace</span>
+<span class="sd">        Command-line arguments and configuration parameters.</span>
+<span class="sd">    **kwargs : keyword arguments</span>
+<span class="sd">        Additional parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
             class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># self.data = data</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the Evaluator with given arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args : argparse.Namespace</span>
+<span class="sd">            Command-line arguments and configuration parameters.</span>
+<span class="sd">        **kwargs : keyword arguments</span>
+<span class="sd">            Additional parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span
             class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span
             class="n">args</span><span class="o">.</span><span class="n">device</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span
             class="p">()</span>
-        <span class="c1"># print(&#39;adj_param:&#39;, self.adj_param.shape, &#39;feat_syn:&#39;, self.feat_syn.shape)</span>
 
 <div class="viewcode-block" id="Evaluator.reset_parameters"><a class="viewcode-back"
                                                                href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.reset_parameters">[docs]</a>    <span
         class="k">def</span> <span class="nf">reset_parameters</span><span class="p">(</span><span
         class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes or resets model parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
-        <span class="c1"># self.adj_param.data.copy_(torch.randn(self.adj_param.size()))</span>
-        <span class="c1"># self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))</span>
 
 <div class="viewcode-block" id="Evaluator.get_syn_data"><a class="viewcode-back"
                                                            href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.get_syn_data">[docs]</a>    <span
@@ -166,16 +187,37 @@
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
         class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
         class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads or computes synthetic data for evaluation.</span>
 
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model used for generating synthetic data.</span>
+<span class="sd">        verbose : bool, optional, default=False</span>
+<span class="sd">            Whether to print detailed logs.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        feat_syn : torch.Tensor</span>
+<span class="sd">            Synthetic feature matrix.</span>
+<span class="sd">        adj_syn : torch.Tensor</span>
+<span class="sd">            Synthetic adjacency matrix.</span>
+<span class="sd">        labels_syn : torch.Tensor</span>
+<span class="sd">            Synthetic labels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">adj_syn</span><span class="p">,</span> <span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">labels_syn</span> <span class="o">=</span> <span
             class="n">load_reduced</span><span class="p">(</span><span class="n">args</span><span
             class="p">,</span> <span class="n">data</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">labels_syn</span><span class="o">.</span><span
-            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span
-            class="o">==</span><span class="n">data</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
+            class="o">==</span> <span class="n">data</span><span class="o">.</span><span
             class="n">labels_train</span><span class="o">.</span><span class="n">shape</span><span
             class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="k">return</span> <span class="n">feat_syn</span><span class="p">,</span> <span class="n">adj_syn</span><span
@@ -192,6 +234,7 @@
             class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span>
+
         <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">sparsify</span><span
             class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span
             class="n">adj_syn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span
@@ -206,11 +249,33 @@
         class="n">model_type</span><span class="p">,</span> <span class="n">param_grid</span><span
         class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span
         class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a grid search over hyperparameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model used for evaluation.</span>
+<span class="sd">        param_grid : dict</span>
+<span class="sd">            A dictionary containing parameter grids for grid search.</span>
+<span class="sd">        reduced : bool, optional, default=True</span>
+<span class="sd">            Whether to use synthetic data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        best_test_result : tuple</span>
+<span class="sd">            Best test result as (mean_accuracy, std_accuracy).</span>
+<span class="sd">        best_params : dict</span>
+<span class="sd">            Best parameters found during grid search.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">best_val_result</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">best_test_result</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">best_params</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="k">for</span> <span class="n">params</span> <span class="ow">in</span> <span
             class="n">tqdm</span><span class="p">(</span><span class="n">ParameterGrid</span><span
             class="p">(</span><span class="n">param_grid</span><span class="p">)):</span>
@@ -236,6 +301,7 @@
             class="o">=</span><span class="s1">&#39;cross&#39;</span><span class="p">)])</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span
             class="o">.</span><span class="n">empty_cache</span><span class="p">()</span>
+
             <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
             class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span><span
             class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">args</span><span
@@ -247,6 +313,7 @@
             class="p">),</span> <span class="n">res</span><span class="o">.</span><span class="n">std</span><span
             class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span
             class="p">)</span>
+
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
             class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span>
@@ -272,6 +339,7 @@
             class="n">res_mean</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span
             class="n">res_std</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">best_params</span> <span class="o">=</span> <span class="n">params</span>
+
         <span class="k">return</span> <span class="n">best_test_result</span><span class="p">,</span> <span class="n">best_params</span></div>
 
 <div class="viewcode-block" id="Evaluator.train_cross"><a class="viewcode-back"
@@ -280,12 +348,23 @@
         class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
         class="n">grid_search</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
         class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Trains models and performs grid search if required.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        grid_search : bool, optional, default=True</span>
+<span class="sd">            Whether to perform grid search over hyperparameters.</span>
+<span class="sd">        reduced : bool, optional, default=True</span>
+<span class="sd">            Whether to use synthetic data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
+
         <span class="k">if</span> <span class="n">grid_search</span><span class="p">:</span>
             <span class="n">gs_params</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="c1"># &#39;MLP&#39;: {&#39;hidden&#39;: [64, 256], &#39;lr&#39;: [0.01, 0.001], &#39;weight_decay&#39;: [0, 5e-4],</span>
-                <span class="c1">#         &#39;dropout&#39;: [0.0, 0.5]},</span>
                 <span class="s1">&#39;GCN&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hidden&#39;</span><span
             class="p">:</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span
             class="mi">256</span><span class="p">],</span> <span class="s1">&#39;lr&#39;</span><span class="p">:</span> <span
@@ -360,7 +439,7 @@
             class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span
             class="p">,</span> <span class="mf">0.7</span><span class="p">]}</span>
             <span class="p">}</span>
-            <span class="c1"># avoid OOM</span>
+
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
             class="ow">in</span> <span class="p">[</span><span class="s1">&#39;reddit&#39;</span><span
             class="p">]:</span>
@@ -368,7 +447,7 @@
             class="p">][</span><span class="s1">&#39;hidden&#39;</span><span class="p">]</span> <span class="o">=</span> <span
             class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">16</span><span
             class="p">]</span>
-                <span class="c1"># args.eval_epochs = 300</span>
+
             <span class="k">for</span> <span class="n">model_type</span> <span class="ow">in</span> <span class="n">gs_params</span><span
             class="p">:</span>
                 <span class="k">if</span> <span class="n">reduced</span><span class="p">:</span>
@@ -444,23 +523,37 @@
         class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span
         class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
         class="s1">&#39;eval&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests a model and returns accuracy and loss.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model to test.</span>
+<span class="sd">        verbose : bool, optional, default=True</span>
+<span class="sd">            Whether to print detailed logs.</span>
+<span class="sd">        reduced : bool, optional, default=True</span>
+<span class="sd">            Whether to use synthetic data.</span>
+<span class="sd">        mode : str, optional, default=&#39;eval&#39;</span>
+<span class="sd">            The mode for the model (e.g., &#39;eval&#39; or &#39;cross&#39;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        best_acc_val : float</span>
+<span class="sd">            Best accuracy on validation set.</span>
+<span class="sd">        acc_test : float</span>
+<span class="sd">            Accuracy on test set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;======= testing </span><span
-            class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">model_type</span><span
-            class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;======= testing </span><span
+            class="si">{</span><span class="n">model_type</span><span class="si">}</span><span
+            class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="c1"># if model_type == &#39;MLP&#39;:</span>
-        <span class="c1">#     data.adj_train = torch.eye(len(data.feat_train))</span>
-        <span class="c1">#     data.adj_full = torch.eye(len(data.feat_full))</span>
-        <span class="c1">#     model_type = &#39;GCN&#39;</span>
-        <span class="c1"># else:</span>
-        <span class="c1"># adj_test = data.adj_test</span>
-        <span class="c1"># adj_full = data.adj_full</span>
-
-        <span class="c1"># assert not (args.method not in [&#39;msgc&#39;] and model_type == &#39;GAT&#39;)</span>
         <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span
             class="n">model_type</span><span class="p">)(</span><span class="n">data</span><span class="o">.</span><span
             class="n">feat_full</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
@@ -468,8 +561,8 @@
             class="n">hidden</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
             class="n">nclass</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span
             class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span><span
-            class="o">.</span><span class="n">to</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">best_acc_val</span> <span class="o">=</span> <span class="n">model</span><span
             class="o">.</span><span class="n">fit_with_val</span><span class="p">(</span><span
             class="n">data</span><span class="p">,</span> <span class="n">train_iters</span><span
@@ -478,9 +571,8 @@
             class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span
             class="p">,</span>
                                           <span class="n">setting</span><span class="o">=</span><span
-            class="n">args</span><span class="o">.</span><span class="n">setting</span><span class="p">,</span>
-                                          <span class="n">reduced</span><span class="o">=</span><span
-            class="n">reduced</span><span class="p">)</span>
+            class="n">args</span><span class="o">.</span><span class="n">setting</span><span class="p">,</span> <span
+            class="n">reduced</span><span class="o">=</span><span class="n">reduced</span><span class="p">)</span>
 
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
         <span class="n">labels_test</span> <span class="o">=</span> <span class="n">data</span><span
@@ -493,6 +585,7 @@
             <span class="n">data</span> <span class="o">=</span> <span class="n">attack</span><span
             class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span
             class="p">)</span>
+
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
             class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;ind&#39;</span><span
             class="p">:</span>
@@ -509,14 +602,15 @@
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span
             class="s2">&quot;Test set results:&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;loss= </span><span class="si">{:.4f}</span><span
-            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
-            class="n">loss_test</span><span class="o">.</span><span class="n">item</span><span class="p">()),</span>
-                      <span class="s2">&quot;accuracy= </span><span class="si">{:.4f}</span><span
-            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
-            class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
+                      <span class="sa">f</span><span class="s2">&quot;loss= </span><span class="si">{</span><span
+            class="n">loss_test</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span
+            class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">,</span>
+                      <span class="sa">f</span><span class="s2">&quot;accuracy= </span><span class="si">{</span><span
+            class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span
+            class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Full graph</span>
             <span class="n">output</span> <span class="o">=</span> <span class="n">model</span><span
             class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
             class="o">.</span><span class="n">feat_full</span><span class="p">,</span> <span class="n">data</span><span
@@ -532,12 +626,14 @@
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span
             class="s2">&quot;Test full set results:&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;loss= </span><span class="si">{:.4f}</span><span
-            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
-            class="n">loss_test</span><span class="o">.</span><span class="n">item</span><span class="p">()),</span>
-                      <span class="s2">&quot;accuracy= </span><span class="si">{:.4f}</span><span
-            class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span
-            class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span class="p">()))</span>
+                      <span class="sa">f</span><span class="s2">&quot;loss= </span><span class="si">{</span><span
+            class="n">loss_test</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span
+            class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">,</span>
+                      <span class="sa">f</span><span class="s2">&quot;accuracy= </span><span class="si">{</span><span
+            class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span
+            class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span
+            class="p">)</span>
 
         <span class="k">return</span> <span class="n">best_acc_val</span><span class="o">.</span><span
             class="n">item</span><span class="p">(),</span> <span class="n">acc_test</span><span class="o">.</span><span
@@ -551,9 +647,33 @@
         class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span
         class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
         class="s1">&#39;eval&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates a model over multiple runs and returns mean and standard deviation of accuracy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model to evaluate.</span>
+<span class="sd">        verbose : bool, optional, default=True</span>
+<span class="sd">            Whether to print detailed logs.</span>
+<span class="sd">        reduced : bool, optional, default=True</span>
+<span class="sd">            Whether to use synthetic data.</span>
+<span class="sd">        mode : str, optional, default=&#39;eval&#39;</span>
+<span class="sd">            The mode for the model (e.g., &#39;eval&#39; or &#39;cross&#39;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mean_acc : float</span>
+<span class="sd">            Mean accuracy over multiple runs.</span>
+<span class="sd">        std_acc : float</span>
+<span class="sd">            Standard deviation of accuracy over multiple runs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
 
+        <span class="c1"># Prepare synthetic data if required</span>
         <span class="k">if</span> <span class="n">reduced</span><span class="p">:</span>
             <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
@@ -565,8 +685,9 @@
                                                                              <span class="n">verbose</span><span
             class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
+        <span class="c1"># Initialize progress bar based on verbosity</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;evaluate reduced data by </span><span
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evaluating reduced data using </span><span
             class="si">{</span><span class="n">model_type</span><span class="si">}</span><span
             class="s1">&#39;</span><span class="p">)</span>
             <span class="n">run_evaluation</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span
@@ -575,6 +696,7 @@
             <span class="n">run_evaluation</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span
             class="n">args</span><span class="o">.</span><span class="n">run_eval</span><span class="p">)</span>
 
+        <span class="c1"># Collect accuracy results from multiple runs</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
             class="n">run_evaluation</span><span class="p">:</span>
@@ -595,9 +717,11 @@
                 <span class="n">run_evaluation</span><span class="o">.</span><span class="n">set_postfix</span><span
             class="p">(</span><span class="n">test_acc</span><span class="o">=</span><span
             class="n">best_acc</span><span class="p">)</span>
+
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
             class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
+        <span class="c1"># Log and return mean and standard deviation of accuracy</span>
         <span class="n">args</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
             class="n">info</span><span class="p">(</span><span class="sa">f</span><span
             class="s1">&#39;Seed:</span><span class="si">{</span><span class="n">args</span><span
@@ -620,9 +744,32 @@
         class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
         class="kc">False</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span
         class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates a model for neural architecture search (NAS) and returns mean and standard deviation of validation accuracy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model to evaluate.</span>
+<span class="sd">        verbose : bool, optional, default=False</span>
+<span class="sd">            Whether to print detailed logs.</span>
+<span class="sd">        reduced : bool, optional, default=None</span>
+<span class="sd">            Whether to use synthetic data.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mean_acc_val : float</span>
+<span class="sd">            Mean validation accuracy over multiple runs.</span>
+<span class="sd">        std_acc_val : float</span>
+<span class="sd">            Standard deviation of validation accuracy over multiple runs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Prepare synthetic data if required</span>
         <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
@@ -631,12 +778,16 @@
             class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
             class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span
             class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Initialize progress bar based on verbosity</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">run_evaluation</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span
             class="n">args</span><span class="o">.</span><span class="n">run_evaluation</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">run_evaluation</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span
             class="n">args</span><span class="o">.</span><span class="n">run_evaluation</span><span class="p">)</span>
+
+        <span class="c1"># Collect validation accuracy results from multiple runs</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
             class="n">run_evaluation</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span
@@ -651,28 +802,27 @@
             class="p">)</span>
             <span class="n">best_acc_val</span> <span class="o">=</span> <span class="n">model</span><span
             class="o">.</span><span class="n">fit_with_val</span><span class="p">(</span><span
-            class="n">data</span><span class="p">,</span>
-                                              <span class="n">train_iters</span><span class="o">=</span><span class="n">args</span><span
-            class="o">.</span><span class="n">eval_epochs</span><span class="p">,</span>
-                                              <span class="n">normadj</span><span class="o">=</span><span class="kc">True</span><span
-            class="p">,</span>
-                                              <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span
+            class="n">data</span><span class="p">,</span> <span class="n">train_iters</span><span
+            class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">eval_epochs</span><span
+            class="p">,</span> <span class="n">normadj</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span
             class="p">,</span>
                                               <span class="n">setting</span><span class="o">=</span><span
-            class="n">args</span><span class="o">.</span><span class="n">setting</span><span class="p">,</span>
-                                              <span class="n">reduced</span><span class="o">=</span><span class="n">reduced</span><span
-            class="p">)</span>
+            class="n">args</span><span class="o">.</span><span class="n">setting</span><span class="p">,</span> <span
+            class="n">reduced</span><span class="o">=</span><span class="n">reduced</span><span class="p">)</span>
             <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
             class="n">best_acc_val</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="n">run_evaluation</span><span class="o">.</span><span class="n">set_postfix</span><span
             class="p">(</span><span class="n">best_acc_val</span><span class="o">=</span><span
             class="n">best_acc_val</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
             class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
 
+        <span class="c1"># Print and return mean and standard deviation of validation accuracy</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Val Mean Accuracy: </span><span
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Validation Mean Accuracy: </span><span
             class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span
             class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">mean</span><span
             class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span
@@ -680,8 +830,184 @@
             class="o">*</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span class="n">std</span><span
             class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span
             class="s1">&#39;</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">mean</span><span
             class="p">(),</span> <span class="n">res</span><span class="o">.</span><span class="n">std</span><span
+            class="p">()</span></div>
+
+<div class="viewcode-block" id="Evaluator.vis"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.vis">[docs]</a>    <span
+        class="k">def</span> <span class="nf">vis</span><span class="p">(</span><span class="n">args</span><span
+        class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args : argparse.Namespace</span>
+<span class="sd">            Command-line arguments and configuration parameters.</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/reduced_graph/</span><span class="si">{</span><span
+            class="n">args</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span
+            class="s1">&#39;</span>
+        <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/feat_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
+            class="p">)</span>
+        <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/label_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
+            class="p">)</span>
+
+        <span class="c1"># Extract features and labels from the dataset</span>
+        <span class="n">labels_train_np</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_train</span><span class="o">.</span><span class="n">cpu</span><span
+            class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">feat_train_np</span> <span class="o">=</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">feat_train</span><span class="o">.</span><span class="n">cpu</span><span
+            class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">labels_syn_np</span> <span class="o">=</span> <span class="n">labels_syn</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+        <span class="n">feat_syn_np</span> <span class="o">=</span> <span class="n">feat_syn</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+
+        <span class="c1"># Separate features based on labels for original and synthetic data</span>
+        <span class="n">data_feat_ori_0</span> <span class="o">=</span> <span class="n">feat_train_np</span><span
+            class="p">[</span><span class="n">labels_train_np</span> <span class="o">==</span> <span class="mi">0</span><span
+            class="p">]</span>
+        <span class="n">data_feat_ori_1</span> <span class="o">=</span> <span class="n">feat_train_np</span><span
+            class="p">[</span><span class="n">labels_train_np</span> <span class="o">==</span> <span class="mi">1</span><span
+            class="p">]</span>
+        <span class="n">data_feat_syn_0</span> <span class="o">=</span> <span class="n">feat_syn_np</span><span
+            class="p">[</span><span class="n">labels_syn_np</span> <span class="o">==</span> <span
+            class="mi">0</span><span class="p">]</span>
+        <span class="n">data_feat_syn_1</span> <span class="o">=</span> <span class="n">feat_syn_np</span><span
+            class="p">[</span><span class="n">labels_syn_np</span> <span class="o">==</span> <span
+            class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Concatenate all features for t-SNE visualization</span>
+        <span class="n">all_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">concatenate</span><span class="p">((</span><span class="n">data_feat_ori_0</span><span
+            class="p">,</span> <span class="n">data_feat_ori_1</span><span class="p">,</span> <span class="n">data_feat_syn_0</span><span
+            class="p">,</span> <span class="n">data_feat_syn_1</span><span class="p">),</span> <span
+            class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">perplexity_value</span> <span class="o">=</span> <span class="nb">min</span><span
+            class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">all_data</span><span class="p">)</span> <span class="o">-</span> <span
+            class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Apply t-SNE to reduce dimensionality</span>
+        <span class="n">tsne</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span
+            class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span
+            class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span
+            class="n">perplexity</span><span class="o">=</span><span class="n">perplexity_value</span><span
+            class="p">)</span>
+        <span class="n">all_data_2d</span> <span class="o">=</span> <span class="n">tsne</span><span
+            class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span
+            class="n">all_data</span><span class="p">)</span>
+
+        <span class="c1"># Separate 2D features based on their original and synthetic labels</span>
+        <span class="n">data_ori_0_2d</span> <span class="o">=</span> <span class="n">all_data_2d</span><span class="p">[:</span><span
+            class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_0</span><span class="p">)]</span>
+        <span class="n">data_ori_1_2d</span> <span class="o">=</span> <span class="n">all_data_2d</span><span class="p">[</span><span
+            class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_0</span><span class="p">):</span><span
+            class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_0</span><span class="p">)</span> <span
+            class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_1</span><span
+            class="p">)]</span>
+        <span class="n">data_syn_0_2d</span> <span class="o">=</span> <span class="n">all_data_2d</span><span class="p">[</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_0</span><span
+            class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span
+            class="n">data_feat_ori_1</span><span class="p">):</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">data_feat_ori_0</span><span class="p">)</span> <span class="o">+</span> <span
+            class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_1</span><span class="p">)</span> <span
+            class="o">+</span> <span class="nb">len</span><span class="p">(</span>
+                            <span class="n">data_feat_syn_0</span><span class="p">)]</span>
+        <span class="n">data_syn_1_2d</span> <span class="o">=</span> <span class="n">all_data_2d</span><span class="p">[</span><span
+            class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_0</span><span class="p">)</span> <span
+            class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_feat_ori_1</span><span
+            class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span
+            class="n">data_feat_syn_0</span><span class="p">):]</span>
+
+        <span class="c1"># Plot t-SNE results</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span
+            class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span
+            class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span
+            class="n">data_ori_0_2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span
+            class="n">data_ori_0_2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span
+            class="n">c</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span
+            class="p">,</span> <span class="n">marker</span><span class="o">=</span><span
+            class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span
+            class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span
+            class="o">=</span><span class="s1">&#39;Original Class 0&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span
+            class="n">data_syn_0_2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span
+            class="n">data_syn_0_2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span
+            class="n">c</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span
+            class="p">,</span> <span class="n">marker</span><span class="o">=</span><span
+            class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">label</span><span
+            class="o">=</span><span class="s1">&#39;Synthetic Class 0&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span
+            class="n">data_ori_1_2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span
+            class="n">data_ori_1_2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span
+            class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span
+            class="p">,</span> <span class="n">marker</span><span class="o">=</span><span
+            class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">alpha</span><span
+            class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span
+            class="o">=</span><span class="s1">&#39;Original Class 1&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span
+            class="n">data_syn_1_2d</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span
+            class="n">data_syn_1_2d</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span
+            class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span
+            class="p">,</span> <span class="n">marker</span><span class="o">=</span><span
+            class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="n">label</span><span
+            class="o">=</span><span class="s1">&#39;Synthetic Class 1&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span
+            class="s1">&#39;t-SNE Visualization of Original and Synthetic Data&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span
+            class="s1">&#39;Feature 1&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span
+            class="s1">&#39;Feature 2&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Save and display the figure</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span
+            class="sa">f</span><span class="s1">&#39;tsne_visualization_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">.pdf&#39;</span><span class="p">,</span> <span class="nb">format</span><span
+            class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved figure to tsne_visualization_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
+            class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s2">.pdf&quot;</span><span
+            class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span
             class="p">()</span></div></div>
 </pre>
                         </div>
@@ -693,7 +1019,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, Melody Group.</p>
+                        <p>&#169; Copyright 2024, Emory Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -15,6 +15,9 @@ from graphslim.models import *
 
 
 class GEOM(GCondBase):
+    """
+    "Navigating Complexity: Toward Lossless Graph Condensation via Expanding Window Matching." https://arxiv.org/pdf/2402.05011.pdf
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(GEOM, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs

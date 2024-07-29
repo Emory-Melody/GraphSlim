@@ -11,8 +11,35 @@ from graphslim.dataset.utils import save_reduced
 
 
 class GCondBase:
+    """
+    A base class for graph condition generation and training.
 
+    Parameters
+    ----------
+    setting : str
+        The setting for the graph condensation process.
+    data : object
+        The data object containing the dataset.
+    args : Namespace
+        Arguments and hyperparameters for the model and training process.
+    **kwargs : keyword arguments
+        Additional arguments for initialization.
+    """
     def __init__(self, setting, data, args, **kwargs):
+        """
+        Initializes a GCondBase instance.
+
+        Parameters
+        ----------
+        setting : str
+            The type of experimental setting.
+        data : object
+            The graph data object, which includes features, adjacency matrix, labels, etc.
+        args : Namespace
+            Arguments object containing hyperparameters for training and model.
+        **kwargs : keyword arguments
+            Additional optional parameters.
+        """
         self.data = data
         self.args = args
         args.epochs -= 1
@@ -42,10 +69,26 @@ class GCondBase:
             print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
 
     def reset_parameters(self):
+        """
+        Resets the parameters of the model.
+        """
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
         self.pge.reset_parameters()
 
     def generate_labels_syn(self, data):
+        """
+        Generates synthetic labels to match the target number of samples.
+
+        Parameters
+        ----------
+        data : object
+            The graph data object, which includes features, adjacency matrix, labels, etc.
+
+        Returns
+        -------
+        np.ndarray
+            A numpy array of synthetic labels.
+        """
         counter = Counter(data.labels_train.tolist())
         num_class_dict = {}
         n = len(data.labels_train)
@@ -71,6 +114,19 @@ class GCondBase:
         return np.array(labels_syn)
 
     def init(self, with_adj=False):
+        """
+        Initializes synthetic features and (optionally) adjacency matrix.
+
+        Parameters
+        ----------
+        with_adj : bool, optional
+            Whether to initialize the adjacency matrix (default is False).
+
+        Returns
+        -------
+        tuple
+            A tuple containing the synthetic features and (optionally) the adjacency matrix.
+        """
         args = self.args
         if args.init == 'clustering':
             agent = Cluster(setting=args.setting, data=self.data, args=args)
@@ -94,6 +150,29 @@ class GCondBase:
             return reduced_data.feat_syn
 
     def train_class(self, model, adj, features, labels, labels_syn, args):
+        """
+        Trains the model and computes the loss.
+
+        Parameters
+        ----------
+        model : torch.nn.Module
+            The model object.
+        adj : torch.Tensor
+            The adjacency matrix.
+        features : torch.Tensor
+            The feature matrix.
+        labels : torch.Tensor
+            The actual labels.
+        labels_syn : torch.Tensor
+            The synthetic labels.
+        args : Namespace
+            Arguments object containing hyperparameters for training and model.
+
+        Returns
+        -------
+        torch.Tensor
+            The computed loss value.
+        """
         data = self.data
         feat_syn = self.feat_syn
         adj_syn_norm = self.adj_syn
@@ -120,10 +199,35 @@ class GCondBase:
     def get_loops(self, args):
         # Get the two hyper-parameters of outer-loop and inner-loop.
         # The following values are empirically good.
+        """
+        Retrieves the outer-loop and inner-loop hyperparameters.
 
+        Parameters
+        ----------
+        args : Namespace
+            Arguments object containing hyperparameters for training and model.
+
+        Returns
+        -------
+        tuple
+            Outer-loop and inner-loop hyperparameters.
+        """
         return args.outer_loop, args.inner_loop
 
     def check_bn(self, model):
+        """
+        Checks if the model contains BatchNorm layers and fixes their mean and variance after training.
+
+        Parameters
+        ----------
+        model : torch.nn.Module
+            The model object.
+
+        Returns
+        -------
+        torch.nn.Module
+            The model with BatchNorm layers fixed.
+        """
         BN_flag = False
         for module in model.modules():
             if 'BatchNorm' in module._get_name():  # BatchNorm
@@ -137,6 +241,23 @@ class GCondBase:
         return model
 
     def intermediate_evaluation(self, best_val, loss_avg, save=True):
+        """
+        Performs intermediate evaluation and saves the best model.
+
+        Parameters
+        ----------
+        best_val : float
+            The best validation accuracy observed so far.
+        loss_avg : float
+            The average loss.
+        save : bool, optional
+            Whether to save the model (default is True).
+
+        Returns
+        -------
+        float
+            The updated best validation accuracy.
+        """
         data = self.data
         args = self.args
         if args.verbose:
@@ -158,6 +279,23 @@ class GCondBase:
         return best_val
 
     def test_with_val(self, verbose=False, setting='trans', iters=200):
+        """
+        Conducts validation testing and returns results.
+
+        Parameters
+        ----------
+        verbose : bool, optional
+            Whether to print verbose output (default is False).
+        setting : str, optional
+            The setting type (default is 'trans').
+        iters : int, optional
+            Number of iterations for validation testing (default is 200).
+
+        Returns
+        -------
+        list
+            A list containing validation results.
+        """
         res = []
 
         args, data, device = self.args, self.data, self.device

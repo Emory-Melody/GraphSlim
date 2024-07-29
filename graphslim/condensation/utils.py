@@ -3,6 +3,25 @@ import torch_geometric
 import math
 
 def match_loss(gw_syn, gw_real, args, device):
+    """
+    Computes the loss between synthetic and real gradients based on the specified distance metric.
+
+    Parameters
+    ----------
+    gw_syn : list of torch.Tensor
+        List of synthetic gradients for different model parameters.
+    gw_real : list of torch.Tensor
+        List of real gradients for different model parameters.
+    args : Namespace
+        Arguments object containing hyperparameters for training and model.
+    device : torch.device
+        Device (CPU or GPU) on which computations are performed.
+
+    Returns
+    -------
+    torch.Tensor
+        The computed distance (loss) between synthetic and real gradients.
+    """
     dis = torch.tensor(0.0).to(device)
 
     if args.dis_metric == 'ours':
@@ -40,6 +59,21 @@ def match_loss(gw_syn, gw_real, args, device):
 
 
 def distance_wb(gwr, gws):
+    """
+    Computes the distance between two tensors representing gradients using cosine similarity.
+
+    Parameters
+    ----------
+    gwr : torch.Tensor
+        The real gradient tensor.
+    gws : torch.Tensor
+        The synthetic gradient tensor.
+
+    Returns
+    -------
+    torch.Tensor
+        The computed distance between the real and synthetic gradients.
+    """
     shape = gwr.shape
 
     if len(gwr.shape) == 2:
@@ -68,7 +102,19 @@ def distance_wb(gwr, gws):
 # GCSNTK utils
 def sub_E(idx, A):
     """
-    output the sparse adjacency matrix of subgraph of idx
+    Generates a sparse adjacency matrix of the subgraph defined by the given indices.
+
+    Parameters
+    ----------
+    idx : torch.Tensor
+        A tensor containing the indices of the nodes that define the subgraph.
+    A : torch.Tensor
+        The original adjacency matrix of the graph.
+
+    Returns
+    -------
+    torch.sparse_coo_tensor
+        The sparse adjacency matrix of the subgraph.
     """
     n = A.shape[0]
     n_neig = len(idx)
@@ -85,10 +131,21 @@ def sub_E(idx, A):
 
 
 def update_E(x_s, neig):
-    '''
-    x_s is the features
-    neig is the average number of the neighbors of each node
-    '''
+    """
+    Update the adjacency matrix based on the features of the nodes and the average number of neighbors.
+
+    Parameters
+    ----------
+    x_s : torch.Tensor
+        A tensor containing the feature vectors of the nodes.
+    neig : float
+        The average number of neighbors each node should have.
+
+    Returns
+    -------
+    torch.sparse_coo_tensor
+        The sparse adjacency matrix based on the updated similarities.
+    """
     n = x_s.shape[0]
     K = torch.empty(n, n)
     A = torch.zeros(n * n)
@@ -120,11 +177,17 @@ def update_E(x_s, neig):
 # utils for GCSNTK
 def normalize_data(data):
     """
-    normalize data
-    parameters:
-        data: torch.Tensor, data need to be normalized
-    return:
-        torch.Tensor, normalized data
+    Normalize the input data using mean and standard deviation.
+
+    Parameters
+    ----------
+    data : torch.Tensor
+        The data to be normalized. Each column represents a feature, and normalization is applied to each feature independently.
+
+    Returns
+    -------
+    torch.Tensor
+        The normalized data where each feature has zero mean and unit variance.
     """
     mean = data.mean(dim=0)
     std = data.std(dim=0)
@@ -135,13 +198,23 @@ def normalize_data(data):
 
 def GCF(adj, x, k=1):
     """
-    Graph convolution filter
-    parameters:
-        adj: torch.Tensor, adjacency matrix, must be self-looped
-        x: torch.Tensor, features
-        k: int, number of hops
-    return:
-        torch.Tensor, filtered features
+    Apply Graph Convolution Filter (GCF) to features using the adjacency matrix.
+
+    Parameters
+    ----------
+    adj : torch.Tensor
+        Adjacency matrix of the graph. It must include self-loops. Shape: (N, N), where N is the number of nodes.
+
+    x : torch.Tensor
+        Node features. Shape: (N, F), where F is the number of features for each node.
+
+    k : int, optional
+        Number of hops (or layers) to apply the filter. Default is 1.
+
+    Returns
+    -------
+    torch.Tensor
+        Filtered features after applying the graph convolution. Shape: (N, F).
     """
     D = torch.sum(adj, dim=1)
     D = torch.pow(D, -0.5)
@@ -155,6 +228,25 @@ def GCF(adj, x, k=1):
 
 # geom
 def neighborhood_difficulty_measurer(data, adj, label):
+    """
+    Measure the difficulty of neighborhoods in the graph based on the label distribution.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph. The shape is (N, N) where N is the number of nodes.
+
+    label : torch.Tensor
+        Tensor containing the label of each node. Shape: (N,)
+
+    Returns
+    -------
+    torch.Tensor
+        Difficulty scores for each node. Higher scores indicate more difficult neighborhoods.
+    """
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
@@ -178,6 +270,25 @@ def neighborhood_difficulty_measurer(data, adj, label):
 
 
 def difficulty_measurer(data, adj, label):
+    """
+    Measure the difficulty of nodes in the graph based on their neighborhood label distribution.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph. The shape is (N, N) where N is the number of nodes.
+
+    label : torch.Tensor
+        Tensor containing the label of each node. Shape: (N,)
+
+    Returns
+    -------
+    torch.Tensor
+        Difficulty scores for each node. Higher scores indicate more difficult nodes.
+    """
     local_difficulty = neighborhood_difficulty_measurer(data, adj, label)
     # global_difficulty = feature_difficulty_measurer(data, label, embedding)
     node_difficulty = local_difficulty
@@ -185,6 +296,25 @@ def difficulty_measurer(data, adj, label):
 
 
 def sort_training_nodes(data, adj, label):
+    """
+    Sort training nodes based on their difficulty measured by neighborhood label distribution.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.
+
+    label : torch.Tensor
+        Tensor containing the label of each node (shape: N,).
+
+    Returns
+    -------
+    numpy.ndarray
+        Indices of the training nodes sorted by their difficulty, from easiest to hardest.
+    """
     node_difficulty = difficulty_measurer(data, adj, label)
     _, indices = torch.sort(node_difficulty)
     indices = indices.cpu().numpy()
@@ -193,6 +323,25 @@ def sort_training_nodes(data, adj, label):
 
 
 def neighborhood_difficulty_measurer_in(data, adj, label):
+    """
+    Measure the difficulty of each node in a graph based on the entropy of neighbor labels.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.
+
+    label : torch.Tensor
+        Tensor containing the label of each node (shape: N,).
+
+    Returns
+    -------
+    torch.Tensor
+        Tensor of local difficulty scores for each node.
+    """
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
@@ -215,6 +364,25 @@ def neighborhood_difficulty_measurer_in(data, adj, label):
 
 
 def difficulty_measurer_in(data, adj, label):
+    """
+    Measure the difficulty of each node in a graph based on local entropy of neighbor labels.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.
+
+    label : torch.Tensor
+        Tensor containing the label of each node (shape: N,).
+
+    Returns
+    -------
+    torch.Tensor
+        Tensor of local difficulty scores for each node.
+    """
     local_difficulty = neighborhood_difficulty_measurer_in(data, adj, label)
     # global_difficulty = feature_difficulty_measurer(data, label, embedding)
     node_difficulty = local_difficulty
@@ -222,12 +390,54 @@ def difficulty_measurer_in(data, adj, label):
 
 
 def sort_training_nodes_in(data, adj, label):
+    """
+    Sort training nodes based on their difficulty scores in ascending order.
+
+    Parameters
+    ----------
+    data : Data
+        PyG Data object containing node features and labels.
+
+    adj : torch.Tensor
+        Sparse adjacency matrix of the graph (shape: N x N) with self-loops.
+
+    label : torch.Tensor
+        Tensor containing the label of each node (shape: N,).
+
+    Returns
+    -------
+    numpy.ndarray
+        Indices of training nodes sorted by difficulty scores.
+    """
     node_difficulty = difficulty_measurer_in(data, adj, label)
     _, indices = torch.sort(node_difficulty)
     indices = indices.cpu().numpy()
     return indices
 
 def training_scheduler(lam, t, T, scheduler='geom'):
+    """
+    Adjust the value of a parameter based on the chosen scheduling strategy.
+
+    Parameters
+    ----------
+    lam : float
+        The initial value or a baseline value for the parameter (0 <= lam <= 1).
+
+    t : int
+        The current training iteration or epoch.
+
+    T : int
+        The total number of training iterations or epochs.
+
+    scheduler : str, optional
+        The type of scheduling strategy to use. Options are 'linear', 'root', or 'geom'.
+        Default is 'geom'.
+
+    Returns
+    -------
+    float
+        The adjusted value of the parameter at iteration `t` based on the scheduling strategy.
+    """
     if scheduler == 'linear':
         return min(1, lam + (1 - lam) * t / T)
     elif scheduler == 'root':

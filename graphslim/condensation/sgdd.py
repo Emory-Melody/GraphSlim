@@ -12,6 +12,9 @@ from tqdm import trange
 
 
 class SGDD(GCondBase):
+    """
+    "Does Graph Distillation See Like Vision Dataset Counterpart?" https://openreview.net/pdf?id=VqIWgUVsXc
+    """
     def __init__(self, setting, data, args, **kwargs):
         super(SGDD, self).__init__(setting, data, args, **kwargs)
 
