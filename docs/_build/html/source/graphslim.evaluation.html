@@ -11,7 +11,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -23,6 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html"/>
     <link rel="search" title="Search" href="../search.html"/>
+    <link href="graphslim.sparsification.html" rel="prev" title="graphslim.sparsification package"/>
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,6 +54,11 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
                 </ul>
+                <p class="caption" role="heading"><span class="caption-text">Dataset</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.dataset.html">graphslim.dataset
+                        package</a></li>
+                </ul>
                 <p class="caption" role="heading"><span class="caption-text">Models</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
@@ -66,6 +72,140 @@
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
                         package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="current reference internal" href="#">graphslim.evaluation
+                        package</a>
+                        <ul>
+                            <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.evaluation.eval_agent">graphslim.evaluation.eval_agent
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.eval_agent.Evaluator"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">Evaluator</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.evaluate"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.evaluate()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.get_syn_data"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.get_syn_data()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.grid_search"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.grid_search()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.nas_evaluate"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.nas_evaluate()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.reset_parameters"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.reset_parameters()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.test"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.test()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.eval_agent.Evaluator.train_cross"><code
+                                                    class="docutils literal notranslate"><span class="pre">Evaluator.train_cross()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.evaluation.nas_eval">graphslim.evaluation.nas_eval
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.nas_eval.NasEvaluator"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">NasEvaluator</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.cal_pearson"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.cal_pearson()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_ori"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.evaluate_ori()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.evaluate_syn"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.evaluate_syn()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.get_rank"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.get_rank()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_ori"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.test_params_ori()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.evaluation.nas_eval.NasEvaluator.test_params_syn"><code
+                                                    class="docutils literal notranslate"><span class="pre">NasEvaluator.test_params_syn()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.nas_eval.load_csv"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">load_csv()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.nas_eval.load_pkl"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">load_pkl()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.nas_eval.save_csv"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">save_csv()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.nas_eval.save_pkl"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">save_pkl()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.evaluation.utils">graphslim.evaluation.utils
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.utils.calc_f1"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">calc_f1()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.utils.evaluate"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">evaluate()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.utils.getsize_mb"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">getsize_mb()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.utils.sparsify"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">sparsify()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.evaluation.utils.verbose_time_memory"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">verbose_time_memory()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.evaluation.vis">graphslim.evaluation.vis
+                                module</a></li>
+                            <li class="toctree-l2"><a class="reference internal" href="#module-graphslim.evaluation">Module
+                                contents</a></li>
+                        </ul>
+                    </li>
                 </ul>
 
             </div>
@@ -110,6 +250,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.eval_agent.Evaluator">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.evaluation.eval_agent.</span></span><span
                                             class="sig-name descname"><span class="pre">Evaluator</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">args</span></span></em>, <em class="sig-param"><span
@@ -300,6 +441,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.NasEvaluator">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
                                             class="sig-name descname"><span class="pre">NasEvaluator</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">args</span></span></em><span class="sig-paren">)</span><a
@@ -407,7 +549,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_csv">
-                                        <span class="sig-name descname"><span class="pre">load_csv</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
+                                            class="sig-name descname"><span class="pre">load_csv</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -420,7 +563,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.load_pkl">
-                                        <span class="sig-name descname"><span class="pre">load_pkl</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
+                                            class="sig-name descname"><span class="pre">load_pkl</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">file_path</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -433,7 +577,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_csv">
-                                        <span class="sig-name descname"><span class="pre">save_csv</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
+                                            class="sig-name descname"><span class="pre">save_csv</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">file_path</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">num</span></span></em><span
@@ -447,7 +592,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.nas_eval.save_pkl">
-                                        <span class="sig-name descname"><span class="pre">save_pkl</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.nas_eval.</span></span><span
+                                            class="sig-name descname"><span class="pre">save_pkl</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">file_path</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">data</span></span></em><span
@@ -467,7 +613,8 @@
                                                                         title="Permalink to this heading"></a></h2>
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.utils.calc_f1">
-                                        <span class="sig-name descname"><span class="pre">calc_f1</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">calc_f1</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">y_true</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">y_pred</span></span></em>, <em
@@ -482,7 +629,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.utils.evaluate">
-                                        <span class="sig-name descname"><span class="pre">evaluate</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">evaluate</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">output</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">labels</span></span></em>, <em
@@ -498,7 +646,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.utils.getsize_mb">
-                                        <span class="sig-name descname"><span class="pre">getsize_mb</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">getsize_mb</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">elements</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -506,12 +655,41 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.evaluation.utils.getsize_mb"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>Calculate the total size of a list of elements in megabytes.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p><strong>elements</strong> (<em>list</em>) – List of
+                                                elements to calculate the size for. The elements can be SparseTensor,
+                                                csr_matrix, or tensors.</p>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>size</strong> – Total size of all elements
+                                                in the list in megabytes.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>float</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="n">elements</span> <span
+                                                    class="o">=</span> <span class="p">[</span><span
+                                                    class="n">tensor1</span><span class="p">,</span> <span class="n">sparse_tensor</span><span
+                                                    class="p">,</span> <span class="n">csr_matrix</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">getsize_mb</span><span class="p">(</span><span
+                                                        class="n">elements</span><span class="p">)</span>
+<span class="go">12.34</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
                                 </dl>
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.utils.sparsify">
-                                        <span class="sig-name descname"><span class="pre">sparsify</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">sparsify</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">model_type</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">adj_syn</span></span></em>, <em
@@ -530,8 +708,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.evaluation.utils.verbose_time_memory">
-                                        <span class="sig-name descname"><span
-                                                class="pre">verbose_time_memory</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.evaluation.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">verbose_time_memory</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">func</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -560,6 +739,11 @@
                     </div>
                 </div>
                 <footer>
+                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+                        <a accesskey="p" class="btn btn-neutral float-left"
+                           href="graphslim.sparsification.html" rel="prev" title="graphslim.sparsification package"><span
+                                aria-hidden="true" class="fa fa-arrow-circle-left"></span> Previous</a>
+                    </div>
 
                     <hr/>
 

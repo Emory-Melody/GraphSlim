@@ -48,6 +48,25 @@ def sparsify(model_type, adj_syn, args, verbose=False):
 
 
 def getsize_mb(elements):
+    """
+    Calculate the total size of a list of elements in megabytes.
+
+    Parameters
+    ----------
+    elements : list
+        List of elements to calculate the size for. The elements can be SparseTensor, csr_matrix, or tensors.
+
+    Returns
+    -------
+    size : float
+        Total size of all elements in the list in megabytes.
+
+    Examples
+    --------
+    >>> elements = [tensor1, sparse_tensor, csr_matrix]
+    >>> getsize_mb(elements)
+    12.34
+    """
     size = 0
     for e in elements:
         if type(e) == SparseTensor:

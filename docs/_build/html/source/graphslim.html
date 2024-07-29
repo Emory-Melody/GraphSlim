@@ -53,6 +53,11 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
                 </ul>
+                <p class="caption" role="heading"><span class="caption-text">Dataset</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.dataset.html">graphslim.dataset
+                        package</a></li>
+                </ul>
                 <p class="caption" role="heading"><span class="caption-text">Models</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
@@ -65,6 +70,11 @@
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.evaluation.html">graphslim.evaluation
                         package</a></li>
                 </ul>
 
@@ -2164,11 +2174,12 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.configs.Obj">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
-                                            class="sig-name descname"><span class="pre">Obj</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
-                                            class="pre">dict_</span></span></em><span class="sig-paren">)</span><a
-                                            class="reference internal"
-                                            href="../_modules/graphslim/configs.html#Obj"><span
+                                            class="sig-prename descclassname"><span
+                                            class="pre">graphslim.configs.</span></span><span class="sig-name descname"><span
+                                            class="pre">Obj</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">dict_</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/configs.html#Obj"><span
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.configs.Obj"
                                             title="Permalink to this definition"></a></dt>
@@ -2179,7 +2190,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.configs.dict2obj">
-                                        <span class="sig-name descname"><span class="pre">dict2obj</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span class="pre">dict2obj</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">d</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2192,8 +2205,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.configs.method_config">
-                                        <span class="sig-name descname"><span
-                                                class="pre">method_config</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span class="pre">method_config</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">args</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2206,8 +2220,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.configs.setting_config">
-                                        <span class="sig-name descname"><span
-                                                class="pre">setting_config</span></span><span class="sig-paren">(</span><em
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">setting_config</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span
                                             class="pre">args</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2220,7 +2236,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.configs.update_from_dict">
-                                        <span class="sig-name descname"><span class="pre">update_from_dict</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.configs.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">update_from_dict</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">obj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">updates</span></span></em><span
@@ -2244,7 +2263,9 @@
                                                              title="Permalink to this heading"></a></h2>
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.accuracy">
-                                        <span class="sig-name descname"><span class="pre">accuracy</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">accuracy</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">output</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">labels</span></span></em><span
@@ -2276,8 +2297,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.add_feature_noise">
-                                        <span class="sig-name descname"><span
-                                                class="pre">add_feature_noise</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_feature_noise</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">noise_ratio</span></span></em>, <em
@@ -2293,7 +2316,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.add_feature_noise_test">
-                                        <span class="sig-name descname"><span class="pre">add_feature_noise_test</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_feature_noise_test</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">noise_ratio</span></span></em>, <em
@@ -2309,7 +2335,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.add_mask">
-                                        <span class="sig-name descname"><span class="pre">add_mask</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">add_mask</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">dataset</span></span></em><span
@@ -2324,8 +2352,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.add_self_loops">
-                                        <span class="sig-name descname"><span
-                                                class="pre">add_self_loops</span></span><span class="sig-paren">(</span><em
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">add_self_loops</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em>,
                                         <em class="sig-param"><span class="n"><span
                                                 class="pre">edge_weight</span></span><span class="o"><span
@@ -2346,7 +2376,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.calc">
-                                        <span class="sig-name descname"><span class="pre">calc</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">calc</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">gntk</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">feat1</span></span></em>, <em class="sig-param"><span
@@ -2366,7 +2398,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.check_type">
-                                        <span class="sig-name descname"><span class="pre">check_type</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">check_type</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">var</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">device</span></span></em><span
@@ -2380,8 +2414,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.classification_margin">
-                                        <span class="sig-name descname"><span
-                                                class="pre">classification_margin</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">classification_margin</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">output</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">true_label</span></span></em><span
@@ -2414,8 +2450,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.compute_alpha">
-                                        <span class="sig-name descname"><span
-                                                class="pre">compute_alpha</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">compute_alpha</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">n</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">sum_log_degrees</span></span></em>, <em
@@ -2430,7 +2467,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.compute_log_likelihood">
-                                        <span class="sig-name descname"><span class="pre">compute_log_likelihood</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">compute_log_likelihood</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">n</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span
@@ -2446,8 +2486,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_adj">
-                                        <span class="sig-name descname"><span
-                                                class="pre">degree_normalize_adj</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_adj</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mx</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2461,8 +2503,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_adj_tensor">
-                                        <span class="sig-name descname"><span
-                                                class="pre">degree_normalize_adj_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_adj_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">sparse</span></span><span class="o"><span
@@ -2478,8 +2522,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.degree_normalize_sparse_tensor">
-                                        <span class="sig-name descname"><span
-                                                class="pre">degree_normalize_sparse_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_normalize_sparse_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">fill_value</span></span><span class="o"><span
@@ -2496,8 +2542,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.degree_sequence_log_likelihood">
-                                        <span class="sig-name descname"><span
-                                                class="pre">degree_sequence_log_likelihood</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">degree_sequence_log_likelihood</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">degree_sequence</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">d_min</span></span></em><span class="sig-paren">)</span><a
@@ -2513,8 +2561,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.dense_gcn_norm">
-                                        <span class="sig-name descname"><span
-                                                class="pre">dense_gcn_norm</span></span><span class="sig-paren">(</span><em
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">dense_gcn_norm</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span class="pre">adj</span></span></em>,
                                         <em class="sig-param"><span class="n"><span
                                                 class="pre">device</span></span></em><span class="sig-paren">)</span><a
@@ -2528,8 +2578,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.encode_onehot">
-                                        <span class="sig-name descname"><span
-                                                class="pre">encode_onehot</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">encode_onehot</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">labels</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2555,8 +2606,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.feature_smoothing">
-                                        <span class="sig-name descname"><span
-                                                class="pre">feature_smoothing</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">feature_smoothing</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">X</span></span></em><span
@@ -2570,8 +2623,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_degree_squence">
-                                        <span class="sig-name descname"><span
-                                                class="pre">get_degree_squence</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_degree_squence</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2584,7 +2638,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_perf">
-                                        <span class="sig-name descname"><span class="pre">get_perf</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_perf</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">output</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">labels</span></span></em>, <em
@@ -2603,8 +2659,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_splits_each_class">
-                                        <span class="sig-name descname"><span
-                                                class="pre">get_splits_each_class</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_splits_each_class</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">labels</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">train_size</span></span></em><span
@@ -2619,8 +2677,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_train_test">
-                                        <span class="sig-name descname"><span
-                                                class="pre">get_train_test</span></span><span class="sig-paren">(</span><em
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_train_test</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span
                                             class="pre">nnodes</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">test_size</span></span><span class="o"><span
@@ -2666,8 +2726,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_train_test_labelrate">
-                                        <span class="sig-name descname"><span
-                                                class="pre">get_train_test_labelrate</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_train_test_labelrate</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">labels</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">label_rate</span></span></em><span
@@ -2682,8 +2743,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_train_val_test">
-                                        <span class="sig-name descname"><span
-                                                class="pre">get_train_val_test</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_train_val_test</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">nnodes</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">val_size</span></span><span class="o"><span
@@ -2735,7 +2797,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.get_train_val_test_gcn">
-                                        <span class="sig-name descname"><span class="pre">get_train_val_test_gcn</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_train_val_test_gcn</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">labels</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">seed</span></span><span class="o"><span
@@ -2775,8 +2840,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.index_to_mask">
-                                        <span class="sig-name descname"><span
-                                                class="pre">index_to_mask</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">index_to_mask</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
                                             class="pre">size</span></span></em><span class="sig-paren">)</span><a
@@ -2790,7 +2856,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.is_identity">
-                                        <span class="sig-name descname"><span class="pre">is_identity</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">is_identity</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mx</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">device</span></span></em><span
@@ -2804,7 +2872,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.is_sparse_tensor">
-                                        <span class="sig-name descname"><span class="pre">is_sparse_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">is_sparse_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">tensor</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2830,7 +2901,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.loss_acc">
-                                        <span class="sig-name descname"><span class="pre">loss_acc</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">loss_acc</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">output</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">labels</span></span></em>, <em
@@ -2848,7 +2921,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.loss_acc_fn_eval">
-                                        <span class="sig-name descname"><span class="pre">loss_acc_fn_eval</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">loss_acc_fn_eval</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">k_ss</span></span></em>, <em
@@ -2868,8 +2944,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.mask_to_index">
-                                        <span class="sig-name descname"><span
-                                                class="pre">mask_to_index</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">mask_to_index</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
                                             class="pre">size</span></span></em><span class="sig-paren">)</span><a
@@ -2883,7 +2960,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.maxdegree">
-                                        <span class="sig-name descname"><span class="pre">maxdegree</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">maxdegree</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2896,8 +2975,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.normalize_adj">
-                                        <span class="sig-name descname"><span
-                                                class="pre">normalize_adj</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">normalize_adj</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">device</span></span><span class="o"><span
@@ -2912,7 +2992,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.normalize_adj_sgformer">
-                                        <span class="sig-name descname"><span class="pre">normalize_adj_sgformer</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_adj_sgformer</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2931,8 +3014,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.normalize_adj_tensor">
-                                        <span class="sig-name descname"><span
-                                                class="pre">normalize_adj_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_adj_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">sparse</span></span><span class="o"><span
@@ -2948,8 +3033,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.normalize_feature">
-                                        <span class="sig-name descname"><span
-                                                class="pre">normalize_feature</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_feature</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mx</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -2976,7 +3063,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.normalize_sparse_tensor">
-                                        <span class="sig-name descname"><span class="pre">normalize_sparse_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">normalize_sparse_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">fill_value</span></span><span class="o"><span
@@ -2993,7 +3083,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.one_hot">
-                                        <span class="sig-name descname"><span class="pre">one_hot</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">one_hot</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">x</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">class_count</span></span></em><span
@@ -3007,8 +3099,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.one_hot_sfgc">
-                                        <span class="sig-name descname"><span
-                                                class="pre">one_hot_sfgc</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">one_hot_sfgc</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">x</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">num_classes</span></span></em>, <em
@@ -3025,7 +3118,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.ravel_multiple_indices">
-                                        <span class="sig-name descname"><span class="pre">ravel_multiple_indices</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">ravel_multiple_indices</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">ixs</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span
@@ -3058,8 +3154,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.regularization">
-                                        <span class="sig-name descname"><span
-                                                class="pre">regularization</span></span><span class="sig-paren">(</span><em
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">regularization</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span class="pre">adj</span></span></em>,
                                         <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>,
                                         <em class="sig-param"><span class="n"><span
@@ -3076,7 +3174,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.reshape_mx">
-                                        <span class="sig-name descname"><span class="pre">reshape_mx</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">reshape_mx</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mx</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">shape</span></span></em><span class="sig-paren">)</span><a
@@ -3090,8 +3190,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.row_normalize_tensor">
-                                        <span class="sig-name descname"><span
-                                                class="pre">row_normalize_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">row_normalize_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mx</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -3104,9 +3206,11 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.seed_everything">
-                                        <span class="sig-name descname"><span
-                                                class="pre">seed_everything</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">seed_everything</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
                                             class="pre">seed</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
                                             href="../_modules/graphslim/utils.html#seed_everything"><span
@@ -3118,9 +3222,11 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.sparse_gcn_norm">
-                                        <span class="sig-name descname"><span
-                                                class="pre">sparse_gcn_norm</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">sparse_gcn_norm</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
                                             href="../_modules/graphslim/utils.html#sparse_gcn_norm"><span
@@ -3132,7 +3238,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.sparse_mx_to_torch_sparse_tensor">
-                                        <span class="sig-name descname"><span class="pre">sparse_mx_to_torch_sparse_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">sparse_mx_to_torch_sparse_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">sparse_mx</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -3146,7 +3255,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.sparsity">
-                                        <span class="sig-name descname"><span class="pre">sparsity</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">sparsity</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal" href="../_modules/graphslim/utils.html#sparsity"><span
@@ -3158,7 +3269,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.sparsity2">
-                                        <span class="sig-name descname"><span class="pre">sparsity2</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">sparsity2</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -3171,8 +3284,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.tensor2onehot">
-                                        <span class="sig-name descname"><span
-                                                class="pre">tensor2onehot</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">tensor2onehot</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">labels</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -3198,8 +3312,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.to_camel_case">
-                                        <span class="sig-name descname"><span
-                                                class="pre">to_camel_case</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_camel_case</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">snake_str</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -3212,7 +3327,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.to_scipy">
-                                        <span class="sig-name descname"><span class="pre">to_scipy</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_scipy</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">tensor</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal" href="../_modules/graphslim/utils.html#to_scipy"><span
@@ -3225,7 +3342,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.to_tensor">
-                                        <span class="sig-name descname"><span class="pre">to_tensor</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">to_tensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="o"><span
                                             class="pre">*</span></span><span class="n"><span
                                             class="pre">vars</span></span></em>, <em class="sig-param"><span
@@ -3241,8 +3360,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.unravel_index">
-                                        <span class="sig-name descname"><span
-                                                class="pre">unravel_index</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">unravel_index</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
                                             class="pre">array_shape</span></span></em><span class="sig-paren">)</span><a
@@ -3256,7 +3376,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.utils.update_sum_log_degrees">
-                                        <span class="sig-name descname"><span class="pre">update_sum_log_degrees</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">update_sum_log_degrees</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">sum_log_degrees_before</span></span></em>, <em
                                             class="sig-param"><span class="n"><span class="pre">n_old</span></span></em>,
@@ -3274,7 +3397,9 @@
                                 <dl class="py function">
                                     <dt class="sig sig-object py"
                                         id="graphslim.utils.updated_log_likelihood_for_edge_changes">
-                                        <span class="sig-name descname"><span class="pre">updated_log_likelihood_for_edge_changes</span></span><span
+                                        <span class="sig-prename descclassname"><span
+                                                class="pre">graphslim.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">updated_log_likelihood_for_edge_changes</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">node_pairs</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">adjacency_matrix</span></span></em>, <em

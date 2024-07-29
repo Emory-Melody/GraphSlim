@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -42,6 +42,21 @@
                 </div>
             </div>
             <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+                <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../installation.html">Installation</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Quickstart</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
+                    </li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Dataset</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.dataset.html">graphslim.dataset
+                        package</a></li>
+                </ul>
                 <p class="caption" role="heading"><span class="caption-text">Models</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
@@ -57,6 +72,12 @@
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.evaluation.html">graphslim.evaluation
                         package</a></li>
                 </ul>
 
@@ -98,6 +119,28 @@
                                                href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.index2mask">[docs]</a><span
         class="k">def</span> <span class="nf">index2mask</span><span class="p">(</span><span class="n">index</span><span
         class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert an index list to a boolean mask.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    index : list or tensor</span>
+<span class="sd">        List or tensor of indices to be set to True.</span>
+<span class="sd">    size : int or tuple of int</span>
+<span class="sd">        Shape of the mask. If an integer, the mask is 1-dimensional.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mask : tensor</span>
+<span class="sd">        A boolean tensor of the specified size, with True at the given `index` positions and False elsewhere.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; index = [0, 2, 4]</span>
+<span class="sd">    &gt;&gt;&gt; size = 5</span>
+<span class="sd">    &gt;&gt;&gt; index2mask(index, size)</span>
+<span class="sd">    tensor([True, False, True, False, True], dtype=torch.bool)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
             class="n">zeros</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span
             class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span
@@ -683,7 +726,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

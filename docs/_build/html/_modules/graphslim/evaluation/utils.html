@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -52,6 +52,11 @@
                     <li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quick Start</a>
                     </li>
                 </ul>
+                <p class="caption" role="heading"><span class="caption-text">Dataset</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.dataset.html">graphslim.dataset
+                        package</a></li>
+                </ul>
                 <p class="caption" role="heading"><span class="caption-text">Models</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../../../source/graphslim.models.html">graphslim.models
@@ -67,6 +72,12 @@
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal"
                                               href="../../../source/graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal"
+                                              href="../../../source/graphslim.evaluation.html">graphslim.evaluation
                         package</a></li>
                 </ul>
 
@@ -192,6 +203,25 @@
                                                href="../../../source/graphslim.evaluation.html#graphslim.evaluation.utils.getsize_mb">[docs]</a><span
         class="k">def</span> <span class="nf">getsize_mb</span><span class="p">(</span><span
         class="n">elements</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the total size of a list of elements in megabytes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    elements : list</span>
+<span class="sd">        List of elements to calculate the size for. The elements can be SparseTensor, csr_matrix, or tensors.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    size : float</span>
+<span class="sd">        Total size of all elements in the list in megabytes.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; elements = [tensor1, sparse_tensor, csr_matrix]</span>
+<span class="sd">    &gt;&gt;&gt; getsize_mb(elements)</span>
+<span class="sd">    12.34</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">size</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elements</span><span
             class="p">:</span>
@@ -437,7 +467,7 @@
                     <hr/>
 
                     <div role="contentinfo">
-                        <p>&#169; Copyright 2024, rockcor.</p>
+                        <p>&#169; Copyright 2024, Melody Group.</p>
                     </div>
 
                     Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -5,6 +5,28 @@ import logging
 
 
 def index2mask(index, size):
+    """
+    Convert an index list to a boolean mask.
+
+    Parameters
+    ----------
+    index : list or tensor
+        List or tensor of indices to be set to True.
+    size : int or tuple of int
+        Shape of the mask. If an integer, the mask is 1-dimensional.
+
+    Returns
+    -------
+    mask : tensor
+        A boolean tensor of the specified size, with True at the given `index` positions and False elsewhere.
+
+    Examples
+    --------
+    >>> index = [0, 2, 4]
+    >>> size = 5
+    >>> index2mask(index, size)
+    tensor([True, False, True, False, True], dtype=torch.bool)
+    """
     mask = torch.zeros(size, dtype=torch.bool)
     mask[index] = 1
     return mask

@@ -18,11 +18,12 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
 .. toctree::
    :maxdepth: 1
    :caption: Dataset
+
    source/graphslim.dataset
 
 .. toctree::
    :maxdepth: 1
-   :caption: Models
+   :caption: Model
 
    source/graphslim.models
 
@@ -37,5 +38,6 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
 .. toctree::
    :maxdepth: 1
    :caption: Evaluation
+
    source/graphslim.evaluation
 

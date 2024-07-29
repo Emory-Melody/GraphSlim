@@ -11,7 +11,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -23,6 +23,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html"/>
     <link rel="search" title="Search" href="../search.html"/>
+    <link href="graphslim.models.html" rel="next" title="graphslim.models package"/>
+    <link href="../quickstart.html" rel="prev" title="Quick Start"/>
 </head>
 
 <body class="wy-body-for-nav">
@@ -53,6 +55,168 @@
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="../quickstart.html">Quick Start</a></li>
                 </ul>
+                <p class="caption" role="heading"><span class="caption-text">Dataset</span></p>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="current reference internal" href="#">graphslim.dataset
+                        package</a>
+                        <ul>
+                            <li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.dataset.attack">graphslim.dataset.attack
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.attack.attack"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">attack()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.dataset.convertor">graphslim.dataset.convertor
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.csr2ei"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">csr2ei()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.dense2sparsetensor"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">dense2sparsetensor()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.ei2csr"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">ei2csr()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.loadSparseGraph"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">loadSparseGraph()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.networkit_to_pyg"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">networkit_to_pyg()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.pyg2gsp"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">pyg2gsp()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.convertor.pyg_to_networkit"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">pyg_to_networkit()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal"
+                                                      href="#module-graphslim.dataset.loader">graphslim.dataset.loader
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.loader.DataGraphSAINT"><code
+                                            class="docutils literal notranslate"><span class="pre">DataGraphSAINT</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.DataGraphSAINT.get"><code
+                                                    class="docutils literal notranslate"><span class="pre">DataGraphSAINT.get()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.DataGraphSAINT.process_labels"><code
+                                                    class="docutils literal notranslate"><span class="pre">DataGraphSAINT.process_labels()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.loader.LargeDataLoader"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">LargeDataLoader</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.GCF"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.GCF()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.get_batch"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.get_batch()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.getitem"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.getitem()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.normalize_data"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.normalize_data()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.properties"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.properties()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.LargeDataLoader.split_batch"><code
+                                                    class="docutils literal notranslate"><span class="pre">LargeDataLoader.split_batch()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.loader.OgbDataLoader"><code
+                                            class="docutils literal notranslate"><span class="pre">OgbDataLoader</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.loader.TransAndInd"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">TransAndInd</span></code></a>
+                                        <ul>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.TransAndInd.pyg_saint"><code
+                                                    class="docutils literal notranslate"><span class="pre">TransAndInd.pyg_saint()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.TransAndInd.reset"><code
+                                                    class="docutils literal notranslate"><span class="pre">TransAndInd.reset()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.TransAndInd.retrieve_class"><code
+                                                    class="docutils literal notranslate"><span class="pre">TransAndInd.retrieve_class()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.TransAndInd.retrieve_class_sampler"><code
+                                                    class="docutils literal notranslate"><span class="pre">TransAndInd.retrieve_class_sampler()</span></code></a>
+                                            </li>
+                                            <li class="toctree-l4"><a class="reference internal"
+                                                                      href="#graphslim.dataset.loader.TransAndInd.to"><code
+                                                    class="docutils literal notranslate"><span class="pre">TransAndInd.to()</span></code></a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.loader.get_dataset"><code
+                                            class="docutils literal notranslate"><span class="pre">get_dataset()</span></code></a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal" href="#module-graphslim.dataset.utils">graphslim.dataset.utils
+                                module</a>
+                                <ul>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.utils.index2mask"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">index2mask()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.utils.load_reduced"><code
+                                            class="docutils literal notranslate"><span class="pre">load_reduced()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.utils.save_reduced"><code
+                                            class="docutils literal notranslate"><span class="pre">save_reduced()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.dataset.utils.splits"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">splits()</span></code></a></li>
+                                </ul>
+                            </li>
+                            <li class="toctree-l2"><a class="reference internal" href="#module-graphslim.dataset">Module
+                                contents</a></li>
+                        </ul>
+                    </li>
+                </ul>
                 <p class="caption" role="heading"><span class="caption-text">Models</span></p>
                 <ul>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.models.html">graphslim.models
@@ -65,6 +229,11 @@
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.condensation.html">graphslim.condensation
                         package</a></li>
                     <li class="toctree-l1"><a class="reference internal" href="graphslim.sparsification.html">graphslim.sparsification
+                        package</a></li>
+                </ul>
+                <p class="caption" role="heading"><span class="caption-text">Evaluation</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="graphslim.evaluation.html">graphslim.evaluation
                         package</a></li>
                 </ul>
 
@@ -107,7 +276,8 @@
                                                                       title="Permalink to this heading"></a></h2>
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.attack.attack">
-                                        <span class="sig-name descname"><span class="pre">attack</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.attack.</span></span><span
+                                            class="sig-name descname"><span class="pre">attack</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">args</span></span></em><span
@@ -127,7 +297,8 @@
                                                                          title="Permalink to this heading"></a></h2>
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.csr2ei">
-                                        <span class="sig-name descname"><span class="pre">csr2ei</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span class="pre">csr2ei</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adjacency_matrix_csr</span></span></em><span
                                             class="sig-paren">)</span><a class="reference internal"
@@ -140,8 +311,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.dense2sparsetensor">
-                                        <span class="sig-name descname"><span
-                                                class="pre">dense2sparsetensor</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span class="pre">dense2sparsetensor</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">mat</span></span><span class="p"><span
                                             class="pre">:</span></span><span class="w"> </span><span class="n"><span
@@ -161,7 +332,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.ei2csr">
-                                        <span class="sig-name descname"><span class="pre">ei2csr</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span class="pre">ei2csr</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">edge_index</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">num_nodes</span></span></em><span
@@ -175,9 +347,10 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.loadSparseGraph">
-                                        <span class="sig-name descname"><span
-                                                class="pre">loadSparseGraph</span></span><span
-                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">loadSparseGraph</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span
                                             class="pre">dataset_name</span></span></em><span
                                             class="sig-paren">)</span><a class="reference internal"
                                                                          href="../_modules/graphslim/dataset/convertor.html#loadSparseGraph"><span
@@ -218,7 +391,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.networkit_to_pyg">
-                                        <span class="sig-name descname"><span class="pre">networkit_to_pyg</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">networkit_to_pyg</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">graph</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -231,7 +406,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.pyg2gsp">
-                                        <span class="sig-name descname"><span class="pre">pyg2gsp</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span class="pre">pyg2gsp</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">edge_index</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -244,7 +420,9 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.convertor.pyg_to_networkit">
-                                        <span class="sig-name descname"><span class="pre">pyg_to_networkit</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.convertor.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">pyg_to_networkit</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">pyg_graph</span></span></em><span class="sig-paren">)</span><a
                                             class="reference internal"
@@ -264,6 +442,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.dataset.loader.DataGraphSAINT">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.dataset.loader.</span></span><span
                                             class="sig-name descname"><span
                                             class="pre">DataGraphSAINT</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="n"><span class="pre">root</span></span></em>,
@@ -316,6 +495,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.dataset.loader.LargeDataLoader">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.dataset.loader.</span></span><span
                                             class="sig-name descname"><span
                                             class="pre">LargeDataLoader</span></span><span class="sig-paren">(</span><em
                                             class="sig-param"><span class="o"><span class="pre">*</span></span><span
@@ -456,6 +636,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.dataset.loader.OgbDataLoader">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.dataset.loader.</span></span><span
                                             class="sig-name descname"><span class="pre">OgbDataLoader</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="o"><span
                                             class="pre">*</span></span><span class="n"><span
@@ -479,6 +660,7 @@
                                 <dl class="py class">
                                     <dt class="sig sig-object py" id="graphslim.dataset.loader.TransAndInd">
                                         <em class="property"><span class="pre">class</span><span class="w"> </span></em><span
+                                            class="sig-prename descclassname"><span class="pre">graphslim.dataset.loader.</span></span><span
                                             class="sig-name descname"><span class="pre">TransAndInd</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
@@ -585,7 +767,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.loader.get_dataset">
-                                        <span class="sig-name descname"><span class="pre">get_dataset</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.loader.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_dataset</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">name</span></span><span class="o"><span
                                             class="pre">=</span></span><span class="default_value"><span class="pre">'cora'</span></span></em>,
@@ -608,7 +791,8 @@
                                                                      title="Permalink to this heading"></a></h2>
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.utils.index2mask">
-                                        <span class="sig-name descname"><span class="pre">index2mask</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">index2mask</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span
                                             class="pre">size</span></span></em><span class="sig-paren">)</span><a
@@ -617,13 +801,50 @@
                                             class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                             class="headerlink" href="#graphslim.dataset.utils.index2mask"
                                             title="Permalink to this definition"></a></dt>
-                                    <dd></dd>
+                                    <dd><p>Convert an index list to a boolean mask.</p>
+                                        <dl class="field-list simple">
+                                            <dt class="field-odd">Parameters<span class="colon">:</span></dt>
+                                            <dd class="field-odd">
+                                                <ul class="simple">
+                                                    <li><p><strong>index</strong> (<em>list</em><em>
+                                                        or </em><em>tensor</em>) – List or tensor of indices to be set
+                                                        to True.</p></li>
+                                                    <li><p><strong>size</strong> (<em>int</em><em>
+                                                        or </em><em>tuple</em><em> of </em><em>int</em>) – Shape of the
+                                                        mask. If an integer, the mask is 1-dimensional.</p></li>
+                                                </ul>
+                                            </dd>
+                                            <dt class="field-even">Returns<span class="colon">:</span></dt>
+                                            <dd class="field-even"><p><strong>mask</strong> – A boolean tensor of the
+                                                specified size, with True at the given <cite>index</cite> positions and
+                                                False elsewhere.</p>
+                                            </dd>
+                                            <dt class="field-odd">Return type<span class="colon">:</span></dt>
+                                            <dd class="field-odd"><p>tensor</p>
+                                            </dd>
+                                        </dl>
+                                        <p class="rubric">Examples</p>
+                                        <div class="doctest highlight-default notranslate">
+                                            <div class="highlight"><pre><span></span><span
+                                                    class="gp">&gt;&gt;&gt; </span><span class="n">index</span> <span
+                                                    class="o">=</span> <span class="p">[</span><span class="mi">0</span><span
+                                                    class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span
+                                                    class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">size</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">index2mask</span><span class="p">(</span><span
+                                                        class="n">index</span><span class="p">,</span> <span class="n">size</span><span
+                                                        class="p">)</span>
+<span class="go">tensor([True, False, True, False, True], dtype=torch.bool)</span>
+</pre>
+                                            </div>
+                                        </div>
+                                    </dd>
                                 </dl>
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.utils.load_reduced">
-                                        <span class="sig-name descname"><span
-                                                class="pre">load_reduced</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">load_reduced</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">args</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">data</span></span><span class="o"><span
@@ -638,8 +859,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.utils.save_reduced">
-                                        <span class="sig-name descname"><span
-                                                class="pre">save_reduced</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">save_reduced</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">adj_syn</span></span><span class="o"><span class="pre">=</span></span><span
                                             class="default_value"><span class="pre">None</span></span></em>, <em
@@ -661,7 +882,8 @@
 
                                 <dl class="py function">
                                     <dt class="sig sig-object py" id="graphslim.dataset.utils.splits">
-                                        <span class="sig-name descname"><span class="pre">splits</span></span><span
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.dataset.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">splits</span></span><span
                                             class="sig-paren">(</span><em class="sig-param"><span class="n"><span
                                             class="pre">data</span></span></em>, <em class="sig-param"><span
                                             class="n"><span class="pre">exp</span></span></em><span
@@ -685,6 +907,14 @@
                     </div>
                 </div>
                 <footer>
+                    <div aria-label="Footer" class="rst-footer-buttons" role="navigation">
+                        <a accesskey="p" class="btn btn-neutral float-left" href="../quickstart.html"
+                           rel="prev" title="Quick Start"><span aria-hidden="true" class="fa fa-arrow-circle-left"></span>
+                            Previous</a>
+                        <a accesskey="n" class="btn btn-neutral float-right"
+                           href="graphslim.models.html" rel="next" title="graphslim.models package">Next <span
+                                aria-hidden="true" class="fa fa-arrow-circle-right"></span></a>
+                    </div>
 
                     <hr/>
 
