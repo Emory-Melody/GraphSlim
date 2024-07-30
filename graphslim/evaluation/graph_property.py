@@ -16,51 +16,51 @@ import logging
 import networkx as nx
 import numpy as np
 from graphslim.dataset import *
-import torch
+from graphslim.evaluation.utils import calculate_homophily
 from graphslim.utils import normalize_adj
 from sklearn.metrics import davies_bouldin_score
 from scipy.sparse.csgraph import laplacian
 
 
 class PropertyEvaluator:
-    def __init__(self, data, args, reduced=True, model_type='GCN'):
-        if reduced:
-            self.feat, self.adj, self.label = get_syn_data(data, args, model_type=model_type)
-        else:
-            self.feat, self.adj, self.label = data.feat_full, data.adj_full, data.labels_full
-        self.feat, self.adj, self.label = self.feat.cpu().numpy(), self.adj.cpu().numpy(), self.label.cpu().numpy()
-        if args.with_structure:
-            self.evaluate = self.graph_property
-        else:
-            self.evaluate = self.graph_property_no_structure()
+    '''
+    Class for evaluating graph properties of original and synthetic
+    graphs, such as density, Laplacian space trace, spectral radius,
+    cluster coefficient, homophily, and Davies-Bouldin index
+
+    Parameters
+    ----------
+    args : object
+        Arguments object containing the command-line arguments
+    '''
+
+    def __init__(self, args):
+
         self.args = args
 
-    def calculate_homophily(self, y, adj):
-        # Convert dense numpy array to sparse matrix if necessary
-        if isinstance(adj, np.ndarray):
-            adj = scipy.sparse.csr_matrix(adj)
+    def evaluate(self, data, reduced=True, model_type='GCN'):
+        '''
+        Evaluates the graph properties of the original or synthetic graph
 
-        if not scipy.sparse.isspmatrix_csr(adj):
-            adj = adj.tocsr()
+        Parameters
+        ----------
+        data : Dataset
+            The dataset containing the graph data
+        reduced : bool
+            Whether to evaluate the reduced graph or the full graph
+        model_type : str
+            The type of model to use for the evaluation
+        '''
+        if reduced:
+            self.feat, self.adj, self.label = get_syn_data(data, self.args, model_type=model_type)
+            self.feat, self.adj, self.label = self.feat.cpu().numpy(), self.adj.cpu().numpy(), self.label.cpu().numpy()
+        else:
+            self.feat, self.adj, self.label = data.feat_full.numpy(), data.adj_full, data.labels_full.numpy()
 
-        # Binarize the adjacency matrix (assuming adj contains weights)
-        # adj.data = (adj.data > 0.5).astype(int)
-
-        # Ensure y is a 1D array
-        y = np.squeeze(y)
-
-        # Get the indices of the non-zero entries in the adjacency matrix
-        edge_indices = adj.nonzero()
-
-        # Get the labels of the source and target nodes for each edge
-        src_labels = y[edge_indices[0]]
-        tgt_labels = y[edge_indices[1]]
-
-        # Calculate the homophily as the fraction of edges connecting nodes of the same label
-        same_label = src_labels == tgt_labels
-        homophily = np.mean(same_label)
-
-        return homophily
+        if self.args.with_structure:
+            self.graph_property()
+        else:
+            self.graph_property_no_structure()
 
     def graph_property(self):
 
@@ -96,7 +96,7 @@ class PropertyEvaluator:
                 den_list.append(density)
                 # sparsity = 1 - density
 
-                homophily = self.calculate_homophily(label, ad)
+                homophily = calculate_homophily(label, ad)
                 hom_list.append(homophily)
                 db_index = davies_bouldin_score(feat, label)
                 db_list.append(db_index)
@@ -140,7 +140,7 @@ class PropertyEvaluator:
             density = nx.density(G)
             # sparsity = 1 - density
 
-            homophily = self.calculate_homophily(label, adj)
+            homophily = calculate_homophily(label, adj)
             db_index = davies_bouldin_score(feat, label)
             adj = normalize_adj(adj)
 

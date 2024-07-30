@@ -61,7 +61,8 @@ def setting_config(args):
 # recommend hyperparameters here
 def method_config(args):
     try:
-        conf_dt = json.load(open(f'configs/{args.method}/{args.dataset}.json'))
+        conf_dt = json.load(
+            open(f"{os.path.join(os.path.dirname(__file__), 'configs', args.method, args.dataset)}.json"))
         update_from_dict(args, conf_dt)
     except:
         print('No config file found or error in json format.')

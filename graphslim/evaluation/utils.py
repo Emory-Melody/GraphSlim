@@ -11,10 +11,32 @@ from torch_sparse import SparseTensor
 from graphslim.dataset.utils import csr2ei
 
 
+def calculate_homophily(y, adj):
+    # Convert dense numpy array to sparse matrix if necessary
+    if isinstance(adj, np.ndarray):
+        adj = sp.csr_matrix(adj)
 
+    if not sp.isspmatrix_csr(adj):
+        adj = adj.tocsr()
 
+    # Binarize the adjacency matrix (assuming adj contains weights)
+    # adj.data = (adj.data > 0.5).astype(int)
 
+    # Ensure y is a 1D array
+    y = np.squeeze(y)
 
+    # Get the indices of the non-zero entries in the adjacency matrix
+    edge_indices = adj.nonzero()
+
+    # Get the labels of the source and target nodes for each edge
+    src_labels = y[edge_indices[0]]
+    tgt_labels = y[edge_indices[1]]
+
+    # Calculate the homophily as the fraction of edges connecting nodes of the same label
+    same_label = src_labels == tgt_labels
+    homophily = np.mean(same_label)
+
+    return homophily
 
 
 def getsize_mb(elements):
