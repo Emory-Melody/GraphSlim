@@ -3,7 +3,7 @@
 ## Online demo
 
 You can run our examples
-at [Collab](https://colab.research.google.com/drive/1gzYgmV2Ht6_eIdf-h1_c2qRWbQr0p-IE?usp=sharing).
+at [Collab](https://colab.research.google.com/drive/1LLG9PYOPnmLCAr0ow0ogRYI8DvLGPk7d?usp=sharing).
 
 ## Examples
 

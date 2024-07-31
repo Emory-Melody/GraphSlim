@@ -8,7 +8,7 @@ import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
-from graphslim.configs import *
+from graphslim.config import *
 from graphslim.dataset import *
 from scipy.sparse.linalg import eigsh
 import matplotlib.pyplot as plt

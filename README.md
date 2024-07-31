@@ -141,12 +141,12 @@ Options:
 from graphslim.dataset import *
 from graphslim.evaluation import *
 from graphslim.condensation import GCond
-from graphslim.configs import cli
+from graphslim.config import cli
 
-args=cli(standalone_mode=False)
+args = cli(standalone_mode=False)
 # customize args here
-args.reduction_rate=0.5
-args.device='cuda:0'
+args.reduction_rate = 0.5
+args.device = 'cuda:0'
 # add more args.<main_args/dataset_args> here
 graph = get_dataset('cora', args=args)
 # To reproduce the benchmark, use our args and graph class

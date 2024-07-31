@@ -4,7 +4,7 @@ import os, sys
 if os.path.abspath('../graphslim') not in sys.path:
     sys.path.append(os.path.abspath('../graphslim'))
 
-from graphslim.configs import cli
+from graphslim.config import cli
 from graphslim.dataset import *
 from graphslim.evaluation import *
 from graphslim.sparsification import KCenter

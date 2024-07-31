@@ -23,14 +23,14 @@ requires_list = [
     'tqdm',
 ]
 setup(
-    name=name,  # 包名同工程名，这样导入包的时候更有对应性
-    version='1.0.4',
+    name=name,
+    version='1.1.0',
     author="Rockcor",
     author_email='jshmhsb@gmail.com',
     description="Slimming the graph data for graph learning",
     packages=find_packages(),
     python_requires='>=3.7',
-    include_package_data=True,  # 自动包含受版本控制(svn/git)的数据文件
+    include_package_data=True,
     classifiers=[
         "Intended Audience :: Developers",
         "Intended Audience :: Education",

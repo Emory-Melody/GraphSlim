@@ -3,7 +3,7 @@ import sys
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
-from graphslim.configs import *
+from graphslim.config import *
 from graphslim.dataset import *
 from graphslim.evaluation.utils import sparsify
 import matplotlib.pyplot as plt

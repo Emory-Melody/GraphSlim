@@ -9,6 +9,7 @@ import logging
 
 import click
 from pprint import pformat
+import graphslim
 from graphslim.utils import seed_everything
 
 
@@ -61,8 +62,9 @@ def setting_config(args):
 # recommend hyperparameters here
 def method_config(args):
     try:
+        print(os.path.abspath(graphslim.__file__))
         conf_dt = json.load(
-            open(f"{os.path.join(os.path.dirname(__file__), 'configs', args.method, args.dataset)}.json"))
+            open(f"{os.path.join(os.path.abspath(graphslim.__file__), 'configs', args.method, args.dataset)}.json"))
         update_from_dict(args, conf_dt)
     except:
         print('No config file found or error in json format.')
