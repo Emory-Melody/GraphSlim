@@ -5,6 +5,7 @@ from tqdm import trange, tqdm
 from sklearn.model_selection import ParameterGrid
 from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
+from torch_sparse import matmul
 
 from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
@@ -12,7 +13,7 @@ from graphslim.evaluation import *
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
-from graphslim.utils import accuracy, seed_everything, is_sparse_tensor, is_identity
+from graphslim.utils import accuracy, seed_everything, normalize_adj_tensor, to_tensor, is_sparse_tensor, is_identity
 
 
 class Evaluator:
@@ -316,26 +317,18 @@ class Evaluator:
 
         return res.mean(), res.std()
 
-    def vis(args, data):
+    def tsne_vis(self, feat_train, labels_train, feat_syn, labels_syn):
         """
-        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.
+        Visualize t-SNE for original and synthetic data.
 
-        Parameters
-        ----------
-        args : argparse.Namespace
-            Command-line arguments and configuration parameters.
-        data : Dataset
-            The dataset containing the graph data.
+        Parameters:
+            feat_train (torch.tensor): Original features.
+            labels_train (torch.tensor): Labels for original features.
+            feat_syn (torch.tensor): Synthetic features.
+            labels_syn (torch.tensor): Labels for synthetic features.
         """
-        save_path = f'{args.save_path}/reduced_graph/{args.method}'
-        feat_syn = torch.load(
-            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-        labels_syn = torch.load(
-            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
-
-        # Extract features and labels from the dataset
-        labels_train_np = data.labels_train.cpu().numpy()
-        feat_train_np = data.feat_train.cpu().numpy()
+        labels_train_np = labels_train.cpu().numpy()
+        feat_train_np = feat_train.cpu().numpy()
         labels_syn_np = labels_syn.cpu().numpy()
         feat_syn_np = feat_syn.cpu().numpy()
 
@@ -374,6 +367,44 @@ class Evaluator:
         plt.ylabel('Feature 2')
 
         # Save and display the figure
-        plt.savefig(f'tsne_visualization_{args.method}_{args.dataset}_{args.reduction_rate}.pdf', format='pdf')
-        print(f"Saved figure to tsne_visualization_{args.method}_{args.dataset}_{args.reduction_rate}.pdf")
+        plt.savefig(f'tsne_visualization_{self.args.method}_{self.args.dataset}_{self.args.reduction_rate}.pdf',
+                    format='pdf')
+        print(
+            f"Saved figure to tsne_visualization_{self.args.method}_{self.args.dataset}_{self.args.reduction_rate}.pdf")
         plt.show()
+
+    def visualize(args, data):
+        """
+        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.
+
+        Parameters
+        ----------
+        args : argparse.Namespace
+            Command-line arguments and configuration parameters.
+        data : Dataset
+            The dataset containing the graph data.
+        """
+        save_path = f'{args.save_path}/reduced_graph/{args.method}'
+        feat_syn = torch.load(
+            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        labels_syn = torch.load(
+            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+        try:
+            adj_syn = torch.load(
+                f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+        except:
+            adj_syn = torch.eye(feat_syn.size(0), device=args.device)
+
+        # Obtain embeddings
+        data.adj_train = to_tensor(data.adj_train)
+        data.pre_conv = normalize_adj_tensor(data.adj_train, sparse=True)
+        data.pre_conv = matmul(data.pre_conv, data.pre_conv)
+        feat_train_agg = matmul(data.pre_conv, data.feat_train).float()
+
+        adj_syn = to_tensor(data.adj_syn)
+        pre_conv_syn = normalize_adj_tensor(adj_syn, sparse=True)
+        pre_conv_syn = matmul(pre_conv_syn, pre_conv_syn)
+        feat_syn_agg = matmul(pre_conv_syn, labels_syn).float()
+
+        self.tsne_vis(data.feat_train, data.labels_train, feat_syn, labels_syn)  # Visualizes feature
+        self.tsne_vis(feat_train_agg, data.labels_train, feat_syn_agg, labels_syn)  # Visualizes embedding
