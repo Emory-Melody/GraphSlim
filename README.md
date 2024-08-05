@@ -6,7 +6,8 @@
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
 **[Survey Paper](https://arxiv.org/pdf/2402.03358)** |
 **[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)** |
-**[Web Interface](https://graphslim-vis.streamlit.app/)**
+**[Web Interface](https://graphslim-vis.streamlit.app/)** |
+**[Code Demo](https://colab.research.google.com/drive/1LLG9PYOPnmLCAr0ow0ogRYI8DvLGPk7d?usp=sharing)**
 
 # Features
 
