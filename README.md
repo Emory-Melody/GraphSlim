@@ -2,6 +2,7 @@
 
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest) [![Downloads](https://static.pepy.tech/badge/graphslim)](https://pepy.tech/project/graphslim)
 
+**[Documentation](https://graphslim.readthedocs.io/en/latest/?badge=latest)** |
 **[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
 **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
 **[Survey Paper](https://arxiv.org/pdf/2402.03358)** |
