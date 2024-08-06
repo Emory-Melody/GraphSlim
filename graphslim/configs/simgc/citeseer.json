@@ -1,0 +1,6 @@
+{
+  "lr_feat": 0.005,
+  "lr_adj": 0.001,
+  "threshold": 0.01,
+  "condense_model": "GCN"
+}

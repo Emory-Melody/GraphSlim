@@ -41,10 +41,7 @@ Our code will automatically download all datasets.
 
 The default path of datasets is `../../data`.-->
 
-
-
 ## Install from pip
-
 
 ```shell
 # choose one version from https://data.pyg.org/whl/ based on your environment
@@ -63,11 +60,14 @@ python examples/train_gcond.py
 See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
 
 # Use As Project
+
 ```shell
 cd graphslim
 python train_all.py -xxx xx
 ```
+
 Run `python configs.py --help` to get all command line options.
+
 ```shell
 Options:
   -D, --dataset TEXT              [default: cora]
@@ -137,6 +137,7 @@ Options:
   -W, --eval_whole                if run on whole graph
   --help                          Show this message and exit.
 ```
+
 # Use As Package
 
 ```python
@@ -164,7 +165,9 @@ evaluator = Evaluator(args)
 # evaluate the reduced graph on a GNN model
 res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
 ```
-All parameters can be divided into 
+
+All parameters can be divided into
+
 ```shell
 <main_args>: dataset, method, setting, reduction_rate, seed, aggpreprocess, eval_whole, run_reduction
 <attack_args>: attack, ptb_r
@@ -172,8 +175,9 @@ All parameters can be divided into
 <agent_args>: init, eval_interval, eval_epochs, eval_model, condense_model, epochs, lr, weight_decay, outer_loop, inner_loop, nlayers, method, activation, dropout, ntrans, with_bn, no_buff, batch_adj, alpha, mx_size, dis_metric, lr_adj, lr_feat
 <evaluator_args>: final_eval_model, eval_epochs, lr, weight_decay
 ```
-See more details in [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
 
+See more details
+in [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
 
 # Customization
 

@@ -51,7 +51,7 @@ def setting_config(args):
         args.setting = 'ind'
     # args.pre_norm = True
     args.run_inter_eval = 3
-    args.eval_interval = 1
+    args.eval_interval = 100
     # if args.method not in ['gcsntk']:
     #     args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
@@ -62,12 +62,12 @@ def setting_config(args):
 # recommend hyperparameters here
 def method_config(args):
     try:
-        print(os.path.abspath(graphslim.__file__))
+        # print(os.path.dirname(graphslim.__file__))
         conf_dt = json.load(
-            open(f"{os.path.join(os.path.abspath(graphslim.__file__), 'configs', args.method, args.dataset)}.json"))
+            open(f"{os.path.join(os.path.dirname(graphslim.__file__), 'configs', args.method, args.dataset)}.json"))
         update_from_dict(args, conf_dt)
     except:
-        print('No config file found or error in json format.')
+        print('No config file found or error in json format, please use method_config(args)')
     if args.method in ['msgc']:
         args.batch_adj = 16
         # add temporary changes here
@@ -165,6 +165,9 @@ def method_config(args):
 @click.option('--save_path', '--sp', default='../checkpoints', show_default=True, help='save path for synthetic graph')
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True, help='if run on whole graph')
 @click.option('--with_structure', default=1, show_default=True, help='if synthesizing structure')
+# ======================================simgc====================================== #
+@click.option('--feat_alpha', default=10, show_default=True, help='feature loss weight')
+@click.option('--smoothness_alpha', default=0.1, show_default=True, help='smoothness loss weight')
 @click.pass_context
 def cli(ctx, **kwargs):
     args = dict2obj(kwargs)
@@ -191,6 +194,10 @@ def cli(ctx, **kwargs):
     args.logger.addHandler(logging.StreamHandler())
     args.logger.info(args)
     return args
+
+
+def get_args():
+    return cli(standalone_mode=False)
 
 
 if __name__ == '__main__':

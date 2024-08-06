@@ -22,9 +22,10 @@ requires_list = [
     'torch_geometric',
     'tqdm',
 ]
+
 setup(
     name=name,
-    version='1.1.0',
+    version='1.1.1',
     author="Rockcor",
     author_email='jshmhsb@gmail.com',
     description="Slimming the graph data for graph learning",

@@ -10,14 +10,13 @@ if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 from graphslim.config import *
 from graphslim.dataset import *
-from graphslim.evaluation.utils import sparsify
 from scipy.sparse.linalg import eigsh
 import matplotlib.pyplot as plt
 import logging
 import networkx as nx
 import numpy as np
 import torch
-from graphslim.utils import normalize_adj
+from graphslim.utils import gcn_normalize_adj
 from sklearn.metrics import davies_bouldin_score
 from scipy.sparse.csgraph import laplacian
 
@@ -85,7 +84,7 @@ def graph_property(adj, feat, label):
             hom_list.append(homophily)
             db_index = davies_bouldin_score(feat, label)
             db_list.append(db_index)
-            ad = normalize_adj(ad)
+            ad = gcn_normalize_adj(ad)
 
             db_index_agg = davies_bouldin_score(ad @ ad @ feat, label)
             db_agg_list.append(db_index_agg)
@@ -127,7 +126,7 @@ def graph_property(adj, feat, label):
 
         homophily = calculate_homophily(label, adj)
         db_index = davies_bouldin_score(feat, label)
-        adj = normalize_adj(adj)
+        adj = gcn_normalize_adj(adj)
 
         db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
         # print("Degree Distribution:", degree_distribution)

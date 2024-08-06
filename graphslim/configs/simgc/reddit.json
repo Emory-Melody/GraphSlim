@@ -1,0 +1,9 @@
+{
+  "lr_feat": 0.1,
+  "lr_adj": 0.1,
+  "dis_metric": "ours",
+  "outer_loop": 10,
+  "threshold": 0.01,
+  "condense_model": "GCN",
+  "epochs": 1000
+}

@@ -212,7 +212,7 @@ def get_syn_data(data, args, model_type, verbose=False):
     if labels_syn.shape[0] == data.labels_train.shape[0]:
         return feat_syn, adj_syn, labels_syn
 
-    if is_sparse_tensor(adj_syn):
+    if type(adj_syn) == torch.tensor and is_sparse_tensor(adj_syn):
         adj_syn = adj_syn.to_dense()
     elif isinstance(adj_syn, torch.sparse.FloatTensor):
         adj_syn = adj_syn.to_dense()

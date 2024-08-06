@@ -18,7 +18,7 @@ class GCond(GCondBase):
     def reduce(self, data, verbose=True):
         args = self.args
         pge = self.pge
-        feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
+        self.feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
@@ -35,7 +35,7 @@ class GCond(GCondBase):
         outer_loop, inner_loop = self.get_loops(args)
         loss_avg = 0
         best_val = 0
-        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden,
+        model = eval(args.condense_model)(self.d, args.hidden,
                                           data.nclass, args).to(self.device)
         for it in trange(args.epochs):
 

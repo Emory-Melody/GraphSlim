@@ -7,3 +7,4 @@ from .geom import GEOM
 from .msgc import MSGC
 from .sfgc import SFGC
 from .sgdd import SGDD
+from .simgc import SimGC

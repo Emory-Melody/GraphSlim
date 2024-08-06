@@ -4,16 +4,16 @@ import sys
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
 
-from graphslim.config import cli
+from graphslim.config import get_args
 from graphslim.dataset import *
 from graphslim.evaluation import *
 from graphslim.sparsification import *
 from graphslim.condensation import *
 from graphslim.coarsening import *
-from graphslim.utils import seed_everything, to_camel_case
+from graphslim.utils import to_camel_case
 
 if __name__ == '__main__':
-    args = cli(standalone_mode=False)
+    args = get_args()
     graph = get_dataset(args.dataset, args)
     if args.attack is not None:
         data = attack(graph, args)
@@ -31,6 +31,8 @@ if __name__ == '__main__':
         agent = CentP(setting=args.setting, data=graph, args=args)
     elif args.method == 'cent_d':
         agent = CentD(setting=args.setting, data=graph, args=args)
+    elif args.method == 'simgc':
+        agent = SimGC(setting=args.setting, data=graph, args=args)
     elif args.method == 'gcond':
         agent = GCond(setting=args.setting, data=graph, args=args)
     elif args.method == 'doscond':

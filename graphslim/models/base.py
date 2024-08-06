@@ -99,7 +99,10 @@ class BaseGNN(nn.Module):
                     adj = adj.to_sparse()
                 adj = normalize_adj_tensor(adj, sparse=True)
 
+        # SparseTensor synthetic graph only used in graphsage, msgc and simgc
         elif self.__class__.__name__ == 'GraphSage' and self.args.method == 'msgc':
+            adj = adj
+        elif self.args.method == 'simgc':
             adj = adj
         else:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))

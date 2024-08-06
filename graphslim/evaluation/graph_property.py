@@ -17,7 +17,7 @@ import networkx as nx
 import numpy as np
 from graphslim.dataset import *
 from graphslim.evaluation.utils import calculate_homophily
-from graphslim.utils import normalize_adj
+from graphslim.utils import gcn_normalize_adj
 from sklearn.metrics import davies_bouldin_score
 from scipy.sparse.csgraph import laplacian
 
@@ -100,7 +100,7 @@ class PropertyEvaluator:
                 hom_list.append(homophily)
                 db_index = davies_bouldin_score(feat, label)
                 db_list.append(db_index)
-                ad = normalize_adj(ad)
+                ad = gcn_normalize_adj(ad)
 
                 db_index_agg = davies_bouldin_score(ad @ ad @ feat, label)
                 db_agg_list.append(db_index_agg)
@@ -142,7 +142,7 @@ class PropertyEvaluator:
 
             homophily = calculate_homophily(label, adj)
             db_index = davies_bouldin_score(feat, label)
-            adj = normalize_adj(adj)
+            adj = gcn_normalize_adj(adj)
 
             db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
             # print("Degree Distribution:", degree_distribution)

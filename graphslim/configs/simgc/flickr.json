@@ -1,0 +1,8 @@
+{
+  "lr_feat": 5e-3,
+  "lr_adj": 5e-3,
+  "dis_metric": "mse",
+  "outer_loop": 10,
+  "threshold": 0.01,
+  "condense_model": "GCN"
+}

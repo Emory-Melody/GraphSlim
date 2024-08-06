@@ -145,9 +145,12 @@ def index_to_mask(index, size):
     mask = torch.zeros((size,), dtype=torch.bool)
     mask[index] = 1
     return mask
+
+
 def to_camel_case(snake_str):
     components = snake_str.split('_')
     return ''.join(x.title() for x in components)
+
 
 # def cal_storage(data, setting):
 #     if setting == 'trans':
@@ -255,36 +258,6 @@ def normalize_feature(mx):
     return mx
 
 
-def normalize_adj(mx):
-    """Normalize sparse adjacency matrix,
-    A' = (D + I)^-1/2 * ( A + I ) * (D + I)^-1/2
-    Row-normalize sparse matrix
-
-    Parameters
-    ----------
-    mx : scipy.sparse.csr_matrix
-        matrix to be normalized
-
-    Returns
-    -------
-    scipy.sprase.lil_matrix
-        normalized matrix
-    """
-
-    if type(mx) is not sp.lil.lil_matrix:
-        mx = mx.tolil()
-    if mx[0, 0] == 0:
-        mx = mx + sp.eye(mx.shape[0])
-    eps = 1e-9
-    rowsum = np.array(mx.sum(1)) + eps
-    r_inv = np.power(rowsum, -1 / 2).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
-    r_mat_inv = sp.diags(r_inv)
-    mx = r_mat_inv.dot(mx)
-    mx = mx.dot(r_mat_inv)
-    return mx
-
-
 def normalize_sparse_tensor(adj, fill_value=1):
     """Normalize sparse tensor. Need to import torch_scatter
     """
@@ -371,12 +344,12 @@ def normalize_adj_sgformer(adj):
 
 
 def normalize_adj_tensor(adj, sparse=False):
-    """Normalize adjacency tensor matrix.
+    """Normalize adjacency tensor matrix, return sparse or not
     """
     device = adj.device
     if sparse:
         adj = to_scipy(adj)
-        mx = normalize_adj(adj)
+        mx = gcn_normalize_adj(adj)
         adj = sparse_mx_to_torch_sparse_tensor(mx).to(device).coalesce()
         adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
                            value=adj.values(), sparse_sizes=adj.size()).t()
@@ -409,7 +382,7 @@ def dense_gcn_norm(adj, device):
     return mx
 
 
-def normalize_adj(adj, device='cpu'):
+def gcn_normalize_adj(adj, device='cpu'):
     if sp.issparse(adj):
         return sparse_gcn_norm(adj)
     elif type(adj) is torch.Tensor:
