@@ -5,12 +5,52 @@ import numpy as np
 import torch
 from pygsp import graphs
 from scipy.sparse import coo_matrix
-from torch_geometric.utils import to_undirected, to_dense_adj
+from torch_geometric.utils import to_undirected, to_dense_adj, remove_self_loops
 from torch_sparse import SparseTensor
 import networkit as nk
-from torch_geometric.data import Data
+from torch_geometric.data import Data, HeteroData
 
 
+def from_dgl(g, name, hetero=True):
+    if g.is_homogeneous:
+        data = Data()
+        data.edge_index = torch.stack(g.edges(), dim=0)
+
+        for attr, value in g.ndata.items():
+            data[attr] = value
+        for attr, value in g.edata.items():
+            data[attr] = value
+
+        return data
+
+    data = HeteroData()
+    data.name = name
+
+    for node_type in g.ntypes:
+        for attr, value in g.nodes[node_type].data.items():
+            data[node_type][attr] = value
+
+    for edge_type in g.canonical_etypes:
+        row, col = g.edges(form="uv", etype=edge_type)
+        data[edge_type].edge_index = torch.stack([row, col], dim=0)
+        for attr, value in g.edge_attr_schemes(edge_type).items():
+            data[edge_type][attr] = value
+
+    data_out = Data()
+    if not hetero:
+        edge_index_list = []
+        for edge_type in g.canonical_etypes:
+            edge_index_list.append(data[edge_type].edge_index)
+        data_out.edge_index = remove_self_loops(torch.cat(edge_index_list, dim=1))[0]
+
+        data_out.x = data.node_stores[0]['feature']
+
+        data_out.y = data.node_stores[0]['label']
+
+    data_out.num_nodes = len(data_out.x)
+    data_out.num_classes = max(data_out.y).item() + 1
+
+    return data_out
 def pyg2gsp(edge_index):
     G = graphs.Graph(W=to_dense_adj(to_undirected(edge_index))[0])
     return G

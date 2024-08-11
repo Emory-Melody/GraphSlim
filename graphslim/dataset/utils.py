@@ -50,9 +50,11 @@ def sparsify(model_type, adj_syn, args, verbose=False):
             threshold = 0
         else:
             threshold = 0
-    if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
+
+    # if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
         # print('Sum:', adj_syn.sum().item())
-        print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+    # print(adj_syn)
+    # print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
     # if args.method in ['sgdd']:
     #     threshold = 0.5
     if threshold > 0:
@@ -98,6 +100,7 @@ def splits(data, exp):
         num_classes = max(data.y) + 1
     else:
         num_classes = max(data.labels_full).item() + 1
+    # data.nclass = num_classes
     if not hasattr(data, 'train_mask'):
         indices = []
         for i in range(num_classes):
@@ -120,7 +123,6 @@ def splits(data, exp):
             val_index = torch.cat([i[int(i.shape[0] * 0.6):int(i.shape[0] * 0.8)] for i in indices], dim=0)
             test_index = torch.cat([i[int(i.shape[0] * 0.8):] for i in indices], dim=0)
             # raise NotImplementedError('Unknown split type')
-
         data.train_mask = index2mask(train_index, size=data.num_nodes)
         data.val_mask = index2mask(val_index, size=data.num_nodes)
         data.test_mask = index2mask(test_index, size=data.num_nodes)

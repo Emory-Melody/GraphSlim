@@ -13,7 +13,8 @@ from graphslim.evaluation import *
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
-from graphslim.utils import accuracy, seed_everything, normalize_adj_tensor, to_tensor, is_sparse_tensor, is_identity
+from graphslim.utils import accuracy, seed_everything, normalize_adj_tensor, to_tensor, is_sparse_tensor, is_identity, \
+    f1_macro
 
 
 class Evaluator:
@@ -42,6 +43,7 @@ class Evaluator:
         self.args = args
         self.device = args.device
         self.reset_parameters()
+        self.metric = accuracy if args.metric == 'accuracy' else f1_macro
 
     def reset_parameters(self):
         """
@@ -195,7 +197,7 @@ class Evaluator:
         if args.setting == 'ind':
             output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
-            acc_test = accuracy(output, labels_test)
+            acc_test = self.metric(output, labels_test)
             if verbose:
                 print("Test set results:",
                       f"loss= {loss_test.item():.4f}",
@@ -203,7 +205,7 @@ class Evaluator:
         else:
             output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
-            acc_test = accuracy(output[data.idx_test], labels_test)
+            acc_test = self.metric(output[data.idx_test], labels_test)
             if verbose:
                 print("Test full set results:",
                       f"loss= {loss_test.item():.4f}",

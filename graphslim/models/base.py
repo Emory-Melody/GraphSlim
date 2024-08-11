@@ -38,6 +38,7 @@ class BaseGNN(nn.Module):
         self.features = None
         self.multi_label = None
         self.float_label = None
+        self.metric = accuracy if args.metric == 'accuracy' else f1_macro
 
     def initialize(self):
         for layer in self.layers:
@@ -160,7 +161,7 @@ class BaseGNN(nn.Module):
                 self.eval()
                 output = self.forward(feat_full, adj_full)
 
-                acc_val = accuracy(output if output.shape[0] == labels_val.shape[0] else output[data.idx_val],
+                acc_val = self.metric(output if output.shape[0] == labels_val.shape[0] else output[data.idx_val],
                                    labels_val)
 
                 if acc_val > best_acc_val:
@@ -192,11 +193,11 @@ class BaseGNN(nn.Module):
         if setting == 'ind':
             output = self.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
-            acc_test = accuracy(output, labels_test)
+            acc_test = self.metric(output, labels_test)
         else:
             output = self.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[idx_test], labels_test)
-            acc_test = accuracy(output[idx_test], labels_test)
+            acc_test = self.metric(output[idx_test], labels_test)
 
         if verbose:
             print("Test set results:",

@@ -42,14 +42,17 @@ def setting_config(args):
         'flickr': 0.01,
         'reddit': 0.001,
         'ogbn-arxiv': 0.01,
+        'yelp': 0.001,
+        'amazon': 0.002
     }
     if args.reduction_rate == -1:
         args.reduction_rate = representative_r[args.dataset]
     if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv']:
         args.setting = 'trans'
-    if args.dataset in ['flickr', 'reddit']:
+    if args.dataset in ['flickr', 'reddit', 'yelp', 'amazon']:
         args.setting = 'ind'
     # args.pre_norm = True
+    args.metric = 'f1_macro' if args.dataset in ['yelp', 'amazon'] else 'accuracy'
     args.run_inter_eval = 3
     args.eval_interval = 100
     # if args.method not in ['gcsntk']:

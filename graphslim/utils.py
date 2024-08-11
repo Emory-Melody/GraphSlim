@@ -6,6 +6,7 @@ import torch
 import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
 from torch_sparse import SparseTensor
 from torch_geometric.utils import degree
 import scipy.sparse as sp
@@ -480,6 +481,34 @@ def accuracy(output, labels):
     correct = correct.sum()
     return correct / len(labels)
 
+
+def f1_macro(output, labels):
+    """Return F1-macro score of output compared to labels.
+
+    Parameters
+    ----------
+    output : torch.Tensor
+        output from model
+    labels : torch.Tensor or numpy.array
+        true labels (0 or 1)
+
+    Returns
+    -------
+    float
+        F1-macro score
+    """
+    if not hasattr(labels, '__len__'):
+        labels = [labels]
+    if type(labels) is not torch.Tensor:
+        labels = torch.LongTensor(labels)
+
+    # Get predictions
+    preds = output.max(1)[1].type_as(labels)
+
+    # Calculate F1-macro score using sklearn's f1_score function
+    f1 = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average='macro')
+
+    return f1
 
 def loss_acc(output, labels, targets, avg_loss=True):
     if type(labels) is not torch.Tensor:

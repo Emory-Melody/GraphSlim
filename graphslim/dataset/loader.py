@@ -14,8 +14,9 @@ from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, 
 from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, add_self_loops
 from torch_sparse import SparseTensor
+from dgl.data import FraudDataset
 
-from graphslim.dataset.convertor import ei2csr, csr2ei
+from graphslim.dataset.convertor import ei2csr, csr2ei, from_dgl
 from graphslim.dataset.utils import splits
 from graphslim.utils import index_to_mask, to_tensor
 
@@ -24,7 +25,7 @@ def get_dataset(name='cora', args=None):
     path = osp.join('../../data')
     # Create a dictionary that maps standard names to normalized names
     standard_names = ['flickr', 'reddit', 'dblp', 'cora_ml', 'physics', 'cs', 'cora', 'citeseer', 'pubmed', 'photo',
-                      'computers', 'ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv']
+                      'computers', 'ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv', 'yelp', 'amazon']
     normalized_names = [name.lower().replace('-', '').replace('_', '') for name in standard_names]
     name_dict = dict(zip(normalized_names, standard_names))
 
@@ -50,16 +51,30 @@ def get_dataset(name='cora', args=None):
             dataset.num_classes = 40
         elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m']:
             dataset = PygNodePropPredDataset(name, root=path)
+        elif name in ['yelp', 'amazon']:
+            dataset = FraudDataset(name, raw_dir=path)
+            dataset = from_dgl(dataset[0], name=name, hetero=False)  # dgl2pyg
     else:
         raise ValueError("Dataset name not recognized.")
-    data = dataset[0]
+
+    try:
+        data = dataset[0]
+
+    except:
+        data = dataset
 
     # pyg2TransAndInd: add splits
     data = splits(data, args.split)
 
     data = TransAndInd(data, name, args.pre_norm)
-    data.nclass = dataset.num_classes
 
+    try:
+        data.nclass = dataset.num_classes
+    except:
+        data.nclass = data.num_classes
+
+    print(len(data.labels_train), len(data.labels_val), len(data.labels_test))
+    print(sum(data.labels_train), sum(data.labels_val), sum(data.labels_test))
     return data
 
 
