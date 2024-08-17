@@ -27,7 +27,7 @@ class PGE(nn.Module):
         self.layers.append(nn.Linear(nhid, 1))
 
         # edge_index = np.array(list(product(range(nnodes), range(nnodes))))
-        X, Y = np.meshgrid(np.arange(nnodes), np.arange(nnodes))
+        X, Y = np.meshgrid(np.arange(nnodes), np.arange(nnodes),copy=False)
         edge_index = np.column_stack((X.ravel(), Y.ravel()))
         self.edge_index = edge_index.T
         self.nnodes = nnodes

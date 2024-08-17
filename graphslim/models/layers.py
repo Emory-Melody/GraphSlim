@@ -38,7 +38,7 @@ class GraphConvolution(torch.nn.Module):
         """
         if isinstance(adj, SparseTensor):
             x = torch.mm(x, self.weight)
-            x = matmul(adj, x)
+            x = adj @ x
         else:
             x = x.view(-1, x.shape[-1])
             x = torch.mm(x, self.weight)

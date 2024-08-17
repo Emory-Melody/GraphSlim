@@ -181,7 +181,6 @@ def cli(ctx, **kwargs):
         # if gpu_id=-1, use cpu
         args.device = 'cpu'
     path = args.save_path
-    seed_everything(args.seed)
     # for benchmark, we need unified settings and reduce flexibility of args
     args = method_config(args)
     # setting_config has higher priority than methods_config

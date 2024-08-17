@@ -31,8 +31,6 @@ class ClusterAgg(Coarsen):
         Additional keyword arguments.
     """
 
-
-
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):
         """
@@ -80,7 +78,7 @@ class ClusterAgg(Coarsen):
             x_c = x_train[y_train == c].cpu()
             n_c = (y_syn == c).sum().item()
             k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
-            k_means.fit(x_c)
+            k_means.fit(x_c, replace=True)
             clusters = torch.from_numpy(k_means.predict(x_c)).long()
             x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0)
 
@@ -130,4 +128,3 @@ class ClusterAgg(Coarsen):
         labels_syn = np.array(labels_syn)
 
         return labels_syn, labels_train
-

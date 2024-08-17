@@ -10,11 +10,12 @@ from graphslim.evaluation import *
 from graphslim.sparsification import *
 from graphslim.condensation import *
 from graphslim.coarsening import *
-from graphslim.utils import to_camel_case
+from graphslim.utils import to_camel_case,seed_everything
 
 if __name__ == '__main__':
     args = get_args()
     graph = get_dataset(args.dataset, args)
+    seed_everything(args.seed)
     if args.attack is not None:
         data = attack(graph, args)
     if args.method == 'kcenter' and not args.aggpreprocess:
@@ -57,6 +58,8 @@ if __name__ == '__main__':
         agent = ClusterAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)
+    elif args.method == 'gcdm':
+        agent = GCDM(setting=args.setting, data=graph, args=args)
     else:
         agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)

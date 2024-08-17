@@ -67,16 +67,15 @@ class BaseGNN(nn.Module):
                 if output_layer_features and ix == self.nlayers - 2:
                     x_out = x
 
+        x = x.view(-1, x.shape[-1])
         if output_layer_features:
-            x = x.view(-1, x.shape[-1])
+            x_out = x_out.view(-1, x_out.shape[-1])
             return x_out, F.log_softmax(x, dim=1)
         else:
-            x = x.view(-1, x.shape[-1])
             return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
-                     normadj=True, setting='trans', reduced=False, final_output=False,
-                     **kwargs):
+                     normadj=True, setting='trans', reduced=False, final_output=False, best_val=None, **kwargs):
 
         self.initialize()
         # data for training
@@ -104,7 +103,7 @@ class BaseGNN(nn.Module):
         elif self.__class__.__name__ == 'GraphSage' and self.args.method == 'msgc':
             adj = adj
         elif self.args.method == 'simgc':
-            adj = adj
+            adj = normalize_adj_tensor(adj, sparse=True)
         else:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
@@ -129,7 +128,10 @@ class BaseGNN(nn.Module):
         if verbose:
             print('=== training ===')
 
-        best_acc_val = 0
+        if best_val is None:
+            best_acc_val = 0
+        else:
+            best_acc_val = best_val
         if setting == 'ind':
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
@@ -142,7 +144,7 @@ class BaseGNN(nn.Module):
 
         self.train()
         for i in range(train_iters):
-            if i == train_iters // 2:
+            if i == train_iters // 2 and self.lr > 0.001:
                 optimizer = optim.Adam(self.parameters(), lr=self.lr * 0.1, weight_decay=self.weight_decay)
 
             optimizer.zero_grad()
@@ -168,14 +170,15 @@ class BaseGNN(nn.Module):
                     best_acc_val = acc_val
                     # self.output = output
                     weights = deepcopy(self.state_dict())
-
         if final_output:
             return
-        else:
-            if verbose:
-                print('=== picking the best model according to the performance on validation ===')
+        if verbose:
+            print('=== picking the best model according to the performance on validation ===')
+        try:
             self.load_state_dict(weights)
-            return best_acc_val
+        except:
+            pass
+        return best_acc_val
 
     @torch.no_grad()
     def test(self, data, setting='trans', verbose=False):

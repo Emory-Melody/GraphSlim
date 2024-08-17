@@ -1,0 +1,10 @@
+{
+  "lr_feat": 0.005,
+  "lr_adj": 0.005,
+  "outer_loop": 10,
+  "inner_loop": 1,
+  "dis_metric": "ours",
+  "threshold": 0.01,
+  "condense_model": "SGC",
+  "ntrans": 2
+}

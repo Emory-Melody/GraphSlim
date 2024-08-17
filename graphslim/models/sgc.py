@@ -51,7 +51,10 @@ class SGC(BaseGNN):
                 x = torch_sparse.matmul(adj, x)
 
         x = x.view(-1, x.shape[-1])
-        return F.log_softmax(x, dim=1)
+        if output_layer_features:
+            return x, F.log_softmax(x, dim=1)
+        else:
+            return F.log_softmax(x, dim=1)
 
     # def forward_sampler(self, x, adjs):
     #     for ix, layer in enumerate(self.layers):

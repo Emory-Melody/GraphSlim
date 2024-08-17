@@ -1,0 +1,11 @@
+{
+  "lr_feat": 0.01,
+  "lr_adj": 0.01,
+  "outer_loop": 20,
+  "inner_loop": 3,
+  "dis_metric": "ours",
+  "threshold": 0.01,
+  "condense_model": "SGC",
+  "ntrans": 2,
+  "epochs": 600
+}

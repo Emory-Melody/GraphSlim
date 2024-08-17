@@ -25,6 +25,7 @@ class GCondBase:
     **kwargs : keyword arguments
         Additional arguments for initialization.
     """
+
     def __init__(self, setting, data, args, **kwargs):
         """
         Initializes a GCondBase instance.
@@ -240,7 +241,7 @@ class GCondBase:
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
-    def intermediate_evaluation(self, best_val, loss_avg, save=True):
+    def intermediate_evaluation(self, best_val, loss_avg, save=True, save_valid_acc=False):
         """
         Performs intermediate evaluation and saves the best model.
 
@@ -267,7 +268,8 @@ class GCondBase:
 
         for i in range(args.run_inter_eval):
             # small epochs for fast intermediate evaluation
-            res.append(self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs))
+            res.append(
+                self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs, best_val=best_val))
 
         res = np.array(res)
         current_val = res.mean()
@@ -278,7 +280,7 @@ class GCondBase:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return best_val
 
-    def test_with_val(self, verbose=False, setting='trans', iters=200):
+    def test_with_val(self, verbose=False, setting='trans', iters=200, best_val=None):
         """
         Conducts validation testing and returns results.
 
@@ -304,7 +306,7 @@ class GCondBase:
 
         acc_val = model.fit_with_val(data,
                                      train_iters=iters, normadj=True, verbose=False,
-                                     setting=setting, reduced=True)
+                                     setting=setting, reduced=True, best_val=best_val)
         # model.eval()
         # labels_test = data.labels_test.long().to(args.device)
         # if setting == 'trans':
