@@ -1,8 +1,7 @@
 {
-  "reduction_rate": 0.5,
-  "eigen_k": 60,
+  "eigen_k": 70,
   "ratio": 0.8,
-  "epoch": 1500,
+  "epochs": 1500,
   "e1": 10,
   "e2": 15,
   "alpha": 0.05,
