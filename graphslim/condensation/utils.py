@@ -4,6 +4,9 @@ import math
 from numpy.linalg import eigh
 from scipy.sparse.linalg import eigsh
 from collections import Counter
+from torch_geometric.data import Data
+from torch_geometric.utils import convert
+import networkx as nx
 
 
 def match_loss(gw_syn, gw_real, args, device):
@@ -451,6 +454,25 @@ def training_scheduler(lam, t, T, scheduler='geom'):
         return min(1, 2 ** (math.log2(lam) - math.log2(lam) * t / T))
 
 
+def get_largest_cc(adj, num_nodes, data_name):
+    mx = (adj).tocoo()
+    edge_index = torch.LongTensor(np.vstack([mx.row, mx.col]))
+    data = Data(edge_index=edge_index, num_nodes=num_nodes)
+    nx_graph = convert.to_networkx(data, to_undirected=True)
+
+    largest_cc = max(nx.connected_components(nx_graph), key=len)
+    idx_lcc = list(largest_cc)
+    largest_cc_graph = nx_graph.subgraph(largest_cc)
+
+    if len(idx_lcc) == num_nodes:
+        adj_lcc = adj
+        adj_norm_lcc = gcn_normalize_adj(adj_lcc)
+    else:
+        adj_lcc = nx.to_scipy_sparse_array(largest_cc_graph)
+        adj_norm_lcc = gcn_normalize_adj(adj_lcc)
+
+    return idx_lcc, adj_norm_lcc, adj_lcc
+
 def get_syn_eigen(real_eigenvals, real_eigenvecs, eigen_k, ratio, step=1):
     k1 = math.ceil(eigen_k * ratio)
     k2 = eigen_k - k1
@@ -504,7 +526,7 @@ def get_embed_mean(embed_sum, label):
 
 
 def get_eigh(laplacian_matrix, data_name, save=True):
-    dir = "./data/" + data_name + "/"
+    dir = "../../data/" + data_name + "/"
     if not os.path.isdir(dir):
         os.makedirs(dir)
 

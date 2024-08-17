@@ -1,5 +1,6 @@
 from tqdm import trange
 import copy
+import os.path as osp
 
 import networkx as nx
 from graphslim.condensation.gcond_base import GCondBase
@@ -19,11 +20,12 @@ class GDEM(GCondBase):
 
     def __init__(self, setting, data, args, **kwargs):
         super(GDEM, self).__init__(setting, data, args, **kwargs)
+        args.eigen_k = min(args.eigen_k, self.nnodes_syn)
         self.eigenvecs_syn = Parameter(
-            torch.FloatTensor(self.nnodes_syn, args.eigen_k).cuda()
+            torch.FloatTensor(self.nnodes_syn, args.eigen_k).to(self.device)
         )
 
-        self.y_syn = to_tensor(label=data.labels_syn, device=self.device)
+        self.y_syn = to_tensor(label=self.labels_syn, device=self.device)
         self.x_syn = self.feat_syn
 
         init_syn_feat = self.init_feat()
@@ -36,23 +38,35 @@ class GDEM(GCondBase):
     def reduce(self, data, verbose=True):
         args = self.args
         pge = self.pge
-        self.feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
+        # calculate eigenvalues and eigenvectors
         dataset_dir = f"../../data/{args.dataset}"
-        idx_lcc = np.load(f"{dataset_dir}/idx_lcc.npy")
-        idx_train_lcc = np.load(f"{dataset_dir}/idx_train_lcc.npy")
-        idx_map = np.load(f"{dataset_dir}/idx_map.npy")
+        if not osp.exists(f"{dataset_dir}/idx_map.npy"):
+            idx_lcc, adj_norm_lcc, _ = get_largest_cc(data.adj_full, data.num_nodes, args.dataset)
+            np.save(f"{dataset_dir}/idx_lcc.npy", idx_lcc)
+
+            L_lcc = sp.eye(len(idx_lcc)) - adj_norm_lcc
+            get_eigh(L_lcc, f"{args.dataset}", True)
+
+            idx_train_lcc, idx_map = get_train_lcc(idx_lcc=idx_lcc, idx_train=data.idx_train, y_full=data.y,
+                                                   num_nodes=data.num_nodes, num_classes=data.nclass)
+            np.save(f"{dataset_dir}/idx_train_lcc.npy", idx_train_lcc)
+            np.save(f"{dataset_dir}/idx_map.npy", idx_map)
+            print('preprocess done')
+        else:
+            idx_lcc = np.load(f"{dataset_dir}/idx_lcc.npy")
+            idx_train_lcc = np.load(f"{dataset_dir}/idx_train_lcc.npy")
+            idx_map = np.load(f"{dataset_dir}/idx_map.npy")
 
         eigenvals_lcc, eigenvecs_lcc = load_eigen(args.dataset)
         eigenvals_lcc = torch.FloatTensor(eigenvals_lcc)
         eigenvecs_lcc = torch.FloatTensor(eigenvecs_lcc)
 
         n_syn = int(len(data.idx_train) * args.reduction_rate)
-        args.eigen_k = args.eigen_k if args.eigen_k < n_syn else n_syn
         eigenvals, eigenvecs = get_syn_eigen(real_eigenvals=eigenvals_lcc, real_eigenvecs=eigenvecs_lcc,
                                              eigen_k=args.eigen_k,
                                              ratio=args.ratio)
 
-        co_x_trans_real = get_subspace_covariance_matrix(eigenvecs, data.feat_full[idx_lcc]).to(self.device)  # kdd
+        co_x_trans_real = get_subspace_covariance_matrix(eigenvecs, data.feat_full[idx_lcc]).to(self.device)
         embed_sum = get_embed_sum(eigenvals=eigenvals, eigenvecs=eigenvecs, x=data.feat_full[idx_lcc])
         embed_sum = embed_sum[idx_map, :]
         embed_mean_real = get_embed_mean(embed_sum=embed_sum, label=data.y[idx_train_lcc]).to(self.device)
@@ -62,7 +76,8 @@ class GDEM(GCondBase):
         )
         eigenvals_syn = eigenvals.to(self.device)
         best_val = 0
-        for ep in range(args.epochs):
+        bar = trange(args.epochs)
+        for ep in bar:
             loss = 0.0
             x_syn = self.x_syn
             eigenvecs_syn = self.eigenvecs_syn
@@ -76,16 +91,16 @@ class GDEM(GCondBase):
             embed_sum_syn = get_embed_sum(eigenvals=eigenvals_syn, eigenvecs=eigenvecs_syn, x=x_syn).to(self.device)
             embed_mean_syn = get_embed_mean(embed_sum=embed_sum_syn, label=self.y_syn).to(self.device)  # cd
             cov_embed = embed_mean_real @ embed_mean_syn.T
-            iden = torch.eye(data.nclass).cuda()
+            iden = torch.eye(data.nclass, device=self.device)
             class_loss = F.mse_loss(cov_embed, iden)
             loss += args.beta * class_loss
 
             # orthog_norm
             orthog_syn = eigenvecs_syn.T @ eigenvecs_syn
-            iden = torch.eye(args.eigen_k).cuda()
+            iden = torch.eye(args.eigen_k, device=self.device)
             orthog_norm = F.mse_loss(orthog_syn, iden)
             loss += args.gamma * orthog_norm
-            if ep in args.checkpoints:
+            if verbose and ep in args.checkpoints:
                 print(f"epoch: {ep}")
                 print(f"eigen_match_loss: {eigen_match_loss}")
                 print(f"args.alpha * eigen_match_loss: {args.alpha * eigen_match_loss}")
@@ -101,16 +116,19 @@ class GDEM(GCondBase):
             loss.backward()
 
             # update U:
-            if ep % 50 < 10:
+            if ep % (args.e1 + args.e2) < args.e1:
                 optimizer_eigenvec.step()
             else:
                 optimizer_feat.step()
 
-            # eigenvecs_syn = self.eigenvecs_syn.detach()
+            eigenvecs_syn = self.eigenvecs_syn.detach()
+            eigenvals_syn = eigenvals_syn.detach()
 
             if ep in args.checkpoints:
+                L_syn = eigenvecs_syn @ torch.diag(eigenvals_syn) @ eigenvecs_syn.T
+                adj_syn = torch.eye(self.nnodes_syn, device=self.device) - L_syn
                 x_syn, y_syn = self.x_syn.detach(), self.y_syn
-                data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(x_syn.shape[0]), x_syn, y_syn
+                data.adj_syn, data.feat_syn, data.labels_syn = adj_syn, x_syn, y_syn
                 best_val = self.intermediate_evaluation(best_val)
 
         return data
@@ -173,7 +191,7 @@ class GDEM(GCondBase):
         syn_graph_L = np.eye(n_syn) - syn_graph_L
         _, eigen_vecs = get_eigh(syn_graph_L, "", False)
 
-        return torch.FloatTensor(eigen_vecs).cuda()
+        return torch.FloatTensor(eigen_vecs).to(self.device)
 
     def mlp_trainer(self, args, data, verbose):
         x_full, y_full = to_tensor(data.feat_full, label=data.labels_full, device=self.device)
