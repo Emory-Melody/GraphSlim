@@ -1,6 +1,10 @@
 from graphslim.utils import *
 import torch_geometric
 import math
+from numpy.linalg import eigh
+from scipy.sparse.linalg import eigsh
+from collections import Counter
+
 
 def match_loss(gw_syn, gw_real, args, device):
     """
@@ -414,6 +418,7 @@ def sort_training_nodes_in(data, adj, label):
     indices = indices.cpu().numpy()
     return indices
 
+
 def training_scheduler(lam, t, T, scheduler='geom'):
     """
     Adjust the value of a parameter based on the chosen scheduling strategy.
@@ -496,6 +501,85 @@ def get_embed_mean(embed_sum, label):
     embed_mean = mean_weight * embed_sum
     embed_mean = F.normalize(input=embed_mean, p=2, dim=1)
     return embed_mean
+
+
+def get_eigh(laplacian_matrix, data_name, save=True):
+    dir = "./data/" + data_name + "/"
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+
+    val_file_name = "eigenvalues.npy"
+    vec_file_name = "eigenvectors.npy"
+
+    eigvals_path = os.path.join(dir, val_file_name)
+    eigvecs_path = os.path.join(dir, vec_file_name)
+
+    if os.path.exists(eigvals_path) and os.path.exists(eigvecs_path):
+        eigenvalues = np.load(eigvals_path)
+        eigenvectors = np.load(eigvecs_path)
+    else:
+        if data_name in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+            eigenvalues, eigenvectors = eigsh(A=laplacian_matrix, k=1000, which="SA", tol=1e-5)
+        else:
+            if sp.issparse(laplacian_matrix):
+                laplacian_matrix = laplacian_matrix.todense()
+            eigenvalues, eigenvectors = eigh(laplacian_matrix)
+
+        if save:
+            np.save(eigvals_path, eigenvalues)
+            np.save(eigvecs_path, eigenvectors)
+
+    if data_name in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+        val_file_name = "eigenvalues_la.npy"
+        vec_file_name = "eigenvectors_la.npy"
+        eigvals_path = os.path.join(dir, val_file_name)
+        eigvecs_path = os.path.join(dir, vec_file_name)
+
+        if os.path.exists(eigvals_path) and os.path.exists(eigvecs_path):
+            eigenvalues_la = np.load(eigvals_path)
+            eigenvectors_la = np.load(eigvecs_path)
+        else:
+            eigenvalues_la, eigenvectors_la = eigsh(A=laplacian_matrix, k=1000, which="LA", tol=1e-5)
+            if save:
+                np.save(eigvals_path, eigenvalues_la)
+                np.save(eigvecs_path, eigenvectors_la)
+
+        eigenvalues = np.hstack([eigenvalues, eigenvalues_la])
+        eigenvectors = np.hstack([eigenvectors, eigenvectors_la])
+
+    idx = np.argsort(eigenvalues)
+    eigenvalues = eigenvalues[idx[:]]
+    eigenvectors = eigenvectors[:, idx[:]]
+
+    return eigenvalues, eigenvectors
+
+
+def load_eigen(dataset):
+    dir = "../../data/" + dataset + "/"
+    val_file_name = "eigenvalues.npy"
+    vec_file_name = "eigenvectors.npy"
+
+    eigvals_path = os.path.join(dir, val_file_name)
+    eigvecs_path = os.path.join(dir, vec_file_name)
+    eigenvalues = np.load(eigvals_path)
+    eigenvectors = np.load(eigvecs_path)
+
+    if dataset in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+        val_file_name = "eigenvalues_la.npy"
+        vec_file_name = "eigenvectors_la.npy"
+        eigvals_path = os.path.join(dir, val_file_name)
+        eigvecs_path = os.path.join(dir, vec_file_name)
+        eigenvalues_la = np.load(eigvals_path)
+        eigenvectors_la = np.load(eigvecs_path)
+
+        eigenvalues = np.hstack([eigenvalues, eigenvalues_la])
+        eigenvectors = np.hstack([eigenvectors, eigenvectors_la])
+
+    idx = np.argsort(eigenvalues)
+    eigenvalues = eigenvalues[idx[:]]
+    eigenvectors = eigenvectors[:, idx[:]]
+
+    return eigenvalues, eigenvectors
 
 
 def get_train_lcc(idx_lcc, idx_train, y_full, num_nodes, num_classes):

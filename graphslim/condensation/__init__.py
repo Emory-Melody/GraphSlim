@@ -10,3 +10,4 @@ from .sgdd import SGDD
 from .simgc import SimGC
 from .mirage import Mirage
 from .gcdm import GCDM
+from .gdem import GDEM

@@ -241,7 +241,7 @@ class GCondBase:
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
-    def intermediate_evaluation(self, best_val, loss_avg, save=True, save_valid_acc=False):
+    def intermediate_evaluation(self, best_val, loss_avg=None, save=True, save_valid_acc=False):
         """
         Performs intermediate evaluation and saves the best model.
 

@@ -171,6 +171,12 @@ def method_config(args):
 # ======================================simgc====================================== #
 @click.option('--feat_alpha', default=10, show_default=True, help='feature loss weight')
 @click.option('--smoothness_alpha', default=0.1, show_default=True, help='smoothness loss weight')
+#==================gdem=====#
+@click.option('--eigen_k', default=2, show_default=True, help='number of eigenvalues')
+@click.option('--ratio', default=0.8, show_default=True, help='eigenvalue loss weight')
+@click.option('--lr_eigenvec', default=0.01, show_default=True, help='eigenvalue loss weight')
+@click.option('--gamma', default=0.5, show_default=True, help='eigenvalue loss weight')
+
 @click.pass_context
 def cli(ctx, **kwargs):
     args = dict2obj(kwargs)
