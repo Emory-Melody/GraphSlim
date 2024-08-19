@@ -1,9 +1,8 @@
 {
   "dataset": "ogbn-arxiv",
-  "reduction_rate": 0.01,
   "eigen_k": 909,
   "ratio": 0.85,
-  "epoch": 1000,
+  "epochs": 1000,
   "e1": 1,
   "e2": 5,
   "alpha": 0.001,

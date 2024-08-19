@@ -39,6 +39,7 @@ def setting_config(args):
     representative_r = {
         'cora': 0.5,
         'citeseer': 0.5,
+        'pubmed': 0.5,
         'flickr': 0.01,
         'reddit': 0.001,
         'ogbn-arxiv': 0.01,

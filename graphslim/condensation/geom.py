@@ -18,6 +18,7 @@ class GEOM(GCondBase):
     """
     "Navigating Complexity: Toward Lossless Graph Condensation via Expanding Window Matching." https://arxiv.org/pdf/2402.05011.pdf
     """
+
     def __init__(self, setting, data, args, **kwargs):
         super(GEOM, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
@@ -145,12 +146,13 @@ class GEOM(GCondBase):
             start_epoch = np.random.randint(args.min_start_epoch, Upper_Bound)
 
             if args.optim == 'Adam':
-                start_epoch = start_epoch // 10
-            starting_params = expert_trajectory[start_epoch]
+                starting_params = expert_trajectory[start_epoch // 10]
+            else:
+                starting_params = expert_trajectory[start_epoch]
 
             # if args.interval_buffer == 1:
             # print(start_epoch + args.expert_epochs // 10)
-            target_params = expert_trajectory[start_epoch + args.expert_epochs // 10]
+            target_params = expert_trajectory[args.expert_epochs // 10]
             target_params = torch.cat([p.data.to(self.device).reshape(-1) for p in target_params], 0)
 
             if args.beta:

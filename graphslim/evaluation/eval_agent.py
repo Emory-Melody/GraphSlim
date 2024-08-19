@@ -10,6 +10,7 @@ from torch_sparse import matmul
 from torch_geometric.utils import dense_to_sparse
 from graphslim.dataset import *
 from graphslim.evaluation import *
+from graphslim.evaluation.utils import *
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
@@ -155,7 +156,7 @@ class Evaluator:
                 args.logger.info(
                     f'{model_type} Result: {100 * best_result[0]:.2f} +/- {100 * best_result[1]:.2f}')
 
-    def test(self, data, model_type, verbose=True, reduced=True, mode='eval'):
+    def test(self, data, model_type, verbose=True, reduced=True, mode='eval', MIA=False):
         """
         Tests a model and returns accuracy and loss.
 
@@ -190,6 +191,7 @@ class Evaluator:
 
         model.eval()
         labels_test = data.labels_test.long().to(args.device)
+        labels_train = data.labels_train.long().to(args.device)
 
         if args.attack is not None:
             data = attack(data, args)
@@ -198,6 +200,11 @@ class Evaluator:
             output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = self.metric(output, labels_test)
+            if MIA:
+                output_train = model.predict(data.feat_train, data.adj_train)
+                conf_train = F.softmax(output_train, dim=1)
+                conf_test = F.softmax(output, dim=1)
+
             if verbose:
                 print("Test set results:",
                       f"loss= {loss_test.item():.4f}",
@@ -206,11 +213,18 @@ class Evaluator:
             output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
             acc_test = self.metric(output[data.idx_test], labels_test)
+            if MIA:
+                conf_train = F.softmax(output[data.idx_train], dim=1)
+                conf_test = F.softmax(output[data.idx_test], dim=1)
             if verbose:
                 print("Test full set results:",
                       f"loss= {loss_test.item():.4f}",
                       f"accuracy= {acc_test.item():.4f}")
-
+        if MIA:
+            mia_acc = inference_via_confidence(conf_train.cpu().numpy(), conf_test.cpu().numpy(), labels_train.cpu(),
+                                               labels_test.cpu())
+            # print(f"MIA accuracy: {mia_acc}")
+            return best_acc_val.item(), acc_test.item(), mia_acc
         return best_acc_val.item(), acc_test.item()
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
@@ -256,7 +270,8 @@ class Evaluator:
         res = []
         for i in run_evaluation:
             seed_everything(args.seed + i)
-            _, best_acc = self.test(data, model_type=model_type, verbose=args.verbose, reduced=reduced, mode=mode)
+            _, best_acc = self.test(data, model_type=model_type, verbose=args.verbose, reduced=reduced,
+                                    mode=mode)
             res.append(best_acc)
             if verbose:
                 run_evaluation.set_postfix(test_acc=best_acc)
@@ -265,6 +280,65 @@ class Evaluator:
 
         # Log and return mean and standard deviation of accuracy
         args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        return res.mean(), res.std()
+
+    def MIA_evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
+        """
+        Evaluates a model over multiple runs and returns mean and standard deviation of accuracy.
+
+        Parameters
+        ----------
+        data : Dataset
+            The dataset containing the graph data.
+        model_type : str
+            The type of model to evaluate.
+        verbose : bool, optional, default=True
+            Whether to print detailed logs.
+        reduced : bool, optional, default=True
+            Whether to use synthetic data.
+        mode : str, optional, default='eval'
+            The mode for the model (e.g., 'eval' or 'cross').
+
+        Returns
+        -------
+        mean_acc : float
+            Mean accuracy over multiple runs.
+        std_acc : float
+            Standard deviation of accuracy over multiple runs.
+        """
+
+        args = self.args
+
+        # Prepare synthetic data if required
+        if reduced:
+            data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, args, model_type=model_type,
+                                                                        verbose=verbose)
+
+        # Initialize progress bar based on verbosity
+        if verbose:
+            print(f'Evaluating reduced data using {model_type}')
+            run_evaluation = trange(args.run_eval)
+        else:
+            run_evaluation = range(args.run_eval)
+
+        # Collect accuracy results from multiple runs
+        res = []
+        mia_res = []
+        for i in run_evaluation:
+            seed_everything(args.seed + i)
+            _, best_acc, mia_acc = self.test(data, model_type=model_type, verbose=args.verbose, reduced=reduced,
+                                             mode=mode, MIA=True)
+            res.append(best_acc)
+            mia_res.append(mia_acc)
+            if verbose:
+                run_evaluation.set_postfix(test_acc=best_acc,MIA_acc=mia_acc)
+
+        res = np.array(res)
+        mia_res = np.array(mia_res)
+
+        # Log and return mean and standard deviation of accuracy
+        args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}, '
+                         f'MIA Accuracy: {100 * mia_res.mean():.2f} +/- {100 * mia_res.std():.2f}')
         return res.mean(), res.std()
 
     def nas_evaluate(self, data, model_type, verbose=False, reduced=None):

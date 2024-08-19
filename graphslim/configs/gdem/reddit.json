@@ -1,9 +1,8 @@
 {
   "dataset": "reddit",
-  "reduction_rate": 0.005,
   "eigen_k": 769,
   "ratio": 0.9,
-  "epoch": 1000,
+  "epochs": 1000,
   "e1": 5,
   "e2": 5,
   "alpha": 1.0,
