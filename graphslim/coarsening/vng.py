@@ -62,7 +62,8 @@ class VNG:
             embeds = [embed[data.train_mask] for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
 
-            coarsen_edge, coarsen_features, coarsen_labels = self.vng(embeds, data.adj_train, labels)
+            coarsen_edge, coarsen_features, coarsen_labels = self.vng(data.feat_full[data.train_mask], embeds,
+                                                                      data.adj_train, labels)
 
         else:
             model = eval(args.eval_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
@@ -73,7 +74,8 @@ class VNG:
             embeds = [embed for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
 
-            coarsen_edge, coarsen_features, coarsen_labels = self.vng(embeds, data.adj_train, labels)
+            coarsen_edge, coarsen_features, coarsen_labels = self.vng(data.feat_full[data.train_mask], embeds,
+                                                                      data.adj_train, labels)
 
         data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_labels
 
@@ -81,7 +83,7 @@ class VNG:
 
         return data
 
-    def vng(self, embeds, adj, labels, verbose=False):
+    def vng(self, X_tr_0, embeds, adj, labels, verbose=False):
         """
         Virtual Node Graph (VNG) method to coarsen the graph.
 
@@ -109,7 +111,7 @@ class VNG:
                 Coarsened labels.
         """
         X_tr_head = torch.concat(embeds, dim=1).cpu().detach().numpy()
-        X_tr_0 = embeds[0].cpu().detach().numpy()
+        X_tr_0 = X_tr_0.cpu().detach().numpy()
         A_tr = adj
 
         column_sum = np.sum(A_tr, axis=0)
