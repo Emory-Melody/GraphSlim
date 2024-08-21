@@ -73,8 +73,10 @@ def get_dataset(name='cora', args=None):
     except:
         data.nclass = data.num_classes
 
-    print(len(data.labels_train), len(data.labels_val), len(data.labels_test))
-    print(sum(data.labels_train), sum(data.labels_val), sum(data.labels_test))
+    print("train nodes num:", sum(data.labels_train))
+    print("val nodes num:", sum(data.labels_val))
+    print("test nodes num:", sum(data.labels_test))
+    print("total nodes num:", data.x.shape)
     return data
 
 

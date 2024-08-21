@@ -1,0 +1,8 @@
+{
+  "lr_feat": 0.01,
+  "lr_adj": 0.01,
+  "dis_metric": "mse",
+  "outer_loop": 5,
+  "threshold": 0.05,
+  "condense_model": "GCN"
+}

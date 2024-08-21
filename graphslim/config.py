@@ -44,11 +44,12 @@ def setting_config(args):
         'reddit': 0.001,
         'ogbn-arxiv': 0.01,
         'yelp': 0.001,
-        'amazon': 0.002
+        'amazon': 0.002,
+        'pubmed': 0.1
     }
     if args.reduction_rate == -1:
         args.reduction_rate = representative_r[args.dataset]
-    if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv']:
+    if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv', 'pubmed']:
         args.setting = 'trans'
     if args.dataset in ['flickr', 'reddit', 'yelp', 'amazon']:
         args.setting = 'ind'

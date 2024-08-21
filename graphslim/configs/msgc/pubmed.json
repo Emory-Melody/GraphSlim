@@ -1,0 +1,12 @@
+{
+  "lr_feat": 0.0001,
+  "lr_adj": 0.0001,
+  "dis_metric": "ours",
+  "ntrans": 1,
+  "pre_norm": true,
+  "condense_model": "SGC",
+  "threshold": 0,
+  "outer_loop": 20,
+  "inner_loop": 15,
+  "init": "clustering"
+}

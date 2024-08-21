@@ -538,7 +538,7 @@ def accuracy(output, labels):
     return correct / len(labels)
 
 
-def f1_macro(output, labels):
+def f1_macro(output, labels, is_sigmoid=False):
     """Return F1-macro score of output compared to labels.
 
     Parameters
@@ -558,11 +558,17 @@ def f1_macro(output, labels):
     if type(labels) is not torch.Tensor:
         labels = torch.LongTensor(labels)
 
-    # Get predictions
-    preds = output.max(1)[1].type_as(labels)
+    labels = labels.cpu().numpy()
+    output = output.cpu().numpy()
 
-    # Calculate F1-macro score using sklearn's f1_score function
-    f1 = f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average='macro')
+    if not is_sigmoid:
+        output = np.argmax(output, axis=1)
+    else:
+        output = output[:, 1]
+        output[output > 0.5] = 1
+        output[output <= 0.5] = 0
+
+    f1 = f1_score(labels, output, average="macro")
 
     return f1
 

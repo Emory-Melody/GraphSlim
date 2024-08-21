@@ -1,0 +1,12 @@
+{
+  "lr_student": 0.5,
+  "lr_teacher": 0.4,
+  "wd_teacher": 0,
+  "lr_feat": 0.001,
+  "teacher_epochs": 2500,
+  "expert_epochs": 1500,
+  "syn_steps": 500,
+  "start_epoch": 30,
+  "init": "kcenter",
+  "optim": "SGD"
+}

@@ -1,0 +1,16 @@
+{
+  "lr_feat": 1e-4,
+  "lr_adj": 1e-4,
+  "dis_metric": "ours",
+  "opt_scale": 1e-11,
+  "ep_ratio": 0.5,
+  "sinkhorn_iter": 10,
+  "beta": 0.5,
+  "weight_decay": 0,
+  "outer_loop": 20,
+  "inner_loop": 15,
+  "condense_model": "SGC",
+  "ntrans": 1,
+  "epochs": 600,
+  "mx_size": 200
+}

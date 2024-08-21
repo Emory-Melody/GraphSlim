@@ -1,0 +1,11 @@
+{
+  "lr": 0.01,
+  "ridge": 1e0,
+  "K": 2,
+  "L": 2,
+  "adj": false,
+  "k": 2,
+  "scale": "average",
+  "epochs": 500,
+  "eval_interval": 10
+}
