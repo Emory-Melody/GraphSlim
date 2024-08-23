@@ -120,13 +120,17 @@
 <span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span
                                 class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span
+                                class="n">matmul</span>
 
 <span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
                                 class="n">dense_to_sparse</span>
 <span class="kn">from</span> <span class="nn">graphslim.dataset</span> <span class="kn">import</span> <span
                                 class="o">*</span>
+<span class="kn">from</span> <span class="nn">graphslim.evaluation</span> <span class="kn">import</span> <span
+                                class="o">*</span>
 <span class="kn">from</span> <span class="nn">graphslim.evaluation.utils</span> <span class="kn">import</span> <span
-                                class="n">sparsify</span>
+                                class="o">*</span>
 <span class="kn">from</span> <span class="nn">graphslim.models</span> <span class="kn">import</span> <span
                                 class="o">*</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
@@ -134,8 +138,11 @@
                                 class="n">ei2csr</span>
 <span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">accuracy</span><span
                                 class="p">,</span> <span class="n">seed_everything</span><span class="p">,</span> <span
+                                class="n">normalize_adj_tensor</span><span class="p">,</span> <span
+                                class="n">to_tensor</span><span class="p">,</span> <span
                                 class="n">is_sparse_tensor</span><span class="p">,</span> <span
-                                class="n">is_identity</span>
+                                class="n">is_identity</span><span class="p">,</span> \
+    <span class="n">f1_macro</span>
 
 
 <div class="viewcode-block" id="Evaluator"><a class="viewcode-back"
@@ -171,6 +178,10 @@
             class="n">args</span><span class="o">.</span><span class="n">device</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_parameters</span><span
             class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span
+            class="n">accuracy</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">metric</span> <span class="o">==</span> <span class="s1">&#39;accuracy&#39;</span> <span
+            class="k">else</span> <span class="n">f1_macro</span>
 
 <div class="viewcode-block" id="Evaluator.reset_parameters"><a class="viewcode-back"
                                                                href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.reset_parameters">[docs]</a>    <span
@@ -180,67 +191,6 @@
 <span class="sd">        Initializes or resets model parameters.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>
-
-<div class="viewcode-block" id="Evaluator.get_syn_data"><a class="viewcode-back"
-                                                           href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.get_syn_data">[docs]</a>    <span
-        class="k">def</span> <span class="nf">get_syn_data</span><span class="p">(</span><span
-        class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
-        class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
-        class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Loads or computes synthetic data for evaluation.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        data : Dataset</span>
-<span class="sd">            The dataset containing the graph data.</span>
-<span class="sd">        model_type : str</span>
-<span class="sd">            The type of model used for generating synthetic data.</span>
-<span class="sd">        verbose : bool, optional, default=False</span>
-<span class="sd">            Whether to print detailed logs.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        feat_syn : torch.Tensor</span>
-<span class="sd">            Synthetic feature matrix.</span>
-<span class="sd">        adj_syn : torch.Tensor</span>
-<span class="sd">            Synthetic adjacency matrix.</span>
-<span class="sd">        labels_syn : torch.Tensor</span>
-<span class="sd">            Synthetic labels.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
-            class="n">args</span>
-        <span class="n">adj_syn</span><span class="p">,</span> <span class="n">feat_syn</span><span
-            class="p">,</span> <span class="n">labels_syn</span> <span class="o">=</span> <span
-            class="n">load_reduced</span><span class="p">(</span><span class="n">args</span><span
-            class="p">,</span> <span class="n">data</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">labels_syn</span><span class="o">.</span><span
-            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
-            class="o">==</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">labels_train</span><span class="o">.</span><span class="n">shape</span><span
-            class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="n">feat_syn</span><span class="p">,</span> <span class="n">adj_syn</span><span
-            class="p">,</span> <span class="n">labels_syn</span>
-
-        <span class="k">if</span> <span class="n">is_sparse_tensor</span><span class="p">(</span><span
-            class="n">adj_syn</span><span class="p">):</span>
-            <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span><span
-            class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span
-            class="n">adj_syn</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span
-            class="n">sparse</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">):</span>
-            <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span><span
-            class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span>
-
-        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">sparsify</span><span
-            class="p">(</span><span class="n">model_type</span><span class="p">,</span> <span
-            class="n">adj_syn</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span
-            class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">feat_syn</span><span class="p">,</span> <span
-            class="n">adj_syn</span><span class="p">,</span> <span class="n">labels_syn</span></div>
 
 <div class="viewcode-block" id="Evaluator.grid_search"><a class="viewcode-back"
                                                           href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.grid_search">[docs]</a>    <span
@@ -454,11 +404,10 @@
                     <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">labels_syn</span> <span class="o">=</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">get_syn_data</span><span class="p">(</span><span
-            class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
-            class="n">model_type</span><span class="p">,</span>
-                                                                                     <span class="n">verbose</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">get_syn_data</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span
+            class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+                                                                                <span class="n">verbose</span><span
             class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span
             class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting Grid Search for </span><span
@@ -492,11 +441,10 @@
                 <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">labels_syn</span> <span class="o">=</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">get_syn_data</span><span class="p">(</span><span
-            class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
-            class="n">model_type</span><span class="p">,</span>
-                                                                                 <span class="n">verbose</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">get_syn_data</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span
+            class="o">=</span><span class="n">model_type</span><span class="p">,</span>
+                                                                            <span class="n">verbose</span><span
             class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span
             class="p">)</span>
                 <span class="n">best_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
@@ -522,7 +470,8 @@
         class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span
         class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="kc">True</span><span
         class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
-        class="s1">&#39;eval&#39;</span><span class="p">):</span>
+        class="s1">&#39;eval&#39;</span><span class="p">,</span> <span class="n">MIA</span><span class="o">=</span><span
+        class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tests a model and returns accuracy and loss.</span>
 
@@ -579,6 +528,10 @@
             class="o">.</span><span class="n">labels_test</span><span class="o">.</span><span class="n">long</span><span
             class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span
             class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">labels_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_train</span><span class="o">.</span><span class="n">long</span><span
+            class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">attack</span> <span
             class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -596,9 +549,23 @@
             <span class="n">loss_test</span> <span class="o">=</span> <span class="n">F</span><span
             class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
             class="p">,</span> <span class="n">labels_test</span><span class="p">)</span>
-            <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy</span><span
-            class="p">(</span><span class="n">output</span><span class="p">,</span> <span
-            class="n">labels_test</span><span class="p">)</span>
+            <span class="n">acc_test</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">metric</span><span class="p">(</span><span class="n">output</span><span
+            class="p">,</span> <span class="n">labels_test</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">MIA</span><span class="p">:</span>
+                <span class="n">output_train</span> <span class="o">=</span> <span class="n">model</span><span
+            class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">feat_train</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">adj_train</span><span class="p">)</span>
+                <span class="n">conf_train</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">softmax</span><span class="p">(</span><span
+            class="n">output_train</span><span class="p">,</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">conf_test</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span>
+
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span
             class="s2">&quot;Test set results:&quot;</span><span class="p">,</span>
@@ -619,10 +586,21 @@
             class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
             class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">idx_test</span><span
             class="p">],</span> <span class="n">labels_test</span><span class="p">)</span>
-            <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy</span><span
-            class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">data</span><span
-            class="o">.</span><span class="n">idx_test</span><span class="p">],</span> <span
-            class="n">labels_test</span><span class="p">)</span>
+            <span class="n">acc_test</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">metric</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">],</span> <span class="n">labels_test</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">MIA</span><span class="p">:</span>
+                <span class="n">conf_train</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">idx_train</span><span
+            class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span>
+                <span class="n">conf_test</span> <span class="o">=</span> <span class="n">F</span><span
+            class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">idx_test</span><span
+            class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span
+            class="p">)</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span
             class="s2">&quot;Test full set results:&quot;</span><span class="p">,</span>
@@ -634,7 +612,19 @@
             class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span
             class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span
             class="p">)</span>
-
+        <span class="k">if</span> <span class="n">MIA</span><span class="p">:</span>
+            <span class="n">mia_acc</span> <span class="o">=</span> <span class="n">inference_via_confidence</span><span
+            class="p">(</span><span class="n">conf_train</span><span class="o">.</span><span class="n">cpu</span><span
+            class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span
+            class="n">conf_test</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span
+            class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">labels_train</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                                               <span class="n">labels_test</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">())</span>
+            <span class="c1"># print(f&quot;MIA accuracy: {mia_acc}&quot;)</span>
+            <span class="k">return</span> <span class="n">best_acc_val</span><span class="o">.</span><span class="n">item</span><span
+            class="p">(),</span> <span class="n">acc_test</span><span class="o">.</span><span class="n">item</span><span
+            class="p">(),</span> <span class="n">mia_acc</span>
         <span class="k">return</span> <span class="n">best_acc_val</span><span class="o">.</span><span
             class="n">item</span><span class="p">(),</span> <span class="n">acc_test</span><span class="o">.</span><span
             class="n">item</span><span class="p">()</span></div>
@@ -670,6 +660,7 @@
 <span class="sd">        std_acc : float</span>
 <span class="sd">            Standard deviation of accuracy over multiple runs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">args</span>
 
@@ -678,11 +669,11 @@
             <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
             class="p">,</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">labels_syn</span> <span class="o">=</span> <span class="bp">self</span><span
-            class="o">.</span><span class="n">get_syn_data</span><span class="p">(</span><span
-            class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">get_syn_data</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span
+            class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
             class="n">model_type</span><span class="p">,</span>
-                                                                             <span class="n">verbose</span><span
+                                                                        <span class="n">verbose</span><span
             class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
         <span class="c1"># Initialize progress bar based on verbosity</span>
@@ -709,8 +700,9 @@
             class="o">=</span><span class="n">model_type</span><span class="p">,</span> <span
             class="n">verbose</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
             class="n">verbose</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span
-            class="n">reduced</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
-            class="n">mode</span><span class="p">)</span>
+            class="n">reduced</span><span class="p">,</span>
+                                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span
+            class="p">)</span>
             <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
             class="n">best_acc</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -731,6 +723,122 @@
             class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span
             class="si">}</span><span class="s1"> +/- </span><span class="si">{</span><span class="mi">100</span><span
             class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span
+            class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span
+            class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">mean</span><span
+            class="p">(),</span> <span class="n">res</span><span class="o">.</span><span class="n">std</span><span
+            class="p">()</span></div>
+
+<div class="viewcode-block" id="Evaluator.MIA_evaluate"><a class="viewcode-back"
+                                                           href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.MIA_evaluate">[docs]</a>    <span
+        class="k">def</span> <span class="nf">MIA_evaluate</span><span class="p">(</span><span
+        class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span
+        class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span
+        class="kc">True</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span
+        class="s1">&#39;eval&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluates a model over multiple runs and returns mean and standard deviation of accuracy.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        model_type : str</span>
+<span class="sd">            The type of model to evaluate.</span>
+<span class="sd">        verbose : bool, optional, default=True</span>
+<span class="sd">            Whether to print detailed logs.</span>
+<span class="sd">        reduced : bool, optional, default=True</span>
+<span class="sd">            Whether to use synthetic data.</span>
+<span class="sd">        mode : str, optional, default=&#39;eval&#39;</span>
+<span class="sd">            The mode for the model (e.g., &#39;eval&#39; or &#39;cross&#39;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        mean_acc : float</span>
+<span class="sd">            Mean accuracy over multiple runs.</span>
+<span class="sd">        std_acc : float</span>
+<span class="sd">            Standard deviation of accuracy over multiple runs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
+            class="n">args</span>
+
+        <span class="c1"># Prepare synthetic data if required</span>
+        <span class="k">if</span> <span class="n">reduced</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">get_syn_data</span><span
+            class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">args</span><span
+            class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
+            class="n">model_type</span><span class="p">,</span>
+                                                                        <span class="n">verbose</span><span
+            class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+
+        <span class="c1"># Initialize progress bar based on verbosity</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Evaluating reduced data using </span><span
+            class="si">{</span><span class="n">model_type</span><span class="si">}</span><span
+            class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">run_evaluation</span> <span class="o">=</span> <span class="n">trange</span><span class="p">(</span><span
+            class="n">args</span><span class="o">.</span><span class="n">run_eval</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">run_evaluation</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span
+            class="n">args</span><span class="o">.</span><span class="n">run_eval</span><span class="p">)</span>
+
+        <span class="c1"># Collect accuracy results from multiple runs</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">mia_res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
+            class="n">run_evaluation</span><span class="p">:</span>
+            <span class="n">seed_everything</span><span class="p">(</span><span class="n">args</span><span
+            class="o">.</span><span class="n">seed</span> <span class="o">+</span> <span class="n">i</span><span
+            class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">best_acc</span><span
+            class="p">,</span> <span class="n">mia_acc</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">data</span><span
+            class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
+            class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span
+            class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span class="n">reduced</span><span
+            class="p">,</span>
+                                             <span class="n">mode</span><span class="o">=</span><span
+            class="n">mode</span><span class="p">,</span> <span class="n">MIA</span><span class="o">=</span><span
+            class="kc">True</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
+            class="n">best_acc</span><span class="p">)</span>
+            <span class="n">mia_res</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">mia_acc</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                <span class="n">run_evaluation</span><span class="o">.</span><span class="n">set_postfix</span><span
+            class="p">(</span><span class="n">test_acc</span><span class="o">=</span><span
+            class="n">best_acc</span><span class="p">,</span><span class="n">MIA_acc</span><span class="o">=</span><span
+            class="n">mia_acc</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">mia_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">array</span><span class="p">(</span><span class="n">mia_res</span><span class="p">)</span>
+
+        <span class="c1"># Log and return mean and standard deviation of accuracy</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span
+            class="n">info</span><span class="p">(</span><span class="sa">f</span><span
+            class="s1">&#39;Seed:</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">seed</span><span class="si">}</span><span
+            class="s1">, Test Mean Accuracy: </span><span class="si">{</span><span class="mi">100</span><span
+            class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span
+            class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span
+            class="si">}</span><span class="s1"> +/- </span><span class="si">{</span><span class="mi">100</span><span
+            class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">res</span><span class="o">.</span><span
+            class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span
+            class="si">}</span><span class="s1">, &#39;</span>
+                         <span class="sa">f</span><span class="s1">&#39;MIA Accuracy: </span><span
+            class="si">{</span><span class="mi">100</span><span class="w"> </span><span class="o">*</span><span
+            class="w"> </span><span class="n">mia_res</span><span class="o">.</span><span class="n">mean</span><span
+            class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span
+            class="s1"> +/- </span><span class="si">{</span><span class="mi">100</span><span class="w"> </span><span
+            class="o">*</span><span class="w"> </span><span class="n">mia_res</span><span class="o">.</span><span
             class="n">std</span><span class="p">()</span><span class="si">:</span><span class="s1">.2f</span><span
             class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">mean</span><span
@@ -773,9 +881,8 @@
         <span class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">labels_syn</span> <span
-            class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
-            class="n">get_syn_data</span><span class="p">(</span><span class="n">data</span><span
-            class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
+            class="o">=</span> <span class="n">get_syn_data</span><span class="p">(</span><span
+            class="n">data</span><span class="p">,</span> <span class="n">model_type</span><span class="o">=</span><span
             class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span
             class="o">=</span><span class="n">verbose</span><span class="p">)</span>
 
@@ -835,55 +942,27 @@
             class="p">(),</span> <span class="n">res</span><span class="o">.</span><span class="n">std</span><span
             class="p">()</span></div>
 
-<div class="viewcode-block" id="Evaluator.vis"><a class="viewcode-back"
-                                                  href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.vis">[docs]</a>    <span
-        class="k">def</span> <span class="nf">vis</span><span class="p">(</span><span class="n">args</span><span
-        class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Evaluator.tsne_vis"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.tsne_vis">[docs]</a>    <span
+        class="k">def</span> <span class="nf">tsne_vis</span><span class="p">(</span><span class="bp">self</span><span
+        class="p">,</span> <span class="n">feat_train</span><span class="p">,</span> <span class="n">labels_train</span><span
+        class="p">,</span> <span class="n">feat_syn</span><span class="p">,</span> <span
+        class="n">labels_syn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.</span>
+<span class="sd">        Visualize t-SNE for original and synthetic data.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        args : argparse.Namespace</span>
-<span class="sd">            Command-line arguments and configuration parameters.</span>
-<span class="sd">        data : Dataset</span>
-<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">            feat_train (torch.tensor): Original features.</span>
+<span class="sd">            labels_train (torch.tensor): Labels for original features.</span>
+<span class="sd">            feat_syn (torch.tensor): Synthetic features.</span>
+<span class="sd">            labels_syn (torch.tensor): Labels for synthetic features.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
-            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">save_path</span><span
-            class="si">}</span><span class="s1">/reduced_graph/</span><span class="si">{</span><span
-            class="n">args</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span
-            class="s1">&#39;</span>
-        <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">torch</span><span
-            class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
-            class="n">save_path</span><span class="si">}</span><span class="s1">/feat_</span><span
-            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
-            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
-            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
-            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
-            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
-            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
-            class="p">)</span>
-        <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">torch</span><span
-            class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
-            class="n">save_path</span><span class="si">}</span><span class="s1">/label_</span><span
-            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
-            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
-            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
-            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
-            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
-            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
-            class="p">)</span>
-
-        <span class="c1"># Extract features and labels from the dataset</span>
-        <span class="n">labels_train_np</span> <span class="o">=</span> <span class="n">data</span><span
-            class="o">.</span><span class="n">labels_train</span><span class="o">.</span><span class="n">cpu</span><span
-            class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-        <span class="n">feat_train_np</span> <span class="o">=</span> <span class="n">data</span><span
-            class="o">.</span><span class="n">feat_train</span><span class="o">.</span><span class="n">cpu</span><span
-            class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">labels_train_np</span> <span class="o">=</span> <span class="n">labels_train</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
+        <span class="n">feat_train_np</span> <span class="o">=</span> <span class="n">feat_train</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">numpy</span><span class="p">()</span>
         <span class="n">labels_syn_np</span> <span class="o">=</span> <span class="n">labels_syn</span><span
             class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
             class="n">numpy</span><span class="p">()</span>
@@ -993,22 +1072,127 @@
 
         <span class="c1"># Save and display the figure</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span
-            class="sa">f</span><span class="s1">&#39;tsne_visualization_</span><span class="si">{</span><span class="n">args</span><span
-            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">_</span><span
+            class="sa">f</span><span class="s1">&#39;tsne_visualization_</span><span class="si">{</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
+            class="n">method</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
+            class="n">dataset</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span
+            class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span
+            class="n">reduction_rate</span><span class="si">}</span><span class="s1">.pdf&#39;</span><span
+            class="p">,</span>
+                    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;pdf&#39;</span><span
+            class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Saved figure to tsne_visualization_</span><span
+            class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">_</span><span
+            class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">_</span><span
+            class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s2">.pdf&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Evaluator.visualize"><a class="viewcode-back"
+                                                        href="../../../source/graphslim.evaluation.html#graphslim.evaluation.eval_agent.Evaluator.visualize">[docs]</a>    <span
+        class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="n">args</span><span
+        class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        args : argparse.Namespace</span>
+<span class="sd">            Command-line arguments and configuration parameters.</span>
+<span class="sd">        data : Dataset</span>
+<span class="sd">            The dataset containing the graph data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">save_path</span><span
+            class="si">}</span><span class="s1">/reduced_graph/</span><span class="si">{</span><span
+            class="n">args</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span
+            class="s1">&#39;</span>
+        <span class="n">feat_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/feat_</span><span
             class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
             class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
             class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
-            class="s1">.pdf&#39;</span><span class="p">,</span> <span class="nb">format</span><span
-            class="o">=</span><span class="s1">&#39;pdf&#39;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved figure to tsne_visualization_</span><span
-            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">method</span><span
-            class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">args</span><span
-            class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">_</span><span
-            class="si">{</span><span class="n">args</span><span class="o">.</span><span
-            class="n">reduction_rate</span><span class="si">}</span><span class="s2">.pdf&quot;</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
             class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span
-            class="p">()</span></div></div>
+        <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/label_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="s1">&#39;cpu&#39;</span><span
+            class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span
+            class="n">save_path</span><span class="si">}</span><span class="s1">/adj_</span><span
+            class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">dataset</span><span
+            class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">args</span><span
+            class="o">.</span><span class="n">reduction_rate</span><span class="si">}</span><span
+            class="s1">_</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
+            class="n">seed</span><span class="si">}</span><span class="s1">.pt&#39;</span><span class="p">,</span> <span
+            class="n">map_location</span><span class="o">=</span><span class="n">args</span><span
+            class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">eye</span><span class="p">(</span><span class="n">feat_syn</span><span class="o">.</span><span
+            class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span
+            class="n">device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Obtain embeddings</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">adj_train</span> <span
+            class="o">=</span> <span class="n">to_tensor</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">adj_train</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">pre_conv</span> <span
+            class="o">=</span> <span class="n">normalize_adj_tensor</span><span class="p">(</span><span
+            class="n">data</span><span class="o">.</span><span class="n">adj_train</span><span class="p">,</span> <span
+            class="n">sparse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">pre_conv</span> <span
+            class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">pre_conv</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">pre_conv</span><span class="p">)</span>
+        <span class="n">feat_train_agg</span> <span class="o">=</span> <span class="n">matmul</span><span
+            class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">pre_conv</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">feat_train</span><span
+            class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">to_tensor</span><span class="p">(</span><span
+            class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">)</span>
+        <span class="n">pre_conv_syn</span> <span class="o">=</span> <span class="n">normalize_adj_tensor</span><span
+            class="p">(</span><span class="n">adj_syn</span><span class="p">,</span> <span class="n">sparse</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pre_conv_syn</span> <span class="o">=</span> <span class="n">matmul</span><span
+            class="p">(</span><span class="n">pre_conv_syn</span><span class="p">,</span> <span
+            class="n">pre_conv_syn</span><span class="p">)</span>
+        <span class="n">feat_syn_agg</span> <span class="o">=</span> <span class="n">matmul</span><span
+            class="p">(</span><span class="n">pre_conv_syn</span><span class="p">,</span> <span
+            class="n">labels_syn</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span
+            class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tsne_vis</span><span class="p">(</span><span
+            class="n">data</span><span class="o">.</span><span class="n">feat_train</span><span class="p">,</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">labels_train</span><span
+            class="p">,</span> <span class="n">feat_syn</span><span class="p">,</span> <span class="n">labels_syn</span><span
+            class="p">)</span>  <span class="c1"># Visualizes feature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tsne_vis</span><span class="p">(</span><span
+            class="n">feat_train_agg</span><span class="p">,</span> <span class="n">data</span><span
+            class="o">.</span><span class="n">labels_train</span><span class="p">,</span> <span
+            class="n">feat_syn_agg</span><span class="p">,</span> <span class="n">labels_syn</span><span
+            class="p">)</span>  <span class="c1"># Visualizes embedding</span></div></div>
 </pre>
                         </div>
 

@@ -149,12 +149,13 @@
             class="n">args</span>
         <span class="n">pge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span
             class="n">pge</span>
-        <span class="n">feat_syn</span><span class="p">,</span> <span class="n">labels_syn</span> <span
-            class="o">=</span> <span class="n">to_tensor</span><span class="p">(</span><span class="bp">self</span><span
-            class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span class="n">label</span><span
-            class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">labels_syn</span><span
-            class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span
-            class="o">.</span><span class="n">device</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feat_syn</span><span
+            class="p">,</span> <span class="n">labels_syn</span> <span class="o">=</span> <span
+            class="n">to_tensor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">feat_syn</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span
+            class="n">data</span><span class="o">.</span><span class="n">labels_syn</span><span class="p">,</span> <span
+            class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span
+            class="n">device</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
             class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
             class="p">:</span>
@@ -195,9 +196,9 @@
         <span class="n">best_val</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span
             class="n">args</span><span class="o">.</span><span class="n">condense_model</span><span
-            class="p">)(</span><span class="n">feat_syn</span><span class="o">.</span><span class="n">shape</span><span
-            class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">args</span><span
-            class="o">.</span><span class="n">hidden</span><span class="p">,</span>
+            class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">d</span><span
+            class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">hidden</span><span
+            class="p">,</span>
                                           <span class="n">data</span><span class="o">.</span><span
             class="n">nclass</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span><span
             class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span

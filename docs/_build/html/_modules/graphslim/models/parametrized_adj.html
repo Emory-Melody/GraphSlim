@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -179,7 +179,8 @@
             class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span
             class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span
             class="n">nnodes</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span
-            class="n">arange</span><span class="p">(</span><span class="n">nnodes</span><span class="p">))</span>
+            class="n">arange</span><span class="p">(</span><span class="n">nnodes</span><span class="p">),</span><span
+            class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">edge_index</span> <span class="o">=</span> <span class="n">np</span><span
             class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">X</span><span
             class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">Y</span><span

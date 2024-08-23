@@ -150,16 +150,6 @@
 <span class="sd">        Additional keyword arguments.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
-            class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
-            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
-            class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">ClusterAgg</span><span
-            class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span
-            class="fm">__init__</span><span class="p">(</span><span class="n">setting</span><span
-            class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">args</span><span
-            class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
 <div class="viewcode-block" id="ClusterAgg.reduce"><a class="viewcode-back"
                                                       href="../../../source/graphslim.coarsening.html#graphslim.coarsening.clusteringagg.ClusterAgg.reduce">[docs]</a>    <span
         class="nd">@verbose_time_memory</span>
@@ -266,7 +256,8 @@
             class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span
             class="p">)</span>
             <span class="n">k_means</span><span class="o">.</span><span class="n">fit</span><span
-            class="p">(</span><span class="n">x_c</span><span class="p">)</span>
+            class="p">(</span><span class="n">x_c</span><span class="p">,</span> <span class="n">replace</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">clusters</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span
             class="n">k_means</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span
@@ -363,7 +354,6 @@
             class="p">)</span>
 
         <span class="k">return</span> <span class="n">labels_syn</span><span class="p">,</span> <span class="n">labels_train</span></div></div>
-
 </pre>
                         </div>
 

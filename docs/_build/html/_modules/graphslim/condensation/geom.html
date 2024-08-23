@@ -140,6 +140,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    &quot;Navigating Complexity: Toward Lossless Graph Condensation via Expanding Window Matching.&quot; https://arxiv.org/pdf/2402.05011.pdf</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
@@ -468,17 +469,18 @@
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
             class="n">optim</span> <span class="o">==</span> <span class="s1">&#39;Adam&#39;</span><span
             class="p">:</span>
-                <span class="n">start_epoch</span> <span class="o">=</span> <span class="n">start_epoch</span> <span
-            class="o">//</span> <span class="mi">10</span>
-            <span class="n">starting_params</span> <span class="o">=</span> <span
-            class="n">expert_trajectory</span><span class="p">[</span><span class="n">start_epoch</span><span class="p">]</span>
+                <span class="n">starting_params</span> <span class="o">=</span> <span class="n">expert_trajectory</span><span
+            class="p">[</span><span class="n">start_epoch</span> <span class="o">//</span> <span
+            class="mi">10</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">starting_params</span> <span class="o">=</span> <span class="n">expert_trajectory</span><span
+            class="p">[</span><span class="n">start_epoch</span><span class="p">]</span>
 
             <span class="c1"># if args.interval_buffer == 1:</span>
             <span class="c1"># print(start_epoch + args.expert_epochs // 10)</span>
             <span class="n">target_params</span> <span class="o">=</span> <span class="n">expert_trajectory</span><span
-            class="p">[</span><span class="n">start_epoch</span> <span class="o">+</span> <span
-            class="n">args</span><span class="o">.</span><span class="n">expert_epochs</span> <span class="o">//</span> <span
-            class="mi">10</span><span class="p">]</span>
+            class="p">[</span><span class="n">args</span><span class="o">.</span><span
+            class="n">expert_epochs</span> <span class="o">//</span> <span class="mi">10</span><span class="p">]</span>
             <span class="n">target_params</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">p</span><span
             class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to</span><span

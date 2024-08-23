@@ -118,13 +118,106 @@
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
 <span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
                                 class="n">to_undirected</span><span class="p">,</span> <span
-                                class="n">to_dense_adj</span>
+                                class="n">to_dense_adj</span><span class="p">,</span> <span
+                                class="n">remove_self_loops</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
 <span class="kn">import</span> <span class="nn">networkit</span> <span class="k">as</span> <span class="nn">nk</span>
 <span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span
-                                class="n">Data</span>
+                                class="n">Data</span><span class="p">,</span> <span class="n">HeteroData</span>
 
 
+<div class="viewcode-block" id="from_dgl"><a class="viewcode-back"
+                                             href="../../../source/graphslim.dataset.html#graphslim.dataset.convertor.from_dgl">[docs]</a><span
+        class="k">def</span> <span class="nf">from_dgl</span><span class="p">(</span><span class="n">g</span><span
+        class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">hetero</span><span
+        class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">is_homogeneous</span><span
+            class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">()</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span
+            class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span
+            class="p">(),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">)</span>
+
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span
+            class="n">value</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span
+            class="n">ndata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span
+            class="o">=</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span
+            class="n">value</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span
+            class="n">edata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">attr</span><span class="p">]</span> <span
+            class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">HeteroData</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span
+            class="n">name</span>
+
+    <span class="k">for</span> <span class="n">node_type</span> <span class="ow">in</span> <span class="n">g</span><span
+            class="o">.</span><span class="n">ntypes</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span
+            class="n">value</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span
+            class="n">nodes</span><span class="p">[</span><span class="n">node_type</span><span class="p">]</span><span
+            class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">items</span><span
+            class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">node_type</span><span class="p">][</span><span
+            class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">for</span> <span class="n">edge_type</span> <span class="ow">in</span> <span class="n">g</span><span
+            class="o">.</span><span class="n">canonical_etypes</span><span class="p">:</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span
+            class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span
+            class="n">form</span><span class="o">=</span><span class="s2">&quot;uv&quot;</span><span class="p">,</span> <span
+            class="n">etype</span><span class="o">=</span><span class="n">edge_type</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">edge_type</span><span class="p">]</span><span
+            class="o">.</span><span class="n">edge_index</span> <span class="o">=</span> <span
+            class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span
+            class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span
+            class="n">value</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span
+            class="n">edge_attr_schemes</span><span class="p">(</span><span class="n">edge_type</span><span
+            class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">edge_type</span><span class="p">][</span><span
+            class="n">attr</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="n">data_out</span> <span class="o">=</span> <span class="n">Data</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">hetero</span><span class="p">:</span>
+        <span class="n">edge_index_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">edge_type</span> <span class="ow">in</span> <span
+            class="n">g</span><span class="o">.</span><span class="n">canonical_etypes</span><span class="p">:</span>
+            <span class="n">edge_index_list</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">edge_type</span><span
+            class="p">]</span><span class="o">.</span><span class="n">edge_index</span><span class="p">)</span>
+        <span class="n">data_out</span><span class="o">.</span><span class="n">edge_index</span> <span
+            class="o">=</span> <span class="n">remove_self_loops</span><span class="p">(</span><span
+            class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span
+            class="n">edge_index_list</span><span class="p">,</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span
+            class="p">]</span>
+
+        <span class="n">data_out</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">node_stores</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">][</span><span class="s1">&#39;feature&#39;</span><span
+            class="p">]</span>
+
+        <span class="n">data_out</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">node_stores</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">][</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+
+    <span class="n">data_out</span><span class="o">.</span><span class="n">num_nodes</span> <span
+            class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data_out</span><span
+            class="o">.</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">data_out</span><span class="o">.</span><span class="n">num_classes</span> <span
+            class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">data_out</span><span
+            class="o">.</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span
+            class="p">()</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">data_out</span></div>
 <div class="viewcode-block" id="pyg2gsp"><a class="viewcode-back"
                                             href="../../../source/graphslim.dataset.html#graphslim.dataset.convertor.pyg2gsp">[docs]</a><span
         class="k">def</span> <span class="nf">pyg2gsp</span><span class="p">(</span><span

@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -133,9 +133,11 @@
                                 class="n">to_undirected</span><span class="p">,</span> <span
                                 class="n">add_self_loops</span>
 <span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">from</span> <span class="nn">dgl.data</span> <span class="kn">import</span> <span class="n">FraudDataset</span>
 
 <span class="kn">from</span> <span class="nn">graphslim.dataset.convertor</span> <span class="kn">import</span> <span
-                                class="n">ei2csr</span><span class="p">,</span> <span class="n">csr2ei</span>
+                                class="n">ei2csr</span><span class="p">,</span> <span class="n">csr2ei</span><span
+                                class="p">,</span> <span class="n">from_dgl</span>
 <span class="kn">from</span> <span class="nn">graphslim.dataset.utils</span> <span class="kn">import</span> <span
                                 class="n">splits</span>
 <span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">index_to_mask</span><span
@@ -159,8 +161,8 @@
             class="p">,</span> <span class="s1">&#39;photo&#39;</span><span class="p">,</span>
                       <span class="s1">&#39;computers&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-products&#39;</span><span
             class="p">,</span> <span class="s1">&#39;ogbn-proteins&#39;</span><span class="p">,</span> <span class="s1">&#39;ogbn-papers100m&#39;</span><span
-            class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">]</span>
-    <span class="c1"># TODO: Add sythesize graph</span>
+            class="p">,</span> <span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">,</span> <span class="s1">&#39;yelp&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;amazon&#39;</span><span class="p">]</span>
     <span class="n">normalized_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span
             class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span
             class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span
@@ -238,11 +240,27 @@
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">PygNodePropPredDataset</span><span
             class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">root</span><span
             class="o">=</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;yelp&#39;</span><span class="p">,</span> <span class="s1">&#39;amazon&#39;</span><span
+            class="p">]:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">FraudDataset</span><span
+            class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">raw_dir</span><span
+            class="o">=</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">from_dgl</span><span
+            class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">],</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span
+            class="p">,</span> <span class="n">hetero</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">)</span>  <span class="c1"># dgl2pyg</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dataset name not recognized.&quot;</span><span
             class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span
             class="mi">0</span><span class="p">]</span>
+
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span>
 
     <span class="c1"># pyg2TransAndInd: add splits</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">splits</span><span class="p">(</span><span
@@ -252,9 +270,26 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">TransAndInd</span><span class="p">(</span><span
             class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span
             class="n">args</span><span class="o">.</span><span class="n">pre_norm</span><span class="p">)</span>
-    <span class="n">data</span><span class="o">.</span><span class="n">nclass</span> <span class="o">=</span> <span
-            class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span>
 
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">nclass</span> <span class="o">=</span> <span
+            class="n">dataset</span><span class="o">.</span><span class="n">num_classes</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">nclass</span> <span class="o">=</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">num_classes</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;train nodes num:&quot;</span><span
+            class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">labels_train</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;val nodes num:&quot;</span><span
+            class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">labels_val</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;test nodes num:&quot;</span><span
+            class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">labels_test</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;total nodes num:&quot;</span><span
+            class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">data</span></div>
 
 

@@ -144,6 +144,7 @@
 <span class="sd">    **kwargs : keyword arguments</span>
 <span class="sd">        Additional arguments for initialization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span
             class="p">,</span> <span class="n">setting</span><span class="p">,</span> <span class="n">data</span><span
             class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="o">**</span><span
@@ -595,8 +596,9 @@
                                                                       href="../../../source/graphslim.condensation.html#graphslim.condensation.gcond_base.GCondBase.intermediate_evaluation">[docs]</a>    <span
         class="k">def</span> <span class="nf">intermediate_evaluation</span><span class="p">(</span><span class="bp">self</span><span
         class="p">,</span> <span class="n">best_val</span><span class="p">,</span> <span class="n">loss_avg</span><span
-        class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span
-        class="p">):</span>
+        class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">save</span><span
+        class="o">=</span><span class="kc">True</span><span class="p">,</span> <span
+        class="n">save_valid_acc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Performs intermediate evaluation and saves the best model.</span>
 
@@ -630,13 +632,14 @@
             class="nb">range</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span
             class="n">run_inter_eval</span><span class="p">):</span>
             <span class="c1"># small epochs for fast intermediate evaluation</span>
-            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span
-            class="bp">self</span><span class="o">.</span><span class="n">test_with_val</span><span
-            class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span
-            class="p">,</span> <span class="n">setting</span><span class="o">=</span><span class="n">args</span><span
-            class="o">.</span><span class="n">setting</span><span class="p">,</span> <span class="n">iters</span><span
-            class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">eval_epochs</span><span
-            class="p">))</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">test_with_val</span><span class="p">(</span><span
+            class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span
+            class="n">setting</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span
+            class="n">setting</span><span class="p">,</span> <span class="n">iters</span><span class="o">=</span><span
+            class="n">args</span><span class="o">.</span><span class="n">eval_epochs</span><span
+            class="p">,</span> <span class="n">best_val</span><span class="o">=</span><span
+            class="n">best_val</span><span class="p">))</span>
 
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
             class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
@@ -665,7 +668,8 @@
         class="bp">self</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
         class="kc">False</span><span class="p">,</span> <span class="n">setting</span><span class="o">=</span><span
         class="s1">&#39;trans&#39;</span><span class="p">,</span> <span class="n">iters</span><span
-        class="o">=</span><span class="mi">200</span><span class="p">):</span>
+        class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">best_val</span><span
+        class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Conducts validation testing and returns results.</span>
 
@@ -709,7 +713,8 @@
             class="kc">False</span><span class="p">,</span>
                                      <span class="n">setting</span><span class="o">=</span><span
             class="n">setting</span><span class="p">,</span> <span class="n">reduced</span><span class="o">=</span><span
-            class="kc">True</span><span class="p">)</span>
+            class="kc">True</span><span class="p">,</span> <span class="n">best_val</span><span class="o">=</span><span
+            class="n">best_val</span><span class="p">)</span>
         <span class="c1"># model.eval()</span>
         <span class="c1"># labels_test = data.labels_test.long().to(args.device)</span>
         <span class="c1"># if setting == &#39;trans&#39;:</span>

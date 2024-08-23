@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -112,6 +112,17 @@
                                 class="o">*</span>
 <span class="kn">import</span> <span class="nn">torch_geometric</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">numpy.linalg</span> <span class="kn">import</span> <span
+                                class="n">eigh</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="kn">import</span> <span class="n">eigsh</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span
+                                class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span
+                                class="n">Data</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
+                                class="n">convert</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
 
 <div class="viewcode-block" id="match_loss"><a class="viewcode-back"
                                                href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.match_loss">[docs]</a><span
@@ -842,6 +853,7 @@
             class="p">()</span>
     <span class="k">return</span> <span class="n">indices</span></div>
 
+
 <div class="viewcode-block" id="training_scheduler"><a class="viewcode-back"
                                                        href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.training_scheduler">[docs]</a><span
         class="k">def</span> <span class="nf">training_scheduler</span><span class="p">(</span><span
@@ -896,6 +908,436 @@
             class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">lam</span><span
             class="p">)</span> <span class="o">*</span> <span class="n">t</span> <span class="o">/</span> <span
             class="n">T</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_largest_cc"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_largest_cc">[docs]</a><span
+        class="k">def</span> <span class="nf">get_largest_cc</span><span class="p">(</span><span
+        class="n">adj</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span
+        class="n">data_name</span><span class="p">):</span>
+    <span class="n">mx</span> <span class="o">=</span> <span class="p">(</span><span class="n">adj</span><span
+            class="p">)</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">LongTensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span
+            class="n">vstack</span><span class="p">([</span><span class="n">mx</span><span class="o">.</span><span
+            class="n">row</span><span class="p">,</span> <span class="n">mx</span><span class="o">.</span><span
+            class="n">col</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span
+            class="n">num_nodes</span><span class="o">=</span><span class="n">num_nodes</span><span class="p">)</span>
+    <span class="n">nx_graph</span> <span class="o">=</span> <span class="n">convert</span><span class="o">.</span><span
+            class="n">to_networkx</span><span class="p">(</span><span class="n">data</span><span
+            class="p">,</span> <span class="n">to_undirected</span><span class="o">=</span><span
+            class="kc">True</span><span class="p">)</span>
+
+    <span class="n">largest_cc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span
+            class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span
+            class="p">(</span><span class="n">nx_graph</span><span class="p">),</span> <span class="n">key</span><span
+            class="o">=</span><span class="nb">len</span><span class="p">)</span>
+    <span class="n">idx_lcc</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span
+            class="n">largest_cc</span><span class="p">)</span>
+    <span class="n">largest_cc_graph</span> <span class="o">=</span> <span class="n">nx_graph</span><span
+            class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span
+            class="n">largest_cc</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_lcc</span><span
+            class="p">)</span> <span class="o">==</span> <span class="n">num_nodes</span><span class="p">:</span>
+        <span class="n">adj_lcc</span> <span class="o">=</span> <span class="n">adj</span>
+        <span class="n">adj_norm_lcc</span> <span class="o">=</span> <span class="n">gcn_normalize_adj</span><span
+            class="p">(</span><span class="n">adj_lcc</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">adj_lcc</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span
+            class="n">to_scipy_sparse_array</span><span class="p">(</span><span class="n">largest_cc_graph</span><span
+            class="p">)</span>
+        <span class="n">adj_norm_lcc</span> <span class="o">=</span> <span class="n">gcn_normalize_adj</span><span
+            class="p">(</span><span class="n">adj_lcc</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">idx_lcc</span><span class="p">,</span> <span
+            class="n">adj_norm_lcc</span><span class="p">,</span> <span class="n">adj_lcc</span></div>
+
+<div class="viewcode-block" id="get_syn_eigen"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_syn_eigen">[docs]</a><span
+        class="k">def</span> <span class="nf">get_syn_eigen</span><span class="p">(</span><span
+        class="n">real_eigenvals</span><span class="p">,</span> <span class="n">real_eigenvecs</span><span
+        class="p">,</span> <span class="n">eigen_k</span><span class="p">,</span> <span class="n">ratio</span><span
+        class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">k1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span
+            class="n">ceil</span><span class="p">(</span><span class="n">eigen_k</span> <span class="o">*</span> <span
+            class="n">ratio</span><span class="p">)</span>
+    <span class="n">k2</span> <span class="o">=</span> <span class="n">eigen_k</span> <span class="o">-</span> <span
+            class="n">k1</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;k1:&quot;</span><span class="p">,</span> <span
+            class="n">k1</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span
+            class="p">,</span> <span class="s2">&quot;k2:&quot;</span><span class="p">,</span> <span class="n">k2</span><span
+            class="p">)</span>
+    <span class="n">k1_end</span> <span class="o">=</span> <span class="p">(</span><span class="n">k1</span> <span
+            class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span
+            class="n">step</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">eigen_sum</span> <span class="o">=</span> <span class="n">real_eigenvals</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span>
+    <span class="n">k2_end</span> <span class="o">=</span> <span class="n">eigen_sum</span> <span
+            class="o">-</span> <span class="p">(</span><span class="n">k2</span> <span class="o">-</span> <span
+            class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">step</span> <span
+            class="o">-</span> <span class="mi">1</span>
+    <span class="n">k1_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span
+            class="mi">0</span><span class="p">,</span> <span class="n">k1_end</span><span class="p">,</span> <span
+            class="n">step</span><span class="p">)</span>
+    <span class="n">k2_list</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span
+            class="n">k2_end</span><span class="p">,</span> <span class="n">eigen_sum</span><span
+            class="p">,</span> <span class="n">step</span><span class="p">)</span>
+    <span class="n">eigenvals</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">real_eigenvals</span><span class="p">[</span><span
+            class="n">k1_list</span><span class="p">],</span> <span class="n">real_eigenvals</span><span
+            class="p">[</span><span class="n">k2_list</span><span class="p">]]</span>
+    <span class="p">)</span>
+    <span class="n">eigenvecs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">cat</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">real_eigenvecs</span><span class="p">[:,</span> <span
+            class="n">k1_list</span><span class="p">],</span> <span class="n">real_eigenvecs</span><span
+            class="p">[:,</span> <span class="n">k2_list</span><span class="p">]],</span> <span
+            class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">eigenvals</span><span class="p">,</span> <span
+            class="n">eigenvecs</span></div>
+
+
+<div class="viewcode-block" id="get_subspace_embed"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_subspace_embed">[docs]</a><span
+        class="k">def</span> <span class="nf">get_subspace_embed</span><span class="p">(</span><span
+        class="n">eigenvecs</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">x_trans</span> <span class="o">=</span> <span class="n">eigenvecs</span><span
+            class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>  <span
+            class="c1"># kd</span>
+    <span class="n">u_unsqueeze</span> <span class="o">=</span> <span class="p">(</span><span class="n">eigenvecs</span><span
+            class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span
+            class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># kn1</span>
+    <span class="n">x_trans_unsqueeze</span> <span class="o">=</span> <span class="n">x_trans</span><span
+            class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span>  <span class="c1"># k1d</span>
+    <span class="n">sub_embed</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">bmm</span><span class="p">(</span><span class="n">u_unsqueeze</span><span class="p">,</span> <span
+            class="n">x_trans_unsqueeze</span><span class="p">)</span>  <span class="c1"># kn1 @ k1d = knd</span>
+    <span class="k">return</span> <span class="n">x_trans</span><span class="p">,</span> <span
+            class="n">sub_embed</span></div>
+
+
+<div class="viewcode-block" id="get_subspace_covariance_matrix"><a class="viewcode-back"
+                                                                   href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_subspace_covariance_matrix">[docs]</a><span
+        class="k">def</span> <span class="nf">get_subspace_covariance_matrix</span><span class="p">(</span><span
+        class="n">eigenvecs</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">x_trans</span> <span class="o">=</span> <span class="n">eigenvecs</span><span
+            class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>  <span
+            class="c1"># kd</span>
+    <span class="n">x_trans</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">normalize</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span
+            class="n">x_trans</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span
+            class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span
+            class="mi">1</span><span class="p">)</span>
+    <span class="n">x_trans_unsqueeze</span> <span class="o">=</span> <span class="n">x_trans</span><span
+            class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">)</span>  <span class="c1"># k1d</span>
+    <span class="n">co_matrix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">bmm</span><span class="p">(</span><span class="n">x_trans_unsqueeze</span><span class="o">.</span><span
+            class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span
+            class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span
+            class="n">x_trans_unsqueeze</span><span class="p">)</span>  <span class="c1"># kd1 @ k1d = kdd</span>
+    <span class="k">return</span> <span class="n">co_matrix</span></div>
+
+
+<div class="viewcode-block" id="get_embed_sum"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_embed_sum">[docs]</a><span
+        class="k">def</span> <span class="nf">get_embed_sum</span><span class="p">(</span><span
+        class="n">eigenvals</span><span class="p">,</span> <span class="n">eigenvecs</span><span
+        class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">x_trans</span> <span class="o">=</span> <span class="n">eigenvecs</span><span
+            class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">x</span>  <span
+            class="c1"># kd</span>
+    <span class="n">x_trans</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span
+            class="n">eigenvals</span><span class="p">)</span> <span class="o">@</span> <span class="n">x_trans</span>  <span
+            class="c1"># kd</span>
+    <span class="n">embed_sum</span> <span class="o">=</span> <span class="n">eigenvecs</span> <span class="o">@</span> <span
+            class="n">x_trans</span>  <span class="c1"># nk @ kd = nd</span>
+    <span class="k">return</span> <span class="n">embed_sum</span></div>
+
+
+<div class="viewcode-block" id="get_embed_mean"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_embed_mean">[docs]</a><span
+        class="k">def</span> <span class="nf">get_embed_mean</span><span class="p">(</span><span
+        class="n">embed_sum</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">class_matrix</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">one_hot</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span
+            class="o">.</span><span class="n">float</span><span class="p">()</span>  <span class="c1"># nc</span>
+    <span class="n">class_matrix</span> <span class="o">=</span> <span class="n">class_matrix</span><span
+            class="o">.</span><span class="n">T</span>  <span class="c1"># cn</span>
+    <span class="n">embed_sum</span> <span class="o">=</span> <span class="n">class_matrix</span> <span
+            class="o">@</span> <span class="n">embed_sum</span>  <span class="c1"># cd</span>
+    <span class="n">mean_weight</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span
+            class="o">/</span> <span class="n">class_matrix</span><span class="o">.</span><span
+            class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span><span
+            class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">)</span>  <span class="c1"># c1</span>
+    <span class="n">embed_mean</span> <span class="o">=</span> <span class="n">mean_weight</span> <span
+            class="o">*</span> <span class="n">embed_sum</span>
+    <span class="n">embed_mean</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span
+            class="n">normalize</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span
+            class="n">embed_mean</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span
+            class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span
+            class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">embed_mean</span></div>
+
+
+<div class="viewcode-block" id="get_eigh"><a class="viewcode-back"
+                                             href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_eigh">[docs]</a><span
+        class="k">def</span> <span class="nf">get_eigh</span><span class="p">(</span><span
+        class="n">laplacian_matrix</span><span class="p">,</span> <span class="n">data_name</span><span
+        class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">True</span><span
+        class="p">):</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="s2">&quot;../../data/&quot;</span> <span
+            class="o">+</span> <span class="n">data_name</span> <span class="o">+</span> <span
+            class="s2">&quot;/&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">)</span>
+
+    <span class="n">val_file_name</span> <span class="o">=</span> <span class="s2">&quot;eigenvalues.npy&quot;</span>
+    <span class="n">vec_file_name</span> <span class="o">=</span> <span class="s2">&quot;eigenvectors.npy&quot;</span>
+
+    <span class="n">eigvals_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">,</span> <span class="n">val_file_name</span><span class="p">)</span>
+    <span class="n">eigvecs_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">,</span> <span class="n">vec_file_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+            class="o">.</span><span class="n">exists</span><span class="p">(</span><span
+            class="n">eigvals_path</span><span class="p">)</span> <span class="ow">and</span> <span
+            class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span
+            class="n">exists</span><span class="p">(</span><span class="n">eigvecs_path</span><span class="p">):</span>
+        <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span
+            class="n">eigvals_path</span><span class="p">)</span>
+        <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span
+            class="n">eigvecs_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data_name</span> <span class="ow">in</span> <span
+            class="p">[</span><span class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch-gamer&#39;</span><span
+            class="p">]:</span>
+            <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span
+            class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">A</span><span
+            class="o">=</span><span class="n">laplacian_matrix</span><span class="p">,</span> <span
+            class="n">k</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span
+            class="n">which</span><span class="o">=</span><span class="s2">&quot;SA&quot;</span><span class="p">,</span> <span
+            class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span
+            class="n">issparse</span><span class="p">(</span><span class="n">laplacian_matrix</span><span
+            class="p">):</span>
+                <span class="n">laplacian_matrix</span> <span class="o">=</span> <span class="n">laplacian_matrix</span><span
+            class="o">.</span><span class="n">todense</span><span class="p">()</span>
+            <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span> <span
+            class="o">=</span> <span class="n">eigh</span><span class="p">(</span><span
+            class="n">laplacian_matrix</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+            class="n">eigvals_path</span><span class="p">,</span> <span class="n">eigenvalues</span><span
+            class="p">)</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span
+            class="n">eigvecs_path</span><span class="p">,</span> <span class="n">eigenvectors</span><span
+            class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data_name</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch-gamer&#39;</span><span
+            class="p">]:</span>
+        <span class="n">val_file_name</span> <span class="o">=</span> <span
+            class="s2">&quot;eigenvalues_la.npy&quot;</span>
+        <span class="n">vec_file_name</span> <span class="o">=</span> <span
+            class="s2">&quot;eigenvectors_la.npy&quot;</span>
+        <span class="n">eigvals_path</span> <span class="o">=</span> <span class="n">os</span><span
+            class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+            class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span
+            class="n">val_file_name</span><span class="p">)</span>
+        <span class="n">eigvecs_path</span> <span class="o">=</span> <span class="n">os</span><span
+            class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+            class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span
+            class="n">vec_file_name</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span
+            class="o">.</span><span class="n">exists</span><span class="p">(</span><span
+            class="n">eigvals_path</span><span class="p">)</span> <span class="ow">and</span> <span
+            class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span
+            class="n">exists</span><span class="p">(</span><span class="n">eigvecs_path</span><span class="p">):</span>
+            <span class="n">eigenvalues_la</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span
+            class="n">eigvals_path</span><span class="p">)</span>
+            <span class="n">eigenvectors_la</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span
+            class="n">eigvecs_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eigenvalues_la</span><span class="p">,</span> <span class="n">eigenvectors_la</span> <span
+            class="o">=</span> <span class="n">eigsh</span><span class="p">(</span><span class="n">A</span><span
+            class="o">=</span><span class="n">laplacian_matrix</span><span class="p">,</span> <span
+            class="n">k</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span
+            class="n">which</span><span class="o">=</span><span class="s2">&quot;LA&quot;</span><span class="p">,</span> <span
+            class="n">tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">save</span><span class="p">:</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span
+            class="p">(</span><span class="n">eigvals_path</span><span class="p">,</span> <span
+            class="n">eigenvalues_la</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">save</span><span
+            class="p">(</span><span class="n">eigvecs_path</span><span class="p">,</span> <span class="n">eigenvectors_la</span><span
+            class="p">)</span>
+
+        <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">hstack</span><span class="p">([</span><span
+            class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvalues_la</span><span
+            class="p">])</span>
+        <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">hstack</span><span class="p">([</span><span
+            class="n">eigenvectors</span><span class="p">,</span> <span class="n">eigenvectors_la</span><span class="p">])</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">argsort</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">)</span>
+    <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">eigenvalues</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">[:]]</span>
+    <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">eigenvectors</span><span
+            class="p">[:,</span> <span class="n">idx</span><span class="p">[:]]</span>
+
+    <span class="k">return</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span></div>
+
+
+<div class="viewcode-block" id="load_eigen"><a class="viewcode-back"
+                                               href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.load_eigen">[docs]</a><span
+        class="k">def</span> <span class="nf">load_eigen</span><span class="p">(</span><span
+        class="n">dataset</span><span class="p">):</span>
+    <span class="nb">dir</span> <span class="o">=</span> <span class="s2">&quot;../../data/&quot;</span> <span
+            class="o">+</span> <span class="n">dataset</span> <span class="o">+</span> <span
+            class="s2">&quot;/&quot;</span>
+    <span class="n">val_file_name</span> <span class="o">=</span> <span class="s2">&quot;eigenvalues.npy&quot;</span>
+    <span class="n">vec_file_name</span> <span class="o">=</span> <span class="s2">&quot;eigenvectors.npy&quot;</span>
+
+    <span class="n">eigvals_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">,</span> <span class="n">val_file_name</span><span class="p">)</span>
+    <span class="n">eigvecs_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span
+            class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span
+            class="nb">dir</span><span class="p">,</span> <span class="n">vec_file_name</span><span class="p">)</span>
+    <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span><span class="n">eigvals_path</span><span class="p">)</span>
+    <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span><span class="n">eigvecs_path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;ogbn-arxiv&#39;</span><span class="p">,</span> <span class="s1">&#39;flickr&#39;</span><span
+            class="p">,</span> <span class="s1">&#39;reddit&#39;</span><span class="p">,</span> <span class="s1">&#39;twitch-gamer&#39;</span><span
+            class="p">]:</span>
+        <span class="n">val_file_name</span> <span class="o">=</span> <span
+            class="s2">&quot;eigenvalues_la.npy&quot;</span>
+        <span class="n">vec_file_name</span> <span class="o">=</span> <span
+            class="s2">&quot;eigenvectors_la.npy&quot;</span>
+        <span class="n">eigvals_path</span> <span class="o">=</span> <span class="n">os</span><span
+            class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+            class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span
+            class="n">val_file_name</span><span class="p">)</span>
+        <span class="n">eigvecs_path</span> <span class="o">=</span> <span class="n">os</span><span
+            class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span
+            class="p">(</span><span class="nb">dir</span><span class="p">,</span> <span
+            class="n">vec_file_name</span><span class="p">)</span>
+        <span class="n">eigenvalues_la</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">load</span><span class="p">(</span><span class="n">eigvals_path</span><span class="p">)</span>
+        <span class="n">eigenvectors_la</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">load</span><span class="p">(</span><span
+            class="n">eigvecs_path</span><span class="p">)</span>
+
+        <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">hstack</span><span class="p">([</span><span
+            class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvalues_la</span><span
+            class="p">])</span>
+        <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">hstack</span><span class="p">([</span><span
+            class="n">eigenvectors</span><span class="p">,</span> <span class="n">eigenvectors_la</span><span class="p">])</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">argsort</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">)</span>
+    <span class="n">eigenvalues</span> <span class="o">=</span> <span class="n">eigenvalues</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">[:]]</span>
+    <span class="n">eigenvectors</span> <span class="o">=</span> <span class="n">eigenvectors</span><span
+            class="p">[:,</span> <span class="n">idx</span><span class="p">[:]]</span>
+
+    <span class="k">return</span> <span class="n">eigenvalues</span><span class="p">,</span> <span class="n">eigenvectors</span></div>
+
+
+<div class="viewcode-block" id="get_train_lcc"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.condensation.html#graphslim.condensation.utils.get_train_lcc">[docs]</a><span
+        class="k">def</span> <span class="nf">get_train_lcc</span><span class="p">(</span><span class="n">idx_lcc</span><span
+        class="p">,</span> <span class="n">idx_train</span><span class="p">,</span> <span class="n">y_full</span><span
+        class="p">,</span> <span class="n">num_nodes</span><span class="p">,</span> <span
+        class="n">num_classes</span><span class="p">):</span>
+    <span class="n">idx_train_lcc</span> <span class="o">=</span> <span class="nb">list</span><span
+            class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">idx_train</span><span
+            class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span
+            class="nb">set</span><span class="p">(</span><span class="n">idx_lcc</span><span class="p">)))</span>
+    <span class="n">y_full</span> <span class="o">=</span> <span class="n">y_full</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">idx_lcc</span><span
+            class="p">)</span> <span class="o">==</span> <span class="n">num_nodes</span><span class="p">:</span>
+        <span class="n">idx_map</span> <span class="o">=</span> <span class="n">idx_train</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">y_train</span> <span class="o">=</span> <span class="n">y_full</span><span
+            class="p">[</span><span class="n">idx_train</span><span class="p">]</span>
+        <span class="n">y_train_lcc</span> <span class="o">=</span> <span class="n">y_full</span><span
+            class="p">[</span><span class="n">idx_train_lcc</span><span class="p">]</span>
+
+        <span class="n">y_lcc_idx</span> <span class="o">=</span> <span class="nb">list</span><span
+            class="p">((</span><span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span
+            class="p">(</span><span class="n">num_nodes</span><span class="p">))</span> <span class="o">-</span> <span
+            class="nb">set</span><span class="p">(</span><span class="n">idx_train</span><span class="p">))</span><span
+            class="o">.</span><span class="n">intersection</span><span class="p">(</span><span
+            class="nb">set</span><span class="p">(</span><span class="n">idx_lcc</span><span class="p">)))</span>
+        <span class="n">y_lcc_</span> <span class="o">=</span> <span class="n">y_full</span><span
+            class="p">[</span><span class="n">y_lcc_idx</span><span class="p">]</span>
+        <span class="n">counter_train</span> <span class="o">=</span> <span class="n">Counter</span><span
+            class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+        <span class="n">counter_train_lcc</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span
+            class="n">y_train_lcc</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">y_lcc_</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">num_classes</span><span class="p">):</span>
+            <span class="n">num_c</span> <span class="o">=</span> <span class="n">counter_train</span><span
+            class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">-</span> <span class="n">counter_train_lcc</span><span
+            class="p">[</span><span class="n">c</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">num_c</span> <span class="o">&gt;</span> <span class="mi">0</span><span
+            class="p">:</span>
+                <span class="n">idx_c</span> <span class="o">=</span> <span class="nb">list</span><span
+            class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="n">y_lcc_</span> <span
+            class="o">==</span> <span class="n">c</span><span class="p">])</span>
+                <span class="n">idx_c</span> <span class="o">=</span> <span class="n">np</span><span
+            class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y_lcc_idx</span><span
+            class="p">)[</span><span class="n">idx_c</span><span class="p">]</span>
+                <span class="n">idx_train_lcc</span> <span class="o">+=</span> <span class="nb">list</span><span
+            class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span
+            class="o">.</span><span class="n">permutation</span><span class="p">(</span><span
+            class="n">idx_c</span><span class="p">)[:</span><span class="n">num_c</span><span class="p">])</span>
+        <span class="n">idx_map</span> <span class="o">=</span> <span class="p">[</span><span
+            class="n">idx_lcc</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span
+            class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span
+            class="ow">in</span> <span class="n">idx_train_lcc</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">idx_train_lcc</span><span class="p">,</span> <span
+            class="n">idx_map</span></div>
 </pre>
                         </div>
 

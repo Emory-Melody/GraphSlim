@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -222,8 +222,12 @@
             <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
             class="p">,</span> <span class="n">coarsen_labels</span> <span class="o">=</span> <span
             class="bp">self</span><span class="o">.</span><span class="n">vng</span><span class="p">(</span><span
-            class="n">embeds</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">adj_train</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span class="p">[</span><span
+            class="n">data</span><span class="o">.</span><span class="n">train_mask</span><span
+            class="p">],</span> <span class="n">embeds</span><span class="p">,</span>
+                                                                      <span class="n">data</span><span
+            class="o">.</span><span class="n">adj_train</span><span class="p">,</span> <span
+            class="n">labels</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="nb">eval</span><span
@@ -263,8 +267,12 @@
             <span class="n">coarsen_edge</span><span class="p">,</span> <span class="n">coarsen_features</span><span
             class="p">,</span> <span class="n">coarsen_labels</span> <span class="o">=</span> <span
             class="bp">self</span><span class="o">.</span><span class="n">vng</span><span class="p">(</span><span
-            class="n">embeds</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span
-            class="n">adj_train</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+            class="n">data</span><span class="o">.</span><span class="n">feat_full</span><span class="p">[</span><span
+            class="n">data</span><span class="o">.</span><span class="n">train_mask</span><span
+            class="p">],</span> <span class="n">embeds</span><span class="p">,</span>
+                                                                      <span class="n">data</span><span
+            class="o">.</span><span class="n">adj_train</span><span class="p">,</span> <span
+            class="n">labels</span><span class="p">)</span>
 
         <span class="n">data</span><span class="o">.</span><span class="n">adj_syn</span><span class="p">,</span> <span
             class="n">data</span><span class="o">.</span><span class="n">feat_syn</span><span class="p">,</span> <span
@@ -281,9 +289,10 @@
 <div class="viewcode-block" id="VNG.vng"><a class="viewcode-back"
                                             href="../../../source/graphslim.coarsening.html#graphslim.coarsening.vng.VNG.vng">[docs]</a>    <span
         class="k">def</span> <span class="nf">vng</span><span class="p">(</span><span class="bp">self</span><span
-        class="p">,</span> <span class="n">embeds</span><span class="p">,</span> <span class="n">adj</span><span
-        class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">verbose</span><span
-        class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        class="p">,</span> <span class="n">X_tr_0</span><span class="p">,</span> <span class="n">embeds</span><span
+        class="p">,</span> <span class="n">adj</span><span class="p">,</span> <span class="n">labels</span><span
+        class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span
+        class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Virtual Node Graph (VNG) method to coarsen the graph.</span>
 
@@ -316,10 +325,10 @@
             class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span
             class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span
             class="n">numpy</span><span class="p">()</span>
-        <span class="n">X_tr_0</span> <span class="o">=</span> <span class="n">embeds</span><span
-            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span
-            class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span
-            class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+        <span class="n">X_tr_0</span> <span class="o">=</span> <span class="n">X_tr_0</span><span
+            class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span
+            class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
         <span class="n">A_tr</span> <span class="o">=</span> <span class="n">adj</span>
 
         <span class="n">column_sum</span> <span class="o">=</span> <span class="n">np</span><span

@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../_static/js/html5shiv.min.js"></script>
+    <script src="../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../_static/jquery.js?v=5d32c60e"></script>
@@ -116,11 +116,150 @@
 <span class="kn">import</span> <span class="nn">torch.sparse</span> <span class="k">as</span> <span class="nn">ts</span>
 <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span
                                 class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">f1_score</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span class="n">SparseTensor</span><span
+                                class="p">,</span><span class="n">fill_diag</span><span class="p">,</span><span
+                                class="n">matmul</span><span class="p">,</span><span class="n">mul</span>
+<span class="kn">from</span> <span class="nn">torch_sparse</span> <span class="kn">import</span> <span
+                                class="nb">sum</span> <span class="k">as</span> <span class="n">sparsesum</span>
 <span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
                                 class="n">degree</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span
+                                class="n">add_remaining_self_loops</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils.num_nodes</span> <span
+                                class="kn">import</span> <span class="n">maybe_num_nodes</span>
+<span class="kn">from</span> <span class="nn">torch_scatter</span> <span class="kn">import</span> <span class="n">scatter_add</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">_overload</span>
+<span class="k">def</span> <span class="nf">gcn_norm</span><span class="p">(</span><span
+                                class="n">edge_index</span><span class="p">,</span> <span
+                                class="n">edge_weight</span><span class="o">=</span><span class="kc">None</span><span
+                                class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span
+                                class="kc">None</span><span class="p">,</span> <span class="n">improved</span><span
+                                class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">add_self_loops</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;source_to_target&quot;</span><span
+                                class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span
+                                class="p">):</span>
+    <span class="c1"># type: (Tensor, OptTensor, Optional[int], bool, bool, str, Optional[int]) -&gt; PairTensor  # noqa</span>
+    <span class="k">pass</span>
 
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">_overload</span>
+<span class="k">def</span> <span class="nf">gcn_norm</span><span class="p">(</span><span
+                                class="n">edge_index</span><span class="p">,</span> <span
+                                class="n">edge_weight</span><span class="o">=</span><span class="kc">None</span><span
+                                class="p">,</span> <span class="n">num_nodes</span><span class="o">=</span><span
+                                class="kc">None</span><span class="p">,</span> <span class="n">improved</span><span
+                                class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">add_self_loops</span><span class="o">=</span><span class="kc">True</span><span
+                                class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;source_to_target&quot;</span><span
+                                class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span
+                                class="p">):</span>
+    <span class="c1"># type: (SparseTensor, OptTensor, Optional[int], bool, bool, str, Optional[int]) -&gt; SparseTensor  # noqa</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="gcn_norm"><a class="viewcode-back"
+                                             href="../../source/graphslim.html#graphslim.utils.gcn_norm">[docs]</a><span
+        class="k">def</span> <span class="nf">gcn_norm</span><span class="p">(</span><span
+        class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span><span
+        class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_nodes</span><span
+        class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">improved</span><span
+        class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">add_self_loops</span><span class="o">=</span><span class="kc">True</span><span
+            class="p">,</span> <span class="n">flow</span><span class="o">=</span><span class="s2">&quot;source_to_target&quot;</span><span
+            class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="kc">None</span><span
+            class="p">):</span>
+
+    <span class="n">fill_value</span> <span class="o">=</span> <span class="mf">2.</span> <span
+            class="k">if</span> <span class="n">improved</span> <span class="k">else</span> <span class="mf">1.</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">SparseTensor</span><span
+            class="p">):</span>
+        <span class="k">assert</span> <span class="n">flow</span> <span class="ow">in</span> <span
+            class="p">[</span><span class="s2">&quot;source_to_target&quot;</span><span class="p">]</span>
+        <span class="n">adj_t</span> <span class="o">=</span> <span class="n">edge_index</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">adj_t</span><span class="o">.</span><span
+            class="n">has_value</span><span class="p">():</span>
+            <span class="n">adj_t</span> <span class="o">=</span> <span class="n">adj_t</span><span
+            class="o">.</span><span class="n">fill_value</span><span class="p">(</span><span class="mf">1.</span><span
+            class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span
+            class="p">)</span>
+        <span class="k">if</span> <span class="n">add_self_loops</span><span class="p">:</span>
+            <span class="n">adj_t</span> <span class="o">=</span> <span class="n">fill_diag</span><span
+            class="p">(</span><span class="n">adj_t</span><span class="p">,</span> <span
+            class="n">fill_value</span><span class="p">)</span>
+        <span class="n">deg</span> <span class="o">=</span> <span class="n">sparsesum</span><span
+            class="p">(</span><span class="n">adj_t</span><span class="p">,</span> <span class="n">dim</span><span
+            class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">deg_inv_sqrt</span> <span class="o">=</span> <span class="n">deg</span><span
+            class="o">.</span><span class="n">pow_</span><span class="p">(</span><span class="o">-</span><span
+            class="mf">0.5</span><span class="p">)</span>
+        <span class="n">deg_inv_sqrt</span><span class="o">.</span><span class="n">masked_fill_</span><span
+            class="p">(</span><span class="n">deg_inv_sqrt</span> <span class="o">==</span> <span
+            class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span
+            class="p">),</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="n">adj_t</span> <span class="o">=</span> <span class="n">mul</span><span class="p">(</span><span
+            class="n">adj_t</span><span class="p">,</span> <span class="n">deg_inv_sqrt</span><span
+            class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">adj_t</span> <span class="o">=</span> <span class="n">mul</span><span class="p">(</span><span
+            class="n">adj_t</span><span class="p">,</span> <span class="n">deg_inv_sqrt</span><span
+            class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">adj_t</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">flow</span> <span class="ow">in</span> <span
+            class="p">[</span><span class="s2">&quot;source_to_target&quot;</span><span class="p">,</span> <span
+            class="s2">&quot;target_to_source&quot;</span><span class="p">]</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">maybe_num_nodes</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="p">,</span> <span class="n">num_nodes</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">edge_weight</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="n">edge_weight</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">edge_index</span><span
+            class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span
+            class="p">),</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span
+            class="n">dtype</span><span class="p">,</span>
+                                     <span class="n">device</span><span class="o">=</span><span
+            class="n">edge_index</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">add_self_loops</span><span class="p">:</span>
+            <span class="n">edge_index</span><span class="p">,</span> <span class="n">tmp_edge_weight</span> <span
+            class="o">=</span> <span class="n">add_remaining_self_loops</span><span class="p">(</span>
+                <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_weight</span><span
+            class="p">,</span> <span class="n">fill_value</span><span class="p">,</span> <span
+            class="n">num_nodes</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">tmp_edge_weight</span> <span class="ow">is</span> <span
+            class="ow">not</span> <span class="kc">None</span>
+            <span class="n">edge_weight</span> <span class="o">=</span> <span class="n">tmp_edge_weight</span>
+
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span
+            class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span
+            class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">col</span> <span class="k">if</span> <span
+            class="n">flow</span> <span class="o">==</span> <span class="s2">&quot;source_to_target&quot;</span> <span
+            class="k">else</span> <span class="n">row</span>
+        <span class="n">deg</span> <span class="o">=</span> <span class="n">scatter_add</span><span
+            class="p">(</span><span class="n">edge_weight</span><span class="p">,</span> <span class="n">idx</span><span
+            class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
+            class="p">,</span> <span class="n">dim_size</span><span class="o">=</span><span
+            class="n">num_nodes</span><span class="p">)</span>
+        <span class="n">deg_inv_sqrt</span> <span class="o">=</span> <span class="n">deg</span><span
+            class="o">.</span><span class="n">pow_</span><span class="p">(</span><span class="o">-</span><span
+            class="mf">0.5</span><span class="p">)</span>
+        <span class="n">deg_inv_sqrt</span><span class="o">.</span><span class="n">masked_fill_</span><span
+            class="p">(</span><span class="n">deg_inv_sqrt</span> <span class="o">==</span> <span
+            class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span
+            class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">deg_inv_sqrt</span><span
+            class="p">[</span><span class="n">row</span><span class="p">]</span> <span class="o">*</span> <span
+            class="n">edge_weight</span> <span class="o">*</span> <span class="n">deg_inv_sqrt</span><span
+            class="p">[</span><span class="n">col</span><span class="p">]</span></div>
 
 <span class="c1"># from deeprobust.graph.utils import *</span>
 <div class="viewcode-block" id="is_identity"><a class="viewcode-back"
@@ -413,6 +552,8 @@
     <span class="n">mask</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span
                                 class="o">=</span> <span class="mi">1</span>
     <span class="k">return</span> <span class="n">mask</span>
+
+
 <div class="viewcode-block" id="to_camel_case"><a class="viewcode-back"
                                                   href="../../source/graphslim.html#graphslim.utils.to_camel_case">[docs]</a><span
         class="k">def</span> <span class="nf">to_camel_case</span><span class="p">(</span><span
@@ -424,6 +565,7 @@
             class="n">join</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span
             class="n">title</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span
             class="ow">in</span> <span class="n">components</span><span class="p">)</span></div>
+
 
 <span class="c1"># def cal_storage(data, setting):</span>
 <span class="c1">#     if setting == &#39;trans&#39;:</span>
@@ -593,60 +735,6 @@
     <span class="n">mx</span> <span class="o">=</span> <span class="n">r_mat_inv</span><span class="o">.</span><span
             class="n">dot</span><span class="p">(</span><span class="n">mx</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">mx</span></div>
-
-
-<span class="k">def</span> <span class="nf">normalize_adj</span><span class="p">(</span><span class="n">mx</span><span
-                                class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize sparse adjacency matrix,</span>
-<span class="sd">    A&#39; = (D + I)^-1/2 * ( A + I ) * (D + I)^-1/2</span>
-<span class="sd">    Row-normalize sparse matrix</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    mx : scipy.sparse.csr_matrix</span>
-<span class="sd">        matrix to be normalized</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    scipy.sprase.lil_matrix</span>
-<span class="sd">        normalized matrix</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">mx</span><span
-                                class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span
-                                class="n">sp</span><span class="o">.</span><span class="n">lil</span><span
-                                class="o">.</span><span class="n">lil_matrix</span><span class="p">:</span>
-        <span class="n">mx</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span
-                                class="n">tolil</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">mx</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span
-                                class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span
-                                class="mi">0</span><span class="p">:</span>
-        <span class="n">mx</span> <span class="o">=</span> <span class="n">mx</span> <span class="o">+</span> <span
-                                class="n">sp</span><span class="o">.</span><span class="n">eye</span><span
-                                class="p">(</span><span class="n">mx</span><span class="o">.</span><span
-                                class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-9</span>
-    <span class="n">rowsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
-                                class="n">array</span><span class="p">(</span><span class="n">mx</span><span
-                                class="o">.</span><span class="n">sum</span><span class="p">(</span><span
-                                class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="n">eps</span>
-    <span class="n">r_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
-                                class="n">power</span><span class="p">(</span><span class="n">rowsum</span><span
-                                class="p">,</span> <span class="o">-</span><span class="mi">1</span> <span
-                                class="o">/</span> <span class="mi">2</span><span class="p">)</span><span
-                                class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-    <span class="n">r_inv</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span
-                                class="n">isinf</span><span class="p">(</span><span class="n">r_inv</span><span
-                                class="p">)]</span> <span class="o">=</span> <span class="mf">0.</span>
-    <span class="n">r_mat_inv</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span
-                                class="n">diags</span><span class="p">(</span><span class="n">r_inv</span><span
-                                class="p">)</span>
-    <span class="n">mx</span> <span class="o">=</span> <span class="n">r_mat_inv</span><span class="o">.</span><span
-                                class="n">dot</span><span class="p">(</span><span class="n">mx</span><span
-                                class="p">)</span>
-    <span class="n">mx</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">dot</span><span
-                                class="p">(</span><span class="n">r_mat_inv</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">mx</span>
 
 
 <div class="viewcode-block" id="normalize_sparse_tensor"><a class="viewcode-back"
@@ -833,14 +921,15 @@
         class="k">def</span> <span class="nf">normalize_adj_tensor</span><span class="p">(</span><span
         class="n">adj</span><span class="p">,</span> <span class="n">sparse</span><span class="o">=</span><span
         class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalize adjacency tensor matrix.</span>
+<span class="w">    </span><span
+            class="sd">&quot;&quot;&quot;Normalize adjacency tensor matrix, return sparse or not</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">device</span> <span class="o">=</span> <span class="n">adj</span><span class="o">.</span><span
             class="n">device</span>
     <span class="k">if</span> <span class="n">sparse</span><span class="p">:</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="n">to_scipy</span><span class="p">(</span><span
             class="n">adj</span><span class="p">)</span>
-        <span class="n">mx</span> <span class="o">=</span> <span class="n">normalize_adj</span><span
+        <span class="n">mx</span> <span class="o">=</span> <span class="n">gcn_normalize_adj</span><span
             class="p">(</span><span class="n">adj</span><span class="p">)</span>
         <span class="n">adj</span> <span class="o">=</span> <span class="n">sparse_mx_to_torch_sparse_tensor</span><span
             class="p">(</span><span class="n">mx</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span
@@ -915,10 +1004,10 @@
     <span class="k">return</span> <span class="n">mx</span></div>
 
 
-<div class="viewcode-block" id="normalize_adj"><a class="viewcode-back"
-                                                  href="../../source/graphslim.html#graphslim.utils.normalize_adj">[docs]</a><span
-        class="k">def</span> <span class="nf">normalize_adj</span><span class="p">(</span><span
-        class="n">adj</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span
+<div class="viewcode-block" id="gcn_normalize_adj"><a class="viewcode-back"
+                                                      href="../../source/graphslim.html#graphslim.utils.gcn_normalize_adj">[docs]</a><span
+        class="k">def</span> <span class="nf">gcn_normalize_adj</span><span class="p">(</span><span class="n">adj</span><span
+        class="p">,</span> <span class="n">device</span><span class="o">=</span><span
         class="s1">&#39;cpu&#39;</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">issparse</span><span
             class="p">(</span><span class="n">adj</span><span class="p">):</span>
@@ -1121,6 +1210,63 @@
     <span class="k">return</span> <span class="n">correct</span> <span class="o">/</span> <span
             class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="f1_macro"><a class="viewcode-back"
+                                             href="../../source/graphslim.html#graphslim.utils.f1_macro">[docs]</a><span
+        class="k">def</span> <span class="nf">f1_macro</span><span class="p">(</span><span class="n">output</span><span
+        class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">is_sigmoid</span><span
+        class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return F1-macro score of output compared to labels.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    output : torch.Tensor</span>
+<span class="sd">        output from model</span>
+<span class="sd">    labels : torch.Tensor or numpy.array</span>
+<span class="sd">        true labels (0 or 1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        F1-macro score</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">labels</span><span class="p">,</span> <span class="s1">&#39;__len__&#39;</span><span
+            class="p">):</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span
+            class="n">labels</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">labels</span><span
+            class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">LongTensor</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span
+            class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span
+            class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_sigmoid</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">argmax</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span
+            class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span
+            class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">output</span><span class="p">[</span><span class="n">output</span> <span
+            class="o">&gt;</span> <span class="mf">0.5</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">1</span>
+        <span class="n">output</span><span class="p">[</span><span class="n">output</span> <span class="o">&lt;=</span> <span
+            class="mf">0.5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">f1</span> <span class="o">=</span> <span class="n">f1_score</span><span class="p">(</span><span
+            class="n">labels</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span
+            class="n">average</span><span class="o">=</span><span class="s2">&quot;macro&quot;</span><span
+            class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f1</span></div>
 
 <div class="viewcode-block" id="loss_acc"><a class="viewcode-back"
                                              href="../../source/graphslim.html#graphslim.utils.loss_acc">[docs]</a><span

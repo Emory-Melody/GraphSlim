@@ -183,6 +183,10 @@
             class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">float_label</span> <span class="o">=</span> <span
             class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metric</span> <span class="o">=</span> <span
+            class="n">accuracy</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">metric</span> <span class="o">==</span> <span class="s1">&#39;accuracy&#39;</span> <span
+            class="k">else</span> <span class="n">f1_macro</span>
 
 <div class="viewcode-block" id="BaseGNN.initialize"><a class="viewcode-back"
                                                        href="../../../source/graphslim.models.html#graphslim.models.base.BaseGNN.initialize">[docs]</a>    <span
@@ -259,20 +263,21 @@
             class="n">nlayers</span> <span class="o">-</span> <span class="mi">2</span><span class="p">:</span>
                     <span class="n">x_out</span> <span class="o">=</span> <span class="n">x</span>
 
-        <span class="k">if</span> <span class="n">output_layer_features</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span
             class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span
             class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span
             class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">output_layer_features</span><span class="p">:</span>
+            <span class="n">x_out</span> <span class="o">=</span> <span class="n">x_out</span><span
+            class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span
+            class="mi">1</span><span class="p">,</span> <span class="n">x_out</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span
+            class="p">])</span>
             <span class="k">return</span> <span class="n">x_out</span><span class="p">,</span> <span
             class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span
             class="n">x</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span
             class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span
-            class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span
-            class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span
-            class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span
             class="n">log_softmax</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span
             class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
@@ -287,8 +292,9 @@
             class="p">,</span> <span class="n">setting</span><span class="o">=</span><span
             class="s1">&#39;trans&#39;</span><span class="p">,</span> <span class="n">reduced</span><span
             class="o">=</span><span class="kc">False</span><span class="p">,</span> <span
-            class="n">final_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            class="n">final_output</span><span class="o">=</span><span class="kc">False</span><span
+            class="p">,</span> <span class="n">best_val</span><span class="o">=</span><span class="kc">None</span><span
+            class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
         <span class="c1"># data for training</span>
@@ -351,6 +357,7 @@
             class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">sparse</span><span
             class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+        <span class="c1"># SparseTensor synthetic graph only used in graphsage, msgc and simgc</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span
             class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span
             class="o">==</span> <span class="s1">&#39;GraphSage&#39;</span> <span class="ow">and</span> <span
@@ -358,6 +365,12 @@
             class="n">method</span> <span class="o">==</span> <span class="s1">&#39;msgc&#39;</span><span
             class="p">:</span>
             <span class="n">adj</span> <span class="o">=</span> <span class="n">adj</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span
+            class="o">.</span><span class="n">method</span> <span class="o">==</span> <span
+            class="s1">&#39;simgc&#39;</span><span class="p">:</span>
+            <span class="n">adj</span> <span class="o">=</span> <span class="n">normalize_adj_tensor</span><span
+            class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">sparse</span><span
+            class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">adj</span> <span class="o">=</span> <span class="n">normalize_adj_tensor</span><span
             class="p">(</span><span class="n">adj</span><span class="p">,</span> <span class="n">sparse</span><span
@@ -406,7 +419,11 @@
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== training ===&#39;</span><span
             class="p">)</span>
 
-        <span class="n">best_acc_val</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">best_val</span> <span class="ow">is</span> <span
+            class="kc">None</span><span class="p">:</span>
+            <span class="n">best_acc_val</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">best_acc_val</span> <span class="o">=</span> <span class="n">best_val</span>
         <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;ind&#39;</span><span
             class="p">:</span>
             <span class="n">feat_full</span><span class="p">,</span> <span class="n">adj_full</span> <span
@@ -438,7 +455,9 @@
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span
             class="nb">range</span><span class="p">(</span><span class="n">train_iters</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span
-            class="n">train_iters</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
+            class="n">train_iters</span> <span class="o">//</span> <span class="mi">2</span> <span class="ow">and</span> <span
+            class="bp">self</span><span class="o">.</span><span class="n">lr</span> <span class="o">&gt;</span> <span
+            class="mf">0.001</span><span class="p">:</span>
                 <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span
             class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="bp">self</span><span
             class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span
@@ -493,13 +512,14 @@
             class="o">.</span><span class="n">forward</span><span class="p">(</span><span
             class="n">feat_full</span><span class="p">,</span> <span class="n">adj_full</span><span class="p">)</span>
 
-                <span class="n">acc_val</span> <span class="o">=</span> <span class="n">accuracy</span><span
-            class="p">(</span><span class="n">output</span> <span class="k">if</span> <span class="n">output</span><span
-            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
-            class="p">]</span> <span class="o">==</span> <span class="n">labels_val</span><span class="o">.</span><span
-            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
-            class="k">else</span> <span class="n">output</span><span class="p">[</span><span class="n">data</span><span
-            class="o">.</span><span class="n">idx_val</span><span class="p">],</span>
+                <span class="n">acc_val</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">metric</span><span class="p">(</span><span class="n">output</span> <span
+            class="k">if</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span
+            class="n">labels_val</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span> <span class="k">else</span> <span class="n">output</span><span
+            class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">idx_val</span><span
+            class="p">],</span>
                                    <span class="n">labels_val</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">acc_val</span> <span class="o">&gt;</span> <span class="n">best_acc_val</span><span
@@ -509,16 +529,17 @@
                     <span class="n">weights</span> <span class="o">=</span> <span class="n">deepcopy</span><span
             class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_dict</span><span
             class="p">())</span>
-
         <span class="k">if</span> <span class="n">final_output</span><span class="p">:</span>
             <span class="k">return</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== picking the best model according to the performance on validation ===&#39;</span><span
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;=== picking the best model according to the performance on validation ===&#39;</span><span
             class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">load_state_dict</span><span
             class="p">(</span><span class="n">weights</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">best_acc_val</span></div>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">best_acc_val</span></div>
 
     <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="bp">self</span><span
@@ -550,9 +571,9 @@
             <span class="n">loss_test</span> <span class="o">=</span> <span class="n">F</span><span
             class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
             class="p">,</span> <span class="n">labels_test</span><span class="p">)</span>
-            <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy</span><span
-            class="p">(</span><span class="n">output</span><span class="p">,</span> <span
-            class="n">labels_test</span><span class="p">)</span>
+            <span class="n">acc_test</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">metric</span><span class="p">(</span><span class="n">output</span><span
+            class="p">,</span> <span class="n">labels_test</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span
             class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">data</span><span
@@ -562,9 +583,10 @@
             class="o">.</span><span class="n">nll_loss</span><span class="p">(</span><span class="n">output</span><span
             class="p">[</span><span class="n">idx_test</span><span class="p">],</span> <span
             class="n">labels_test</span><span class="p">)</span>
-            <span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy</span><span
-            class="p">(</span><span class="n">output</span><span class="p">[</span><span class="n">idx_test</span><span
-            class="p">],</span> <span class="n">labels_test</span><span class="p">)</span>
+            <span class="n">acc_test</span> <span class="o">=</span> <span class="bp">self</span><span
+            class="o">.</span><span class="n">metric</span><span class="p">(</span><span class="n">output</span><span
+            class="p">[</span><span class="n">idx_test</span><span class="p">],</span> <span
+            class="n">labels_test</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span

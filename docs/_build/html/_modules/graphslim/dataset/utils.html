@@ -9,7 +9,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../../../_static/js/html5shiv.min.js"></script>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../../../_static/jquery.js?v=5d32c60e"></script>
@@ -112,7 +112,98 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">graphslim.dataset.convertor</span> <span class="kn">import</span> <span
                                 class="o">*</span>
+<span class="kn">from</span> <span class="nn">graphslim.utils</span> <span class="kn">import</span> <span class="n">is_sparse_tensor</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
+
+<div class="viewcode-block" id="sparsify"><a class="viewcode-back"
+                                             href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.sparsify">[docs]</a><span
+        class="k">def</span> <span class="nf">sparsify</span><span class="p">(</span><span
+        class="n">model_type</span><span class="p">,</span> <span class="n">adj_syn</span><span class="p">,</span> <span
+        class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
+        class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies sparsification to the adjacency matrix based on the model type and given arguments.</span>
+
+<span class="sd">    This function modifies the adjacency matrix to make it sparser according to the model type and method specified.</span>
+<span class="sd">    For specific methods and datasets, it adjusts the threshold used for sparsification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    model_type : str</span>
+<span class="sd">        The type of model used, which determines the sparsification strategy. Can be &#39;MLP&#39;, &#39;GAT&#39;, or other.</span>
+<span class="sd">    adj_syn : torch.Tensor</span>
+<span class="sd">        The adjacency matrix to be sparsified.</span>
+<span class="sd">    args : argparse.Namespace</span>
+<span class="sd">        Command-line arguments and configuration parameters which may include method-specific settings.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, prints information about the sparsity of the adjacency matrix before and after sparsification.</span>
+<span class="sd">        Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    adj_syn : torch.Tensor</span>
+<span class="sd">        The sparsified adjacency matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">model_type</span> <span class="o">==</span> <span
+            class="s1">&#39;MLP&#39;</span><span class="p">:</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span> <span class="o">-</span> <span
+            class="n">adj_syn</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span
+            class="n">adj_syn</span><span class="p">)</span><span class="o">.</span><span class="n">fill_</span><span
+            class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">model_type</span> <span class="o">==</span> <span class="s1">&#39;GAT&#39;</span><span
+            class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcond&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;doscond&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dataset</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;cora&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;citeseer&#39;</span><span class="p">]:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Make the graph sparser as GAT does not work well on dense graph</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;msgc&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">threshold</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">method</span> <span
+            class="ow">in</span> <span class="p">[</span><span class="s1">&#39;gcond&#39;</span><span class="p">,</span> <span
+            class="s1">&#39;doscond&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">args</span><span
+            class="o">.</span><span class="n">threshold</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span
+            class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span
+            class="s1">&#39;msgc&#39;</span><span class="p">]:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># if verbose and args.method not in [&#39;gcondx&#39;, &#39;doscondx&#39;, &#39;sfgc&#39;, &#39;geom&#39;, &#39;gcsntk&#39;]:</span>
+    <span class="c1"># print(&#39;Sum:&#39;, adj_syn.sum().item())</span>
+    <span class="c1"># print(adj_syn)</span>
+    <span class="c1"># print(&#39;Sparsity:&#39;, adj_syn.nonzero().shape[0] / adj_syn.numel())</span>
+    <span class="c1"># if args.method in [&#39;sgdd&#39;]:</span>
+    <span class="c1">#     threshold = 0.5</span>
+    <span class="k">if</span> <span class="n">threshold</span> <span class="o">&gt;</span> <span
+            class="mi">0</span><span class="p">:</span>
+        <span class="n">adj_syn</span><span class="p">[</span><span class="n">adj_syn</span> <span class="o">&lt;</span> <span
+            class="n">threshold</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span
+            class="s1">&#39;Sparsity after truncating:&#39;</span><span class="p">,</span> <span
+            class="n">adj_syn</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">/</span> <span class="n">adj_syn</span><span class="o">.</span><span
+            class="n">numel</span><span class="p">())</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     print(&quot;structure free methods do not need to truncate the adjacency matrix&quot;)</span>
+    <span class="k">return</span> <span class="n">adj_syn</span></div>
 
 
 <div class="viewcode-block" id="index2mask"><a class="viewcode-back"
@@ -153,7 +244,8 @@
 <div class="viewcode-block" id="splits"><a class="viewcode-back"
                                            href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.splits">[docs]</a><span
         class="k">def</span> <span class="nf">splits</span><span class="p">(</span><span class="n">data</span><span
-        class="p">,</span> <span class="n">exp</span><span class="p">):</span>
+        class="p">,</span> <span class="n">exp</span><span class="o">=</span><span
+        class="s1">&#39;default&#39;</span><span class="p">):</span>
     <span class="c1"># customize your split here</span>
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">data</span><span
             class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">):</span>
@@ -165,6 +257,7 @@
             class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">labels_full</span><span
             class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span
             class="o">+</span> <span class="mi">1</span>
+    <span class="c1"># data.nclass = num_classes</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span
             class="n">data</span><span class="p">,</span> <span class="s1">&#39;train_mask&#39;</span><span
             class="p">):</span>
@@ -224,12 +317,12 @@
             class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
             class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># if fixed but no split is provided, use the default 6/2/2 split classwise</span>
+            <span class="c1"># if fixed but no split is provided, use the default 8/1/1 split classwise</span>
             <span class="n">train_index</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
             class="p">[:</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
             class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
-            class="p">]</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">)]</span> <span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)]</span> <span
             class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span
             class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
             class="p">)</span>
@@ -237,22 +330,21 @@
             class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
             class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
             class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
-            class="p">]</span> <span class="o">*</span> <span class="mf">0.6</span><span class="p">):</span><span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">):</span><span
             class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span
             class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
-            class="o">*</span> <span class="mf">0.8</span><span class="p">)]</span> <span class="k">for</span> <span
+            class="o">*</span> <span class="mf">0.9</span><span class="p">)]</span> <span class="k">for</span> <span
             class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">],</span> <span
             class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">test_index</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">i</span><span
             class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span
             class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
-            class="p">]</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">):]</span> <span
+            class="p">]</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">):]</span> <span
             class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span
             class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span
             class="p">)</span>
             <span class="c1"># raise NotImplementedError(&#39;Unknown split type&#39;)</span>
-
         <span class="n">data</span><span class="o">.</span><span class="n">train_mask</span> <span
             class="o">=</span> <span class="n">index2mask</span><span class="p">(</span><span
             class="n">train_index</span><span class="p">,</span> <span class="n">size</span><span
@@ -359,6 +451,7 @@
         class="k">def</span> <span class="nf">load_reduced</span><span class="p">(</span><span
         class="n">args</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span
         class="kc">None</span><span class="p">):</span>
+    <span class="n">flag</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">save_path</span> <span class="o">=</span> <span class="sa">f</span><span
             class="s1">&#39;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span
             class="n">save_path</span><span class="si">}</span><span class="s1">/reduced_graph/</span><span
@@ -390,6 +483,7 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no feat, use original feature matrix instead&quot;</span><span
             class="p">)</span>
+        <span class="n">flag</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span
             class="n">setting</span> <span class="o">==</span> <span class="s1">&#39;trans&#39;</span><span
             class="p">:</span>
@@ -413,6 +507,7 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no label, use original label matrix instead&quot;</span><span
             class="p">)</span>
+        <span class="n">flag</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">labels_syn</span> <span class="o">=</span> <span class="n">data</span><span
             class="o">.</span><span class="n">labels_train</span>
 
@@ -431,15 +526,80 @@
     <span class="k">except</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;find no adj, use identity matrix instead&quot;</span><span
             class="p">)</span>
+        <span class="n">flag</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">torch</span><span
             class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">feat_syn</span><span
             class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span
             class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">args</span><span
             class="o">.</span><span class="n">device</span><span class="p">)</span>
     <span class="c1"># args.logger.info(f&quot;Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt&quot;)</span>
+    <span class="k">assert</span> <span class="n">flag</span> <span class="o">&lt;</span> <span class="mi">3</span><span
+            class="p">,</span> <span class="s2">&quot;no file found, please run the reduction method first&quot;</span>
+
     <span class="k">return</span> <span class="n">adj_syn</span><span class="p">,</span> <span class="n">feat_syn</span><span
             class="p">,</span> <span class="n">labels_syn</span></div>
 
+
+<div class="viewcode-block" id="get_syn_data"><a class="viewcode-back"
+                                                 href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.get_syn_data">[docs]</a><span
+        class="k">def</span> <span class="nf">get_syn_data</span><span class="p">(</span><span
+        class="n">data</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span
+        class="n">model_type</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span
+        class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loads or computes synthetic data for evaluation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : Dataset</span>
+<span class="sd">        The dataset containing the graph data.</span>
+<span class="sd">    model_type : str</span>
+<span class="sd">        The type of model used for generating synthetic data.</span>
+<span class="sd">    verbose : bool, optional, default=False</span>
+<span class="sd">        Whether to print detailed logs.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    feat_syn : torch.Tensor</span>
+<span class="sd">        Synthetic feature matrix.</span>
+<span class="sd">    adj_syn : torch.Tensor</span>
+<span class="sd">        Synthetic adjacency matrix.</span>
+<span class="sd">    labels_syn : torch.Tensor</span>
+<span class="sd">        Synthetic labels.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">adj_syn</span><span class="p">,</span> <span class="n">feat_syn</span><span class="p">,</span> <span
+            class="n">labels_syn</span> <span class="o">=</span> <span class="n">load_reduced</span><span
+            class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">data</span><span
+            class="p">)</span>
+
+    <span class="k">if</span> <span class="n">labels_syn</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span
+            class="n">data</span><span class="o">.</span><span class="n">labels_train</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]:</span>
+        <span class="k">return</span> <span class="n">feat_syn</span><span class="p">,</span> <span
+            class="n">adj_syn</span><span class="p">,</span> <span class="n">labels_syn</span>
+
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">adj_syn</span><span
+            class="p">)</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span> <span class="ow">and</span> <span class="n">is_sparse_tensor</span><span
+            class="p">(</span><span class="n">adj_syn</span><span class="p">):</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span><span
+            class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">sparse</span><span
+            class="o">.</span><span class="n">FloatTensor</span><span class="p">):</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span><span
+            class="o">.</span><span class="n">to_dense</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">adj_syn</span>
+
+    <span class="n">adj_syn</span> <span class="o">=</span> <span class="n">sparsify</span><span class="p">(</span><span
+            class="n">model_type</span><span class="p">,</span> <span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">verbose</span><span
+            class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">feat_syn</span><span class="p">,</span> <span class="n">adj_syn</span><span
+            class="p">,</span> <span class="n">labels_syn</span></div>
 <span class="c1"># =============from graphsaint================#</span>
 <span class="c1"># import networkx as nx</span>
 <span class="c1"># import numpy as np</span>
@@ -716,6 +876,830 @@
 <span class="c1">#     idx = np.arange(len(feat))</span>
 <span class="c1">#     dpr_data = GraphData(adj - adj, feat, labels, idx, idx, idx)</span>
 <span class="c1">#     return Dpr2Pyg(dpr_data)</span>
+<span class="c1">#====mirage utils====#</span>
+
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span
+                                class="n">Data</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.loader</span> <span class="kn">import</span> <span
+                                class="n">DataLoader</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pyfpgrowth</span>
+
+<div class="viewcode-block" id="disjointed_union"><a class="viewcode-back"
+                                                     href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.disjointed_union">[docs]</a><span
+        class="k">def</span> <span class="nf">disjointed_union</span><span class="p">(</span><span
+        class="n">tree_list</span><span class="p">,</span> <span class="n">class_</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span
+        class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;Computes disjointed union of trees inside tree_list. trees are in</span>
+<span class="sd">    torch_geometric.data.Data format. Returns a torch_geometric.data.Data</span>
+<span class="sd">    graph without the roots_to_embed information.&quot;&quot;&quot;</span>
+    <span class="n">tree_list</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">tree</span> <span class="k">for</span> <span class="n">tree</span> <span
+            class="ow">in</span> <span class="n">tree_list</span> <span class="k">if</span> <span
+            class="n">tree</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
+            class="o">&gt;</span> <span class="mi">1</span>
+    <span class="p">]</span>  <span class="c1"># skipping single node trees for now because it causes issues</span>
+    <span class="n">total_nodes</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span
+            class="n">tree</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span
+            class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">tree_list</span><span
+            class="p">)</span>
+    <span class="n">total_edges</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span
+            class="n">tree</span><span class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span
+            class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">tree_list</span><span
+            class="p">)</span>
+    <span class="k">if</span> <span class="n">total_nodes</span> <span class="o">&lt;=</span> <span
+            class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># if the whole graph has just one node, then we return none</span>
+    <span class="k">if</span> <span class="n">device</span> <span class="ow">is</span> <span class="kc">None</span><span
+            class="p">:</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">tree_list</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">device</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">device</span> <span class="o">==</span> <span class="n">tree</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">device</span> <span class="k">for</span> <span
+            class="n">tree</span> <span class="ow">in</span> <span class="n">tree_list</span>
+    <span class="p">),</span> <span class="s2">&quot;Trees must be on same device.&quot;</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span
+            class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span
+            class="o">==</span> <span class="n">tree_list</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span
+            class="n">tree</span> <span class="ow">in</span> <span class="n">tree_list</span>
+    <span class="p">),</span> <span class="s2">&quot;Number of node features are different.&quot;</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+        <span class="n">tree</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span
+            class="n">tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span
+            class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">tree</span> <span
+            class="ow">in</span> <span class="n">tree_list</span>
+    <span class="p">),</span> <span class="s2">&quot;Tree must be in same class.&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span
+            class="n">tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span
+            class="s2">&quot;edge_attr&quot;</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">tree</span><span
+            class="p">,</span> <span class="s2">&quot;edge_attr&quot;</span><span class="p">)</span> <span
+            class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span class="n">tree_list</span>
+        <span class="p">),</span> <span class="s2">&quot;Not all trees have edge features.&quot;</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">tree</span><span class="o">.</span><span class="n">edge_attr</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">]</span> <span class="o">==</span> <span class="n">tree_list</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">edge_attr</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span
+            class="p">]</span>
+            <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span
+            class="n">tree_list</span>
+        <span class="p">),</span> <span class="s2">&quot;Number of edge features are different.&quot;</span>
+        <span class="n">hasedgeattr</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hasedgeattr</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">total_nodes</span><span class="p">,</span> <span
+            class="n">tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span
+            class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="n">tree_list</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">hasedgeattr</span><span class="p">:</span>
+        <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">total_edges</span><span class="p">,</span> <span
+            class="n">tree_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span
+            class="o">.</span><span class="n">edge_attr</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">tree_list</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">edge_attr</span><span
+            class="o">.</span><span class="n">dtype</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span
+            class="n">total_edges</span><span class="p">),</span> <span class="n">device</span><span
+            class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span
+            class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span
+            class="p">)</span>
+    <span class="n">node_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">edge_start</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span
+            class="n">tree_list</span><span class="p">:</span>
+        <span class="n">num_nodes</span> <span class="o">=</span> <span class="n">tree</span><span
+            class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">arange</span><span class="p">(</span><span class="n">num_nodes</span><span
+            class="p">)</span> <span class="o">+</span> <span class="n">node_start</span>
+        <span class="n">x</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span
+            class="p">:]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span
+            class="n">x</span>
+        <span class="n">num_edges</span> <span class="o">=</span> <span class="n">tree</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="o">.</span><span class="n">shape</span><span
+            class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">idxs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">arange</span><span class="p">(</span><span class="n">num_edges</span><span
+            class="p">)</span> <span class="o">+</span> <span class="n">edge_start</span>
+        <span class="k">if</span> <span class="n">hasedgeattr</span><span class="p">:</span>
+            <span class="n">edge_attr</span><span class="p">[</span><span class="n">idxs</span><span class="p">,</span> <span
+            class="p">:]</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span
+            class="n">edge_attr</span>
+        <span class="n">edge_index_extract</span> <span class="o">=</span> <span class="n">tree</span><span
+            class="o">.</span><span class="n">edge_index</span>
+        <span class="n">edge_index_extract</span> <span class="o">=</span> <span
+            class="n">edge_index_extract</span> <span class="o">+</span> <span class="n">node_start</span>
+        <span class="n">edge_index</span><span class="p">[:,</span> <span class="n">idxs</span><span class="p">]</span> <span
+            class="o">=</span> <span class="n">edge_index_extract</span>
+        <span class="n">node_start</span> <span class="o">+=</span> <span class="n">num_nodes</span>
+        <span class="n">edge_start</span> <span class="o">+=</span> <span class="n">num_edges</span>
+    <span class="k">if</span> <span class="n">hasedgeattr</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span
+            class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span
+            class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span
+            class="o">=</span><span class="n">edge_attr</span><span class="p">,</span> <span class="n">y</span><span
+            class="o">=</span><span class="n">class_</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span><span
+            class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span
+            class="o">=</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">y</span><span
+            class="o">=</span><span class="n">class_</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="roots_to_embed"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.roots_to_embed">[docs]</a><span
+        class="k">def</span> <span class="nf">roots_to_embed</span><span class="p">(</span><span
+        class="n">data</span><span class="p">):</span>
+    <span class="n">nn</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span
+            class="mi">0</span><span class="p">]</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span
+            class="n">zeros</span><span class="p">((</span><span class="n">nn</span><span class="p">,),</span> <span
+            class="n">device</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span
+            class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">root_indices</span> <span class="o">=</span> <span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span>
+        <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span
+            class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span
+            class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span
+            class="n">difference</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">data</span><span
+            class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span
+            class="p">)</span>
+    <span class="n">root</span><span class="p">[</span><span class="n">root_indices</span><span class="p">]</span> <span
+            class="o">=</span> <span class="mi">1</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">roots_to_embed</span> <span
+            class="o">=</span> <span class="n">root</span>
+    <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="myDataset"><a class="viewcode-back"
+                                              href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.myDataset">[docs]</a><span
+        class="k">class</span> <span class="nc">myDataset</span><span class="p">(</span><span
+        class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="n">this</span><span
+            class="p">,</span> <span class="n">dataset_list</span><span class="p">,</span> <span
+            class="n">dataset_len</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span
+            class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span
+            class="fm">__init__</span><span class="p">()</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">dataset_list</span> <span class="o">=</span> <span
+            class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">d</span><span
+            class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span
+            class="n">dataset_list</span><span class="p">]</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">dataset_len</span> <span
+            class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span
+            class="p">(</span><span class="n">this</span><span class="o">.</span><span
+            class="n">dataset_list</span><span class="p">),</span> <span class="n">dataset_len</span><span
+            class="p">)</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">rng</span> <span class="o">=</span> <span
+            class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span
+            class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span
+            class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span
+            class="s1">&#39;seed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="n">freq</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span
+            class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span
+            class="o">*</span><span class="p">((</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;freq&#39;</span><span
+            class="p">],</span><span class="n">d</span><span class="p">[</span><span
+            class="s1">&#39;data&#39;</span><span class="p">])</span> <span class="k">for</span> <span
+            class="n">d</span> <span class="ow">in</span> <span class="n">this</span><span class="o">.</span><span
+            class="n">dataset_list</span><span class="p">)))</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span
+            class="n">asarray</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span
+            class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span
+            class="p">(</span><span class="n">freq</span><span class="p">)</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span
+            class="p">[</span><span class="n">data</span><span class="p">[</span><span class="n">this</span><span
+            class="o">.</span><span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span
+            class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span
+            class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span
+            class="p">)),</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span
+            class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span
+            class="nb">range</span><span class="p">(</span><span class="n">this</span><span class="o">.</span><span
+            class="n">dataset_len</span><span class="p">)]</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">dataset_len</span> <span
+            class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">this</span><span
+            class="o">.</span><span class="n">dataset_list</span><span class="p">)</span>
+        <span class="n">this</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span
+            class="n">data</span>
+
+<div class="viewcode-block" id="myDataset.len"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.myDataset.len">[docs]</a>    <span
+        class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="n">this</span><span
+        class="p">):</span>
+        <span class="k">return</span> <span class="n">this</span><span class="o">.</span><span
+            class="n">dataset_len</span></div>
+
+<div class="viewcode-block" id="myDataset.get"><a class="viewcode-back"
+                                                  href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.myDataset.get">[docs]</a>    <span
+        class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">this</span><span
+        class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">this</span><span class="o">.</span><span
+            class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div></div>
+
+
+<div class="viewcode-block" id="get_dataloader"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.get_dataloader">[docs]</a><span
+        class="k">def</span> <span class="nf">get_dataloader</span><span class="p">(</span><span class="n">dataset_classwise</span><span
+        class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset_classwise</span><span
+            class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">dataset_classwise</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">]</span> <span class="o">+</span> <span class="n">dataset_classwise</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># for now assumes only two classes named 0 and 1 exist</span>
+        <span class="n">mydataset</span> <span class="o">=</span> <span class="n">myDataset</span><span
+            class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;dataset_len&#39;</span> <span class="ow">in</span> <span
+            class="n">kwargs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;dataset_len&#39;</span><span
+            class="p">]</span>
+        <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span
+            class="p">(</span><span class="n">mydataset</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span
+            class="p">(</span><span class="n">dataset_classwise</span><span class="p">,</span> <span class="o">**</span><span
+            class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataloader</span></div>
+
+<span class="c1"># ---------------  PROCESS DATASET (LABELS)  ------------------</span>
+<div class="viewcode-block" id="get_label_maps"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.get_label_maps">[docs]</a><span
+        class="k">def</span> <span class="nf">get_label_maps</span><span class="p">(</span><span
+        class="n">dataset</span><span class="p">):</span>
+    <span class="n">node_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">node_labels_full</span> <span class="o">=</span> <span class="nb">set</span><span
+            class="p">()</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dataset</span><span
+            class="p">:</span>
+        <span class="n">node_label</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span
+            class="n">y</span>
+        <span class="n">node_label_full</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span
+            class="n">x</span>
+        <span class="p">[</span><span class="n">node_labels</span><span class="o">.</span><span
+            class="n">add</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">item</span><span
+            class="p">())</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span
+            class="n">node_label</span><span class="p">]</span>
+        <span class="p">[</span>
+            <span class="n">node_labels_full</span><span class="o">.</span><span class="n">add</span><span
+            class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span
+            class="n">node_label_full</span><span class="p">[</span><span class="n">n</span><span
+            class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">tolist</span><span
+            class="p">()))</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="nb">len</span><span class="p">(</span><span
+            class="n">node_label_full</span><span class="p">))</span>
+        <span class="p">]</span>
+    <span class="n">node_label_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span
+            class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span
+            class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span
+            class="nb">enumerate</span><span class="p">(</span><span class="n">node_labels</span><span
+            class="p">)}</span>
+    <span class="n">node_label_map_full</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span
+            class="p">:</span> <span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span
+            class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span
+            class="nb">enumerate</span><span class="p">(</span><span class="n">node_labels_full</span><span
+            class="p">)}</span>
+    <span class="k">return</span> <span class="n">node_label_map</span><span class="p">,</span> <span class="n">node_label_map_full</span></div>
+
+
+<div class="viewcode-block" id="process_labels"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.process_labels">[docs]</a><span
+        class="k">def</span> <span class="nf">process_labels</span><span class="p">(</span><span
+        class="n">dataset</span><span class="p">,</span> <span class="n">node_label_map</span><span
+        class="p">,</span> <span class="n">node_label_map_full</span><span class="p">):</span>
+    <span class="n">dataset_</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dataset</span><span
+            class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">node_label_map</span><span class="p">[</span><span
+            class="n">n</span><span class="o">.</span><span class="n">item</span><span class="p">()]</span> <span
+            class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">d</span><span
+            class="o">.</span><span class="n">y</span><span class="p">]</span>
+            <span class="p">),</span>  <span class="c1"># since this goes into C++ and out comes just a string, the node features are lost</span>
+            <span class="n">original_x</span><span class="o">=</span><span class="n">d</span><span
+            class="o">.</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">edge_index</span><span class="o">=</span><span class="n">d</span><span
+            class="o">.</span><span class="n">edge_index</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">d</span><span class="o">.</span><span
+            class="n">y</span><span class="p">,</span>
+            <span class="n">node_attr</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">node_label_map_full</span><span class="p">[</span><span class="nb">tuple</span><span
+            class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">x</span><span
+            class="p">[</span><span class="n">n</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span
+            class="n">tolist</span><span class="p">())]</span>
+                    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">x</span><span
+            class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span
+            class="p">])</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">dataset_</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dataset_</span></div>
+
+
+<div class="viewcode-block" id="preprocess_dataset"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.preprocess_dataset">[docs]</a><span
+        class="k">def</span> <span class="nf">preprocess_dataset</span><span class="p">(</span><span
+        class="n">dataset</span><span class="p">,</span> <span class="n">full_dataset</span><span class="p">):</span>
+    <span class="n">node_label_map</span><span class="p">,</span> <span class="n">node_label_map_full</span> <span
+            class="o">=</span> <span class="n">get_label_maps</span><span class="p">(</span><span
+            class="n">full_dataset</span><span class="p">)</span>
+    <span class="n">label_processed_dataset</span> <span class="o">=</span> <span class="n">process_labels</span><span
+            class="p">(</span>
+        <span class="n">dataset</span><span class="p">,</span>
+        <span class="n">node_label_map</span><span class="p">,</span>
+        <span class="n">node_label_map_full</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">label_processed_dataset</span><span class="p">,</span> <span
+            class="n">node_label_map</span><span class="p">,</span> <span class="n">node_label_map_full</span></div>
+
+
+<div class="viewcode-block" id="preprocess_dataset_test"><a class="viewcode-back"
+                                                            href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.preprocess_dataset_test">[docs]</a><span
+        class="k">def</span> <span class="nf">preprocess_dataset_test</span><span class="p">(</span><span class="n">dataset</span><span
+        class="p">,</span> <span class="n">node_label_map</span><span class="p">,</span> <span
+        class="n">edge_label_map</span><span class="p">,</span> <span class="n">node_label_map_full</span><span
+        class="p">):</span>
+    <span class="n">label_processed_dataset</span> <span class="o">=</span> <span class="n">process_labels</span><span
+            class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span
+            class="n">node_label_map</span><span class="p">,</span> <span class="n">edge_label_map</span><span
+            class="p">,</span> <span class="n">node_label_map_full</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">label_processed_dataset</span></div>
+
+
+
+
+<span class="c1"># ----------------  PROCESS CANONICAL LABELS  -----------------</span>
+<div class="viewcode-block" id="prettify_canonical_label"><a class="viewcode-back"
+                                                             href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.prettify_canonical_label">[docs]</a><span
+        class="k">def</span> <span class="nf">prettify_canonical_label</span><span class="p">(</span><span class="n">label</span><span
+        class="p">):</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span
+            class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="n">tokens</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span
+            class="n">split</span><span class="p">()</span>
+    <span class="n">label2</span> <span class="o">=</span> <span class="sa">f</span><span
+            class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">tokens</span><span
+            class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span
+            class="s2">,</span><span class="si">{</span><span class="n">tokens</span><span class="p">[</span><span
+            class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&gt;&quot;</span>
+    <span class="n">ptr</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">while</span> <span class="n">ptr</span> <span class="o">&lt;</span> <span class="nb">len</span><span
+            class="p">(</span><span class="n">tokens</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">tokens</span><span class="p">[</span><span class="n">ptr</span><span
+            class="p">]</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span><span class="p">:</span>
+            <span class="n">label2</span> <span class="o">+=</span> <span class="n">tokens</span><span
+            class="p">[</span><span class="n">ptr</span><span class="p">]</span>
+            <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">node_label</span> <span class="o">=</span> <span class="n">tokens</span><span
+            class="p">[</span><span class="n">ptr</span><span class="p">]</span>
+            <span class="n">node_original_label</span> <span class="o">=</span> <span class="n">tokens</span><span
+            class="p">[</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">1</span><span
+            class="p">]</span>
+            <span class="n">edge_label</span> <span class="o">=</span> <span class="n">tokens</span><span
+            class="p">[</span><span class="n">ptr</span> <span class="o">+</span> <span class="mi">2</span><span
+            class="p">]</span>
+            <span class="n">ptr</span> <span class="o">+=</span> <span class="mi">3</span>
+            <span class="n">label2</span> <span class="o">+=</span> <span class="sa">f</span><span
+            class="s2">&quot;&lt;</span><span class="si">{</span><span class="n">node_label</span><span
+            class="si">}</span><span class="s2">,</span><span class="si">{</span><span
+            class="n">node_original_label</span><span class="si">}</span><span class="s2">,</span><span
+            class="si">{</span><span class="n">edge_label</span><span class="si">}</span><span
+            class="s2">&gt;&quot;</span>
+    <span class="k">return</span> <span class="n">label2</span></div>
+
+
+<div class="viewcode-block" id="canonical_label_to_naturals"><a class="viewcode-back"
+                                                                href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.canonical_label_to_naturals">[docs]</a><span
+        class="k">def</span> <span class="nf">canonical_label_to_naturals</span><span class="p">(</span><span class="n">dataset_labels</span><span
+        class="p">):</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">ctr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">graph_labels</span> <span class="ow">in</span> <span class="n">dataset_labels</span><span
+            class="p">:</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span
+            class="n">graph_labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span
+            class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">label</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">ctr</span>
+                <span class="n">ctr</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">mapping</span></div>
+
+
+
+<span class="c1"># ---------------  COMPUTE FREQUENT PATTERNS  -----------------</span>
+<div class="viewcode-block" id="tree_class_ctr"><a class="viewcode-back"
+                                                   href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.tree_class_ctr">[docs]</a><span
+        class="k">def</span> <span class="nf">tree_class_ctr</span><span class="p">(</span><span
+        class="n">classes</span><span class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+    <span class="n">tree_class_count</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">class_</span><span class="p">,</span> <span class="n">graph</span> <span
+            class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">classes</span><span
+            class="p">,</span> <span class="n">dataset</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tree</span> <span class="ow">in</span> <span
+            class="n">graph</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tree</span> <span class="ow">not</span> <span class="ow">in</span> <span
+            class="n">tree_class_count</span><span class="p">:</span>
+                <span class="n">tree_class_count</span><span class="p">[</span><span class="n">tree</span><span
+            class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="n">class_</span> <span class="ow">not</span> <span
+            class="ow">in</span> <span class="n">tree_class_count</span><span class="p">[</span><span
+            class="n">tree</span><span class="p">]:</span>
+                <span class="n">tree_class_count</span><span class="p">[</span><span class="n">tree</span><span
+            class="p">][</span><span class="n">class_</span><span class="p">]</span> <span class="o">=</span> <span
+            class="mi">0</span>
+            <span class="n">tree_class_count</span><span class="p">[</span><span class="n">tree</span><span
+            class="p">][</span><span class="n">class_</span><span class="p">]</span> <span class="o">+=</span> <span
+            class="mi">1</span>
+    <span class="k">return</span> <span class="n">tree_class_count</span></div>
+
+
+<div class="viewcode-block" id="get_invalid_trees"><a class="viewcode-back"
+                                                      href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.get_invalid_trees">[docs]</a><span
+        class="k">def</span> <span class="nf">get_invalid_trees</span><span class="p">(</span><span class="n">tree_class_count</span><span
+        class="p">):</span>
+    <span class="n">trees</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">tree</span><span class="p">,</span> <span class="n">ctr</span> <span
+            class="ow">in</span> <span class="n">tree_class_count</span><span class="o">.</span><span
+            class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ctr</span><span
+            class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">trees</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">tree</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">trees</span></div>
+
+
+<div class="viewcode-block" id="pyfpgrowth_wrapper"><a class="viewcode-back"
+                                                       href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.pyfpgrowth_wrapper">[docs]</a><span
+        class="k">def</span> <span class="nf">pyfpgrowth_wrapper</span><span class="p">(</span><span
+        class="n">classwise</span><span class="p">,</span> <span class="n">freq_thresholds</span><span
+        class="p">):</span>
+    <span class="n">patterns</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">class_</span><span class="p">,</span> <span
+            class="n">dataset</span> <span class="ow">in</span> <span class="n">classwise</span><span class="o">.</span><span
+            class="n">items</span><span class="p">():</span>
+        <span class="n">thresh</span> <span class="o">=</span> <span class="n">freq_thresholds</span><span
+            class="p">[</span><span class="n">class_</span><span class="p">]</span>
+        <span class="n">class_patterns</span> <span class="o">=</span> <span class="n">pyfpgrowth</span><span class="o">.</span><span
+            class="n">find_frequent_patterns</span><span class="p">(</span><span class="n">dataset</span><span
+            class="p">,</span> <span class="n">thresh</span><span class="p">)</span>
+        <span class="n">patterns</span><span class="p">[</span><span class="n">class_</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">class_patterns</span>
+    <span class="k">return</span> <span class="n">patterns</span></div>
+
+
+<span class="c1"># -------------  &lt;/COMPUTE FREQUENT PATTERNS&gt;  ----------------</span>
+
+
+<div class="viewcode-block" id="parse_canonical_label_bak"><a class="viewcode-back"
+                                                              href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.parse_canonical_label_bak">[docs]</a><span
+        class="k">def</span> <span class="nf">parse_canonical_label_bak</span><span class="p">(</span><span class="n">label</span><span
+        class="p">):</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">parsed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">etmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">node_label_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">edge_label_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">nid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span
+            class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
+                <span class="c1"># create root here</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">nid</span><span class="p">)</span>
+                <span class="n">node_label_map</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="n">nid</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">parsed</span><span class="o">.</span><span class="n">append</span><span
+            class="p">({</span><span class="s2">&quot;node_label&quot;</span><span class="p">:</span> <span class="n">tmp</span><span
+            class="p">})</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span><span
+            class="p">:</span>
+                <span class="c1"># create root here</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">nid</span><span class="p">)</span>
+                <span class="n">node_label_map</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span><span
+            class="p">:</span>
+                <span class="c1"># this will be used to pop parent for creating actual edges later</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">pass</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">2</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;,&quot;</span><span
+            class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">3</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">etmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                <span class="n">parsed</span><span class="o">.</span><span class="n">append</span><span
+            class="p">({</span><span class="s2">&quot;node_label&quot;</span><span class="p">:</span> <span class="n">tmp</span><span
+            class="p">,</span> <span class="s2">&quot;edge_label&quot;</span><span class="p">:</span> <span class="n">etmp</span><span
+            class="p">})</span>
+                <span class="c1"># create node here</span>
+                <span class="n">par</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">nid</span><span class="p">)</span>
+                <span class="n">node_label_map</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="c1"># create edges here</span>
+                <span class="c1"># (to, from)</span>
+                <span class="n">edge_label_map</span><span class="p">[(</span><span class="n">nid</span><span class="p">,</span> <span
+            class="n">par</span><span class="p">)]</span> <span class="o">=</span> <span class="n">etmp</span>
+                <span class="n">nid</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">etmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">assert</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span
+            class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Parsing failed for input </span><span
+            class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">node_label_map</span><span class="p">,</span> <span class="n">edge_label_map</span></div>
+
+
+<div class="viewcode-block" id="parse_canonical_label"><a class="viewcode-back"
+                                                          href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.parse_canonical_label">[docs]</a><span
+        class="k">def</span> <span class="nf">parse_canonical_label</span><span class="p">(</span><span
+        class="n">label</span><span class="p">):</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">otmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">etmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">node_label_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">node_label_map_original</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">edge_label_map</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">nid</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span
+            class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span
+            class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">0</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">1</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;,&quot;</span><span
+            class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">2</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">otmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                <span class="c1"># create root here</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">nid</span><span class="p">)</span>
+                <span class="n">node_label_map</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="n">node_label_map_original</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">otmp</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">otmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">nid</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">3</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&lt;&quot;</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;$&quot;</span><span
+            class="p">:</span>
+                <span class="c1"># pop stack here</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">4</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">etmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;,&quot;</span><span
+            class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">5</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;,&quot;</span><span
+            class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">6</span>
+        <span class="k">elif</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">6</span><span
+            class="p">:</span>
+            <span class="k">if</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">isnumeric</span><span
+            class="p">():</span>
+                <span class="n">otmp</span> <span class="o">+=</span> <span class="n">label</span><span
+            class="p">[</span><span class="n">idx</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">label</span><span class="p">[</span><span
+            class="n">idx</span><span class="p">]</span> <span class="o">==</span> <span
+            class="s2">&quot;&gt;&quot;</span><span class="p">:</span>
+                <span class="c1"># create new node and edge here</span>
+                <span class="n">par</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span
+            class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">nid</span><span class="p">)</span>
+                <span class="n">node_label_map</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+                <span class="n">node_label_map_original</span><span class="p">[</span><span class="n">nid</span><span
+            class="p">]</span> <span class="o">=</span> <span class="n">otmp</span>
+                <span class="n">edge_label_map</span><span class="p">[(</span><span class="n">nid</span><span class="p">,</span> <span
+            class="n">par</span><span class="p">)]</span> <span class="o">=</span> <span class="n">etmp</span>
+                <span class="c1"># https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/utils/convert.html#from_networkx</span>
+                <span class="c1"># in the source, edge_index[0,:] is sources and edge_index[1,:] is destinations</span>
+                <span class="n">nid</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">otmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">etmp</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">assert</span> <span class="n">q</span> <span class="o">==</span> <span class="mi">3</span><span
+            class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Parsing failed for input </span><span
+            class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">node_label_map</span><span class="p">,</span> <span class="n">edge_label_map</span><span
+            class="p">,</span> <span class="n">node_label_map_original</span></div>
+
+
+<div class="viewcode-block" id="get_data"><a class="viewcode-back"
+                                             href="../../../source/graphslim.dataset.html#graphslim.dataset.utils.get_data">[docs]</a><span
+        class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
+    <span class="n">node_label_map</span><span class="p">,</span>
+    <span class="n">edge_label_map</span><span class="p">,</span>
+    <span class="n">node_label_map_original</span><span class="p">,</span>
+    <span class="n">node_label_map_orig</span><span class="p">,</span>
+    <span class="n">edge_label_map_orig</span><span class="p">,</span>
+    <span class="n">node_label_map_full</span><span class="p">,</span>
+    <span class="n">class_</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">i2n</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span
+            class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span
+            class="n">v</span> <span class="ow">in</span> <span class="n">node_label_map_orig</span><span
+            class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="n">i2n_o</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span
+            class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span
+            class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span
+            class="n">node_label_map_full</span><span class="o">.</span><span class="n">items</span><span
+            class="p">()}</span>
+    <span class="n">i2e</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span
+            class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span
+            class="n">v</span> <span class="ow">in</span> <span class="n">edge_label_map_orig</span><span
+            class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="c1"># features = [list(i2n_o[int(n)]) for idx, n in node_label_map_original.items()]</span>
+    <span class="c1"># node_labels = [i2n[int(n)] for idx, n in node_label_map.items()]</span>
+    <span class="n">features</span><span class="p">,</span> <span class="n">node_labels</span> <span class="o">=</span> <span
+            class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">n</span> <span
+            class="ow">in</span> <span class="n">node_label_map_original</span><span class="o">.</span><span class="n">items</span><span
+            class="p">():</span>
+        <span class="n">feature</span> <span class="o">=</span> <span class="nb">list</span><span
+            class="p">(</span><span class="n">i2n_o</span><span class="p">[</span><span class="nb">int</span><span
+            class="p">(</span><span class="n">n</span><span class="p">)])</span>
+        <span class="n">features</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">feature</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="n">node_label</span> <span class="o">=</span> <span class="n">i2n</span><span
+            class="p">[</span><span class="nb">int</span><span class="p">(</span><span
+            class="n">node_label_map</span><span class="p">[</span><span class="n">idx</span><span class="p">])]</span>
+        <span class="n">node_labels</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">node_label</span><span class="p">)</span>
+    <span class="c1">#</span>
+    <span class="n">edge_index_row</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">edge_index_col</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">edge_attr</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span
+            class="ow">in</span> <span class="n">edge_label_map</span><span class="o">.</span><span
+            class="n">items</span><span class="p">():</span>
+        <span class="n">edge_index_row</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">k</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>  <span
+            class="c1"># k[0] is child (source)</span>
+        <span class="n">edge_index_col</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span
+            class="c1"># k[1] is parent (destination)</span>
+        <span class="n">edge_attr</span><span class="o">.</span><span class="n">append</span><span
+            class="p">(</span><span class="n">i2e</span><span class="p">[</span><span class="nb">int</span><span
+            class="p">(</span><span class="n">v</span><span class="p">)])</span>
+    <span class="n">edge_index</span> <span class="o">=</span> <span class="p">[</span><span
+            class="n">edge_index_row</span><span class="p">,</span> <span class="n">edge_index_col</span><span
+            class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Data</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span
+            class="n">tensor</span><span class="p">(</span><span class="n">features</span><span class="p">),</span>
+        <span class="n">edge_index</span><span class="o">=</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span
+            class="n">edge_index</span><span class="p">),</span>
+        <span class="n">edge_attr</span><span class="o">=</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">edge_attr</span><span
+            class="p">),</span>
+        <span class="n">node_labels</span><span class="o">=</span><span class="n">torch</span><span
+            class="o">.</span><span class="n">tensor</span><span class="p">(</span><span
+            class="n">node_labels</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span></div>
 </pre>
                         </div>
 

@@ -11,6 +11,6 @@
 source ~/.bashrc
 source ~/anaconda3/bin/activate pygdgl
 
-srun -n 1 python run_cross_arch.py --dataset ${1} --method ${2} --reduction_rate ${3}
+python run_cross_arch.py -D ${1} -M ${2}
 
 scontrol show job $SLURM_J0B_ID

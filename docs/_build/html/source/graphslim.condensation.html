@@ -11,7 +11,7 @@
 
 
     <!--[if lt IE 9]>
-      <script src="../_static/js/html5shiv.min.js"></script>
+    <script src="../_static/js/html5shiv.min.js"></script>
     <![endif]-->
 
     <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -345,6 +345,42 @@
                                             class="docutils literal notranslate"><span class="pre">distance_wb()</span></code></a>
                                     </li>
                                     <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_eigh"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_eigh()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_embed_mean"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_embed_mean()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_embed_sum"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_embed_sum()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_largest_cc"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_largest_cc()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_subspace_covariance_matrix"><code
+                                            class="docutils literal notranslate"><span class="pre">get_subspace_covariance_matrix()</span></code></a>
+                                    </li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_subspace_embed"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_subspace_embed()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_syn_eigen"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_syn_eigen()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.get_train_lcc"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">get_train_lcc()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
+                                                              href="#graphslim.condensation.utils.load_eigen"><code
+                                            class="docutils literal notranslate"><span
+                                            class="pre">load_eigen()</span></code></a></li>
+                                    <li class="toctree-l3"><a class="reference internal"
                                                               href="#graphslim.condensation.utils.match_loss"><code
                                             class="docutils literal notranslate"><span
                                             class="pre">match_loss()</span></code></a></li>
@@ -591,13 +627,19 @@
                                                 <span class="sig-name descname"><span class="pre">intermediate_evaluation</span></span><span
                                                     class="sig-paren">(</span><em class="sig-param"><span
                                                     class="n"><span class="pre">best_val</span></span></em>, <em
-                                                    class="sig-param"><span class="n"><span class="pre">loss_avg</span></span></em>,
-                                                <em class="sig-param"><span class="n"><span
-                                                        class="pre">save</span></span><span class="o"><span class="pre">=</span></span><span
-                                                        class="default_value"><span
-                                                        class="pre">True</span></span></em><span
-                                                    class="sig-paren">)</span><a class="reference internal"
-                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.intermediate_evaluation"><span
+                                                    class="sig-param"><span class="n"><span class="pre">loss_avg</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">None</span></span></em>, <em
+                                                    class="sig-param"><span class="n"><span
+                                                    class="pre">save</span></span><span class="o"><span
+                                                    class="pre">=</span></span><span class="default_value"><span
+                                                    class="pre">True</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">save_valid_acc</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span
+                                                    class="pre">False</span></span></em><span class="sig-paren">)</span><a
+                                                    class="reference internal"
+                                                    href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.intermediate_evaluation"><span
                                                     class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                                     class="headerlink"
                                                     href="#graphslim.condensation.gcond_base.GCondBase.intermediate_evaluation"
@@ -657,9 +699,12 @@
                                                     class="sig-param"><span class="n"><span
                                                     class="pre">iters</span></span><span class="o"><span
                                                     class="pre">=</span></span><span class="default_value"><span
-                                                    class="pre">200</span></span></em><span class="sig-paren">)</span><a
-                                                    class="reference internal"
-                                                    href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.test_with_val"><span
+                                                    class="pre">200</span></span></em>, <em class="sig-param"><span
+                                                    class="n"><span class="pre">best_val</span></span><span
+                                                    class="o"><span class="pre">=</span></span><span
+                                                    class="default_value"><span class="pre">None</span></span></em><span
+                                                    class="sig-paren">)</span><a class="reference internal"
+                                                                                 href="../_modules/graphslim/condensation/gcond_base.html#GCondBase.test_with_val"><span
                                                     class="viewcode-link"><span class="pre">[source]</span></span></a><a
                                                     class="headerlink"
                                                     href="#graphslim.condensation.gcond_base.GCondBase.test_with_val"
@@ -1626,6 +1671,160 @@
                                             </dd>
                                         </dl>
                                     </dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_eigh">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_eigh</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">laplacian_matrix</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">data_name</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span class="pre">save</span></span><span
+                                            class="o"><span class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">True</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#get_eigh"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_eigh"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_embed_mean">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_embed_mean</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">embed_sum</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#get_embed_mean"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_embed_mean"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_embed_sum">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_embed_sum</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">eigenvals</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">eigenvecs</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">x</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#get_embed_sum"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_embed_sum"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_largest_cc">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_largest_cc</span></span><span class="sig-paren">(</span><em
+                                            class="sig-param"><span class="n"><span class="pre">adj</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">num_nodes</span></span></em>,
+                                        <em class="sig-param"><span class="n"><span class="pre">data_name</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#get_largest_cc"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_largest_cc"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py"
+                                        id="graphslim.condensation.utils.get_subspace_covariance_matrix">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span
+                                            class="pre">get_subspace_covariance_matrix</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">eigenvecs</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">x</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#get_subspace_covariance_matrix"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink"
+                                            href="#graphslim.condensation.utils.get_subspace_covariance_matrix"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_subspace_embed">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_subspace_embed</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">eigenvecs</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">x</span></span></em><span
+                                            class="sig-paren">)</span><a class="reference internal"
+                                                                         href="../_modules/graphslim/condensation/utils.html#get_subspace_embed"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_subspace_embed"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_syn_eigen">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_syn_eigen</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">real_eigenvals</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">real_eigenvecs</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">eigen_k</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">ratio</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">step</span></span><span class="o"><span
+                                            class="pre">=</span></span><span class="default_value"><span
+                                            class="pre">1</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#get_syn_eigen"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_syn_eigen"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.get_train_lcc">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">get_train_lcc</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">idx_lcc</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">idx_train</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">y_full</span></span></em>, <em class="sig-param"><span
+                                            class="n"><span class="pre">num_nodes</span></span></em>, <em
+                                            class="sig-param"><span class="n"><span
+                                            class="pre">num_classes</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#get_train_lcc"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.get_train_lcc"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
+                                </dl>
+
+                                <dl class="py function">
+                                    <dt class="sig sig-object py" id="graphslim.condensation.utils.load_eigen">
+                                        <span class="sig-prename descclassname"><span class="pre">graphslim.condensation.utils.</span></span><span
+                                            class="sig-name descname"><span class="pre">load_eigen</span></span><span
+                                            class="sig-paren">(</span><em class="sig-param"><span class="n"><span
+                                            class="pre">dataset</span></span></em><span class="sig-paren">)</span><a
+                                            class="reference internal"
+                                            href="../_modules/graphslim/condensation/utils.html#load_eigen"><span
+                                            class="viewcode-link"><span class="pre">[source]</span></span></a><a
+                                            class="headerlink" href="#graphslim.condensation.utils.load_eigen"
+                                            title="Permalink to this definition"></a></dt>
+                                    <dd></dd>
                                 </dl>
 
                                 <dl class="py function">
