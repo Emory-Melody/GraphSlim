@@ -1,2 +1,5 @@
 /.idea/
 /graphslim.egg-info/
+*.log
+*.sh
+*.out

@@ -1,87 +1,0 @@
-====start running====
-{'activation': 'relu',
- 'aggpreprocess': False,
- 'alpha': 0.1,
- 'attack': None,
- 'batch_adj': 1,
- 'checkpoints': [-1, 99, 199, 299, 399, 499, 599, 699, 799, 899, 999],
- 'coarsen_strategy': 'greedy',
- 'condense_model': 'SGC',
- 'dataset': 'cora',
- 'device': 'cuda:0',
- 'dis_metric': 'ours',
- 'dropout': 0.0,
- 'eigen_k': 60,
- 'epochs': 1000,
- 'eval_epochs': 300,
- 'eval_interval': 100,
- 'eval_model': 'GCN',
- 'eval_whole': False,
- 'feat_alpha': 10,
- 'final_eval_model': 'GCN',
- 'gamma': 0.5,
- 'gpu_id': 0,
- 'hidden': 256,
- 'init': None,
- 'inner_loop': 5,
- 'load_path': '/scratch/sgong36/data',
- 'logger': <Logger graphslim.config (INFO)>,
- 'lr': 0.01,
- 'lr_adj': 0.01,
- 'lr_eigenvec': 0.01,
- 'lr_feat': 0.01,
- 'method': 'gcdm',
- 'metric': 'accuracy',
- 'mx_size': 100,
- 'nlayers': 2,
- 'no_buff': False,
- 'ntrans': 1,
- 'optim': 'Adam',
- 'outer_loop': 10,
- 'pre_norm': True,
- 'ptb_r': 0.25,
- 'ratio': 0.8,
- 'reduction_rate': 0.5,
- 'run_eval': 10,
- 'run_inter_eval': 3,
- 'run_reduction': 3,
- 'save_path': '/scratch/sgong36/checkpoints',
- 'seed': 1,
- 'setting': 'trans',
- 'smoothness_alpha': 0.1,
- 'soft_label': 0,
- 'split': 'fixed',
- 'threshold': 0.0,
- 'ts': 4,
- 'verbose': False,
- 'weight_decay': 0.0,
- 'with_bn': False,
- 'with_structure': 1}
-Val Accuracy and Std:[0.2733333333333334, 0.03597530016861878]
-Saved /scratch/sgong36/checkpoints/reduced_graph/gcdm/adj_cora_0.5_1.pt
-Val Accuracy and Std:[0.2735555555555556, 0.00031426968052734606]
-Saved /scratch/sgong36/checkpoints/reduced_graph/gcdm/adj_cora_0.5_1.pt
-Val Accuracy and Std:[0.2966666666666667, 0.02792052212182923]
-Saved /scratch/sgong36/checkpoints/reduced_graph/gcdm/adj_cora_0.5_1.pt
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-Val Accuracy and Std:[0.2966666666666667, 0.0]
-train nodes num: tensor(420)
-val nodes num: tensor(1449)
-test nodes num: tensor(2831)
-total nodes num: torch.Size([2708, 1433])
-target reduced size:70
-actual reduced size:70
-adj_syn: (70, 70) feat_syn: torch.Size([70, 1433])
-selected nodes: 70
-induced edges: 6
-Function Time: 0.0015335828065872192 s
-Function Time: 1.5335828065872192 ms
-Original graph:0.77 Mb  Condensed graph:0.40 Mb
-Evaluating reduced data using GCN
-  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s, MIA_acc=0.547, test_acc=0.192] 10%|█         | 1/10 [00:00<00:05,  1.79it/s, MIA_acc=0.547, test_acc=0.192] 10%|█         | 1/10 [00:01<00:05,  1.79it/s, MIA_acc=0.576, test_acc=0.207] 20%|██        | 2/10 [00:01<00:04,  1.81it/s, MIA_acc=0.576, test_acc=0.207] 20%|██        | 2/10 [00:01<00:04,  1.81it/s, MIA_acc=0.515, test_acc=0.294] 30%|███       | 3/10 [00:01<00:03,  1.83it/s, MIA_acc=0.515, test_acc=0.294] 30%|███       | 3/10 [00:02<00:03,  1.83it/s, MIA_acc=0.579, test_acc=0.223] 40%|████      | 4/10 [00:02<00:03,  1.83it/s, MIA_acc=0.579, test_acc=0.223] 40%|████      | 4/10 [00:02<00:03,  1.83it/s, MIA_acc=0.559, test_acc=0.19]  50%|█████     | 5/10 [00:02<00:02,  1.83it/s, MIA_acc=0.559, test_acc=0.19] 50%|█████     | 5/10 [00:03<00:02,  1.83it/s, MIA_acc=0.58, test_acc=0.191] 60%|██████    | 6/10 [00:03<00:02,  1.83it/s, MIA_acc=0.58, test_acc=0.191] 60%|██████    | 6/10 [00:03<00:02,  1.83it/s, MIA_acc=0.588, test_acc=0.214] 70%|███████   | 7/10 [00:03<00:01,  1.83it/s, MIA_acc=0.588, test_acc=0.214] 70%|███████   | 7/10 [00:04<00:01,  1.83it/s, MIA_acc=0.582, test_acc=0.23]  80%|████████  | 8/10 [00:04<00:01,  1.83it/s, MIA_acc=0.582, test_acc=0.23] 80%|████████  | 8/10 [00:04<00:01,  1.83it/s, MIA_acc=0.586, test_acc=0.24] 90%|█████████ | 9/10 [00:04<00:00,  1.83it/s, MIA_acc=0.586, test_acc=0.24] 90%|█████████ | 9/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]100%|██████████| 10/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]100%|██████████| 10/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]
-Seed:1, Test Mean Accuracy: 22.08 +/- 2.96, MIA Accuracy: 56.84 +/- 2.14
-=====end=======
