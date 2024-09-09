@@ -65,3 +65,23 @@ Val Accuracy and Std:[0.2966666666666667, 0.02792052212182923]
 Saved /scratch/sgong36/checkpoints/reduced_graph/gcdm/adj_cora_0.5_1.pt
 Val Accuracy and Std:[0.2966666666666667, 0.0]
 Val Accuracy and Std:[0.2966666666666667, 0.0]
+Val Accuracy and Std:[0.2966666666666667, 0.0]
+Val Accuracy and Std:[0.2966666666666667, 0.0]
+Val Accuracy and Std:[0.2966666666666667, 0.0]
+Val Accuracy and Std:[0.2966666666666667, 0.0]
+train nodes num: tensor(420)
+val nodes num: tensor(1449)
+test nodes num: tensor(2831)
+total nodes num: torch.Size([2708, 1433])
+target reduced size:70
+actual reduced size:70
+adj_syn: (70, 70) feat_syn: torch.Size([70, 1433])
+selected nodes: 70
+induced edges: 6
+Function Time: 0.0015335828065872192 s
+Function Time: 1.5335828065872192 ms
+Original graph:0.77 Mb  Condensed graph:0.40 Mb
+Evaluating reduced data using GCN
+  0%|          | 0/10 [00:00<?, ?it/s]  0%|          | 0/10 [00:00<?, ?it/s, MIA_acc=0.547, test_acc=0.192] 10%|█         | 1/10 [00:00<00:05,  1.79it/s, MIA_acc=0.547, test_acc=0.192] 10%|█         | 1/10 [00:01<00:05,  1.79it/s, MIA_acc=0.576, test_acc=0.207] 20%|██        | 2/10 [00:01<00:04,  1.81it/s, MIA_acc=0.576, test_acc=0.207] 20%|██        | 2/10 [00:01<00:04,  1.81it/s, MIA_acc=0.515, test_acc=0.294] 30%|███       | 3/10 [00:01<00:03,  1.83it/s, MIA_acc=0.515, test_acc=0.294] 30%|███       | 3/10 [00:02<00:03,  1.83it/s, MIA_acc=0.579, test_acc=0.223] 40%|████      | 4/10 [00:02<00:03,  1.83it/s, MIA_acc=0.579, test_acc=0.223] 40%|████      | 4/10 [00:02<00:03,  1.83it/s, MIA_acc=0.559, test_acc=0.19]  50%|█████     | 5/10 [00:02<00:02,  1.83it/s, MIA_acc=0.559, test_acc=0.19] 50%|█████     | 5/10 [00:03<00:02,  1.83it/s, MIA_acc=0.58, test_acc=0.191] 60%|██████    | 6/10 [00:03<00:02,  1.83it/s, MIA_acc=0.58, test_acc=0.191] 60%|██████    | 6/10 [00:03<00:02,  1.83it/s, MIA_acc=0.588, test_acc=0.214] 70%|███████   | 7/10 [00:03<00:01,  1.83it/s, MIA_acc=0.588, test_acc=0.214] 70%|███████   | 7/10 [00:04<00:01,  1.83it/s, MIA_acc=0.582, test_acc=0.23]  80%|████████  | 8/10 [00:04<00:01,  1.83it/s, MIA_acc=0.582, test_acc=0.23] 80%|████████  | 8/10 [00:04<00:01,  1.83it/s, MIA_acc=0.586, test_acc=0.24] 90%|█████████ | 9/10 [00:04<00:00,  1.83it/s, MIA_acc=0.586, test_acc=0.24] 90%|█████████ | 9/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]100%|██████████| 10/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]100%|██████████| 10/10 [00:05<00:00,  1.83it/s, MIA_acc=0.571, test_acc=0.227]
+Seed:1, Test Mean Accuracy: 22.08 +/- 2.96, MIA Accuracy: 56.84 +/- 2.14
+=====end=======
