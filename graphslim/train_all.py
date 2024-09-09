@@ -14,7 +14,7 @@ from graphslim.utils import to_camel_case, seed_everything
 
 if __name__ == '__main__':
     args = get_args()
-    graph = get_dataset(args.dataset, args)
+    graph = get_dataset(args.dataset, args, args.load_path)
     seed_everything(args.seed)
     if args.attack is not None:
         data = attack(graph, args)

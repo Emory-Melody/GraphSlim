@@ -168,6 +168,7 @@ def method_config(args):
 @click.option('--mx_size', default=100, help='for gcsntk methods, avoid SVD error', show_default=True)
 @click.option('--ts', default=4, help='for tspanner', show_default=True)
 @click.option('--save_path', '--sp', default='../checkpoints', show_default=True, help='save path for synthetic graph')
+@click.option('--load_path', '--lp', default='../../data', show_default=True, help='save path for synthetic graph')
 @click.option('--eval_whole', '-W', is_flag=True, show_default=True, help='if run on whole graph')
 @click.option('--with_structure', default=1, show_default=True, help='if synthesizing structure')
 # ======================================simgc====================================== #
