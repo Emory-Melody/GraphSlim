@@ -8,9 +8,6 @@ from graphslim.models import *
 
 
 class GCDM(GCondBase):
-    """
-    "Graph Condensation for Graph Neural Networks" https://cse.msu.edu/~jinwei2/files/GCond.pdf
-    """
     def __init__(self, setting, data, args, **kwargs):
         super(GCDM, self).__init__(setting, data, args, **kwargs)
 
@@ -33,52 +30,29 @@ class GCDM(GCondBase):
         adj = normalize_adj_tensor(adj, sparse=True)
 
         outer_loop, inner_loop = self.get_loops(args)
-        best_val = 0
         model = eval(args.condense_model)(self.d, args.hidden,
                                           data.nclass, args).to(self.device)
 
         feat_syn, pge= self.feat_syn, self.pge
 
-        adj_syn = pge.inference(feat_syn)
+        best_val = 0
         for it in range(args.epochs):
             model.initialize()
             model_parameters = list(model.parameters())
             self.optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
+            with torch.no_grad():
+                mean_emb_real=self.conv_emb(model,features,adj,labels,setting=args.setting,mask=data.train_mask)
 
-            labels_unique = self.num_class_dict.keys()
             loss_avg = 0
-
             for ol in range(outer_loop):
-                with torch.no_grad():
-                    embedding_real, _ = model.forward(features, adj, output_layer_features=True)
-                    if args.setting=='trans':
-                        embedding_real = embedding_real[data.idx_train]
-                        train_labels = labels[data.idx_train]
-                    else:
-                        train_labels = labels
-                    mean_emb_real = torch.zeros(
-                        (len(labels_unique), embedding_real.size(1)),
-                        device=embedding_real.device,
-                    )
-                    for i, label in enumerate(labels_unique):
-                        label_mask = train_labels == label
-                        mean_emb_real[i] = torch.mean(embedding_real[label_mask], dim=0)
+                for param in model.parameters():
+                    param.requires_grad_(False)
 
                 adj_syn = pge(feat_syn)
-                embedding_syn, _ = model.forward(feat_syn, adj_syn, output_layer_features=True)
-                mean_emb_syn = torch.zeros(
-                    (len(labels_unique), embedding_syn.size(1)),
-                    device=embedding_syn.device,
-                )
-                for i, label in enumerate(labels_unique):
-                    label_mask = labels_syn == label
-                    mean_emb_syn[i] = torch.mean(embedding_syn[label_mask], dim=0)
+                mean_emb_syn=self.conv_emb(model,feat_syn,adj_syn,labels_syn,setting='ind')
+                loss_emb=torch.sum(torch.mean((mean_emb_syn-mean_emb_real)**2,dim=1))
 
-                # loss_emb = torch.sum(
-                #     torch.mean((mean_emb_syn - mean_emb_real) ** 2, dim=1)
-                # )
-                loss_emb = torch.mean((mean_emb_syn - mean_emb_real) ** 2).sum()
                 loss_avg += loss_emb.item()
 
                 self.optimizer_pge.zero_grad()
@@ -99,44 +73,19 @@ class GCDM(GCondBase):
                     adj_syn_inner, sparse=False
                 )
 
+                for param in model.parameters():
+                    param.requires_grad_(True)
+
+
                 for _ in range(inner_loop):
+                    mean_emb_syn=self.conv_emb(model,feat_syn_inner,adj_syn_inner_norm,labels_syn,setting='ind')
+                    loss_inner=torch.sum(torch.mean((mean_emb_syn-mean_emb_real)**2,dim=1))
                     self.optimizer_model.zero_grad()
-                    embedding_syn, _ = model.forward(
-                        feat_syn_inner, adj_syn_inner_norm, output_layer_features=True
-                    )
-                    mean_emb_syn = torch.zeros(
-                        (len(labels_unique), embedding_syn.size(1)),
-                        device=embedding_syn.device,
-                    )
-                    for i, label in enumerate(labels_unique):
-                        label_mask = labels_syn == label
-                        mean_emb_syn[i] = torch.mean(embedding_syn[label_mask], dim=0)
-                    loss_syn_inner = torch.mean(
-                        (mean_emb_syn - mean_emb_real) ** 2
-                    ).sum()
-                    # loss_syn_inner = torch.sum(
-                    #     torch.mean((mean_emb_syn - mean_emb_real) ** 2, dim=1)
-                    # )
-                    loss_syn_inner.backward()
+                    loss_inner.backward()
                     self.optimizer_model.step()
                     with torch.no_grad():
-                        embedding_real, _ = model.forward(
-                            features, adj, output_layer_features=True
-                        )
-                        if args.setting =='trans':
-                            embedding_real = embedding_real[data.idx_train]
-                        mean_emb_real = torch.zeros(
-                            (len(labels_unique), embedding_real.size(1)),
-                            device=embedding_real.device,
-                        )
-                        for i, label in enumerate(labels_unique):
-                            label_mask = train_labels == label
-                            mean_emb_real[i] = torch.mean(
-                                embedding_real[label_mask], dim=0
-                            )
-                # self.feat_syn = feat_syn
-                # self.pge = pge
-            loss_avg /= data.nclass * outer_loop
+                        mean_emb_real=self.conv_emb(model,features,adj,labels,setting=args.setting,mask=data.train_mask)
+            loss_avg /= outer_loop
 
             if it in args.checkpoints:
                 self.adj_syn = adj_syn_inner_norm
@@ -144,3 +93,13 @@ class GCDM(GCondBase):
                 best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data
+    def conv_emb(self,model,features,adj,labels,setting='trans',mask=None):
+        embedding_real, _ = model.forward(features, adj, output_layer_features=True)
+        if setting=='trans':
+            embedding_real = embedding_real[mask]
+            y = labels[mask]
+        else:
+            y = labels
+        mean_emb = torch.stack([torch.mean(embedding_real[y == cls], 0) for cls in torch.unique(y)])
+        return mean_emb
+        

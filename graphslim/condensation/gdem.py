@@ -39,7 +39,7 @@ class GDEM(GCondBase):
         args = self.args
         pge = self.pge
         # calculate eigenvalues and eigenvectors
-        dataset_dir = f"../../data/{args.dataset}"
+        dataset_dir = osp.join(args.load_path, args.dataset)
         if not osp.exists(f"{dataset_dir}/idx_map.npy"):
             idx_lcc, adj_norm_lcc, _ = get_largest_cc(data.adj_full, data.num_nodes, args.dataset)
             np.save(f"{dataset_dir}/idx_lcc.npy", idx_lcc)
@@ -57,7 +57,7 @@ class GDEM(GCondBase):
             idx_train_lcc = np.load(f"{dataset_dir}/idx_train_lcc.npy")
             idx_map = np.load(f"{dataset_dir}/idx_map.npy")
 
-        eigenvals_lcc, eigenvecs_lcc = load_eigen(args.dataset)
+        eigenvals_lcc, eigenvecs_lcc = load_eigen(args.dataset,args.load_path)
         eigenvals_lcc = torch.FloatTensor(eigenvals_lcc)
         eigenvecs_lcc = torch.FloatTensor(eigenvecs_lcc)
 

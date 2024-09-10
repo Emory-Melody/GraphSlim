@@ -156,7 +156,7 @@ def method_config(args):
 @click.option('--lr_adj', default=1e-4, show_default=True)
 @click.option('--lr_feat', default=1e-4, show_default=True)
 @click.option('--optim', default="Adam", show_default=True)
-@click.option('--threshold', default=0, show_default=True, help='sparsificaiton threshold before evaluation')
+@click.option('--threshold', default=0.0, show_default=True, help='sparsificaiton threshold before evaluation')
 @click.option('--dropout', default=0.0, show_default=True)
 @click.option('--ntrans', default=1, show_default=True, help='number of transformations in SGC and APPNP')
 @click.option('--with_bn', is_flag=True, show_default=True)
@@ -179,7 +179,6 @@ def method_config(args):
 @click.option('--ratio', default=0.8, show_default=True, help='eigenvalue loss weight')
 @click.option('--lr_eigenvec', default=0.01, show_default=True, help='eigenvalue loss weight')
 @click.option('--gamma', default=0.5, show_default=True, help='eigenvalue loss weight')
-
 @click.pass_context
 def cli(ctx, **kwargs):
     args = dict2obj(kwargs)
@@ -194,6 +193,9 @@ def cli(ctx, **kwargs):
     args = method_config(args)
     # setting_config has higher priority than methods_config
     args = setting_config(args)
+    for key, value in ctx.params.items():
+        if ctx.get_parameter_source(key) == click.core.ParameterSource.COMMANDLINE:
+            setattr(args, key, value)
     if not os.path.exists(f'{path}/logs/{args.method}'):
         try:
             os.makedirs(f'{path}/logs/{args.method}')

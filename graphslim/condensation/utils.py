@@ -576,8 +576,8 @@ def get_eigh(laplacian_matrix, data_name, save=True):
     return eigenvalues, eigenvectors
 
 
-def load_eigen(dataset):
-    dir = "../../data/" + dataset + "/"
+def load_eigen(dataset,load_path):
+    dir = os.path.join(load_path, dataset) 
     val_file_name = "eigenvalues.npy"
     vec_file_name = "eigenvectors.npy"
 

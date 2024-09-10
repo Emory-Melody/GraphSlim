@@ -15,6 +15,7 @@ from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, add_self_loops
 from torch_sparse import SparseTensor
 from dgl.data import FraudDataset
+import shutil
 
 from graphslim.dataset.convertor import ei2csr, csr2ei, from_dgl
 from graphslim.dataset.utils import splits
@@ -371,7 +372,13 @@ class DataGraphSAINT:
             os.makedirs(dataset_str)
             print('Downloading dataset')
             url = 'https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa'  # Change this to your actual file ID
-            gdown.download_folder(url=url, output=dataset_str, quiet=False)
+            downloaded_folder=gdown.download_folder(url=url, output=dataset_str, quiet=False)
+            if downloaded_folder and osp.isdir(downloaded_folder):
+                for filename in os.listdir(downloaded_folder):
+                    file_path = osp.join(downloaded_folder, filename)
+                    shutil.move(file_path, dataset_str)
+
+                shutil.rmtree(downloaded_folder)
 
         if dataset == 'ogbn_arxiv':
             self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
