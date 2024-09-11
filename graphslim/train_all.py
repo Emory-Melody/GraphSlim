@@ -38,8 +38,10 @@ if __name__ == '__main__':
         agent = GCond(setting=args.setting, data=graph, args=args)
     elif args.method == 'doscond':
         agent = DosCond(setting=args.setting, data=graph, args=args)
-    elif args.method in ['doscondx', 'gcondx']:
+    elif args.method in ['doscondx']:
         agent = DosCondX(setting=args.setting, data=graph, args=args)
+    elif args.method in ['gcondx']:
+        agent = GCondX(setting=args.setting, data=graph, args=args)
     elif args.method == 'sfgc':
         agent = SFGC(setting=args.setting, data=graph, args=args)
     elif args.method == 'sgdd':
@@ -62,6 +64,8 @@ if __name__ == '__main__':
         agent = GCDM(setting=args.setting, data=graph, args=args)
     elif args.method == 'gdem':
         agent = GDEM(setting=args.setting, data=graph, args=args)
+    elif args.method == 'cadm':
+        agent = CADM(setting=args.setting, data=graph, args=args)
     else:
         agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)

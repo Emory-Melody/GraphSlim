@@ -1,9 +1,8 @@
 {
-  "lr_feat": 1e-4,
-  "lr_adj": 1e-4,
+  "lr_feat": 1e-5,
+  "lr_adj": 1e-5,
   "pre_norm": true,
-  "dis_metric": "ours",
-  "outer_loop": 10,
+  "outer_loop": 5,
   "inner_loop": 1,
   "threshold": 0.0,
   "condense_model": "GCN",

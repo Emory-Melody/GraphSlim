@@ -114,7 +114,7 @@ class GCondBase:
             print(num_class_dict)
         return np.array(labels_syn)
 
-    def init(self, with_adj=False):
+    def init(self, with_adj=False, agg=False):
         """
         Initializes synthetic features and (optionally) adjacency matrix.
 
@@ -130,7 +130,10 @@ class GCondBase:
         """
         args = self.args
         if args.init == 'clustering':
-            agent = Cluster(setting=args.setting, data=self.data, args=args)
+            if agg:
+                agent = ClusterAgg(setting=args.setting, data=self.data, args=args)
+            else:
+                agent = Cluster(setting=args.setting, data=self.data, args=args)
         elif args.init == 'averaging':
             agent = Average(setting=args.setting, data=self.data, args=args)
         elif args.init == 'kcenter':

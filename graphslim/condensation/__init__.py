@@ -11,3 +11,4 @@ from .simgc import SimGC
 # from .mirage import Mirage
 from .gcdm import GCDM
 from .gdem import GDEM
+from .cadm import CADM

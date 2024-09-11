@@ -5,6 +5,7 @@ from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import *
 from graphslim.utils import *
+import torch.nn.functional as F
 
 
 class DosCondX(GCondBase):
@@ -26,7 +27,7 @@ class DosCondX(GCondBase):
                                               device=self.device)
 
         # initialization the features
-        feat_init = self.init()
+        feat_init = self.init(with_adj=False)
         self.feat_syn.data.copy_(feat_init)
 
         self.adj_syn = torch.eye(feat_init.shape[0], device=self.device)
@@ -47,6 +48,7 @@ class DosCondX(GCondBase):
             for ol in range(outer_loop):
                 model = self.check_bn(model)
                 loss = self.train_class(model, adj, features, labels, labels_syn, args)
+
                 loss_avg += loss.item()
 
                 self.optimizer_feat.zero_grad()

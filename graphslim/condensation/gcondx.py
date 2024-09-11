@@ -18,6 +18,7 @@ class GCondX(GCondBase):
     def reduce(self, data, verbose=True):
         args = self.args
         feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
+
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
         else:
@@ -25,7 +26,7 @@ class GCondX(GCondBase):
                                               device=self.device)
 
             # initialization the features
-        feat_init = self.init()
+        feat_init = self.init(with_adj=False)
         self.feat_syn.data.copy_(feat_init)
 
         self.adj_syn = torch.eye(feat_init.shape[0], device=self.device)

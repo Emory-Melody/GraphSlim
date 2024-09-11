@@ -56,7 +56,7 @@ def setting_config(args):
     # args.pre_norm = True
     args.metric = 'f1_macro' if args.dataset in ['yelp', 'amazon'] else 'accuracy'
     args.run_inter_eval = 3
-    args.eval_interval = 100
+    args.eval_interval = args.epochs // 10
     # if args.method not in ['gcsntk']:
     #     args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
@@ -132,7 +132,7 @@ def method_config(args):
 #               type=click.Choice(
 #                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
 #                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
-#                    'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk', 'geom',
+#                    'gcond', 'doscond', 'gcondx', 'doscondx', 'sfgc', 'msgc', 'disco', 'sgdd', 'gcsntk', 'geom','cadm',
 #                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random',
 #                    'random_edge'
 #                    ]), show_default=True)
