@@ -43,7 +43,6 @@ class GCondBase:
         """
         self.data = data
         self.args = args
-        args.epochs -= 1
         self.device = args.device
         self.setting = setting
 
@@ -114,7 +113,7 @@ class GCondBase:
             print(num_class_dict)
         return np.array(labels_syn)
 
-    def init(self, with_adj=False, agg=False):
+    def init(self, with_adj=False, reuse_init=False):
         """
         Initializes synthetic features and (optionally) adjacency matrix.
 
@@ -130,7 +129,7 @@ class GCondBase:
         """
         args = self.args
         if args.init == 'clustering':
-            if agg:
+            if args.agg:
                 agent = ClusterAgg(setting=args.setting, data=self.data, args=args)
             else:
                 agent = Cluster(setting=args.setting, data=self.data, args=args)
@@ -147,13 +146,29 @@ class GCondBase:
         else:
             agent = Random(setting=args.setting, data=self.data, args=args)
 
-        reduced_data = agent.reduce(self.data, verbose=True, save=False)
+        if reuse_init:
+            save_path = f'{args.save_path}/reduced_graph/{args.init}'
+            if with_adj and os.path.exists(f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'):
+                feat_syn = torch.load(
+                        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+                return feat_syn, adj_syn
+            if os.path.exists(f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'):
+                feat_syn = torch.load(
+                        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+                return feat_syn
+        temp = args.method
+        args.method = args.init
+        reduced_data = agent.reduce(self.data, verbose=True, save=True)
+        args.method = temp
         if with_adj:
             return reduced_data.feat_syn, reduced_data.adj_syn
         else:
             return reduced_data.feat_syn
+            #return reduced_data.feat_syn_0, reduced_data.feat_syn_1,reduced_data.feat_syn_2
 
-    def train_class(self, model, adj, features, labels, labels_syn, args):
+
+
+    def train_class(self, model, adj, features, labels, labels_syn, args, soft=True):
         """
         Trains the model and computes the loss.
 
@@ -179,23 +194,63 @@ class GCondBase:
         """
         data = self.data
         feat_syn = self.feat_syn
-        adj_syn_norm = self.adj_syn
-        loss = torch.tensor(0.0).to(self.device)
+        adj_syn = self.adj_syn
+        loss = torch.tensor(0.0, device=self.device)
+
+        if not soft:
+            loss_fn = F.nll_loss
+            # Convert labels to class indices if they are one-hot encoded
+            if labels.dim() > 1:
+                hard_labels = torch.argmax(labels, dim=-1)
+            else:
+                hard_labels = labels.long()
+            if labels_syn.dim() > 1:
+                hard_labels_syn = torch.argmax(labels_syn, dim=-1)
+            else:
+                hard_labels_syn = labels_syn.long()
+        else:
+            loss_fn = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+            # Convert labels to one-hot encoding if they are class indices
+            if labels.dim() == 1:
+                hard_labels = labels
+                soft_labels = F.one_hot(labels, num_classes=data.nclass).float()
+            if labels_syn.dim() == 1:
+                hard_labels_syn = labels
+                soft_labels_syn = F.one_hot(labels_syn, num_classes=data.nclass).float()
+            else:
+                hard_labels_syn = torch.argmax(labels_syn, dim=-1)
+                soft_labels_syn = labels_syn
+
+        # Loop over each class
         for c in range(data.nclass):
-            batch_size, n_id, adjs = data.retrieve_class_sampler(
-                c, adj, args)
+            # Retrieve a batch of real data samples for class c
+            batch_size, n_id, adjs = data.retrieve_class_sampler(c, adj, args)
             adjs = [adj[0].to(self.device) for adj in adjs]
-            output = model(features[n_id], adjs)
-            loss_real = F.nll_loss(output, labels[n_id[:batch_size]])
-            gw_reals = torch.autograd.grad(loss_real, model.parameters())
-            gw_reals = list((_.detach().clone() for _ in gw_reals))
-            # ------------------------------------------------------------------
-            output_syn = model(feat_syn, adj_syn_norm)
-            loss_syn = F.nll_loss(output_syn[labels_syn == c], labels_syn[labels_syn == c])
-            gw_syns = torch.autograd.grad(loss_syn, model.parameters(), create_graph=True)
-            # ------------------------------------------------------------------
+            input_real = features[n_id].to(self.device)
+            if soft:
+                labels_real = soft_labels[n_id[:batch_size]].to(self.device)
+            else:
+                labels_real = hard_labels[n_id[:batch_size]].to(self.device)
+
+            output_real = model(input_real, adjs)
+            loss_real = loss_fn(output_real, labels_real)
+
+            gw_real = torch.autograd.grad(loss_real, model.parameters(), retain_graph=True)
+            gw_real = [g.detach().clone() for g in gw_real]
+
+            output_syn = model(feat_syn, adj_syn)
+            if soft:
+                loss_syn = loss_fn(output_syn[hard_labels_syn == c], soft_labels_syn[hard_labels_syn == c])
+            else:
+                loss_syn = loss_fn(output_syn[hard_labels_syn == c], hard_labels_syn[hard_labels_syn == c])
+
+
+            # Compute gradients w.r.t. model parameters for synthetic data
+            gw_syn = torch.autograd.grad(loss_syn, model.parameters(), create_graph=True)
+
+            # Compute matching loss between gradients
             coeff = self.num_class_dict[c] / self.nnodes_syn
-            ml = match_loss(gw_syns, gw_reals, args, device=self.device)
+            ml = match_loss(gw_syn, gw_real, args, device=self.device)
             loss += coeff * ml
 
         return loss
@@ -270,13 +325,13 @@ class GCondBase:
         res = []
 
         for i in range(args.run_inter_eval):
-            # small epochs for fast intermediate evaluation
             res.append(
-                self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs, best_val=best_val))
+                self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs))
 
-        res = np.array(res)
-        current_val = res.mean()
-        args.logger.info('Val Accuracy and Std:' + repr([current_val, res.std()]))
+        res = np.array(res).T
+        current_val = res[0].mean()
+        args.logger.info('\nVal:  {:.4f} +/- {:.4f}'.format(100*current_val, 100*res[0].std()))
+        args.logger.info('Test: {:.4f} +/- {:.4f}'.format(100*res[1].mean(), 100*res[1].std()))
 
         if save and current_val > best_val:
             best_val = current_val
@@ -301,7 +356,6 @@ class GCondBase:
         list
             A list containing validation results.
         """
-        res = []
 
         args, data, device = self.args, self.data, self.device
 
@@ -310,20 +364,10 @@ class GCondBase:
         acc_val = model.fit_with_val(data,
                                      train_iters=iters, normadj=True, verbose=False,
                                      setting=setting, reduced=True, best_val=best_val)
-        # model.eval()
-        # labels_test = data.labels_test.long().to(args.device)
-        # if setting == 'trans':
-        #
-        #     output = model.predict(data.feat_full, data.adj_full)
-        #     acc_test = accuracy(output[data.idx_test], labels_test)
-        #
-        # else:
-        #     output = model.predict(data.feat_test, data.adj_test)
-        #     # loss_test = F.nll_loss(output, labels_test)
-        #     acc_test = accuracy(output, labels_test)
-        # res.append(acc_test.item())
-        res.append(acc_val.item())
+
+        model.eval()
+        acc_test = model.test(data)
         # if verbose:
         #     print('Val Accuracy and Std:',
         #           repr([res.mean(0), res.std(0)]))
-        return res
+        return [acc_val, acc_test]

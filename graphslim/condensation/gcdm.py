@@ -5,6 +5,7 @@ from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.utils import *
 from graphslim.models import *
+import torch.nn.functional as F
 
 
 class GCDM(GCondBase):
@@ -14,7 +15,6 @@ class GCDM(GCondBase):
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
-        pge = self.pge
         self.feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == 'trans':
             features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
@@ -33,73 +33,86 @@ class GCDM(GCondBase):
         model = eval(args.condense_model)(self.d, args.hidden,
                                           data.nclass, args).to(self.device)
 
-        feat_syn, pge= self.feat_syn, self.pge
+        feat_syn = self.feat_syn
+        adj_syn = torch.eye(feat_syn.shape[0], device=self.device)
 
         best_val = 0
-        for it in range(args.epochs):
+        bar = trange(args.epochs)
+        for it in bar:
             model.initialize()
             model_parameters = list(model.parameters())
             self.optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
             model.train()
             with torch.no_grad():
-                mean_emb_real=self.conv_emb(model,features,adj,labels,setting=args.setting,mask=data.train_mask)
+                emb_real,_ = model.forward(features,adj, output_layer_features=True)
 
             loss_avg = 0
             for ol in range(outer_loop):
-                for param in model.parameters():
-                    param.requires_grad_(False)
+                emb_syn, _ = model.forward(feat_syn,adj_syn, output_layer_features=True)
+                loss_emb = 0
+                # To parallelize
+                for i in range(len(emb_syn)):
+                    if i == args.nlayers-1:
+                        break
+                    for c in range(data.nclass):
+                        coeff = self.num_class_dict[c] / self.nnodes_syn
 
-                adj_syn = pge(feat_syn)
-                mean_emb_syn=self.conv_emb(model,feat_syn,adj_syn,labels_syn,setting='ind')
-                loss_emb=torch.sum(torch.mean((mean_emb_syn-mean_emb_real)**2,dim=1))
+                        st_id, ed_id = self.syn_class_indices[c]
+                        num_syn_samples = emb_syn[i][st_id:ed_id].shape[0]
+                        class_mask = (data.labels_train == c)
+                        real_indices = class_mask.nonzero(as_tuple=False).squeeze()
+
+                        num_real_samples = real_indices.shape[0]
+
+                        selected_indices = real_indices[torch.randperm(num_real_samples)[:num_syn_samples]]
+
+                        #emb_real_selected = emb_real[i][data.train_mask][selected_indices]
+                        emb_real_class = emb_real[i][data.train_mask][class_mask]
+                        emb_syn_selected = emb_syn[i][st_id:ed_id]
+
+                        loss_emb += coeff * dist(torch.mean(emb_real_class,dim=0), torch.mean(emb_syn_selected,dim=0), method=args.dis_metric)
 
                 loss_avg += loss_emb.item()
 
-                self.optimizer_pge.zero_grad()
                 self.optimizer_feat.zero_grad()
-
                 loss_emb.backward()
-                if it % 50 < 10:
-                    self.optimizer_pge.step()
-                else:
-                    self.optimizer_feat.step()
-
-                if ol == outer_loop - 1:
-                    break
+                self.optimizer_feat.step()
 
                 feat_syn_inner = feat_syn.detach()
-                adj_syn_inner = pge.inference(feat_syn_inner)
-                adj_syn_inner_norm = normalize_adj_tensor(
-                    adj_syn_inner, sparse=False
-                )
-
-                for param in model.parameters():
-                    param.requires_grad_(True)
 
 
                 for _ in range(inner_loop):
-                    mean_emb_syn=self.conv_emb(model,feat_syn_inner,adj_syn_inner_norm,labels_syn,setting='ind')
-                    loss_inner=torch.sum(torch.mean((mean_emb_syn-mean_emb_real)**2,dim=1))
+                    props = model.forward(feat_syn_inner, adj_syn)
+                    loss_inner = F.nll_loss(props, labels_syn)
                     self.optimizer_model.zero_grad()
                     loss_inner.backward()
                     self.optimizer_model.step()
-                    with torch.no_grad():
-                        mean_emb_real=self.conv_emb(model,features,adj,labels,setting=args.setting,mask=data.train_mask)
+                with torch.no_grad():
+                    emb_real,_ = model.forward(features,adj, output_layer_features=True)
             loss_avg /= outer_loop
+            bar.set_postfix({'loss': loss_avg})
 
             if it in args.checkpoints:
-                self.adj_syn = adj_syn_inner_norm
+                self.adj_syn = adj_syn
                 data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn, self.feat_syn.detach(), labels_syn.detach()
                 best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data
-    def conv_emb(self,model,features,adj,labels,setting='trans',mask=None):
-        embedding_real, _ = model.forward(features, adj, output_layer_features=True)
-        if setting=='trans':
-            embedding_real = embedding_real[mask]
-            y = labels[mask]
-        else:
-            y = labels
-        mean_emb = torch.stack([torch.mean(embedding_real[y == cls], 0) for cls in torch.unique(y)])
-        return mean_emb
         
+def dist(x, y, method='mse'):
+    """Distance objectives
+    """
+    if method == 'mse':
+        dist_ = (x - y).pow(2).sum()
+    elif method == 'l1':
+        dist_ = (x - y).abs().sum()
+    elif method == 'l1_mean':
+        n_b = x.shape[0]
+        dist_ = (x - y).abs().reshape(n_b, -1).mean(-1).sum()
+    elif method == 'cos':
+        x = x.reshape(x.shape[0], -1)
+        y = y.reshape(y.shape[0], -1)
+        dist_ = torch.sum(1 - torch.sum(x * y, dim=-1) /
+                          (torch.norm(x, dim=-1) * torch.norm(y, dim=-1) + 1e-6))
+    return dist_
+

@@ -77,7 +77,7 @@ def get_dataset(name='cora', args=None, load_path='../../data'):
     print("train nodes num:", sum(data.labels_train))
     print("val nodes num:", sum(data.labels_val))
     print("test nodes num:", sum(data.labels_test))
-    print("total nodes num:", data.x.shape)
+    print("total nodes num:", data.x.shape[0])
     return data
 
 

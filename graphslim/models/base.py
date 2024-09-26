@@ -57,6 +57,7 @@ class BaseGNN(nn.Module):
                     x = F.relu(x)
                     x = F.dropout(x, self.dropout, training=self.training)
         else:
+            feat_list = []
             for ix, layer in enumerate(self.layers):
                 x = layer(x, adj)
                 if ix != self.nlayers - 1:
@@ -64,18 +65,18 @@ class BaseGNN(nn.Module):
                     if self.with_relu:
                         x = F.relu(x)
                     x = F.dropout(x, self.dropout, training=self.training)
-                if output_layer_features and ix == self.nlayers - 2:
-                    x_out = x
+                if output_layer_features and ix < self.nlayers:
+                    feat_list.append(x.reshape(-1, x.shape[-1]))
 
         x = x.view(-1, x.shape[-1])
         if output_layer_features:
-            x_out = x_out.view(-1, x_out.shape[-1])
-            return x_out, F.log_softmax(x, dim=1)
+            return feat_list, F.log_softmax(x, dim=1)
         else:
             return F.log_softmax(x, dim=1)
 
     def fit_with_val(self, data, train_iters=600, verbose=False,
                      normadj=True, setting='trans', reduced=False, final_output=False, best_val=None, **kwargs):
+        args=self.args
 
         self.initialize()
         # data for training
@@ -100,18 +101,24 @@ class BaseGNN(nn.Module):
                 adj = normalize_adj_tensor(adj, sparse=True)
 
         # SparseTensor synthetic graph only used in graphsage, msgc and simgc
-        elif self.__class__.__name__ == 'GraphSage' and self.args.method == 'msgc':
+        elif self.__class__.__name__ == 'GraphSage' and args.method == 'msgc':
             adj = adj
-        elif self.args.method == 'simgc':
+        elif args.method == 'simgc':
             adj = normalize_adj_tensor(adj, sparse=True)
         else:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))
 
         if self.loss is None:
-            if self.args.method == 'geom' and self.args.soft_label:
+            if args.method == 'geom' and args.soft_label:
                 self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
             elif len(labels.shape) == 2:
-                self.loss = torch.nn.MSELoss()
+                if args.eval_loss=='MSE':
+                    self.loss = torch.nn.MSELoss()
+                elif args.eval_loss=='KLD':
+                    self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+                else:
+                    raise NotImplementedError
+                self.weight_decay = args.eval_wd
             else:
                 labels = to_tensor(label=labels, device=self.device)
                 self.loss = F.nll_loss
@@ -178,7 +185,7 @@ class BaseGNN(nn.Module):
             self.load_state_dict(weights)
         except:
             pass
-        return best_acc_val
+        return best_acc_val.item()
 
     @torch.no_grad()
     def test(self, data, setting='trans', verbose=False):

@@ -199,7 +199,7 @@ class Evaluator:
         if args.setting == 'ind':
             output = model.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
-            acc_test = self.metric(output, labels_test)
+            acc_test = self.metric(output, labels_test).item()
             if MIA:
                 output_train = model.predict(data.feat_train, data.adj_train)
                 conf_train = F.softmax(output_train, dim=1)
@@ -208,24 +208,24 @@ class Evaluator:
             if verbose:
                 print("Test set results:",
                       f"loss= {loss_test.item():.4f}",
-                      f"accuracy= {acc_test.item():.4f}")
+                      f"accuracy= {acc_test:.4f}")
         else:
             output = model.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[data.idx_test], labels_test)
-            acc_test = self.metric(output[data.idx_test], labels_test)
+            acc_test = self.metric(output[data.idx_test], labels_test).item()
             if MIA:
                 conf_train = F.softmax(output[data.idx_train], dim=1)
                 conf_test = F.softmax(output[data.idx_test], dim=1)
             if verbose:
                 print("Test full set results:",
                       f"loss= {loss_test.item():.4f}",
-                      f"accuracy= {acc_test.item():.4f}")
+                      f"accuracy= {acc_test:.4f}")
         if MIA:
             mia_acc = inference_via_confidence(conf_train.cpu().numpy(), conf_test.cpu().numpy(), labels_train.cpu(),
                                                labels_test.cpu())
             # print(f"MIA accuracy: {mia_acc}")
-            return best_acc_val.item(), acc_test.item(), mia_acc
-        return best_acc_val.item(), acc_test.item()
+            return best_acc_val, acc_test, mia_acc
+        return best_acc_val, acc_test
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
         """
@@ -383,7 +383,7 @@ class Evaluator:
                                               setting=args.setting, reduced=reduced)
             res.append(best_acc_val)
             if verbose:
-                run_evaluation.set_postfix(best_acc_val=best_acc_val.item())
+                run_evaluation.set_postfix(best_acc_val=best_acc_val)
 
         res = np.array(res)
 

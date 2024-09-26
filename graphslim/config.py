@@ -122,7 +122,7 @@ def method_config(args):
 @click.option('--nlayers', default=2, help='number of GNN layers of condensed model', show_default=True)
 @click.option('--verbose', '-V', is_flag=True, show_default=True)
 @click.option('--soft_label', default=0, show_default=True)
-@click.option('--init', default=None, help='features initialization methods',
+@click.option('--init', default='random', help='features initialization methods',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',
                    'affinity_GS', 'kron', 'vng', 'clustering', 'averaging',
@@ -136,6 +136,12 @@ def method_config(args):
 #                    'cent_d', 'cent_p', 'kcenter', 'herding', 'random',
 #                    'random_edge'
 #                    ]), show_default=True)
+
+@click.option('--eval_wd', '--ewd', default=0.0, show_default=True)
+@click.option('--eval_loss', '--eloss', default='CE',
+                type=click.Choice(
+                  ['CE', 'KLD','MSE']
+              ), show_default=True)
 @click.option('--method', '-M', default='kcenter', show_default=True)
 @click.option('--activation', default='relu', help='activation function when do NAS',
               type=click.Choice(
@@ -150,7 +156,7 @@ def method_config(args):
                   ['optimal', 'greedy']
               ), show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True, help='perturbation rate for corruptions')
-@click.option('--aggpreprocess', is_flag=True, show_default=True, help='use aggregation for coreset methods')
+@click.option('--agg', is_flag=True, show_default=True, help='use aggregation for coreset methods')
 @click.option('--dis_metric', default='ours', show_default=True,
               help='distance metric for all condensation methods,ours means metric used in GCond paper')
 @click.option('--lr_adj', default=1e-4, show_default=True)
@@ -192,10 +198,10 @@ def cli(ctx, **kwargs):
     # for benchmark, we need unified settings and reduce flexibility of args
     args = method_config(args)
     # setting_config has higher priority than methods_config
-    args = setting_config(args)
     for key, value in ctx.params.items():
         if ctx.get_parameter_source(key) == click.core.ParameterSource.COMMANDLINE:
             setattr(args, key, value)
+    args = setting_config(args)
     if not os.path.exists(f'{path}/logs/{args.method}'):
         try:
             os.makedirs(f'{path}/logs/{args.method}')

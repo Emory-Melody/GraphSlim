@@ -10,5 +10,4 @@ conda activate pygdgl
 cd ~/GraphSlim/graphslim
 
 echo '====start running===='
-python train_all.py -M gcdm --dis_metric l1 --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data --epochs 10 --init clustering --agg
-echo '=====end======='
+python train_all.py -M gcdm --dis_metric l1 --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data --epochs 10 -D ogbn-arxiv --init clustering --agg

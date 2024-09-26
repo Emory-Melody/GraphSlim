@@ -17,7 +17,7 @@ class MFCoreSet(CoreSet):
 
         args = self.args
         if self.setting == 'trans':
-            if args.aggpreprocess:
+            if args.agg:
                 data.adj_fully = to_tensor(data.adj_full)
                 data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
                 data.pre_conv = matmul(data.pre_conv, data.pre_conv)
@@ -34,7 +34,7 @@ class MFCoreSet(CoreSet):
                 data.labels_syn = data.labels_full[idx_selected]
 
         if self.setting == 'ind':
-            if args.aggpreprocess:
+            if args.agg:
                 data.adj_fully = to_tensor(data.adj_train)
                 data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
                 data.pre_conv = matmul(data.pre_conv, data.pre_conv)
