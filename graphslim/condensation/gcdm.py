@@ -50,7 +50,6 @@ class GCDM(GCondBase):
             for ol in range(outer_loop):
                 emb_syn, _ = model.forward(feat_syn,adj_syn, output_layer_features=True)
                 loss_emb = 0
-                # To parallelize
                 for i in range(len(emb_syn)):
                     if i == args.nlayers-1:
                         break
@@ -66,13 +65,20 @@ class GCDM(GCondBase):
 
                         selected_indices = real_indices[torch.randperm(num_real_samples)[:num_syn_samples]]
 
-                        #emb_real_selected = emb_real[i][data.train_mask][selected_indices]
-                        emb_real_class = emb_real[i][data.train_mask][class_mask]
+                        if args.setting == 'trans':
+                            emb_real_selected = emb_real[i][data.train_mask][selected_indices]
+                            emb_real_class = emb_real[i][data.train_mask][class_mask]
+                        else:
+                            emb_real_selected = emb_real[i][selected_indices]
+                            emb_real_class = emb_real[i][class_mask]
+
+
                         emb_syn_selected = emb_syn[i][st_id:ed_id]
 
-                        loss_emb += coeff * dist(torch.mean(emb_real_class,dim=0), torch.mean(emb_syn_selected,dim=0), method=args.dis_metric)
-
+                        # loss_emb += coeff * dist(torch.mean(emb_real_class,dim=0), torch.mean(emb_syn_selected,dim=0), method=args.dis_metric)
+                        loss_emb += coeff * dist(emb_real_selected, emb_syn_selected, method=args.dis_metric)
                 loss_avg += loss_emb.item()
+
 
                 self.optimizer_feat.zero_grad()
                 loss_emb.backward()

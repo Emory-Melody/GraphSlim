@@ -359,14 +359,14 @@ class GCondBase:
 
         args, data, device = self.args, self.data, self.device
 
-        model = GCN(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(device)
+        model = eval(args.final_eval_model)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(device)
 
         acc_val = model.fit_with_val(data,
                                      train_iters=iters, normadj=True, verbose=False,
                                      setting=setting, reduced=True, best_val=best_val)
 
         model.eval()
-        acc_test = model.test(data)
+        acc_test = model.test(data, setting=setting,verbose=False)
         # if verbose:
         #     print('Val Accuracy and Std:',
         #           repr([res.mean(0), res.std(0)]))

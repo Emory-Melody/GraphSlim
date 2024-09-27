@@ -10,4 +10,4 @@ conda activate pygdgl
 cd ~/GraphSlim/graphslim
 
 echo '====start running===='
-python train_all.py -M doscondx --dis_metric l1 --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data -D reddit -R $1
+python train_all.py -M gcdm --dis_metric l1 --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data -D pubmed -R $1
