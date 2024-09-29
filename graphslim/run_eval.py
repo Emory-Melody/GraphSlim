@@ -10,12 +10,12 @@ from graphslim.evaluation import Evaluator, PropertyEvaluator
 
 if __name__ == '__main__':
     args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args)
+    data = get_dataset(args.dataset, args, load_path=args.load_path)
     if args.eval_whole:
         # evaluator = PropertyEvaluator(args)
         evaluator = Evaluator(args)
         evaluator.evaluate(data, reduced=False, model_type='GCN')
-        evaluator.MIA_evaluate(data, reduced=False, model_type='GCN')
+        #evaluator.MIA_evaluate(data, reduced=False, model_type='GCN')
     else:
         if args.attack is not None:
             data = attack(data, args)
@@ -23,4 +23,4 @@ if __name__ == '__main__':
         # evaluator = PropertyEvaluator(data, args, reduced=True)
         evaluator = PropertyEvaluator(args)
         evaluator.evaluate(data, reduced=True, model_type='GCN')
-        evaluator.MIA_evaluate(data, reduced=True, model_type='GCN')
+        #evaluator.MIA_evaluate(data, reduced=True, model_type='GCN')

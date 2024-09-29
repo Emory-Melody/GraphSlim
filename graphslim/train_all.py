@@ -18,13 +18,13 @@ if __name__ == '__main__':
     seed_everything(args.seed)
     if args.attack is not None:
         data = attack(graph, args)
-    if args.method == 'kcenter' and not args.aggpreprocess:
+    if args.method == 'kcenter' and not args.agg:
         agent = KCenter(setting=args.setting, reduction_rate=args.reduction_rate, data=graph, args=args)
-    elif args.method == 'kcenter' and args.aggpreprocess:
+    elif args.method == 'kcenter' and args.agg:
         agent = KCenterAgg(setting=args.setting, data=graph, args=args)
-    elif args.method == 'herding' and not args.aggpreprocess:
+    elif args.method == 'herding' and not args.agg:
         agent = Herding(setting=args.setting, data=graph, args=args)
-    elif args.method == 'herding' and args.aggpreprocess:
+    elif args.method == 'herding' and args.agg:
         agent = HerdingAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'random':
         agent = Random(setting=args.setting, data=graph, args=args)
@@ -54,9 +54,9 @@ if __name__ == '__main__':
         agent = GEOM(setting=args.setting, data=graph, args=args)
     elif args.method == 'vng':
         agent = VNG(setting=args.setting, data=graph, args=args)
-    elif args.method == 'clustering' and not args.aggpreprocess:
+    elif args.method == 'clustering' and not args.agg:
         agent = Cluster(setting=args.setting, data=graph, args=args)
-    elif args.method == 'clustering' and args.aggpreprocess:
+    elif args.method == 'clustering' and args.agg:
         agent = ClusterAgg(setting=args.setting, data=graph, args=args)
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)

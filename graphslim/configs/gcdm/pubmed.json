@@ -4,6 +4,7 @@
   "dis_metric": "l1",
   "outer_loop": 5,
   "inner_loop": 0,
-  "condense_model": "GCN"
+  "condense_model": "GCN",
+  "epochs": 2000
 }
 
