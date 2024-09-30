@@ -157,6 +157,7 @@ def method_config(args):
               ), show_default=True)
 @click.option('--ptb_r', '-P', default=0.25, show_default=True, help='perturbation rate for corruptions')
 @click.option('--agg', is_flag=True, show_default=True, help='use aggregation for coreset methods')
+@click.option('--multi_label', is_flag=True, show_default=True, help='use aggregation for coreset methods')
 @click.option('--dis_metric', default='ours', show_default=True,
               help='distance metric for all condensation methods,ours means metric used in GCond paper')
 @click.option('--lr_adj', default=1e-4, show_default=True)

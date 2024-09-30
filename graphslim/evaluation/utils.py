@@ -178,7 +178,7 @@ def verbose_time_memory(func):
 # from deeprobust.graph.utils import accuracy
 
 
-def calc_f1(y_true, y_pred, is_sigmoid):
+def calc_f1(y_true, y_pred, is_sigmoid=False):
     """
     Calculate the F1 score for binary or multi-class classification.
 

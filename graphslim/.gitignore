@@ -1,5 +1,6 @@
 # Auxillary file on MacOS
 .DS_Store
+.nfs*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

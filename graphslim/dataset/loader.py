@@ -55,6 +55,7 @@ def get_dataset(name='cora', args=None, load_path='../../data'):
         elif name in ['yelp', 'amazon']:
             dataset = FraudDataset(name, raw_dir=path)
             dataset = from_dgl(dataset[0], name=name, hetero=False)  # dgl2pyg
+            dataset.num_classes = 2
     else:
         raise ValueError("Dataset name not recognized.")
 

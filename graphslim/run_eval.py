@@ -21,6 +21,6 @@ if __name__ == '__main__':
             data = attack(data, args)
             args.save_path = f'checkpoints'
         # evaluator = PropertyEvaluator(data, args, reduced=True)
-        evaluator = PropertyEvaluator(args)
+        #evaluator = PropertyEvaluator(args)
         evaluator.evaluate(data, reduced=True, model_type='GCN')
         #evaluator.MIA_evaluate(data, reduced=True, model_type='GCN')

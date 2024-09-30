@@ -36,7 +36,7 @@ class BaseGNN(nn.Module):
         self.best_output = None
         self.adj_norm = None
         self.features = None
-        self.multi_label = None
+        self.multi_label = args.multi_label
         self.float_label = None
         self.metric = accuracy if args.metric == 'accuracy' else f1_macro
 
@@ -69,6 +69,8 @@ class BaseGNN(nn.Module):
                     feat_list.append(x.reshape(-1, x.shape[-1]))
 
         x = x.view(-1, x.shape[-1])
+        if self.multi_label:
+            return torch.sigmoid(x)
         if output_layer_features:
             return feat_list, F.log_softmax(x, dim=1)
         else:
@@ -111,6 +113,8 @@ class BaseGNN(nn.Module):
         if self.loss is None:
             if args.method == 'geom' and args.soft_label:
                 self.loss = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+            elif data.nclass == 1:
+                self.loss = torch.nn.BCELoss()
             elif len(labels.shape) == 2:
                 if args.eval_loss=='MSE':
                     self.loss = torch.nn.MSELoss()
@@ -125,12 +129,6 @@ class BaseGNN(nn.Module):
         else:
             labels = to_tensor(label=labels, device=self.device)
 
-        # elif len(data.labels_full.shape) > 1:
-        #     self.multi_label = True
-        #     self.loss = torch.nn.BCELoss()
-        # else:
-        #     self.multi_label = False
-        #     self.loss = F.nll_loss
 
         if verbose:
             print('=== training ===')

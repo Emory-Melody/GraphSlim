@@ -10,4 +10,4 @@ conda activate pygdgl
 cd ~/GraphSlim/graphslim
 
 echo '====start running===='
-python train_all.py -M gcdm --dis_metric l1 --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data --dataset yelp -R $1
+python run_eval.py -M gcdm --save_path /scratch/sgong36/checkpoints --load_path /scratch/sgong36/data --dataset yelp -R $1 -W --run_eval 1 --multi_label

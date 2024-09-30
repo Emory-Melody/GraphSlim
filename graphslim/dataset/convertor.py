@@ -9,6 +9,7 @@ from torch_geometric.utils import to_undirected, to_dense_adj, remove_self_loops
 from torch_sparse import SparseTensor
 import networkit as nk
 from torch_geometric.data import Data, HeteroData
+import dgl
 
 
 def from_dgl(g, name, hetero=True):
@@ -38,17 +39,14 @@ def from_dgl(g, name, hetero=True):
 
     data_out = Data()
     if not hetero:
-        edge_index_list = []
-        for edge_type in g.canonical_etypes:
-            edge_index_list.append(data[edge_type].edge_index)
-        data_out.edge_index = remove_self_loops(torch.cat(edge_index_list, dim=1))[0]
 
-        data_out.x = data.node_stores[0]['feature']
+        graph = dgl.to_homogeneous(g, ndata=['feature', 'label', 'train_mask', 'val_mask', 'test_mask'])
+        graph = dgl.add_self_loop(graph)
+        data_out.edge_index = torch.stack(graph.edges(), dim=0)
 
-        data_out.y = data.node_stores[0]['label']
-
-    data_out.num_nodes = len(data_out.x)
-    data_out.num_classes = max(data_out.y).item() + 1
+        data_out.y = graph.ndata['label'].long().squeeze(-1)
+        data_out.x = graph.ndata['feature'].float()
+        data_out.num_nodes = len(data_out.x)
 
     return data_out
 def pyg2gsp(edge_index):
