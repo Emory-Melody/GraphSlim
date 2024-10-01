@@ -141,7 +141,7 @@ class Evaluator:
 
             for model_type in gs_params:
                 if reduced:
-                    data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, model_type=model_type,
+                    data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, args, model_type=model_type,
                                                                                 verbose=args.verbose)
                 print(f'Starting Grid Search for {model_type}')
                 best_result, best_params = self.grid_search(data, model_type, gs_params[model_type], reduced=reduced)
@@ -150,7 +150,7 @@ class Evaluator:
         else:
             eval_model_list = ['GCN', 'SGC', 'APPNP', 'Cheby', 'GraphSage', 'GAT']
             for model_type in eval_model_list:
-                data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, model_type=model_type,
+                data.feat_syn, data.adj_syn, data.labels_syn = get_syn_data(data, args, model_type=model_type,
                                                                             verbose=args.verbose)
                 best_result = self.evaluate(data, model_type=args.eval_model)
                 args.logger.info(
