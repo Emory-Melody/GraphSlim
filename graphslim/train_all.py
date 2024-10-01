@@ -66,8 +66,6 @@ if __name__ == '__main__':
         agent = GCDMX(setting=args.setting, data=graph, args=args)
     elif args.method == 'gdem':
         agent = GDEM(setting=args.setting, data=graph, args=args)
-    elif args.method == 'cadm':
-        agent = CADM(setting=args.setting, data=graph, args=args)
     elif args.method == 'variation_edges':
         agent = VariationEdges(setting=args.setting, data=graph, args=args)
     elif args.method == 'variation_neighborhoods':
