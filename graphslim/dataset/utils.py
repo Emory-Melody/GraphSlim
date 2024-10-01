@@ -12,7 +12,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
     This function modifies the adjacency matrix to make it sparser according to the model type and method specified.
     For specific methods and datasets, it adjusts the threshold used for sparsification.
 
-    Parameters
+    Parametersm
     ----------
     model_type : str
         The type of model used, which determines the sparsification strategy. Can be 'MLP', 'GAT', or other.

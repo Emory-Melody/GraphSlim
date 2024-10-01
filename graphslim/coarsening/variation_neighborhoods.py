@@ -29,7 +29,7 @@ class VariationNeighborhoods(Coarsen):
         N = G.N
 
         # current and target graph sizes
-        n, n_target = N, np.ceil((1 - r) * N)
+        n, n_target = N, np.ceil(r * N)
 
         C = sp.sparse.eye(N, format="csc")
         Gc = G

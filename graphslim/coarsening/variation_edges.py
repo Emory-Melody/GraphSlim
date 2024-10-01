@@ -19,7 +19,7 @@ class VariationEdges(Coarsen):
 
     def coarsen(self, G):
         K = 10
-        r = 0.5
+        r = self.args.reduction_rate
         max_levels = 10
         Uk = None
         lk = None
@@ -29,7 +29,7 @@ class VariationEdges(Coarsen):
         N = G.N
 
         # current and target graph sizes
-        n, n_target = N, np.ceil((1 - r) * N)
+        n, n_target = N, np.ceil(r * N)
 
         C = sp.sparse.eye(N, format="csc")
         Gc = G
