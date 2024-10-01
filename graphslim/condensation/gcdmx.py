@@ -8,9 +8,9 @@ from graphslim.models import *
 import torch.nn.functional as F
 
 
-class GCDM(GCondBase):
+class GCDMX(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
-        super(GCDM, self).__init__(setting, data, args, **kwargs)
+        super(GCDMX, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):

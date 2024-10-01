@@ -61,11 +61,11 @@ if __name__ == '__main__':
     elif args.method == 'averaging':
         agent = Average(setting=args.setting, data=graph, args=args)
     elif args.method == 'gcdm':
-        agent = GCDM(setting=args.setting, data=graph, args=args)
+        agent = GCDM(setting=args.setting, data=graph, args=args) #currently the code is same as GCDMX
+    elif args.method == 'gcdmx':
+        agent = GCDMX(setting=args.setting, data=graph, args=args)
     elif args.method == 'gdem':
         agent = GDEM(setting=args.setting, data=graph, args=args)
-    elif args.method == 'cadm':
-        agent = CADM(setting=args.setting, data=graph, args=args)
     else:
         agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)

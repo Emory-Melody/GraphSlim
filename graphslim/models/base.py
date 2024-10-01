@@ -38,7 +38,8 @@ class BaseGNN(nn.Module):
         self.features = None
         self.multi_label = args.multi_label
         self.float_label = None
-        self.metric = accuracy if args.metric == 'accuracy' else f1_macro
+        # self.metric = accuracy if args.metric == 'accuracy' else f1_macro
+        self.metric = args.metric
 
     def initialize(self):
         for layer in self.layers:

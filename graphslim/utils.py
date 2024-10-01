@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, roc_auc_score
 from torch_sparse import SparseTensor,fill_diag,matmul,mul
 from torch_sparse import sum as sparsesum
 from torch_geometric.utils import degree
@@ -536,6 +536,45 @@ def accuracy(output, labels):
     correct = preds.eq(labels).double()
     correct = correct.sum()
     return correct / len(labels)
+def roc_auc(output, labels, is_sigmoid=False):
+    """Return ROC-AUC score of output compared to labels.
+
+    Parameters
+    ----------
+    output : torch.Tensor
+        output from model
+    labels : torch.Tensor or numpy.array
+        true labels (0 or 1)
+    is_sigmoid : bool, optional
+        If True, apply sigmoid thresholding on the output, by default False.
+
+    Returns
+    -------
+    float
+        ROC-AUC score
+    """
+    if not hasattr(labels, '__len__'):
+        labels = [labels]
+    if type(labels) is not torch.Tensor:
+        labels = torch.LongTensor(labels)
+
+    labels = labels.cpu().numpy()
+    output = output.cpu().numpy()
+
+    if not is_sigmoid:
+        # For multi-class classification (softmax output), get probabilities for the positive class (class 1).
+        if output.shape[1] > 1:
+            output = output[:, 1]  # Use the probabilities of the positive class
+        else:
+            output = np.argmax(output, axis=1)
+    else:
+        # For binary classification (sigmoid output)
+        output = output[:, 1]
+
+    # Compute ROC-AUC score
+    roc_auc = roc_auc_score(labels, output)
+
+    return roc_auc
 
 
 def f1_macro(output, labels, is_sigmoid=False):
@@ -572,28 +611,28 @@ def f1_macro(output, labels, is_sigmoid=False):
 
     return f1
 
-def loss_acc(output, labels, targets, avg_loss=True):
-    if type(labels) is not torch.Tensor:
-        labels = torch.LongTensor(labels)
-    preds = output.max(1)[1].type_as(labels)
-    correct = preds.eq(labels).double()[targets]
-    loss = F.nll_loss(output[targets], labels[targets], reduction='mean' if avg_loss else 'none')
+# def loss_acc(output, labels, targets, avg_loss=True):
+#     if type(labels) is not torch.Tensor:
+#         labels = torch.LongTensor(labels)
+#     preds = output.max(1)[1].type_as(labels)
+#     correct = preds.eq(labels).double()[targets]
+#     loss = F.nll_loss(output[targets], labels[targets], reduction='mean' if avg_loss else 'none')
 
-    if avg_loss:
-        return loss, correct.sum() / len(targets)
-    return loss, correct
+#     if avg_loss:
+#         return loss, correct.sum() / len(targets)
+#     return loss, correct
     # correct = correct.sum()
     # return loss, correct / len(labels)
 
 
-def get_perf(output, labels, mask, verbose=True):
-    """evalute performance for test masked data"""
-    loss = F.nll_loss(output[mask], labels[mask])
-    acc = accuracy(output[mask], labels[mask])
-    if verbose:
-        print("loss= {:.4f}".format(loss.item()),
-              "accuracy= {:.4f}".format(acc.item()))
-    return loss.item(), acc.item()
+# def get_perf(output, labels, mask, verbose=True):
+#     """evalute performance for test masked data"""
+#     loss = F.nll_loss(output[mask], labels[mask])
+#     acc = accuracy(output[mask], labels[mask])
+#     if verbose:
+#         print("loss= {:.4f}".format(loss.item()),
+#               "accuracy= {:.4f}".format(acc.item()))
+#     return loss.item(), acc.item()
 
 
 def classification_margin(output, true_label):

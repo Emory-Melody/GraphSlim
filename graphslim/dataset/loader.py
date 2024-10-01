@@ -1,6 +1,7 @@
 import json
 import os.path as osp
 import os
+import pickle
 
 import numpy as np
 import scipy.sparse as sp
@@ -53,9 +54,10 @@ def get_dataset(name='cora', args=None, load_path='../../data'):
         elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m']:
             dataset = PygNodePropPredDataset(name, root=path)
         elif name in ['yelp', 'amazon']:
+            # dataset = pickle.load(open(f'{path}/{args.dataset}.dat', 'rb'))
+            # dataset.num_classes = 2
             dataset = FraudDataset(name, raw_dir=path)
             dataset = from_dgl(dataset[0], name=name, hetero=False)  # dgl2pyg
-            dataset.num_classes = 2
     else:
         raise ValueError("Dataset name not recognized.")
 
@@ -75,9 +77,9 @@ def get_dataset(name='cora', args=None, load_path='../../data'):
     except:
         data.nclass = data.num_classes
 
-    print("train nodes num:", sum(data.labels_train))
-    print("val nodes num:", sum(data.labels_val))
-    print("test nodes num:", sum(data.labels_test))
+    print("train nodes num:", sum(data.train_mask).item())
+    print("val nodes num:", sum(data.val_mask).item())
+    print("test nodes num:", sum(data.test_mask).item())
     print("total nodes num:", data.x.shape[0])
     return data
 
@@ -290,10 +292,10 @@ class LargeDataLoader(nn.Module):
         return:
             torch.Tensor, normalized data
         """
-        mean = data.mean(dim=0)  # 沿第0维（即样本维）求均值
-        std = data.std(dim=0)  # 沿第0维（即样本维）求标准差
-        std[std == 0] = 1  # 将std中的0值替换为1，以避免分母为0的情况
-        normalized_data = (data - mean) / std  # 对数据进行归一化处理
+        mean = data.mean(dim=0)  
+        std = data.std(dim=0)  
+        std[std == 0] = 1  
+        normalized_data = (data - mean) / std
         return normalized_data
 
     def GCF(self, adj, x, k=2):

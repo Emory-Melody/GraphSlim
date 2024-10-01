@@ -10,7 +10,7 @@ import logging
 import click
 from pprint import pformat
 import graphslim
-from graphslim.utils import seed_everything
+from graphslim.utils import seed_everything, f1_macro, accuracy, roc_auc
 
 
 class Obj(object):
@@ -51,10 +51,11 @@ def setting_config(args):
         args.reduction_rate = representative_r[args.dataset]
     if args.dataset in ['cora', 'citeseer', 'pubmed', 'ogbn-arxiv', 'pubmed']:
         args.setting = 'trans'
-    if args.dataset in ['flickr', 'reddit', 'yelp', 'amazon']:
+    if args.dataset in ['flickr', 'reddit', 'amazon','yelp']:
         args.setting = 'ind'
     # args.pre_norm = True
-    args.metric = 'f1_macro' if args.dataset in ['yelp', 'amazon'] else 'accuracy'
+    args.metric = f1_macro if args.dataset in ['yelp', 'amazon'] else accuracy
+    # args.metric = 'accuracy'
     args.run_inter_eval = 3
     args.eval_interval = args.epochs // 10
     # if args.method not in ['gcsntk']:
@@ -199,10 +200,10 @@ def cli(ctx, **kwargs):
     # for benchmark, we need unified settings and reduce flexibility of args
     args = method_config(args)
     # setting_config has higher priority than methods_config
+    args = setting_config(args)
     for key, value in ctx.params.items():
         if ctx.get_parameter_source(key) == click.core.ParameterSource.COMMANDLINE:
             setattr(args, key, value)
-    args = setting_config(args)
     if not os.path.exists(f'{path}/logs/{args.method}'):
         try:
             os.makedirs(f'{path}/logs/{args.method}')
