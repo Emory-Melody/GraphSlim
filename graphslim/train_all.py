@@ -66,15 +66,21 @@ if __name__ == '__main__':
         agent = GCDMX(setting=args.setting, data=graph, args=args)
     elif args.method == 'gdem':
         agent = GDEM(setting=args.setting, data=graph, args=args)
+    elif args.method == 'cadm':
+        agent = CADM(setting=args.setting, data=graph, args=args)
+    elif args.method == 'variation_edges':
+        agent = VariationEdges(setting=args.setting, data=graph, args=args)
+    elif args.method == 'variation_neighborhoods':
+        agent = VariationNeighborhoods(setting=args.setting, data=graph, args=args)
+    elif args.method == 'algebraic_JC':
+        agent = AlgebraicJc(setting=args.setting, data=graph, args=args)
+    elif args.method == 'affinity_GS':
+        agent = AffinityGs(setting=args.setting, data=graph, args=args)
+    elif args.method == 't_spanner':
+        agent = TSpanner(setting=args.setting, data=graph, args=args)
     else:
         agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
     reduced_graph = agent.reduce(graph, verbose=args.verbose)
-    if args.method in ['variation_edges', 'variation_neighborhoods', 'vng', 'heavy_edge', 'algebraic_JC', 'affinity_GS',
-                       'kron']:
-        if args.setting == 'trans':
-            print("real reduction rate", reduced_graph.feat_syn.shape[0] / graph.x.shape[0] * 100, "%")
-        else:
-            print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask).item() * 100, "%")
     evaluator = Evaluator(args)
     res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=args.final_eval_model)
     # args.logger.info(f'Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
