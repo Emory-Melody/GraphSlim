@@ -1,6 +1,6 @@
 [//]: # (# Preparation)
 
-# GC-Bench: A Benchmark Framework for Graph Condensation with New Insights
+# GC4NC: A Benchmark Framework for Graph Condensation on Node Classification with New Insights
  
 [[Paper Link]](https://arxiv.org/pdf/2406.16715) 
 
