@@ -25,6 +25,10 @@ class Average(Coarsen):
         Additional keyword arguments.
     """
 
+    def __init__(self, setting, data, args):
+        super(Average, self).__init__(setting, data, args)
+        args.method = "averaging"
+
 
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):

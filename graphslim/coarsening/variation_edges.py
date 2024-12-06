@@ -16,7 +16,9 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class VariationEdges(Coarsen):
-
+    def __init__(self, setting, data, args):
+        super(VariationEdges, self).__init__(setting, data, args)
+        args.method = "variation_edges"
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate

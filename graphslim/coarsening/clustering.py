@@ -29,6 +29,9 @@ class Cluster(Coarsen):
         Additional keyword arguments.
     """
 
+    def __init__(self, setting, data, args):
+        super(Cluster, self).__init__(setting, data, args)
+        args.method = "clustering"
 
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):

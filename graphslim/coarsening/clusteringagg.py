@@ -31,6 +31,10 @@ class ClusterAgg(Coarsen):
         Additional keyword arguments.
     """
 
+    def __init__(self, setting, data, args):
+        super(ClusterAgg, self).__init__(setting, data, args)
+        args.method = "clustering_agg"
+
     @verbose_time_memory
     def reduce(self, data, verbose=True, save=True):
         """

@@ -1,24 +1,19 @@
-import os, sys
+import os
+import sys
 
-if os.path.abspath('../graphslim') not in sys.path:
-    sys.path.append(os.path.abspath('../graphslim'))
-from graphslim.config import *
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
 
-from graphslim.evaluation.eval_agent import Evaluator
-from graphslim.coarsening.coarsening_base import Coarsen
+from graphslim.config import get_args
 from graphslim.dataset import *
+from graphslim.evaluation import *
+from graphslim.coarsening import *
+from graphslim.utils import to_camel_case, seed_everything
 
-args = cli(standalone_mode=False)
-
-graph = get_dataset(args.dataset, args)
-agent = Coarsen(setting=args.setting, data=graph, args=args)
+args = get_args()
+graph = get_dataset(args.dataset, args, args.load_path)
+seed_everything(args.seed)
+agent = VariationNeighborhoods(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.reduce(graph)
-
-# print("num of synthetic node", reduced_graph.feat_syn.shape[0])
-if args.setting == 'trans':
-    print("real reduction rate", reduced_graph.feat_syn.shape[0] / graph.x.shape[0] * 100, "%")
-else:
-    print("real reduction rate", reduced_graph.feat_syn.shape[0] / sum(graph.train_mask) * 100, "%")
-
 evaluator = Evaluator(args)
 evaluator.evaluate(reduced_graph, 'GCN')

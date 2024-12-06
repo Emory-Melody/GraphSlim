@@ -16,7 +16,9 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class VariationNeighborhoods(Coarsen):
-
+    def __init__(self, setting, data, args):
+        super(VariationNeighborhoods, self).__init__(setting, data, args)
+        args.method = "variation_neighborhoods"
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate

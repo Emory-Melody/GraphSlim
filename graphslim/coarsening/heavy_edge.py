@@ -16,7 +16,9 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class HeavyEdge(Coarsen):
-
+    def __init__(self, setting, data, args):
+        super(HeavyEdge, self).__init__(setting, data, args)
+        args.method = "heavy_edge"
 
     def coarsen(self, G, method):
         K = 10

@@ -16,7 +16,9 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class Kron(Coarsen):
-
+    def __init__(self, setting, data, args):
+        super(Kron, self).__init__(setting, data, args)
+        args.method = "kron"
 
     def coarsen(self, G):
         K = 10

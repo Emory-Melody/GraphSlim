@@ -10,7 +10,9 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 class AffinityGs(Coarsen):
 
-
+    def __init__(self, setting, data, args):
+        super(AffinityGs, self).__init__(setting, data, args)
+        args.method = "affinity_GS"
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate
