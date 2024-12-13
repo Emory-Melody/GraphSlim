@@ -29,9 +29,9 @@ preserving **properties or performance** of the original graph.
 
 # Prepare Environments
 
-Please choose from `requirements_torch1+.txt (torch 1.\*)` and `requirements.txt (torch2.*)` at your convenience.
-Please change the cuda version of `torch`, `torch-geometric` and `torch-sparse` in the requirements file according to
-your system configuration.
+## Install from requirements
+
+Please choose from `requirements_torch1+.txt (for torch 1.\*)` and `requirements.txt (for torch2.*)` at your convenience.
 
 <!--# Download Datasets
 
@@ -48,6 +48,10 @@ The default path of datasets is `../../data`.-->
 pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
 pip install graphslim
 ```
+
+## Recommended way to download 'torch_sparse' and `torch_scatter`
+
+It's usually faster and easy to download from .whl file. See details in `install_torch_sparse.sh`
 
 # Examples
 
