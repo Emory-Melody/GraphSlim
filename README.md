@@ -29,6 +29,10 @@ preserving **properties or performance** of the original graph.
 
 # Prepare Environments
 
+## CUDA and PyTorch
+Check [torch previous versions](https://pytorch.org/get-started/previous-versions/).
+We test  this repo  in  `torch 1.13.1`  and `torch  2.1.2` with `CUDA 12.4`.
+
 ## Install from requirements
 
 Please choose from `requirements_torch1+.txt (for torch 1.\*)` and `requirements.txt (for torch2.*)` at your convenience.
