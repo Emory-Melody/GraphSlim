@@ -2,3 +2,4 @@
 /graphslim.egg-info/
 *.log
 *.out
+checkpoints/
