@@ -168,7 +168,7 @@ class GCondBase:
 
 
 
-    def train_class(self, model, adj, features, labels, labels_syn, args, soft=True):
+    def train_class(self, model, adj, features, labels, labels_syn, args, soft=False):
         """
         Trains the model and computes the loss.
 
