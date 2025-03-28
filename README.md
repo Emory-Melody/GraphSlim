@@ -1,14 +1,50 @@
-# GraphSlim
+<div align="center">
+  <!-- <h1><b> Time-LLM </b></h1> -->
+  <!-- <h2><b> Time-LLM </b></h2> -->
+  <h2><b> GraphSlim, a PyTorch Library for Graph Reduction. </b></h2>
+</div>
 
-[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
-**[Documentation](https://graphslim.readthedocs.io/en/latest/?badge=latest)** |
-**[Benchmark Paper](https://arxiv.org/abs/2406.16715)** |
-**[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)** |
-**[Survey Paper](https://arxiv.org/pdf/2402.03358)** |
-**[Paper Collection](https://github.com/Emory-Melody/awesome-graph-reduction)** |
-**[Web Interface](https://graphslim-vis.streamlit.app/)** 
+<div align="center">
 
-**[Online Demo](https://colab.research.google.com/drive/1LLG9PYOPnmLCAr0ow0ogRYI8DvLGPk7d?usp=sharing)**
+![](https://img.shields.io/github/last-commit/Emory-Melody/GraphSlim?color=green)
+![](https://img.shields.io/github/stars/Emory-Melody/GraphSlim?color=yellow)
+![](https://img.shields.io/github/forks/Emory-Melody/GraphSlim?color=lightblue)
+![](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)
+![](https://img.shields.io/badge/PRs-Welcome-green)
+
+</div>
+
+<div align="center">
+
+**[<a href="https://graphslim.readthedocs.io/en/latest/?badge=latest">Documentation</a>]**
+**[<a href="https://graphslim-vis.streamlit.app/">Web Interface</a>]**
+**[<a href="https://colab.research.google.com/drive/1LLG9PYOPnmLCAr0ow0ogRYI8DvLGPk7d?usp=sharing">Online Demo</a>]**
+
+**[<a href="https://arxiv.org/abs/2406.16715">Benchmark Paper</a>]**
+**[<a href="https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark">Benchmark Scripts</a>]**
+**[<a href="https://arxiv.org/pdf/2402.03358">Survey Paper</a>]**
+**[<a href="https://github.com/Emory-Melody/awesome-graph-reduction">Paper Collection</a>]**
+
+</div>
+
+<div align="center">
+  <img src="./figures/logo.png" width="300">
+</div>
+
+---
+>
+> 🙋 Please let us know if you find out a mistake or have any suggestions!
+> 
+> 🌟 If you find this resource helpful, please consider to star this repository and cite our research:
+
+```
+@article{gong2024gc4nc,
+  title={GC4NC: A Benchmark Framework for Graph Condensation on Node Classification with New Insights},
+  author={Gong, Shengbo and Ni, Juntong and Sachdeva, Noveen and Yang, Carl and Jin, Wei},
+  journal={arXiv preprint arXiv:2406.16715},
+  year={2024}
+}
+```
 
 # Features
 
