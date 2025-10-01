@@ -89,10 +89,6 @@ pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-${TORCH
 pip install graphslim
 ```
 
-## Recommended way to download 'torch_sparse' and `torch_scatter`
-
-It's usually faster and easy to download from .whl file. See details in `install_torch_sparse.sh`
-
 # Examples
 
 ```
