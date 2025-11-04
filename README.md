@@ -1,7 +1,7 @@
 <div align="center">
   <!-- <h1><b> Time-LLM </b></h1> -->
   <!-- <h2><b> Time-LLM </b></h2> -->
-  <h2><b> GraphSlim, a PyTorch Library for Graph Reduction. </b></h2>
+  <h2><b> (NeurIPS'25) GraphSlim, a PyTorch Library for Graph Reduction. </b></h2>
 </div>
 
 <div align="center">
@@ -20,9 +20,9 @@
 **[<a href="https://graphslim-vis.streamlit.app/">Web Interface</a>]**
 **[<a href="https://colab.research.google.com/drive/1LLG9PYOPnmLCAr0ow0ogRYI8DvLGPk7d?usp=sharing">Online Demo</a>]**
 
-**[<a href="https://arxiv.org/abs/2406.16715">Benchmark Paper</a>]**
+**[<a href="https://arxiv.org/abs/2406.16715">NeurIPS'25 Benchmark Paper</a>]**
 **[<a href="https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark">Benchmark Scripts</a>]**
-**[<a href="https://arxiv.org/pdf/2402.03358">Survey Paper</a>]**
+**[<a href="https://arxiv.org/pdf/2402.03358">IJCAI'24 Survey Paper</a>]**
 **[<a href="https://github.com/Emory-Melody/awesome-graph-reduction">Paper Collection</a>]**
 
 </div>
@@ -38,11 +38,13 @@
 > 🌟 If you find this resource helpful, please consider to star this repository and cite our research:
 
 ```
-@article{gong2024gc4nc,
-  title={GC4NC: A Benchmark Framework for Graph Condensation on Node Classification with New Insights},
-  author={Gong, Shengbo and Ni, Juntong and Sachdeva, Noveen and Yang, Carl and Jin, Wei},
-  journal={arXiv preprint arXiv:2406.16715},
-  year={2024}
+@inproceedings{
+gong2025gcnc,
+title={{GC}4{NC}: A Benchmark Framework for Graph Condensation on Node Classification with New Insights},
+author={Shengbo Gong and Juntong Ni and Noveen Sachdeva and Carl Yang and Wei Jin},
+booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+year={2025},
+url={https://openreview.net/forum?id=ZhxeUImT89}
 }
 ```
 
