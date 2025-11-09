@@ -1,0 +1,42 @@
+[project]
+name = "graphslim"
+version = "1.2.0"
+description = "Slimming the graph data for graph learning"
+authors = [
+    {name = "Rockcor", email = "jshmhsb@gmail.com"},
+]
+license = "MIT"
+requires-python = ">=3.9, <=3.11"
+dependencies = [
+    "click",
+    "deeprobust",
+    "gdown",
+    "networkit",
+    "networkx",
+    "numpy",
+    "ogb",
+    "PyGSP",
+    "scikit_learn",
+    "scipy",
+    "sortedcontainers",
+    "torch",
+    "torch_geometric",
+    "tqdm",
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries",
+]
+
+[tool.setuptools.packages.find]
+include = ["graphslim*"]
+exclude = ["benchmark*", "checkpoints*", "docs*", "examples*", "figures*", "geom_buffer*", "interface*"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

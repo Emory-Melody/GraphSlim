@@ -94,9 +94,10 @@ pip install graphslim
 # Examples
 
 ```
-python examples/train_coreset.py
-python examples/train_coarsen.py
-python examples/train_gcond.py
+cd examples
+python train_coreset.py
+python train_coarsen.py
+python train_gcond.py
 ```
 
 See more examples in **[Benchmark Scripts](https://github.com/Emory-Melody/GraphSlim/tree/main/benchmark)**.
@@ -132,8 +133,8 @@ Options:
                                   [default: SGC]
   -E, --epochs INTEGER            number of reduction epochs  [default: 1000]
   --lr FLOAT                      [default: 0.01]
-  --weight_decay, --wd INTEGER    [default: 0]
-  --pre_norm BOOLEAN              pre-normalize features, forced true for
+  --weight_decay, --wd FLOAT    [default: 0.0]
+  --pre_norm BOOLEAN              pre-row-normalize features, forced true for
                                   arxiv, flickr and reddit  [default: True]
   --outer_loop INTEGER            [default: 10]
   --inner_loop INTEGER            [default: 1]
@@ -208,16 +209,6 @@ evaluator = Evaluator(args)
 res_mean, res_std = evaluator.evaluate(reduced_graph, model_type='GCN')
 ```
 
-All parameters can be divided into
-
-```shell
-<main_args>: dataset, method, setting, reduction_rate, seed, aggpreprocess, eval_whole, run_reduction
-<attack_args>: attack, ptb_r
-<dataset_args>: pre_norm, save_path, split, threshold
-<agent_args>: init, eval_interval, eval_epochs, eval_model, condense_model, epochs, lr, weight_decay, outer_loop, inner_loop, nlayers, method, activation, dropout, ntrans, with_bn, no_buff, batch_adj, alpha, mx_size, dis_metric, lr_adj, lr_feat
-<evaluator_args>: final_eval_model, eval_epochs, lr, weight_decay
-```
-
 See more details
 in [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg?style=flat)](https://graphslim.readthedocs.io/en/latest/?badge=latest)
 
@@ -244,8 +235,8 @@ to activate the interface. Please satisfy the dependency in [interface/requireme
 
 # TODO
 
-- [ ] Add sparsification algorithms like Spanner
-- [ ] Add latest condensation methods
+- [-] Add sparsification algorithms like Spanner
+- [ ] Add more latest condensation methods
 - [ ] Support more datasets
 - [ ] Present full results in a website
 

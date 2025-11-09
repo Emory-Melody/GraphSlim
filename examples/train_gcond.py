@@ -1,7 +1,7 @@
 import os, sys
 
-if os.path.abspath('../graphslim') not in sys.path:
-    sys.path.append(os.path.abspath('../graphslim'))
+if os.path.abspath('..') not in sys.path:
+    sys.path.append(os.path.abspath('..'))
 from graphslim.config import *
 from graphslim.evaluation.eval_agent import Evaluator
 
@@ -14,4 +14,4 @@ graph = get_dataset(args.dataset, args)
 agent = GCond(setting=args.setting, data=graph, args=args)
 reduced_graph = agent.reduce(graph, verbose=args.verbose)
 evaluator = Evaluator(args)
-evaluator.evaluate(reduced_graph, model_type='GAT')
+evaluator.evaluate(reduced_graph, model_type='GCN')
