@@ -21,6 +21,19 @@ import shutil
 from graphslim.dataset.convertor import ei2csr, csr2ei, from_dgl
 from graphslim.dataset.utils import splits
 from graphslim.utils import index_to_mask, to_tensor
+try:
+    from torch_geometric.data.data import DataEdgeAttr, DataTensorAttr  # type: ignore
+except ImportError:
+    DataEdgeAttr = None  # type: ignore
+    DataTensorAttr = None  # type: ignore
+try:
+    from torch_geometric.data.storage import GlobalStorage  # type: ignore
+except ImportError:
+    GlobalStorage = None  # type: ignore
+try:
+    import torch.serialization as torch_serialization
+except ImportError:
+    torch_serialization = None
 
 
 def get_dataset(name='cora', args=None, load_path='../../data'):
@@ -373,15 +386,42 @@ class DataGraphSAINT:
         dataset_str = root + '/' + dataset + '/raw/'
         if not osp.exists(dataset_str):
             os.makedirs(dataset_str)
+        required_files = ['adj_full.npz', 'role.json', 'feats.npy', 'class_map.json']
+        missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
+        if missing_files:
             print('Downloading dataset')
             url = 'https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa'  # Change this to your actual file ID
-            downloaded_folder=gdown.download_folder(url=url, output=dataset_str, quiet=False)
-            if downloaded_folder and osp.isdir(downloaded_folder):
-                for filename in os.listdir(downloaded_folder):
-                    file_path = osp.join(downloaded_folder, filename)
-                    shutil.move(file_path, dataset_str)
-
-                shutil.rmtree(downloaded_folder)
+            try:
+                downloaded_items = gdown.download_folder(url=url, output=dataset_str, quiet=False)
+            except Exception as exc:
+                print(f'gdown download failed: {exc}')
+                downloaded_items = None
+            if downloaded_items:
+                if isinstance(downloaded_items, str):
+                    downloaded_items = [downloaded_items]
+                for item_path in downloaded_items:
+                    if not isinstance(item_path, str):
+                        continue
+                    if osp.isdir(item_path):
+                        for filename in os.listdir(item_path):
+                            src = osp.join(item_path, filename)
+                            dst = osp.join(dataset_str, filename)
+                            if osp.abspath(src) == osp.abspath(dst):
+                                continue
+                            shutil.move(src, dst)
+                        if osp.abspath(item_path) != osp.abspath(dataset_str):
+                            shutil.rmtree(item_path)
+                    elif osp.isfile(item_path):
+                        dst = osp.join(dataset_str, osp.basename(item_path))
+                        if osp.abspath(item_path) != osp.abspath(dst):
+                            shutil.move(item_path, dst)
+            missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
+            if missing_files and dataset == 'ogbn_arxiv':
+                print('Falling back to OGB loader for ogbn-arxiv.')
+                self._prepare_ogbn_arxiv_from_ogb(dataset_str, root)
+                missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
+            if missing_files:
+                raise RuntimeError(f'Unable to prepare dataset files: {missing_files}')
 
         if dataset == 'ogbn_arxiv':
             self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
@@ -403,6 +443,51 @@ class DataGraphSAINT:
 
         class_map = json.load(open(dataset_str + 'class_map.json', 'r'))
         self.labels_full = to_tensor(label=self.process_labels(class_map))
+
+    def _prepare_ogbn_arxiv_from_ogb(self, dataset_str, root):
+        from ogb.nodeproppred import PygNodePropPredDataset
+        if torch_serialization is not None:
+            add_safe_globals = getattr(torch_serialization, 'add_safe_globals', None)
+            if callable(add_safe_globals):
+                safe_classes = []
+                if DataEdgeAttr is not None:
+                    safe_classes.append(DataEdgeAttr)
+                if DataTensorAttr is not None:
+                    safe_classes.append(DataTensorAttr)
+                if GlobalStorage is not None:
+                    safe_classes.append(GlobalStorage)
+                if safe_classes:
+                    add_safe_globals(safe_classes)
+        ogb_root = osp.join(root, 'ogb_cache')
+        dataset = PygNodePropPredDataset(name='ogbn-arxiv', root=ogb_root)
+        data = dataset[0]
+        split_idx = dataset.get_idx_split()
+
+        features = data.x.cpu().numpy().astype(np.float32)
+        labels = data.y.view(-1).cpu().numpy().astype(np.int64)
+        edge_index = data.edge_index.cpu().numpy()
+        num_nodes = features.shape[0]
+
+        values = np.ones(edge_index.shape[1], dtype=np.float32)
+        adj = sp.coo_matrix((values, (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes))
+        adj = adj.tocsr()
+        adj = adj + adj.T
+        adj[adj > 1] = 1
+
+        sp.save_npz(osp.join(dataset_str, 'adj_full.npz'), adj)
+        np.save(osp.join(dataset_str, 'feats.npy'), features)
+
+        role = {
+            'tr': split_idx['train'].cpu().tolist(),
+            'va': split_idx['valid'].cpu().tolist(),
+            'te': split_idx['test'].cpu().tolist(),
+        }
+        with open(osp.join(dataset_str, 'role.json'), 'w') as f:
+            json.dump(role, f)
+
+        class_map = {str(idx): int(label) for idx, label in enumerate(labels)}
+        with open(osp.join(dataset_str, 'class_map.json'), 'w') as f:
+            json.dump(class_map, f)
 
     def process_labels(self, class_map):
         """

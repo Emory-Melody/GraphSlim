@@ -51,11 +51,17 @@ def _stringify_value(value):
 PARAMETER_CATEGORIES = {
     'Common': {
         'dataset', 'method', 'gpu_id', 'device', 'setting', 'split', 'run_reduction', 'run_eval',
-        'run_inter_eval', 'eval_interval', 'hidden', 'condense_model', 'epochs', 'agg', 'multi_label',
+        'run_inter_eval', 'eval_interval', 'hidden', 'condense_model', 'epochs', 'multi_label',
         'dis_metric', 'lr_adj', 'lr_feat', 'optim', 'threshold', 'dropout', 'ntrans', 'with_bn',
         'save_path', 'load_path', 'eval_whole', 'with_structure', 'lr', 'weight_decay', 'pre_norm',
         'outer_loop', 'inner_loop', 'reduction_rate', 'seed', 'nlayers', 'verbose', 'soft_label',
         'init', 'checkpoints', 'logger','metric'
+    },
+    'GEOM, SFGC': {
+        'no_buff'
+    },
+    'KCenter, Herding, Random, Clustering': {
+        'agg'
     },
     'Downstream Evaluation': {
         'eval_epochs', 'eval_model', 'final_eval_model', 'eval_wd', 'eval_loss', 'activation', 'alpha'
@@ -88,6 +94,7 @@ CATEGORY_ORDER = [
     'Downstream Evaluation',
     'Attack',
     'Coarsening',
+    'KCenter, Herding, Random, Clustering',
     'GEOM, SFGC',
     'MSGC',
     'GCSNTK',
@@ -104,6 +111,7 @@ COARSENING_METHODS = {
 CATEGORY_METHOD_REQUIREMENTS = {
     'Coarsening': COARSENING_METHODS,
     'GEOM, SFGC': {'geom', 'sfgc'},
+    'KCenter, Herding, Random, Clustering': {'kcenter', 'herding', 'random', 'clustering'},
     'MSGC': {'msgc'},
     'GCSNTK': {'gcsntk'},
     'Tspanner': {'tspanner', 't_spanner'},
@@ -166,6 +174,9 @@ def format_args_tables(args):
     for key, value in args_dict.items():
         if key.startswith('_'):
             continue
+        if key == 'no_buff':
+            if not (isinstance(method, str) and method.lower() in ('geom', 'sfgc')):
+                continue
         category = _get_category_for_key(key)
         if category is None and method_specific_category:
             category = method_specific_category

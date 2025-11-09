@@ -1,8 +1,12 @@
 import os
 import sys
+import warnings
 
 if os.path.abspath('..') not in sys.path:
     sys.path.append(os.path.abspath('..'))
+
+warnings.filterwarnings("ignore", category=FutureWarning, message=".*pynvml package is deprecated.*")
+warnings.filterwarnings("ignore", category=UserWarning, message=".*pkg_resources is deprecated as an API.*")
 
 from graphslim.config import get_args
 from graphslim.dataset import *
