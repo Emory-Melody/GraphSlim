@@ -134,55 +134,126 @@ def splits(data, exp='default'):
 
 
 def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
-    save_path = f'{args.save_path}/reduced_graph/{args.method}'
+    base_path = os.path.abspath(os.path.expanduser(args.save_path))
+    save_path = os.path.join(base_path, 'reduced_graph', args.method)
     if args.attack is not None and args.dataset in ['flickr']:
-        save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
+        save_path = os.path.join(base_path, 'corrupt_graph', args.attack, 'reduced_graph', args.method)
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if adj_syn is not None:
         torch.save(adj_syn,
-                   f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+                   os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
     if feat_syn is not None:
         torch.save(feat_syn,
-                   f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+                   os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
     if labels_syn is not None:
         torch.save(labels_syn,
-                   f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
-    args.logger.info(f"Saved {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
+                   os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
+    args.logger.info(f"Saved {os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')}")
 
 
 def load_reduced(args, data=None):
     flag = 0
-    save_path = f'{args.save_path}/reduced_graph/{args.method}'
+    base_path = os.path.abspath(os.path.expanduser(args.save_path))
+    save_path = os.path.join(base_path, 'reduced_graph', args.method)
     if args.attack is not None and args.dataset in ['flickr']:
-        save_path = f'{args.save_path}/corrupt_graph/{args.attack}/reduced_graph/{args.method}'
+        save_path = os.path.join(base_path, 'corrupt_graph', args.attack, 'reduced_graph', args.method)
+
+    def _resolve_device(device_str):
+        if device_str is None:
+            return 'cpu'
+        if isinstance(device_str, str) and device_str.lower() == 'cpu':
+            return 'cpu'
+        if isinstance(device_str, str) and device_str.startswith('cuda'):
+            if not torch.cuda.is_available():
+                if hasattr(args, 'logger'):
+                    args.logger.warning("CUDA requested but not available. Falling back to CPU for reduced graph loading.")
+                return 'cpu'
+            try:
+                parts = device_str.split(':')
+                idx = int(parts[1]) if len(parts) > 1 else 0
+            except ValueError:
+                idx = 0
+            if idx < torch.cuda.device_count():
+                return f'cuda:{idx}'
+            fallback = 'cuda:0' if torch.cuda.device_count() > 0 else 'cpu'
+            if hasattr(args, 'logger'):
+                args.logger.warning(
+                    f"Requested device {device_str} unavailable. Using {fallback} for reduced graph loading.")
+            return fallback
+        return device_str
+
+    target_device = _resolve_device(getattr(args, 'device', 'cpu'))
+    if hasattr(args, 'device') and args.device != target_device:
+        args.device = target_device
+
+    def _safe_load_tensor(file_path):
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(file_path)
+        load_locations = []
+        if target_device != 'cpu':
+            load_locations.append(target_device)
+        load_locations.append('cpu')
+        last_exc = None
+        tried = set()
+        for loc in load_locations:
+            if loc in tried:
+                continue
+            tried.add(loc)
+            try:
+                tensor = torch.load(file_path, map_location=loc)
+                if loc != target_device and target_device != 'cpu' and hasattr(tensor, 'to'):
+                    try:
+                        tensor = tensor.to(target_device)
+                    except Exception as move_err:
+                        if hasattr(args, 'logger'):
+                            args.logger.warning(
+                                f"Loaded {file_path} on {loc} but failed to move to {target_device}: {move_err}")
+                return tensor
+            except Exception as e:
+                last_exc = e
+                continue
+        if last_exc is not None:
+            raise last_exc
+        raise RuntimeError(f"Failed to load tensor from {file_path}")
+
     try:
-        feat_syn = torch.load(
-            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
-    except:
-        print("find no feat, use original feature matrix instead")
+        feat_path = os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        feat_syn = _safe_load_tensor(feat_path)
+    except Exception as e:
+        file_path = os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        print(f"find no feat at {file_path}, use original feature matrix instead. Error: {e}")
+        if hasattr(args, 'logger'):
+            args.logger.warning(f"Failed to load synthetic features from {file_path}: {e}")
         flag += 1
         if args.setting == 'trans':
             feat_syn = data.feat_full
         else:
             feat_syn = data.feat_train
     try:
-        labels_syn = torch.load(
-            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
-    except:
-        print("find no label, use original label matrix instead")
+        label_path = os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        labels_syn = _safe_load_tensor(label_path)
+    except Exception as e:
+        file_path = os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        print(f"find no label at {file_path}, use original label matrix instead. Error: {e}")
+        if hasattr(args, 'logger'):
+            args.logger.warning(f"Failed to load synthetic labels from {file_path}: {e}")
         flag += 1
         labels_syn = data.labels_train
 
     try:
-        adj_syn = torch.load(
-            f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
-    except:
-        print("find no adj, use identity matrix instead")
+        adj_path = os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        adj_syn = _safe_load_tensor(adj_path)
+    except Exception as e:
+        file_path = os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        print(f"find no adj at {file_path}, use identity matrix instead. Error: {e}")
+        if hasattr(args, 'logger'):
+            args.logger.warning(f"Failed to load synthetic adjacency from {file_path}: {e}")
         flag += 1
         adj_syn = torch.eye(feat_syn.size(0), device=args.device)
     # args.logger.info(f"Load {save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt")
-    assert flag < 3, "no file found, please run the reduction method first"
+    if flag == 3:
+        args.logger.info("no file found, use original graph instead")
 
     return adj_syn, feat_syn, labels_syn
 

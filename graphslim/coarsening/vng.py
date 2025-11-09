@@ -55,7 +55,7 @@ class VNG:
         cpu_data = copy.deepcopy(data)
 
         if args.setting == 'trans':
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
+            model = eval(args.condense_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose, setting=args.setting,
                                reduced=False)
             embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)
@@ -66,7 +66,7 @@ class VNG:
                                                                       data.adj_train, labels)
 
         else:
-            model = eval(args.eval_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
+            model = eval(args.condense_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
             model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose, setting=args.setting,
                                reduced=False, reindex=True)
             model.eval()

@@ -76,9 +76,15 @@ if __name__ == '__main__':
         agent = AffinityGs(setting=args.setting, data=graph, args=args)
     elif args.method == 't_spanner':
         agent = TSpanner(setting=args.setting, data=graph, args=args)
+    elif args.method == 'gecc':
+        agent = GECC(setting=args.setting, data=graph, args=args)
     else:
         agent = eval(to_camel_case(args.method))(setting=args.setting, data=graph, args=args)
-    reduced_graph = agent.reduce(graph, verbose=args.verbose)
+
+    if args.run_reduction > 0:
+        reduced_graph = agent.reduce(graph, verbose=args.verbose)
+    else:
+        reduced_graph = graph
+
     evaluator = Evaluator(args)
-    res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=args.final_eval_model)
-    # args.logger.info(f'Test Mean Accuracy: {100 * all_res[:, 0].mean():.2f} +/- {100 * all_res[:, 1].mean():.2f}')
+    res_mean, res_std = evaluator.evaluate(reduced_graph, model_type=args.eval_model)

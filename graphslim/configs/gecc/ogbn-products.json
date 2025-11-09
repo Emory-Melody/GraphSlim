@@ -1,0 +1,11 @@
+{
+  "agg_alpha": 0.1,
+  "agg_beta": 0.0,
+  "agg_gamma": 0.9,
+  "eval_wd": 0.001,
+  "fuzziness": 1.0,
+  "rep_fuzz": 1,
+  "depth": 2,
+  "balance_alpha": 1
+}
+

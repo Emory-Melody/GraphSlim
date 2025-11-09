@@ -12,3 +12,4 @@ from .simgc import SimGC
 from .gcdm import GCDM
 from .gcdmx import GCDMX
 from .gdem import GDEM
+from .gecc import GECC

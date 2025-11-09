@@ -182,6 +182,10 @@ class Evaluator:
         """
         args = self.args
 
+        # Sync evaluator device with the (possibly updated) args.device
+        if hasattr(args, 'device'):
+            self.device = args.device
+
         if verbose:
             print(f'======= testing {model_type}')
 
@@ -279,7 +283,11 @@ class Evaluator:
         res = np.array(res)
 
         # Log and return mean and standard deviation of accuracy
-        args.logger.info(f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}')
+        summary_msg = f'Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}'
+        if hasattr(args, 'logger'):
+            args.logger.info(summary_msg)
+        if verbose:
+            print(summary_msg)
         return res.mean(), res.std()
 
     def MIA_evaluate(self, data, model_type, verbose=True, reduced=True, mode='eval'):
@@ -462,12 +470,12 @@ class Evaluator:
         """
         save_path = f'{args.save_path}/reduced_graph/{args.method}'
         feat_syn = torch.load(
-            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+            f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt', map_location='cpu')
         labels_syn = torch.load(
-            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location='cpu')
+            f'{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt', map_location='cpu')
         try:
             adj_syn = torch.load(
-                f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+                f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt', map_location=args.device)
         except:
             adj_syn = torch.eye(feat_syn.size(0), device=args.device)
 
