@@ -1,6 +1,6 @@
 [project]
 name = "graphslim"
-version = "1.2.0"
+version = "1.2.1"
 description = "Slimming the graph data for graph learning"
 authors = [
     {name = "Rockcor", email = "jshmhsb@gmail.com"},

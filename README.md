@@ -1,7 +1,7 @@
 <div align="center">
   <!-- <h1><b> Time-LLM </b></h1> -->
   <!-- <h2><b> Time-LLM </b></h2> -->
-  <h2><b> (NeurIPS'25) GraphSlim, a PyTorch Library for Graph Reduction. </b></h2>
+  <h2><b> GraphSlim, a PyTorch Library for Graph Reduction. </b></h2>
 </div>
 
 <div align="center">
@@ -58,39 +58,38 @@ preserving **properties or performance** of the original graph.
 * Unified evaluation tools including Grid Search and NAS.
 * Support evasion and poisoning attacks on the input graph by DeepRobust.
 
-# Guidance
+# News
 
-* Please first prepare the environments.
-* If you are new to GraphSlim, we highly suggest you first run the examples in the `examples` folder.
-* If you have any questions or suggestions regarding this library, feel free to create an
-  issue [here](https://github.com/Emory-Melody/GraphSlim/issues). We will reply as soon as possible :)
+[11/9/25] Version 1.2 released! We categorize the parameters. Now they look much clear. The environment can be easily set up by uv now.
 
 # Prepare Environments
 
 ## CUDA and PyTorch
 Check [torch previous versions](https://pytorch.org/get-started/previous-versions/).
-We test  this repo  in  `torch 1.13.1`  and `torch  2.1.2` with `CUDA 12.4`.
+We test this repo in `torch 1.13.1`, `torch  2.1.2`, `torch 2.6.0` with `CUDA 12.8`.
 
-## Install from requirements
+## Reproduce Environment by `uv` (Recommended)
 
-Please choose from `requirements_torch1+.txt (for torch 1.\*)` and `requirements.txt (for torch2.*)` at your convenience.
+To ensure a consistent and reproducible environment, we use `uv` to lock our dependencies. If you have `uv` installed, you can reproduce our exact environment by running the following command:
 
-<!--# Download Datasets
-
-For cora, citeseer, flickr and reddit (reddit2 in pyg), the pyg code will directly download them.
-For arxiv, we use the datasets provided by [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT). 
-Our code will automatically download all datasets.
-
-The default path of datasets is `../../data`.-->
+```shell
+uv pip sync
+```
+This will install all the packages listed in `uv.lock` with their exact versions.
 
 ## Install from pip
 
 ```shell
 # choose one version from https://data.pyg.org/whl/ based on your environment
 pip install torch_scatter torch_sparse -f https://data.pyg.org/whl/torch-${TORCH}+${CUDA}.html
-pip install graphslim
+pip install torch_geometric
+pip install -r graphslim/requirements.txt
 ```
 
+## Directly Use from pip
+```
+pip install graphslim
+```
 # Examples
 
 ```

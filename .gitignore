@@ -3,3 +3,4 @@
 *.log
 *.out
 checkpoints/
+dist/
