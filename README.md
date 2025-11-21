@@ -46,6 +46,14 @@ booktitle={The Thirty-ninth Annual Conference on Neural Information Processing S
 year={2025},
 url={https://openreview.net/forum?id=ZhxeUImT89}
 }
+
+@inproceedings{hashemi2024comprehensive,
+  title={A comprehensive survey on graph reduction: sparsification, coarsening, and condensation},
+  author={Hashemi, Mohammad and Gong, Shengbo and Ni, Juntong and Fan, Wenqi and Prakash, B Aditya and Jin, Wei},
+  booktitle={Proceedings of the Thirty-Third International Joint Conference on Artificial Intelligence},
+  pages={8058--8066},
+  year={2024}
+}
 ```
 
 # Features
