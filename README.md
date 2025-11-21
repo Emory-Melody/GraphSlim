@@ -38,13 +38,11 @@
 > 🌟 If you find this resource helpful, please consider to star this repository and cite our research:
 
 ```
-@inproceedings{
-gong2025gcnc,
-title={{GC}4{NC}: A Benchmark Framework for Graph Condensation on Node Classification with New Insights},
-author={Shengbo Gong and Juntong Ni and Noveen Sachdeva and Carl Yang and Wei Jin},
-booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
-year={2025},
-url={https://openreview.net/forum?id=ZhxeUImT89}
+@inproceedings{gong2025gcnc,
+  title={{GC}4{NC}: A Benchmark Framework for Graph Condensation on Node Classification with New Insights},
+  author={Shengbo Gong and Juntong Ni and Noveen Sachdeva and Carl Yang and Wei Jin},
+  booktitle={The Thirty-ninth Annual Conference on Neural Information Processing Systems Datasets and Benchmarks Track},
+  year={2025}
 }
 
 @inproceedings{hashemi2024comprehensive,
