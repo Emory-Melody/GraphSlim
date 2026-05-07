@@ -526,7 +526,7 @@ def get_embed_mean(embed_sum, label):
 
 
 def get_eigh(laplacian_matrix, data_name, save=True):
-    dir = "../../data/" + data_name + "/"
+    dir = os.path.join("./data", data_name)
     if not os.path.isdir(dir):
         os.makedirs(dir)
 

@@ -36,7 +36,7 @@ except ImportError:
     torch_serialization = None
 
 
-def get_dataset(name='cora', args=None, load_path='../../data'):
+def get_dataset(name='cora', args=None, load_path='./data'):
     path = osp.join(load_path)
     # Create a dictionary that maps standard names to normalized names
     standard_names = ['flickr', 'reddit', 'dblp', 'cora_ml', 'physics', 'cs', 'cora', 'citeseer', 'pubmed', 'photo',
@@ -232,7 +232,7 @@ class TransAndInd:
 class LargeDataLoader(nn.Module):
     def __init__(self, name='Flickr', split='train', batch_size=200, split_method='kmeans'):
         super(LargeDataLoader, self).__init__()
-        path = osp.join('../../data')
+        path = osp.join('./data')
         if name in ['ogbn-arxiv']:
             dataset = DataGraphSAINT(root=path, dataset=name)
             dataset.num_classes = 40
