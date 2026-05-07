@@ -1,0 +1,296 @@
+\documentclass[twoside,11pt]{article}
+
+% JMLR/MLOSS submissions normally use jmlr2e.sty from the JMLR author kit.
+% Compile with the JMLR style file available on the TeX path.
+\usepackage{jmlr2e}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{amsmath}
+
+\jmlrheading{27}{2026}{1-}{TODO}{TODO}{TODO}{TODO}
+\ShortHeadings{GraphSlim: A PyTorch Library for Graph Reduction}{Gong, Ni, Sachdeva, Yang, and Jin}
+\firstpageno{1}
+
+\begin{document}
+
+\title{GraphSlim: A PyTorch Library for Graph Reduction}
+
+\author{
+\name Shengbo Gong \email TODO \\
+\addr TODO
+\AND
+\name Juntong Ni \email TODO \\
+\addr TODO
+\AND
+\name Noveen Sachdeva \email TODO \\
+\addr TODO
+\AND
+\name Carl Yang \email TODO \\
+\addr TODO
+\AND
+\name Wei Jin \email TODO \\
+\addr TODO
+}
+
+\editor{TODO}
+
+\maketitle
+
+\begin{abstract}
+Graph reduction methods aim to replace a large graph with a smaller graph that preserves
+downstream predictive performance or structural properties. We introduce GraphSlim, an
+open-source PyTorch and PyTorch Geometric library for graph reduction. GraphSlim provides
+a unified implementation of representative methods from the three main families of graph
+reduction: sparsification, coarsening, and condensation. The package includes dataset
+loading and conversion utilities, reduction method construction, downstream evaluation,
+benchmark scripts, optional experiment tracking, and local visualization helpers. By
+standardizing the interfaces between datasets, reduction methods, and evaluators, GraphSlim
+lowers the engineering barrier for comparing graph reduction algorithms and for applying
+them to graph learning workflows.
+\end{abstract}
+
+\begin{keywords}
+graph reduction, graph condensation, graph sparsification, graph coarsening, graph neural
+networks, PyTorch, PyTorch Geometric, open-source software
+\end{keywords}
+
+\section{Introduction}
+
+Graph neural networks have become a standard tool for learning from relational data, but
+training and evaluating models on large graphs can be expensive in memory, time, and
+storage. Graph reduction addresses this problem by constructing a smaller graph or
+training set that retains useful information from the original graph. The resulting reduced
+object can accelerate downstream model selection, repeated training, privacy-sensitive
+sharing, visualization, and controlled benchmarking.
+
+GraphSlim is a Python package for graph reduction research and practice. It is designed
+around a PyTorch-first workflow and accepts graph data in PyTorch Geometric-style formats.
+The package exposes implementations of representative algorithms across sparsification,
+coarsening, and condensation, together with common evaluation and benchmarking utilities.
+GraphSlim is distributed as open-source software and is available from PyPI and GitHub.
+
+The main design goal of GraphSlim is to make graph reduction methods comparable under a
+shared data and evaluation contract. Instead of each method carrying its own ad hoc
+orchestration logic, recent versions organize method construction through a shared registry
+and factory. This allows entry points such as command-line training, initialization, and
+package-level usage to construct reduction methods consistently.
+
+\section{Related Software and Motivation}
+
+The Python graph learning ecosystem includes mature libraries such as PyTorch
+Geometric~\citep{fey2019fast}, DGL~\citep{wang2019dgl}, NetworkX~\citep{hagberg2008networkx},
+and OGB~\citep{hu2020ogb}. These packages provide graph data structures, message passing
+operators, datasets, and evaluation protocols, but they are not primarily graph reduction
+toolkits. GraphSlim complements these libraries by focusing on the algorithmic layer that
+constructs reduced graphs and reduced training sets.
+
+Graph reduction has several distinct methodological traditions. Sparsification methods
+select nodes or edges, coarsening methods contract or aggregate graph structure, and
+condensation methods synthesize features, labels, and sometimes graph structure. A recent
+survey by \citet{hashemi2024comprehensive} and the GC4NC benchmark of
+\citet{gong2025gc4nc} motivate a unified implementation layer for these families.
+GraphSlim follows this motivation by providing a package where multiple reduction families
+share dataset loaders, evaluation routines, and experiment configuration.
+
+\section{Software Overview}
+
+GraphSlim is organized into modules that separate datasets, methods, models, evaluation,
+tracking, and visualization. Table~\ref{tab:modules} summarizes the main package
+components.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Module & Role \\
+\midrule
+\texttt{graphslim.dataset} & Dataset loading, splitting, conversion, attacks, and persistence \\
+\texttt{graphslim.sparsification} & Node, core-set, and edge sparsification methods \\
+\texttt{graphslim.coarsening} & Graph coarsening and contraction methods \\
+\texttt{graphslim.condensation} & Synthetic graph and feature condensation methods \\
+\texttt{graphslim.models} & GNN backbones, graph layers, kernels, and parametrized adjacency modules \\
+\texttt{graphslim.evaluation} & Downstream evaluation, timing, memory, NAS, and graph property evaluation \\
+\texttt{graphslim.reduction} & Method registry and factory for constructing reducers \\
+\texttt{graphslim.tracking} & Optional experiment tracking and graph summary logging \\
+\texttt{graphslim.visualization} & Local visualization utilities for small graph comparisons \\
+\bottomrule
+\end{tabular}
+\caption{Main GraphSlim modules and responsibilities.}
+\label{tab:modules}
+\end{table}
+
+The package currently supports representative methods from all three reduction families.
+The method registry includes node and edge sparsification methods such as \texttt{kcenter},
+\texttt{herding}, \texttt{random}, \texttt{random\_edge}, \texttt{g\_spar}, and
+\texttt{t\_spanner}; coarsening methods such as \texttt{variation\_neighborhoods},
+\texttt{heavy\_edge}, \texttt{kron}, and \texttt{clustering}; and condensation methods such
+as \texttt{gcond}, \texttt{doscond}, \texttt{sfgc}, \texttt{msgc}, \texttt{sgdd},
+\texttt{gcsntk}, \texttt{geom}, \texttt{simgc}, \texttt{gcdm}, and \texttt{gecc}.
+
+\section{Usage}
+
+GraphSlim can be installed from PyPI or from source. The command-line interface exposes a
+single training entry point for loading a dataset, running a reduction method, and evaluating
+the reduced graph. A typical command is:
+
+\begin{verbatim}
+graphslim-train --dataset cora --method kcenter --gpu_id -1 \
+  --epochs 100 --eval_epochs 300 --reduction_rate 0.5
+\end{verbatim}
+
+The package can also be used directly from Python. The following sketch shows the intended
+programmatic workflow:
+
+\begin{verbatim}
+from graphslim.config import cli
+from graphslim.dataset import get_dataset
+from graphslim.evaluation import Evaluator
+from graphslim.reduction import create_reducer
+
+args = cli(standalone_mode=False)
+args.dataset = "cora"
+args.method = "gcond"
+args.reduction_rate = 0.5
+
+graph = get_dataset(args.dataset, args=args, load_path=args.load_path)
+reducer = create_reducer(args.method, setting=args.setting, data=graph, args=args)
+reduced_graph = reducer.reduce(graph, verbose=True)
+
+evaluator = Evaluator(args)
+mean, std = evaluator.evaluate(reduced_graph, model_type=args.eval_model)
+\end{verbatim}
+
+This interface is intentionally method-agnostic: changing the reduction method should not
+require rewriting the dataset loading or evaluation code. Method-specific hyperparameters
+are handled through JSON configuration files and command-line options.
+
+\section{Datasets and Evaluation}
+
+GraphSlim wraps several dataset sources behind a common \texttt{TransAndInd} data object.
+The current loaders cover Planetoid datasets, PyTorch Geometric datasets such as Flickr,
+Reddit2, Coauthor, CitationFull, and Amazon, OGB node property prediction datasets, a
+GraphSAINT-style loader for \texttt{ogbn-arxiv}, and DGL fraud datasets converted to a PyG
+style interface.
+
+The evaluator trains downstream GNN models on the reduced graph and reports validation and
+test metrics. Supported evaluation backbones include GCN, SGC, APPNP, Cheby, GraphSage,
+GAT, and SGFormer. The evaluation layer is shared across reduction families, which makes it
+possible to compare sparsification, coarsening, and condensation methods under the same
+metric and split definitions.
+
+\section{Implementation Notes}
+
+The shared registry in \texttt{graphslim.reduction} maps public method names to concrete
+implementation classes and imports them lazily. Lazy importing keeps package import time
+low for users who only need method discovery or metadata. The same registry is used by the
+command-line training entry point and by condensation initialization routines, reducing
+duplicated method-selection logic.
+
+GraphSlim keeps dataset conversion at package boundaries. PyG-style tensors and sparse
+matrices form the internal data contract, while compatibility utilities support conversion
+from DGL and related graph objects. Optional tracking and visualization utilities are kept
+separate from the core training path so that users can install only the dependencies needed
+for their workflow.
+
+\section{Quality Control and Reproducibility}
+
+GraphSlim includes unit tests for compatibility helpers, the reduction registry, tracking,
+and visualization. Recent smoke tests exercise the public training path across all registered
+methods on Citeseer with minimum CPU settings, and a representative module-by-loader matrix
+covers Planetoid, PyG Amazon, PyG Coauthor, PyG Flickr, GraphSAINT/OGB, and DGL
+FraudDataset loading paths.
+
+These smoke tests are intended to check pipeline health rather than benchmark model
+quality. In particular, very short evaluation runs can produce repeated deterministic
+accuracy values and should not be interpreted as scientific performance comparisons.
+Quality benchmarking should use method-appropriate reduction epochs, enough downstream
+evaluation epochs, multiple random seeds, and the benchmark scripts distributed with the
+project.
+
+\section{Availability}
+
+GraphSlim is open-source software released under the MIT license. The package is available
+on PyPI as \texttt{graphslim}, with source code, documentation, examples, benchmark scripts,
+and a web visualization interface linked from the project repository:
+
+\begin{center}
+\url{https://github.com/Emory-Melody/GraphSlim}
+\end{center}
+
+The package supports Python 3.9--3.11 and depends on PyTorch, PyTorch Geometric, SciPy,
+NumPy, scikit-learn, Networkit, PyGSP, OGB, and related graph learning utilities.
+
+\section{Limitations and Future Work}
+
+GraphSlim is a research-oriented package and some methods inherit the computational cost
+and dependency complexity of their original algorithms. Condensation methods that rely on
+teacher trajectory buffers, such as \texttt{sfgc} and \texttt{geom}, can be expensive in
+small smoke-test settings unless replay buffers are precomputed or lightweight test buffers
+are used. Some coarsening implementations depend on external graph libraries whose APIs
+may change across versions, and some large-dataset experiments require substantial memory
+or preprocessing time.
+
+Future work includes expanding fast CPU tests for method construction and reduction,
+strengthening cross-dataset CI coverage, adding optional compiled acceleration for repeated
+sparse conversion and contraction routines, and continuing to align the public API with
+the unified registry and evaluation pipeline.
+
+\section{Conclusion}
+
+GraphSlim provides a unified PyTorch-based library for graph reduction. By collecting
+sparsification, coarsening, and condensation methods behind shared dataset and evaluation
+interfaces, it supports reproducible comparison and lowers the cost of using graph reduction
+in graph learning workflows.
+
+\acks{TODO: Add funding, contributor, and infrastructure acknowledgments.}
+
+\begin{thebibliography}{}
+
+\bibitem[Fey and Lenssen(2019)]{fey2019fast}
+Fey, M. and Lenssen, J. E. (2019).
+\newblock Fast graph representation learning with PyTorch Geometric.
+\newblock In \emph{ICLR Workshop on Representation Learning on Graphs and Manifolds}.
+
+\bibitem[Gong et~al.(2025)]{gong2025gc4nc}
+Gong, S., Ni, J., Sachdeva, N., Yang, C., and Jin, W. (2025).
+\newblock {GC}4{NC}: A benchmark framework for graph condensation on node
+classification with new insights.
+\newblock In \emph{Advances in Neural Information Processing Systems, Datasets and
+Benchmarks Track}.
+
+\bibitem[Hagberg et~al.(2008)]{hagberg2008networkx}
+Hagberg, A. A., Schult, D. A., and Swart, P. J. (2008).
+\newblock Exploring network structure, dynamics, and function using NetworkX.
+\newblock In \emph{Proceedings of the 7th Python in Science Conference}.
+
+\bibitem[Hashemi et~al.(2024)]{hashemi2024comprehensive}
+Hashemi, M., Gong, S., Ni, J., Fan, W., Prakash, B. A., and Jin, W. (2024).
+\newblock A comprehensive survey on graph reduction: Sparsification, coarsening,
+and condensation.
+\newblock In \emph{Proceedings of the Thirty-Third International Joint Conference on
+Artificial Intelligence}, pages 8058--8066.
+
+\bibitem[Hu et~al.(2020)]{hu2020ogb}
+Hu, W., Fey, M., Zitnik, M., Dong, Y., Ren, H., Liu, B., Catasta, M., and Leskovec, J.
+(2020).
+\newblock Open Graph Benchmark: Datasets for machine learning on graphs.
+\newblock In \emph{Advances in Neural Information Processing Systems}.
+
+\bibitem[Paszke et~al.(2019)]{paszke2019pytorch}
+Paszke, A., Gross, S., Massa, F., Lerer, A., Bradbury, J., Chanan, G., Killeen, T.,
+Lin, Z., Gimelshein, N., Antiga, L., Desmaison, A., Kopf, A., Yang, E., DeVito, Z.,
+Raison, M., Tejani, A., Chilamkurthy, S., Steiner, B., Fang, L., Bai, J., and Chintala,
+S. (2019).
+\newblock PyTorch: An imperative style, high-performance deep learning library.
+\newblock In \emph{Advances in Neural Information Processing Systems}.
+
+\bibitem[Wang et~al.(2019)]{wang2019dgl}
+Wang, M., Yu, L., Zheng, D., Gan, Q., Gai, Y., Ye, Z., Li, M., Zhou, J., Huang, Q.,
+Ma, C., Huang, Z., Guo, Q., Zhang, H., Lin, H., Zhao, J., Li, J., Smola, A. J., and
+Zhang, Z. (2019).
+\newblock Deep Graph Library: Towards efficient and scalable deep learning on graphs.
+\newblock In \emph{ICLR Workshop on Representation Learning on Graphs and Manifolds}.
+
+\end{thebibliography}
+
+\end{document}

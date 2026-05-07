@@ -55,7 +55,8 @@ PARAMETER_CATEGORIES = {
         'dis_metric', 'lr_adj', 'lr_feat', 'optim', 'threshold', 'dropout', 'ntrans', 'with_bn',
         'save_path', 'load_path', 'eval_whole', 'with_structure', 'lr', 'weight_decay', 'pre_norm',
         'outer_loop', 'inner_loop', 'reduction_rate', 'seed', 'nlayers', 'verbose', 'soft_label',
-        'init', 'checkpoints', 'logger','metric'
+        'init', 'checkpoints', 'logger', 'metric', 'wandb', 'wandb_project', 'wandb_run_name',
+        'wandb_required'
     },
     'GEOM, SFGC': {
         'no_buff'
@@ -302,6 +303,10 @@ def method_config(args):
 @click.option('--nlayers', default=2, help='number of GNN layers of condensed model', show_default=True)
 @click.option('--verbose', '-V', is_flag=True, show_default=True)
 @click.option('--soft_label', default=0, show_default=True)
+@click.option('--wandb', is_flag=True, show_default=True, help='log reduction trajectories to Weights & Biases')
+@click.option('--wandb_project', default='graphslim', show_default=True, help='Weights & Biases project name')
+@click.option('--wandb_run_name', default=None, help='optional Weights & Biases run name')
+@click.option('--wandb_required', is_flag=True, show_default=True, help='fail if WandB logging is requested but unavailable')
 @click.option('--init', default='random', help='features initialization methods',
               type=click.Choice(
                   ['variation_neighborhoods', 'variation_edges', 'variation_cliques', 'heavy_edge', 'algebraic_JC',

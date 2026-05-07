@@ -23,6 +23,7 @@ dependencies = [
     "torch_geometric",
     "tqdm",
 ]
+readme = "README.md"
 classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: Education",
@@ -33,10 +34,21 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
 ]
 
+[project.optional-dependencies]
+dgl = ["dgl"]
+tracking = ["wandb"]
+viz = ["matplotlib", "networkx", "pyvis", "streamlit"]
+test = ["pytest"]
+dev = ["build", "pytest", "twine", "wandb"]
+
+[project.scripts]
+graphslim-train = "graphslim.train_all:main"
+graphslim-visualize = "graphslim.visualization:main"
+
 [tool.setuptools.packages.find]
 include = ["graphslim*"]
 exclude = ["benchmark*", "checkpoints*", "docs*", "examples*", "figures*", "geom_buffer*", "interface*"]
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"

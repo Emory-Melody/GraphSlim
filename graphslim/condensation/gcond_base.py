@@ -5,6 +5,7 @@ import torch.nn as nn
 from graphslim.coarsening import *
 from graphslim.condensation.utils import *
 from graphslim.models import *
+from graphslim.reduction import create_reducer
 from graphslim.sparsification import *
 from graphslim.utils import *
 from graphslim.dataset.utils import save_reduced
@@ -128,23 +129,7 @@ class GCondBase:
             A tuple containing the synthetic features and (optionally) the adjacency matrix.
         """
         args = self.args
-        if args.init == 'clustering':
-            if args.agg:
-                agent = ClusterAgg(setting=args.setting, data=self.data, args=args)
-            else:
-                agent = Cluster(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'averaging':
-            agent = Average(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'kcenter':
-            agent = KCenter(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'herding':
-            agent = Herding(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'cent_p':
-            agent = CentP(setting=args.setting, data=self.data, args=args)
-        elif args.init == 'cent_d':
-            agent = CentD(setting=args.setting, data=self.data, args=args)
-        else:
-            agent = Random(setting=args.setting, data=self.data, args=args)
+        agent = create_reducer(args.init, setting=args.setting, data=self.data, args=args)
 
         if reuse_init:
             save_path = f'{args.save_path}/reduced_graph/{args.init}'
