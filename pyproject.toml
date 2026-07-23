@@ -6,7 +6,7 @@ authors = [
     {name = "Rockcor", email = "jshmhsb@gmail.com"},
 ]
 license = "MIT"
-requires-python = ">=3.9, <=3.11"
+requires-python = ">=3.10, <3.12"
 dependencies = [
     "click",
     "deeprobust",
@@ -15,6 +15,7 @@ dependencies = [
     "networkx",
     "numpy",
     "ogb",
+    "pillow>=12.3.0",
     "PyGSP",
     "scikit_learn",
     "scipy",

@@ -109,7 +109,7 @@ parso==0.8.5
 partd==1.4.2
 peft==0.11.1
 pexpect==4.9.0
-pillow==11.1.0
+pillow==12.3.0
 pip==25.2
 prompt_toolkit==3.0.52
 propcache==0.3.1
