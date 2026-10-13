@@ -16,6 +16,8 @@ class KernelRidgeRegression(nn.Module):
         b = torch.linalg.solve(K_ss + regulizer, y_s)
         pred = torch.matmul(K_ts, b)
         pred = nn.functional.softmax(pred, dim=1)
-        correct = torch.eq(pred.argmax(1).to(torch.float32), y_t.argmax(1).to(torch.float32)).sum().item()
+        correct = (
+            torch.eq(pred.argmax(1).to(torch.float32), y_t.argmax(1).to(torch.float32)).sum().item()
+        )
         acc = correct / len(y_t)
         return pred, acc

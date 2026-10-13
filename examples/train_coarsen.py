@@ -1,19 +1,13 @@
-import os
+"""Run the variation_neighborhoods example through the shared GraphSlim pipeline."""
+
+from pathlib import Path
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from graphslim.config import get_args
-from graphslim.dataset import *
-from graphslim.evaluation import *
-from graphslim.coarsening import *
-from graphslim.utils import to_camel_case, seed_everything
+from graphslim.train_all import main
 
-args = get_args()
-graph = get_dataset(args.dataset, args, args.load_path)
-seed_everything(args.seed)
-agent = VariationNeighborhoods(setting=args.setting, data=graph, args=args)
-reduced_graph = agent.reduce(graph)
-evaluator = Evaluator(args)
-evaluator.evaluate(reduced_graph, 'GCN')
+
+if __name__ == "__main__":
+    main(default_method="variation_neighborhoods")

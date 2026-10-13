@@ -77,40 +77,41 @@ def getsize_mb(elements):
                 size += e.element_size() * e.nelement()
     return size / 1024 / 1024
 
+
 def inference_via_confidence(confidence_mtx1, confidence_mtx2, label_vec1, label_vec2):
 
-    #----------------First step: obtain confidence lists for both training dataset and test dataset--------------
+    # ----------------First step: obtain confidence lists for both training dataset and test dataset--------------
     confidence1 = []
     confidence2 = []
     acc1 = 0
     acc2 = 0
     for num in range(confidence_mtx1.shape[0]):
-        confidence1.append(confidence_mtx1[num,label_vec1[num]])
-        if np.argmax(confidence_mtx1[num,:]) == np.argmax(label_vec1[num]):
+        confidence1.append(confidence_mtx1[num, label_vec1[num]])
+        if np.argmax(confidence_mtx1[num, :]) == np.argmax(label_vec1[num]):
             acc1 += 1
 
     for num in range(confidence_mtx2.shape[0]):
-        confidence2.append(confidence_mtx2[num,label_vec2[num]])
-        if np.argmax(confidence_mtx2[num,:]) == np.argmax(label_vec2[num]):
+        confidence2.append(confidence_mtx2[num, label_vec2[num]])
+        if np.argmax(confidence_mtx2[num, :]) == np.argmax(label_vec2[num]):
             acc2 += 1
     confidence1 = np.array(confidence1)
     confidence2 = np.array(confidence2)
 
     # print('model accuracy for training and test-', (acc1/confidence_mtx1.shape[0], acc2/confidence_mtx2.shape[0]) )
 
-
-    #sort_confidence = np.sort(confidence1)
+    # sort_confidence = np.sort(confidence1)
     sort_confidence = np.sort(np.concatenate((confidence1, confidence2)))
     max_accuracy = 0.5
     for num in range(len(sort_confidence)):
         delta = sort_confidence[num]
-        ratio1 = np.sum(confidence1>=delta)/confidence_mtx1.shape[0]
-        ratio2 = np.sum(confidence2>=delta)/confidence_mtx2.shape[0]
-        accuracy_now = 0.5*(ratio1+1-ratio2)
+        ratio1 = np.sum(confidence1 >= delta) / confidence_mtx1.shape[0]
+        ratio2 = np.sum(confidence2 >= delta) / confidence_mtx2.shape[0]
+        accuracy_now = 0.5 * (ratio1 + 1 - ratio2)
         if accuracy_now > max_accuracy:
             max_accuracy = accuracy_now
     # print('maximum inference accuracy is:', max_accuracy)
     return max_accuracy
+
 
 def verbose_time_memory(func):
     """
@@ -132,7 +133,7 @@ def verbose_time_memory(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        verbose = kwargs.get('verbose', False)
+        verbose = kwargs.get("verbose", False)
         if verbose:
             start = time.perf_counter()
 
@@ -145,30 +146,32 @@ def verbose_time_memory(func):
             print("Function Time:", runTime, "s")
             print("Function Time:", runTime_ms, "ms")
 
-            data = kwargs.get('data', None)
+            data = kwargs.get("data", None)
             if data is None:
                 for arg in args:
-                    if hasattr(arg, 'feat_train') or hasattr(arg, 'x'):
+                    if hasattr(arg, "feat_train") or hasattr(arg, "x"):
                         data = arg
                         break
                 if data is None:
                     raise ValueError("The function must be called with 'data' as an argument.")
 
-            if 'setting' in kwargs and kwargs['setting'] == 'trans':
+            if "setting" in kwargs and kwargs["setting"] == "trans":
                 origin_storage = getsize_mb([data.x, data.edge_index, data.y])
             else:
                 origin_storage = getsize_mb([data.feat_train, data.adj_train, data.labels_train])
-            if not hasattr(data, 'feat_syn'):
-                if 'setting' in kwargs and kwargs['setting'] == 'trans':
+            if not hasattr(data, "feat_syn"):
+                if "setting" in kwargs and kwargs["setting"] == "trans":
                     data.feat_syn = data.feat_full
                 else:
                     data.feat_syn = data.feat_train
-            if not hasattr(data, 'adj_syn'):
+            if not hasattr(data, "adj_syn"):
                 data.adj_syn = torch.eye(data.labels_train.shape[0])
-            if not hasattr(data, 'labels_syn'):
+            if not hasattr(data, "labels_syn"):
                 data.labels_syn = data.labels_train
             condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
-            print(f'Original graph:{origin_storage:.2f} Mb  Condensed graph:{condensed_storage:.2f} Mb')
+            print(
+                f"Original graph:{origin_storage:.2f} Mb  Condensed graph:{condensed_storage:.2f} Mb"
+            )
 
         return result
 
@@ -232,7 +235,7 @@ def evaluate(output, labels, args):
     -------
     None
     """
-    data_graphsaint = ['yelp', 'ppi', 'ppi-large', 'flickr', 'reddit', 'amazon']
+    data_graphsaint = ["yelp", "ppi", "ppi-large", "flickr", "reddit", "amazon"]
     if args.dataset in data_graphsaint:
         labels = labels.cpu().numpy()
         output = output.cpu().numpy()
@@ -240,12 +243,15 @@ def evaluate(output, labels, args):
             micro, macro = calc_f1(labels, output, is_sigmoid=True)
         else:
             micro, macro = calc_f1(labels, output, is_sigmoid=False)
-        print("Test set results:", "F1-micro= {:.4f}".format(micro),
-              "F1-macro= {:.4f}".format(macro))
+        print(
+            "Test set results:", "F1-micro= {:.4f}".format(micro), "F1-macro= {:.4f}".format(macro)
+        )
     else:
         loss_test = F.nll_loss(output, labels)
         acc_test = accuracy_score(output, labels)
-        print("Test set results:",
-              "loss= {:.4f}".format(loss_test.item()),
-              "accuracy= {:.4f}".format(acc_test.item()))
+        print(
+            "Test set results:",
+            "loss= {:.4f}".format(loss_test.item()),
+            "accuracy= {:.4f}".format(acc_test.item()),
+        )
     return

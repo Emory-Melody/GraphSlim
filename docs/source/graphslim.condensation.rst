@@ -1,6 +1,18 @@
 graphslim.condensation package
 ==============================
 
+Lightweight methods
+-------------------
+
+.. automodule:: graphslim.condensation.cgc
+   :members:
+
+.. automodule:: graphslim.condensation.clustgdd
+   :members:
+
+.. automodule:: graphslim.condensation.gcgp
+   :members:
+
 graphslim.condensation.gcond\_base module
 -----------------------------------------
 

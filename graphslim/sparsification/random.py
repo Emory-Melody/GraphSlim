@@ -6,6 +6,7 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 class Random(MFCoreSet):
     def __init__(self, setting, data, args, **kwargs):
         super(Random, self).__init__(setting, data, args, **kwargs)
+
     def select(self, embedds=None):
         idx_selected = []
 

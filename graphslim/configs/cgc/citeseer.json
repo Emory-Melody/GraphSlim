@@ -1,0 +1,7 @@
+{
+  "rate_profiles": {
+    "0.25": {"cgc_adj_threshold": 0.8, "cgc_alpha": 2.0, "cgc_tau": 0.05, "cgc_aug_ratio": 0.6},
+    "0.5": {"cgc_adj_threshold": 0.8, "cgc_alpha": 1.0, "cgc_tau": 0.05, "cgc_aug_ratio": 0.1},
+    "1.0": {"cgc_adj_threshold": 0.75, "cgc_alpha": 2.0, "cgc_tau": 0.5, "cgc_aug_ratio": 0.5}
+  }
+}

@@ -1,17 +1,5 @@
-#!/bin/bash
-#SBATCH --time=02:00:00
-#SBATCH --account=a100v100
-#SBATCH --cpus-per-task=4
-#SBATCH --gpus=1
-#SBATCH --mem=16G
-#SBATCH --partition=a100-8-gm320-c96-m1152
-conda init bash >/dev/null 2>&1
-source ~/.bashrc
-conda activate pygdgl
-
-# Change directory to the project folder
-cd ~/GraphSlim/graphslim
-
+#!/usr/bin/env bash
+source "$(dirname -- "${BASH_SOURCE[0]}")/common.sh"
 # Define hyperparameter values for grid search
 lr_feat_values=(1e-4 1e-3 1e-2 1e-1)
 lr_adj_values=(1e-4 1e-3 1e-2 1e-1)
@@ -25,12 +13,13 @@ ntrans_values=(1)
 epochs_values=(2000 3000)
 
 # Paths
-SAVE_PATH="/scratch/sgong36/checkpoints"
-LOAD_PATH="/scratch/sgong36/data"
+SAVE_PATH="${GRAPHSLIM_SAVE_PATH:-$repo_dir/checkpoints/grid}"
+LOAD_PATH="${GRAPHSLIM_LOAD_PATH:-$repo_dir/data}"
 
 best_val_acc=0.0
 best_test_acc=0.0
 best_config=""
+log_file="$SAVE_PATH/logs/gcdm/ogbn-arxiv_0.01.log"
 
 # Start grid search
 echo '====start running grid search===='
@@ -48,8 +37,12 @@ for lr_feat in "${lr_feat_values[@]}"; do
                     # Construct the command with current hyperparameters
                     echo "Running with lr_feat=$lr_feat, lr_adj=$lr_adj, pre_norm=$pre_norm, dis_metric=$dis_metric, outer_loop=$outer_loop, inner_loop=$inner_loop, threshold=$threshold, condense_model=$condense_model, ntrans=$ntrans, epochs=$epochs"
                     
-                    # Run the training script and capture the output
-                    output=$(python train_all.py -M gcdm -D ogbn-arxiv\
+                    # Only validation observations from this trial may select it.
+                    previous_lines=0
+                    if [[ -f "$log_file" ]]; then
+                      previous_lines=$(wc -l < "$log_file")
+                    fi
+                    output=$("$graphslim_python" -m graphslim.train_all -M gcdm -D ogbn-arxiv -R 0.01 --run_reduction 1 \
                         --save_path "$SAVE_PATH" \
                         --load_path "$LOAD_PATH" \
                         --lr_feat "$lr_feat" \
@@ -61,16 +54,16 @@ for lr_feat in "${lr_feat_values[@]}"; do
                         --threshold "$threshold" \
                         --condense_model "$condense_model" \
                         --ntrans "$ntrans" \
-                        --epochs "$epochs")
+                        --epochs "$epochs" "$@")
                     
                     # Extract the validation accuracy and test accuracy
-                    val_acc=$(echo "$output" | grep "Val Accuracy and Std" | tail -1 | awk -F '[,\\[\\]]' '{print $2}')
-                    test_acc=$(echo "$output" | grep "Test Mean Accuracy" | tail -1 | awk -F '[ ,]' '{print $5}')
+                    val_acc=$(awk -v start="$previous_lines" 'NR > start && $1 == "Val:" {if (!found || $2 > best) best=$2; found=1} END {if (found) print best}' "$log_file")
+                    test_acc=$(awk '/Test Mean Accuracy:/ {value=$5} END {print value}' <<< "$output")
                     
-                    # Ensure val_acc is not empty and use bc for comparison
+                    # Select by validation only; test accuracy is descriptive.
                     if [[ ! -z "$val_acc" ]]; then
                       # Compare val_acc with best_val_acc using bc
-                      if (( $(echo "$val_acc > $best_val_acc" | bc -l) )); then
+                      if awk -v val="$val_acc" -v best="$best_val_acc" 'BEGIN {exit !(val > best)}'; then
                         best_val_acc=$val_acc
                         best_test_acc=$test_acc
                         best_config="lr_feat=$lr_feat, lr_adj=$lr_adj, pre_norm=$pre_norm, dis_metric=$dis_metric, outer_loop=$outer_loop, inner_loop=$inner_loop, threshold=$threshold, condense_model=$condense_model, ntrans=$ntrans, epochs=$epochs"

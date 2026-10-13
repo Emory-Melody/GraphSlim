@@ -11,8 +11,10 @@ from io import StringIO
 from pprint import pprint
 from datetime import datetime
 from importlib import import_module
+
 # import pygcanl
 import time
+
 
 class Mirage(GCondBase):
     def __init__(self, setting, data, args, **kwargs):
@@ -35,25 +37,26 @@ class Mirage(GCondBase):
     def reduce(self, data, verbose=True):
         args = self.args
         pge = self.pge
-        self.feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
-        if args.setting == 'trans':
-            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        self.feat_syn, labels_syn = to_tensor(
+            self.feat_syn, label=data.labels_syn, device=self.device
+        )
+        if args.setting == "trans":
+            features, adj, labels = to_tensor(
+                data.feat_full, data.adj_full, label=data.labels_full, device=self.device
+            )
         else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
-                                              device=self.device)
+            features, adj, labels = to_tensor(
+                data.feat_train, data.adj_train, label=data.labels_train, device=self.device
+            )
         full_dataset = [Data(x=features, edge_index=adj, y=labels)]
         train_dataset = [Data(x=features, edge_index=adj, y=labels)]
         test_dataset = [Data(x=features, edge_index=adj, y=labels)]
 
-
         r"""The main function. Consider this the algorithm."""
-
 
         dataset_name = args.dataset
         args.run_num = 0
-        output_filename = os.path.join(
-            args.save_path, f"{dataset_name}_{args.run_num}_log.txt"
-        )
+        output_filename = os.path.join(args.save_path, f"{dataset_name}_{args.run_num}_log.txt")
         pprint(f"Outputting logs to {output_filename}")
         self.append_to_file({"seed": args.seed}, output_filename)
         self.append_to_file(args, output_filename)
@@ -80,9 +83,7 @@ class Mirage(GCondBase):
         mapping = canonical_label_to_naturals(prettified)
         mapped_dataset = [[mapping[tree] for tree in graph] for graph in prettified]
         classwise_mapped_graphs = {
-            class__: [
-                graph for graph, class_ in zip(mapped_dataset, classes) if class_ == class__
-            ]
+            class__: [graph for graph, class_ in zip(mapped_dataset, classes) if class_ == class__]
             for class__ in unique_classes
         }
         classwise_trees = {0: set(), 1: set()}
@@ -167,7 +168,7 @@ class Mirage(GCondBase):
                         class_,
                     )
                     datas.append(data)
-                frq[idx] = {'freq': freq, 'data': datas}
+                frq[idx] = {"freq": freq, "data": datas}
                 class_reconstructed.append(frq)
             reconstructed[class_] = class_reconstructed
         dataset = {}
@@ -175,56 +176,78 @@ class Mirage(GCondBase):
             class_dataset = []
             for rec in recon:
                 idx = list(rec.keys())[0]
-                data = disjointed_union(rec[idx]['data'], class_)
+                data = disjointed_union(rec[idx]["data"], class_)
                 if data is None:
                     # skipping when graph has only one node
                     continue
                 data = roots_to_embed(data)
-                rec[idx]['data'] = data
+                rec[idx]["data"] = data
                 class_dataset.append(rec)
             dataset[class_] = class_dataset
         #
-        test_dataset_proc = preprocess_dataset_test(test_dataset, node_label_map_orig, edge_label_map_orig,
-                                                    node_label_map_full)
+        test_dataset_proc = preprocess_dataset_test(
+            test_dataset, node_label_map_orig, edge_label_map_orig, node_label_map_full
+        )
         test_dataset_canonicalized = pygcanl.canonical(test_dataset_proc, hops)
-        test_dataset_prettified = [[prettify_canonical_label(tree) for tree in graph] for graph in
-                                   test_dataset_canonicalized]
+        test_dataset_prettified = [
+            [prettify_canonical_label(tree) for tree in graph]
+            for graph in test_dataset_canonicalized
+        ]
         prettified_collapsed = set()
-        [[[prettified_collapsed.add(inv_mapping[tree]) for tree in graph] for graph in dset.keys()] for dset in
-         patterns.values()]
-        test_dataset_prettified = [[tree for tree in graph if tree in prettified_collapsed] for graph in
-                                   test_dataset_prettified]
+        [
+            [
+                [prettified_collapsed.add(inv_mapping[tree]) for tree in graph]
+                for graph in dset.keys()
+            ]
+            for dset in patterns.values()
+        ]
+        test_dataset_prettified = [
+            [tree for tree in graph if tree in prettified_collapsed]
+            for graph in test_dataset_prettified
+        ]
         test_dataset_reconstructed = []
         assert len(test_dataset_prettified) == len(test_dataset)
         for trees, data in zip(test_dataset_prettified, test_dataset):
             cls = data.y.item()
             if len(trees) == 0:
-                datum = Data(x=data.x, edge_index=data.edge_index, edge_attr=data.edge_attr, y=data.y,
-                             roots_to_embed=torch.ones(data.x.shape[0]))
+                datum = Data(
+                    x=data.x,
+                    edge_index=data.edge_index,
+                    edge_attr=data.edge_attr,
+                    y=data.y,
+                    roots_to_embed=torch.ones(data.x.shape[0]),
+                )
             else:
                 datum = []
                 for tree in trees:
-                    node_label_map, edge_label_map, node_label_map_original = parse_canonical_label(tree)
-                    tree_ = get_data(node_label_map, edge_label_map, node_label_map_original, node_label_map_orig,
-                                     edge_label_map_orig, node_label_map_full, cls)
+                    node_label_map, edge_label_map, node_label_map_original = parse_canonical_label(
+                        tree
+                    )
+                    tree_ = get_data(
+                        node_label_map,
+                        edge_label_map,
+                        node_label_map_original,
+                        node_label_map_orig,
+                        edge_label_map_orig,
+                        node_label_map_full,
+                        cls,
+                    )
                     datum.append(tree_)
                 datum = disjointed_union(datum, cls)
             test_dataset_reconstructed.append(datum)
-        assert not any(hasattr(d, 'node_attr') for d in test_dataset_reconstructed)
+        assert not any(hasattr(d, "node_attr") for d in test_dataset_reconstructed)
         with open(f"{args.output_dir}/saved_dataset_{args.run_num}.pkl", "wb") as data_file:
             pickle.dump(dataset, data_file)
 
-
-
-
-
-
         # append_to_file("Turning off frequency based sampling for comparison", output_filename)
-
 
         if it in args.checkpoints:
             self.adj_syn = adj_syn_inner
-            data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
+            data.adj_syn, data.feat_syn, data.labels_syn = (
+                self.adj_syn.detach(),
+                self.feat_syn.detach(),
+                labels_syn.detach(),
+            )
             best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data

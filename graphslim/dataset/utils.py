@@ -12,7 +12,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
     This function modifies the adjacency matrix to make it sparser according to the model type and method specified.
     For specific methods and datasets, it adjusts the threshold used for sparsification.
 
-    Parametersm
+    Parameters
     ----------
     model_type : str
         The type of model used, which determines the sparsification strategy. Can be 'MLP', 'GAT', or other.
@@ -30,23 +30,27 @@ def sparsify(model_type, adj_syn, args, verbose=False):
         The sparsified adjacency matrix.
     """
     threshold = 0
-    if model_type == 'MLP':
+    if model_type == "MLP":
         adj_syn = adj_syn - adj_syn
         torch.diagonal(adj_syn).fill_(1)
-    elif model_type == 'GAT':
-        if args.method in ['gcond', 'doscond']:
-            if args.dataset in ['cora', 'citeseer']:
+    elif model_type == "GAT":
+        if args.method in ("cgc", "clustgdd", "gcgp", "nope"):
+            # These methods construct their topology explicitly. Compression can
+            # produce valid weights below 0.5; preserve all nonzero edges.
+            threshold = 0
+        elif args.method in ["gcond", "doscond"]:
+            if args.dataset in ["cora", "citeseer"]:
                 threshold = 0.5  # Make the graph sparser as GAT does not work well on dense graph
             else:
                 threshold = 0.1
-        elif args.method in ['msgc']:
+        elif args.method in ["msgc"]:
             threshold = args.threshold
         else:
             threshold = 0.5
     else:
-        if args.method in ['gcond', 'doscond']:
+        if args.method in ["gcond", "doscond"]:
             threshold = args.threshold
-        elif args.method in ['msgc']:
+        elif args.method in ["msgc"]:
             threshold = 0
         else:
             threshold = 0
@@ -60,7 +64,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
     if threshold > 0:
         adj_syn[adj_syn < threshold] = 0
         if verbose:
-            print('Sparsity after truncating:', adj_syn.nonzero().shape[0] / adj_syn.numel())
+            print("Sparsity after truncating:", adj_syn.nonzero().shape[0] / adj_syn.numel())
         # else:
         #     print("structure free methods do not need to truncate the adjacency matrix")
     return adj_syn
@@ -94,14 +98,14 @@ def index2mask(index, size):
     return mask
 
 
-def splits(data, exp='default'):
+def splits(data, exp="default"):
     # customize your split here
-    if hasattr(data, 'y'):
+    if hasattr(data, "y"):
         num_classes = max(data.y) + 1
     else:
         num_classes = max(data.labels_full).item() + 1
     # data.nclass = num_classes
-    if not hasattr(data, 'train_mask'):
+    if not hasattr(data, "train_mask"):
         indices = []
         for i in range(num_classes):
             data.y = data.y.reshape(-1)
@@ -109,19 +113,21 @@ def splits(data, exp='default'):
             index = index[torch.randperm(index.size(0))]
             indices.append(index)
 
-        if exp == 'random':
+        if exp == "random":
             train_index = torch.cat([i[:20] for i in indices], dim=0)
             val_index = torch.cat([i[20:50] for i in indices], dim=0)
             test_index = torch.cat([i[50:] for i in indices], dim=0)
-        elif exp == 'few':
+        elif exp == "few":
             train_index = torch.cat([i[:5] for i in indices], dim=0)
             val_index = torch.cat([i[5:10] for i in indices], dim=0)
             test_index = torch.cat([i[10:] for i in indices], dim=0)
         else:
             # if fixed but no split is provided, use the default 8/1/1 split classwise
-            train_index = torch.cat([i[:int(i.shape[0] * 0.8)] for i in indices], dim=0)
-            val_index = torch.cat([i[int(i.shape[0] * 0.8):int(i.shape[0] * 0.9)] for i in indices], dim=0)
-            test_index = torch.cat([i[int(i.shape[0] * 0.9):] for i in indices], dim=0)
+            train_index = torch.cat([i[: int(i.shape[0] * 0.8)] for i in indices], dim=0)
+            val_index = torch.cat(
+                [i[int(i.shape[0] * 0.8) : int(i.shape[0] * 0.9)] for i in indices], dim=0
+            )
+            test_index = torch.cat([i[int(i.shape[0] * 0.9) :] for i in indices], dim=0)
             # raise NotImplementedError('Unknown split type')
         data.train_mask = index2mask(train_index, size=data.num_nodes)
         data.val_mask = index2mask(val_index, size=data.num_nodes)
@@ -135,65 +141,90 @@ def splits(data, exp='default'):
 
 def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
     base_path = os.path.abspath(os.path.expanduser(args.save_path))
-    save_path = os.path.join(base_path, 'reduced_graph', args.method)
-    if args.attack is not None and args.dataset in ['flickr']:
-        save_path = os.path.join(base_path, 'corrupt_graph', args.attack, 'reduced_graph', args.method)
+    save_path = os.path.join(base_path, "reduced_graph", args.method)
+    if args.attack is not None and args.dataset in ["flickr"]:
+        save_path = os.path.join(
+            base_path, "corrupt_graph", args.attack, "reduced_graph", args.method
+        )
     if not os.path.exists(save_path):
         os.makedirs(save_path)
     if adj_syn is not None:
-        torch.save(adj_syn,
-                   os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
+        torch.save(
+            adj_syn,
+            os.path.join(save_path, f"adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"),
+        )
     if feat_syn is not None:
-        torch.save(feat_syn,
-                   os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
+        torch.save(
+            feat_syn,
+            os.path.join(save_path, f"feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"),
+        )
     if labels_syn is not None:
-        torch.save(labels_syn,
-                   os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'))
-    args.logger.info(f"Saved {os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')}")
+        torch.save(
+            labels_syn,
+            os.path.join(save_path, f"label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"),
+        )
+    args.logger.info(
+        f"Saved {os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')}"
+    )
 
 
 def load_reduced(args, data=None):
     flag = 0
     base_path = os.path.abspath(os.path.expanduser(args.save_path))
-    save_path = os.path.join(base_path, 'reduced_graph', args.method)
-    if args.attack is not None and args.dataset in ['flickr']:
-        save_path = os.path.join(base_path, 'corrupt_graph', args.attack, 'reduced_graph', args.method)
+    save_path = os.path.join(base_path, "reduced_graph", args.method)
+    if args.attack is not None and args.dataset in ["flickr"]:
+        save_path = os.path.join(
+            base_path, "corrupt_graph", args.attack, "reduced_graph", args.method
+        )
+
+    suffix = f"{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+    if not any(
+        os.path.isfile(os.path.join(save_path, f"{kind}_{suffix}"))
+        for kind in ("feat", "adj", "label")
+    ):
+        raise FileNotFoundError(
+            f"No reduced graph checkpoints for {args.method} at {save_path} ({suffix}). "
+            "Run reduction first, or use --eval_whole for the whole-graph baseline."
+        )
 
     def _resolve_device(device_str):
         if device_str is None:
-            return 'cpu'
-        if isinstance(device_str, str) and device_str.lower() == 'cpu':
-            return 'cpu'
-        if isinstance(device_str, str) and device_str.startswith('cuda'):
+            return "cpu"
+        if isinstance(device_str, str) and device_str.lower() == "cpu":
+            return "cpu"
+        if isinstance(device_str, str) and device_str.startswith("cuda"):
             if not torch.cuda.is_available():
-                if hasattr(args, 'logger'):
-                    args.logger.warning("CUDA requested but not available. Falling back to CPU for reduced graph loading.")
-                return 'cpu'
+                if hasattr(args, "logger"):
+                    args.logger.warning(
+                        "CUDA requested but not available. Falling back to CPU for reduced graph loading."
+                    )
+                return "cpu"
             try:
-                parts = device_str.split(':')
+                parts = device_str.split(":")
                 idx = int(parts[1]) if len(parts) > 1 else 0
             except ValueError:
                 idx = 0
             if idx < torch.cuda.device_count():
-                return f'cuda:{idx}'
-            fallback = 'cuda:0' if torch.cuda.device_count() > 0 else 'cpu'
-            if hasattr(args, 'logger'):
+                return f"cuda:{idx}"
+            fallback = "cuda:0" if torch.cuda.device_count() > 0 else "cpu"
+            if hasattr(args, "logger"):
                 args.logger.warning(
-                    f"Requested device {device_str} unavailable. Using {fallback} for reduced graph loading.")
+                    f"Requested device {device_str} unavailable. Using {fallback} for reduced graph loading."
+                )
             return fallback
         return device_str
 
-    target_device = _resolve_device(getattr(args, 'device', 'cpu'))
-    if hasattr(args, 'device') and args.device != target_device:
+    target_device = _resolve_device(getattr(args, "device", "cpu"))
+    if hasattr(args, "device") and args.device != target_device:
         args.device = target_device
 
     def _safe_load_tensor(file_path):
         if not os.path.exists(file_path):
             raise FileNotFoundError(file_path)
         load_locations = []
-        if target_device != 'cpu':
+        if target_device != "cpu":
             load_locations.append(target_device)
-        load_locations.append('cpu')
+        load_locations.append("cpu")
         last_exc = None
         tried = set()
         for loc in load_locations:
@@ -202,13 +233,14 @@ def load_reduced(args, data=None):
             tried.add(loc)
             try:
                 tensor = torch.load(file_path, map_location=loc)
-                if loc != target_device and target_device != 'cpu' and hasattr(tensor, 'to'):
+                if loc != target_device and target_device != "cpu" and hasattr(tensor, "to"):
                     try:
                         tensor = tensor.to(target_device)
                     except Exception as move_err:
-                        if hasattr(args, 'logger'):
+                        if hasattr(args, "logger"):
                             args.logger.warning(
-                                f"Loaded {file_path} on {loc} but failed to move to {target_device}: {move_err}")
+                                f"Loaded {file_path} on {loc} but failed to move to {target_device}: {move_err}"
+                            )
                 return tensor
             except Exception as e:
                 last_exc = e
@@ -218,36 +250,48 @@ def load_reduced(args, data=None):
         raise RuntimeError(f"Failed to load tensor from {file_path}")
 
     try:
-        feat_path = os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        feat_path = os.path.join(
+            save_path, f"feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         feat_syn = _safe_load_tensor(feat_path)
     except Exception as e:
-        file_path = os.path.join(save_path, f'feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        file_path = os.path.join(
+            save_path, f"feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         print(f"find no feat at {file_path}, use original feature matrix instead. Error: {e}")
-        if hasattr(args, 'logger'):
+        if hasattr(args, "logger"):
             args.logger.warning(f"Failed to load synthetic features from {file_path}: {e}")
         flag += 1
-        if args.setting == 'trans':
+        if args.setting == "trans":
             feat_syn = data.feat_full
         else:
             feat_syn = data.feat_train
     try:
-        label_path = os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        label_path = os.path.join(
+            save_path, f"label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         labels_syn = _safe_load_tensor(label_path)
     except Exception as e:
-        file_path = os.path.join(save_path, f'label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        file_path = os.path.join(
+            save_path, f"label_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         print(f"find no label at {file_path}, use original label matrix instead. Error: {e}")
-        if hasattr(args, 'logger'):
+        if hasattr(args, "logger"):
             args.logger.warning(f"Failed to load synthetic labels from {file_path}: {e}")
         flag += 1
         labels_syn = data.labels_train
 
     try:
-        adj_path = os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        adj_path = os.path.join(
+            save_path, f"adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         adj_syn = _safe_load_tensor(adj_path)
     except Exception as e:
-        file_path = os.path.join(save_path, f'adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt')
+        file_path = os.path.join(
+            save_path, f"adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+        )
         print(f"find no adj at {file_path}, use identity matrix instead. Error: {e}")
-        if hasattr(args, 'logger'):
+        if hasattr(args, "logger"):
             args.logger.warning(f"Failed to load synthetic adjacency from {file_path}: {e}")
         flag += 1
         adj_syn = torch.eye(feat_syn.size(0), device=args.device)
@@ -294,6 +338,8 @@ def get_syn_data(data, args, model_type, verbose=False):
 
     adj_syn = sparsify(model_type, adj_syn, args, verbose=verbose)
     return feat_syn, adj_syn, labels_syn
+
+
 # =============from graphsaint================#
 # import networkx as nx
 # import numpy as np
@@ -570,13 +616,13 @@ def get_syn_data(data, args, model_type, verbose=False):
 #     idx = np.arange(len(feat))
 #     dpr_data = GraphData(adj - adj, feat, labels, idx, idx, idx)
 #     return Dpr2Pyg(dpr_data)
-#====mirage utils====#
+# ====mirage utils====#
 
 from torch_geometric.data import Data, Dataset
 from torch_geometric.loader import DataLoader
 
 import torch
-import pyfpgrowth
+
 
 def disjointed_union(tree_list, class_=None, device=None):
     r"""Computes disjointed union of trees inside tree_list. trees are in
@@ -591,22 +637,17 @@ def disjointed_union(tree_list, class_=None, device=None):
         return None  # if the whole graph has just one node, then we return none
     if device is None:
         device = tree_list[0].x.device
-    assert all(
-        device == tree.x.device for tree in tree_list
-    ), "Trees must be on same device."
-    assert all(
-        tree.x.shape[1] == tree_list[0].x.shape[1] for tree in tree_list
-    ), "Number of node features are different."
-    assert all(
-        tree.y == tree_list[0].y for tree in tree_list
-    ), "Tree must be in same class."
+    assert all(device == tree.x.device for tree in tree_list), "Trees must be on same device."
+    assert all(tree.x.shape[1] == tree_list[0].x.shape[1] for tree in tree_list), (
+        "Number of node features are different."
+    )
+    assert all(tree.y == tree_list[0].y for tree in tree_list), "Tree must be in same class."
     if hasattr(tree_list[0], "edge_attr"):
+        assert all(hasattr(tree, "edge_attr") for tree in tree_list), (
+            "Not all trees have edge features."
+        )
         assert all(
-            hasattr(tree, "edge_attr") for tree in tree_list
-        ), "Not all trees have edge features."
-        assert all(
-            tree.edge_attr.shape[1] == tree_list[0].edge_attr.shape[1]
-            for tree in tree_list
+            tree.edge_attr.shape[1] == tree_list[0].edge_attr.shape[1] for tree in tree_list
         ), "Number of edge features are different."
         hasedgeattr = True
     else:
@@ -649,11 +690,7 @@ def roots_to_embed(data):
     nn = data.x.shape[0]
     root = torch.zeros((nn,), device=data.x.device)
     root_indices = torch.tensor(
-        list(
-            set(data.edge_index[1].tolist()).difference(
-                set(data.edge_index[0].tolist())
-            )
-        )
+        list(set(data.edge_index[1].tolist()).difference(set(data.edge_index[0].tolist())))
     ).to(data.x.device)
     root[root_indices] = 1
     data.roots_to_embed = root
@@ -665,10 +702,12 @@ class myDataset(Dataset):
         super().__init__()
         this.dataset_list = [list(d.values())[0] for d in dataset_list]
         this.dataset_len = max(len(this.dataset_list), dataset_len)
-        this.rng = np.random.RandomState(seed=kwargs.get('seed', 0))
-        freq, data = list(zip(*((d['freq'],d['data']) for d in this.dataset_list)))
-        probs = np.asarray(freq)/np.sum(freq)
-        this.data = [data[this.rng.choice(np.arange(len(data)), p=probs)] for _ in range(this.dataset_len)]
+        this.rng = np.random.RandomState(seed=kwargs.get("seed", 0))
+        freq, data = list(zip(*((d["freq"], d["data"]) for d in this.dataset_list)))
+        probs = np.asarray(freq) / np.sum(freq)
+        this.data = [
+            data[this.rng.choice(np.arange(len(data)), p=probs)] for _ in range(this.dataset_len)
+        ]
         this.dataset_len = len(this.dataset_list)
         this.data = data
 
@@ -685,12 +724,13 @@ def get_dataloader(dataset_classwise, **kwargs):
             dataset_classwise[0] + dataset_classwise[1]
         )  # for now assumes only two classes named 0 and 1 exist
         mydataset = myDataset(dataset, **kwargs)
-        if 'dataset_len' in kwargs:
-            del kwargs['dataset_len']
+        if "dataset_len" in kwargs:
+            del kwargs["dataset_len"]
         dataloader = DataLoader(mydataset, **kwargs)
     else:
         dataloader = DataLoader(dataset_classwise, **kwargs)
     return dataloader
+
 
 # ---------------  PROCESS DATASET (LABELS)  ------------------
 def get_label_maps(dataset):
@@ -720,10 +760,7 @@ def process_labels(dataset, node_label_map, node_label_map_full):
             edge_index=d.edge_index,
             y=d.y,
             node_attr=torch.tensor(
-                [
-                    node_label_map_full[tuple(d.x[n, :].tolist())]
-                    for n in range(d.x.shape[0])
-                ]
+                [node_label_map_full[tuple(d.x[n, :].tolist())] for n in range(d.x.shape[0])]
             ),
         )
         dataset_.append(data)
@@ -741,10 +778,10 @@ def preprocess_dataset(dataset, full_dataset):
 
 
 def preprocess_dataset_test(dataset, node_label_map, edge_label_map, node_label_map_full):
-    label_processed_dataset = process_labels(dataset, node_label_map, edge_label_map, node_label_map_full)
+    label_processed_dataset = process_labels(
+        dataset, node_label_map, edge_label_map, node_label_map_full
+    )
     return label_processed_dataset
-
-
 
 
 # ----------------  PROCESS CANONICAL LABELS  -----------------
@@ -777,7 +814,6 @@ def canonical_label_to_naturals(dataset_labels):
     return mapping
 
 
-
 # ---------------  COMPUTE FREQUENT PATTERNS  -----------------
 def tree_class_ctr(classes, dataset):
     tree_class_count = {}
@@ -800,6 +836,8 @@ def get_invalid_trees(tree_class_count):
 
 
 def pyfpgrowth_wrapper(classwise, freq_thresholds):
+    import pyfpgrowth
+
     patterns = {}
     for class_, dataset in classwise.items():
         thresh = freq_thresholds[class_]

@@ -14,6 +14,17 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :caption: Quickstart
 
    quickstart.md
+   lightweight_methods.md
+   compatibility.md
+   efficiency.md
+   cuda_graph.md
+   dataset_expansion.md
+   simgc.md
+
+.. toctree::
+   :hidden:
+
+   source/modules
 
 .. toctree::
    :maxdepth: 1
@@ -41,4 +52,3 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :caption: Evaluation
 
    source/graphslim.evaluation
-

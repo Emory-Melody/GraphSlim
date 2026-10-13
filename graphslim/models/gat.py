@@ -14,25 +14,22 @@ from torch_geometric.nn import GATConv
 
 
 class GAT(BaseGNN):
-    '''
+    """
     simple GAT model, one head and no edge weight
     only for evaluation
-    '''
+    """
 
-    def __init__(self, nfeat, nhid, nclass, args, mode='train'):
+    def __init__(self, nfeat, nhid, nclass, args, mode="train"):
         super(GAT, self).__init__(nfeat, nhid, nclass, args, mode)
 
-        if mode in ['eval', 'cross']:
+        if mode in ["eval", "cross"]:
             self.nlayers = 2
             self.heads = 8
             self.output_heads = 1
 
         self.conv1 = GATConv(
-            nfeat,
-            nhid,
-            heads=self.heads,
-            dropout=self.dropout,
-            bias=self.with_bias)
+            nfeat, nhid, heads=self.heads, dropout=self.dropout, bias=self.with_bias
+        )
 
         self.conv2 = GATConv(
             nhid * self.heads,
@@ -40,7 +37,8 @@ class GAT(BaseGNN):
             heads=self.output_heads,
             concat=False,
             dropout=self.dropout,
-            bias=self.with_bias)
+            bias=self.with_bias,
+        )
 
         self.output = None
         self.best_model = None
@@ -64,6 +62,7 @@ class GAT(BaseGNN):
             x = F.dropout(x, p=self.dropout, training=self.training)
             x = self.conv2(x, adj)
         return F.log_softmax(x, dim=1)
+
 
 # class GAT(BaseGNN):
 #     def __init__(self, in_features, hidden_dim, num_classes, args, mode='train'):

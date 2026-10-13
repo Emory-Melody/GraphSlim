@@ -1,26 +1,26 @@
-import os
+"""Evaluate a saved reduced graph or the whole graph."""
+
+from pathlib import Path
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from graphslim.config import cli
-from graphslim.dataset import *
-from graphslim.evaluation import Evaluator, PropertyEvaluator
+from graphslim.config import get_args
+from graphslim.train_all import run
 
-if __name__ == '__main__':
-    args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args, load_path=args.load_path)
-    if args.eval_whole:
-        # evaluator = PropertyEvaluator(args)
-        evaluator = Evaluator(args)
-        evaluator.evaluate(data, reduced=False, model_type='GCN')
-        #evaluator.MIA_evaluate(data, reduced=False, model_type='GCN')
-    else:
-        if args.attack is not None:
-            data = attack(data, args)
-            args.save_path = f'checkpoints'
-        # evaluator = PropertyEvaluator(data, args, reduced=True)
-        #evaluator = PropertyEvaluator(args)
-        evaluator.evaluate(data, reduced=True, model_type='GCN')
-        #evaluator.MIA_evaluate(data, reduced=True, model_type='GCN')
+
+def main(argv=None):
+    args = get_args(argv)
+    if not hasattr(args, "method"):
+        return None
+    args.run_reduction = 0
+    return run(args)
+
+
+def entrypoint():
+    main()
+
+
+if __name__ == "__main__":
+    entrypoint()

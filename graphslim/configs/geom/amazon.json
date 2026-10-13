@@ -1,4 +1,4 @@
-cora.json{
+{
   "condense_model": "GCN",
   "num_experts": 200,
   "lr_teacher": 0.4,

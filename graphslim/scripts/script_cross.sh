@@ -1,7 +1,9 @@
-dataset=${1}
-r=${2}
-gpu_id=${3}
-for s in 0 1 2 3 4
-do
-python test_other_arcs.py --dataset ${dataset} --gpu_id=${gpu_id} --r=${r} --seed=${s} --nruns=10  >> res/flickr/${1}_${2}.out 
+#!/usr/bin/env bash
+source "$(dirname -- "${BASH_SOURCE[0]}")/common.sh"
+dataset="${1:?usage: script_cross.sh DATASET RATE GPU [options]}"
+rate="${2:?missing rate}"
+gpu="${3:?missing GPU}"
+shift 3
+for seed in 0 1 2 3 4; do
+    "$graphslim_python" -m benchmark.run_cross_arch "${graphslim_paths[@]}" -D "$dataset" -M gcond -R "$rate" -G "$gpu" -S "$seed" --run_eval 10 "$@"
 done

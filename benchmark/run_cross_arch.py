@@ -1,19 +1,26 @@
-import os
+"""Evaluate saved graphs across downstream architectures."""
+
+from pathlib import Path
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from graphslim.config import cli
-from graphslim.dataset import *
-from graphslim.evaluation import Evaluator
+from graphslim.config import get_args
 
-if __name__ == '__main__':
-    args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args)
-    evaluator = Evaluator(args)
-    if args.eval_whole:
-        evaluator.train_cross(data, reduced=False)
 
-    else:
-        evaluator.train_cross(data)
+def main(argv=None):
+    args = get_args(argv)
+    if not hasattr(args, "method"):
+        return None
+    from graphslim.dataset import get_dataset
+    from graphslim.evaluation import Evaluator
+    from graphslim.utils import seed_everything
+
+    seed_everything(args.seed)
+    data = get_dataset(args.dataset, args, args.load_path)
+    return Evaluator(args).train_cross(data, reduced=not args.eval_whole)
+
+
+if __name__ == "__main__":
+    main()

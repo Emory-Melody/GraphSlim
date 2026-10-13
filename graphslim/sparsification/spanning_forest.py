@@ -11,7 +11,7 @@ class SpanningForest(EdgeSparsifier):
 
     def edge_cutter(self, G):
         args = self.args
-        graph=nk.graph.SpanningForest(G).run().getForest()
+        graph = nk.graph.SpanningForest(G).run().getForest()
         if args.verbose:
             nk.overview(graph)
         edge_index, edge_attr = from_networkit(graph)

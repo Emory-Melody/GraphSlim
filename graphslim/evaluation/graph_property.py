@@ -1,173 +1,106 @@
-import os
-import sys
-import scipy
+"""Graph-property diagnostics, including tiny graphs and continuous targets."""
 
-from sklearn.metrics import pairwise_distances
-import warnings
-
-warnings.simplefilter(action='ignore', category=FutureWarning)
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
-from graphslim.config import *
-from graphslim.dataset import *
-from scipy.sparse.linalg import eigsh
-import matplotlib.pyplot as plt
-import logging
 import networkx as nx
 import numpy as np
-from graphslim.dataset import *
-from graphslim.evaluation.utils import calculate_homophily
-from graphslim.utils import gcn_normalize_adj
+import scipy.sparse as sp
+from scipy.sparse.linalg import eigsh
 from sklearn.metrics import davies_bouldin_score
-from scipy.sparse.csgraph import laplacian
+import torch
+
+from graphslim.dataset.utils import get_syn_data
+from graphslim.reduction.lightweight import as_csr
+
+
+def _numpy(value):
+    return value.detach().cpu().numpy() if isinstance(value, torch.Tensor) else np.asarray(value)
+
+
+def graph_statistics(adjacency, features, labels, structure=True):
+    """Undefined quantities are None, never fabricated zeros or NaNs."""
+    features, labels = _numpy(features), _numpy(labels)
+    if labels.ndim == 2:
+        labels = labels.argmax(1)
+    adjacency = as_csr(adjacency)
+    n = adjacency.shape[0]
+    if len(features) != n or len(labels) != n:
+        raise ValueError("Graph-property dimensions do not match")
+    unique = len(np.unique(labels))
+    valid_db = 1 < unique < n
+    statistics = {
+        "nodes": n,
+        "davies_bouldin": float(davies_bouldin_score(features, labels)) if valid_db else None,
+    }
+    if not structure:
+        return statistics
+    # Self loops do not contribute to ordinary graph density or homophily.
+    adjacency.setdiag(0)
+    adjacency.eliminate_zeros()
+    graph = nx.from_scipy_sparse_array(adjacency)
+    laplacian = nx.laplacian_matrix(graph).astype(np.float64)
+    if laplacian.nnz == 0:
+        radius, vector = 0.0, np.empty((n, 0))
+    elif n <= 64:
+        values, vectors = np.linalg.eigh(laplacian.toarray())
+        radius = float(values[-1]) if n else 0.0
+        vector = vectors[:, -1:] if n else np.empty((0, 0))
+    else:
+        values, vector = eigsh(
+            laplacian, k=1, which="LM", v0=np.random.default_rng(0).normal(size=n)
+        )
+        radius = float(values[0])
+    projected = vector.T @ features
+    trace = float(np.square(projected).sum() / features.shape[1]) if laplacian.nnz else None
+    src, dst = adjacency.nonzero()
+    looped = adjacency + sp.eye(n)
+    degree = np.asarray(looped.sum(1)).ravel()
+    inverse = np.power(np.maximum(degree, 1e-12), -0.5)
+    normalized = sp.diags(inverse) @ looped @ sp.diags(inverse)
+    aggregate = normalized @ normalized @ features
+    statistics.update(
+        edges=graph.number_of_edges(),
+        density=float(nx.density(graph)),
+        laplacian_trace=trace,
+        spectral_radius=radius,
+        clustering=float(nx.average_clustering(graph)),
+        homophily=float(np.mean(labels[src] == labels[dst])) if len(src) else None,
+        davies_bouldin_aggregated=float(davies_bouldin_score(aggregate, labels))
+        if valid_db
+        else None,
+    )
+    return statistics
 
 
 class PropertyEvaluator:
-    '''
-    Class for evaluating graph properties of original and synthetic
-    graphs, such as density, Laplacian space trace, spectral radius,
-    cluster coefficient, homophily, and Davies-Bouldin index
-
-    Parameters
-    ----------
-    args : object
-        Arguments object containing the command-line arguments
-    '''
-
     def __init__(self, args):
-
         self.args = args
 
-    def evaluate(self, data, reduced=True, model_type='GCN'):
-        '''
-        Evaluates the graph properties of the original or synthetic graph
-
-        Parameters
-        ----------
-        data : Dataset
-            The dataset containing the graph data
-        reduced : bool
-            Whether to evaluate the reduced graph or the full graph
-        model_type : str
-            The type of model to use for the evaluation
-        '''
+    def evaluate(self, data, reduced=True, model_type="GCN"):
         if reduced:
             self.feat, self.adj, self.label = get_syn_data(data, self.args, model_type=model_type)
-            self.feat, self.adj, self.label = self.feat.cpu().numpy(), self.adj.cpu().numpy(), self.label.cpu().numpy()
         else:
-            self.feat, self.adj, self.label = data.feat_full.numpy(), data.adj_full, data.labels_full.numpy()
-
-        if self.args.with_structure:
+            prefix = "train" if self.args.setting == "ind" else "full"
+            self.feat = getattr(data, f"feat_{prefix}")
+            self.adj = getattr(data, f"adj_{prefix}")
+            self.label = getattr(data, f"labels_{prefix}")
+        return (
             self.graph_property()
+            if self.args.with_structure
+            else self.graph_property_no_structure()
+        )
+
+    def _report(self, structure):
+        adjacency = self.adj
+        if isinstance(adjacency, torch.Tensor) and adjacency.ndim == 3:
+            reports = [
+                graph_statistics(a, self.feat, self.label[: len(a)], structure) for a in adjacency
+            ]
         else:
-            self.graph_property_no_structure()
+            reports = graph_statistics(adjacency, self.feat, self.label, structure)
+        self.args.logger.info("Graph properties: %s", reports)
+        return reports
 
     def graph_property(self):
-
-        args = self.args
-        adj, feat, label = self.adj, self.feat, self.label
-        eigtrace_list = []
-        spe_list = []
-        clu_list = []
-        den_list = []
-        hom_list = []
-        db_list = []
-        db_agg_list = []
-        if len(adj.shape) == 3:
-            for i in range(adj.shape[0]):
-                ad = adj[i]
-                G = nx.from_numpy_array(ad)
-                # laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
-                laplacian_matrix = laplacian(ad, normed=True)
-                eigenvalues, eigenvector = eigsh(laplacian_matrix)
-                eig = feat.T @ eigenvector @ eigenvector.T @ feat
-                trace = np.trace(eig) / feat.shape[1]
-                eigtrace_list.append(trace)
-
-                # The largest eigenvalue is the spectral radius
-                spectral_radius = max(eigenvalues)
-                spe_list.append(spectral_radius)
-                # spectral_min = min(eigenvalues[eigenvalues > 0])
-
-                # cluster_coefficient = nx.average_clustering(G)
-                # clu_list.append(cluster_coefficient)
-
-                density = nx.density(G)
-                den_list.append(density)
-                # sparsity = 1 - density
-
-                homophily = calculate_homophily(label, ad)
-                hom_list.append(homophily)
-                db_index = davies_bouldin_score(feat, label)
-                db_list.append(db_index)
-                ad = gcn_normalize_adj(ad)
-
-                db_index_agg = davies_bouldin_score(ad @ ad @ feat, label)
-                db_agg_list.append(db_index_agg)
-            spe_list = np.array(spe_list)
-            eigtrace_list = np.array(eigtrace_list)
-            clu_list = np.array(clu_list)
-            den_list = np.array(den_list)
-            hom_list = np.array(hom_list)
-            db_list = np.array(db_list)
-            db_agg_list = np.array(db_agg_list)
-            args.logger.info(f"Average Density %: {np.mean(den_list) * 100}")
-            args.logger.info(f"Average LapSpaceTrace: {np.mean(eigtrace_list)}")
-            args.logger.info(f"Average Spectral Radius: {np.mean(spe_list)}")
-            # args.logger.info(f"Average Cluster Coefficient: {np.mean(clu_list)}")
-            args.logger.info(f"Average Homophily: {np.mean(hom_list)}")
-            args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
-            args.logger.info(f"Average Davies-Bouldin Index AGG: {np.mean(db_agg_list)}")
-
-
-        else:
-            G = nx.from_numpy_array(adj)
-
-            laplacian_matrix = nx.laplacian_matrix(G).astype(np.float32)
-
-            # Compute the largest eigenvalue using sparse linear algebra
-            k = 1  # number of eigenvalues and eigenvectors to compute
-            eigenvalues, eigenvector = eigsh(laplacian_matrix, k=k, which='LM')
-            eig = feat.T @ eigenvector @ eigenvector.T @ feat
-            trace = np.trace(eig) / feat.shape[1]
-
-            # The largest eigenvalue is the spectral radius
-            spectral_radius = max(eigenvalues)
-            # spectral_min = min(eigenvalues[eigenvalues > 0])
-
-            cluster_coefficient = nx.average_clustering(G)
-
-            density = nx.density(G)
-            # sparsity = 1 - density
-
-            homophily = calculate_homophily(label, adj)
-            db_index = davies_bouldin_score(feat, label)
-            adj = gcn_normalize_adj(adj)
-
-            db_index_agg = davies_bouldin_score(adj @ adj @ feat, label)
-            # print("Degree Distribution:", degree_distribution)
-            args.logger.info(f"Density %: {density * 100}")
-            args.logger.info(f"LapSpaceTrace: {trace}")
-            args.logger.info(f"Spectral Radius: {spectral_radius}")
-            # print("Spectral Min:", spectral_min)
-            # args.logger.info(f"Cluster Coefficient: {cluster_coefficient}")
-            # print("Density:", density)
-            args.logger.info(f"Homophily: {homophily}")
-            args.logger.info(f"Davies-Bouldin Index: {db_index}")
-            args.logger.info(f"Davies-Bouldin Index AGG: {db_index_agg}")
+        return self._report(True)
 
     def graph_property_no_structure(self):
-        args = self.args
-        adj, feat, label = self.adj, self.feat, self.label
-        db_list = []
-        if len(adj.shape) == 3:
-            for i in range(adj.shape[0]):
-                db_index = davies_bouldin_score(feat, label)
-                db_list.append(db_index)
-
-            db_list = np.array(db_list)
-            args.logger.info(f"Average Davies-Bouldin Index: {np.mean(db_list)}")
-
-        else:
-            db_index = davies_bouldin_score(feat, label)
-            args.logger.info(f"Davies-Bouldin Index: {db_index}")
+        return self._report(False)

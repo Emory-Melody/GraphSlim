@@ -5,7 +5,6 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
 class KCenterAgg(MFCoreSet):
-
     def select(self, embeds):
         idx_selected = []
         for class_id, cnt in self.num_class_dict.items():

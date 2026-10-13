@@ -1,0 +1,48 @@
+{
+  "sources": {
+    "GECC": {
+      "url": "https://arxiv.org/html/2502.17614",
+      "section": "5.1 Implementation Details",
+      "grid": {"alpha_0": [-0.3, 0.9, 0.1], "alpha_1": [-0.3, 0.9, 0.1], "alpha_2": [-0.3, 0.9, 0.1], "weight_decay": [0.0005, 0.001]},
+      "scope": "Yelp is not in the paper; this applies the documented large-dataset search to a new dataset"
+    },
+    "GC4NC": {
+      "url": "https://arxiv.org/html/2406.16715v3",
+      "section": "A.8.2 Table 11",
+      "grid": {"hidden": [64, 128, 256], "lr": [0.01, 0.001], "nlayers": [2, 3, 4], "weight_decay": [0, 0.0005, 0.001], "dropout": [0, 0.5]},
+      "scope": "Downstream GCN search, not condensation algorithm hyperparameters"
+    },
+    "SimGC": {
+      "url": "https://arxiv.org/html/2403.14951",
+      "section": "5.1 Hyperparameter Settings",
+      "official_repository": "https://github.com/BangHonor/SimGC",
+      "commit": "1b3d1d59d9afaf2c9c0c7b652fb183db2a5ffa01",
+      "code_evidence": {
+        "synthetic_alignment_gradient": "SimGC_transductive.py:234-238; SimGC_inductive.py:226-230: synthetic propagation is not detached",
+        "smoothness_sign": "SimGC_transductive.py:228; SimGC_inductive.py:222: negative weighted mean RBF similarity; paper Eq. 6 writes positive similarity, so the port follows released code here",
+        "teacher_order": "models/sgc_multi.py:76-84: propagation precedes MLP",
+        "citation_teacher": "SimGC_transductive.py:397: nonlinear SGC, hidden 2048, no dropout/BN, two propagation hops",
+        "learning_rates": "Paper 5.1: Cora/Citeseer lr_feat=0.005, lr_adj=0.001; others 0.05/0.01",
+        "feature_weights_epochs": "scripts/cora.sh:10/1500; scripts/ogbn_arxiv.sh:10/1500; scripts/flickr.sh:5/3500; scripts/reddit2.sh:100/2500",
+        "teacher_lr_epochs": "SimGC_transductive.py defaults: lr=0.001,1000 iterations; scripts/ogbn_arxiv.sh does not override the teacher learning rate. SimGC_inductive.py defaults: lr=0.01,600 iterations",
+        "teacher_weight_decay": "train_teacher() in both original programs constructs Adam with lr only, hence weight_decay=0. The port must not inherit downstream GCN weight decay.",
+        "citation_validation": "SimGC_transductive.py:180: GCN hidden 2048, act=None, dropout=0, norm=None. Adam lr=0.001, weight_decay=0; range(student_model_loop=3000), validation every 100; condensation checkpoints every 100.",
+        "citation_final": "SimGC_transductive.py:453: GCN hidden 1024, act=None, dropout=0, norm=None. Final range(student_model_loop+1) performs 3001 updates; intermediate performs 3000. Teacher range(teacher_model_loop+1) performs 1001 updates, validation every 50.",
+        "citation_initialization": "models/convs/gcn_conv.py:139-151: Glorot weight initialization and zero biases. SGC_Multi uses PyG Linear in the MLP. The port now keeps these citation defaults separate from other methods.",
+        "activation_bug": "BaseGNN previously hardcoded with_relu=True and ignored args.activation. The package now honors None/none/linear and supported activations in dense and sampled forward paths.",
+        "search_baseline": "Future citation searches include the released hidden-1024 baseline alongside the 108 GC4NC parameter combinations; graph selection independently retains author hidden-2048 validation. Old manifests keep their original candidate IDs and source snapshots.",
+        "citation_features": "utils.py:66-80 sets NormalizeFeatures on dataset.transform, but Pyg2Dpr reads dataset.data at line 97 instead of dataset[0]. Thus the released Cora/Citeseer converter receives raw, unnormalized features. Citation configs now set pre_norm=false explicitly to match effective author inputs, not the unused transform flag. Other method defaults are unchanged.",
+        "synthetic_class_counts": "SimGC_transductive.py:81-95 allocates ceil(class_training_count * reduction_rate) per class. SimGC now uses this author rule rather than the generic floor-based total budget; other methods retain their allocation rules."
+      },
+      "scope": "No condensation search grid is specified. Pubmed and Yelp are not paper datasets: use common transductive/inductive defaults and mark as extensions. Downstream tuning uses GC4NC Table 11."
+    }
+  },
+  "scientific_repairs": [
+    "SimGC differentiable synthetic alignment, author-code smoothness sign, propagate-before-predict teacher and normalized validation",
+    "GECC inductive propagation depth includes second hop; static hard clustering uses k-means++ rather than random initialization",
+    "BaseGNN restores train mode after each validation, so dropout remains active in GCN HPO",
+    "Citation activation/profile repair: preserve method-provided budgets; separate teacher, condensation validation and final evaluation; match released validation cadence and GCN initialization",
+    "Match effective raw Cora/Citeseer features and SimGC per-class ceiling allocation from the released implementation"
+  ],
+  "interpretation": "New repaired-and-tuned local batch, not a hyperparameter-only comparison or exact paper replay. Published and prior untuned results retained."
+}

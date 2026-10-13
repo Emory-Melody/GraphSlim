@@ -9,18 +9,26 @@ from torch_geometric.utils import to_undirected, to_dense_adj, remove_self_loops
 from torch_sparse import SparseTensor
 import networkit as nk
 from torch_geometric.data import Data, HeteroData
-import dgl
 
 
 def from_dgl(g, name, hetero=True):
     if g.is_homogeneous:
         data = Data()
         data.edge_index = torch.stack(g.edges(), dim=0)
+        data.num_nodes = g.num_nodes()
 
         for attr, value in g.ndata.items():
             data[attr] = value
         for attr, value in g.edata.items():
             data[attr] = value
+        for key in ("feature", "feat", "x"):
+            if key in g.ndata:
+                data.x = g.ndata[key]
+                break
+        if "label" in g.ndata:
+            data.y = g.ndata["label"]
+        if "weight" in g.edata:
+            data.edge_weight = g.edata["weight"]
 
         return data
 
@@ -28,14 +36,22 @@ def from_dgl(g, name, hetero=True):
     data.name = name
 
     for node_type in g.ntypes:
+        data[node_type].num_nodes = g.num_nodes(node_type)
         for attr, value in g.nodes[node_type].data.items():
             data[node_type][attr] = value
 
     for edge_type in g.canonical_etypes:
         row, col = g.edges(form="uv", etype=edge_type)
         data[edge_type].edge_index = torch.stack([row, col], dim=0)
-        for attr, value in g.edge_attr_schemes(edge_type).items():
+        for attr, value in g.edges[edge_type].data.items():
             data[edge_type][attr] = value
+
+    if hetero:
+        return data
+    if len(g.ntypes) != 1:
+        raise ValueError(
+            "Flattening a DGL graph with multiple node types requires an explicit node-ID mapping; use hetero=True."
+        )
 
     data_out = Data()
     if not hetero:
@@ -43,34 +59,41 @@ def from_dgl(g, name, hetero=True):
         for edge_type in g.canonical_etypes:
             edge_index_list.append(data[edge_type].edge_index)
         data_out.edge_index = add_self_loops(torch.cat(edge_index_list, dim=1))[0]
-        data_out.x = data.node_stores[0]['feature']  # Features for each node
+        feature_key = "feature" if "feature" in data.node_stores[0] else "feat"
+        data_out.x = data.node_stores[0][feature_key]  # Features for each node
         # Assigning labels to data_out
-        data_out.y = data.node_stores[0]['label']  # Labels for each node
+        data_out.y = data.node_stores[0]["label"]  # Labels for each node
 
         # Assuming the train, validation, and test masks are also in node_stores[0]
-        #data_out.train_mask = data.node_stores[0]['train_mask']  # Training mask
-        #data_out.val_mask = data.node_stores[0].get('val_mask', None)  # Optional: Validation mask (if exists)
-        #data_out.test_mask = data.node_stores[0]['test_mask']  # Test mask
+        # data_out.train_mask = data.node_stores[0]['train_mask']  # Training mask
+        # data_out.val_mask = data.node_stores[0].get('val_mask', None)  # Optional: Validation mask (if exists)
+        # data_out.test_mask = data.node_stores[0]['test_mask']  # Test mask
 
     data_out.num_nodes = len(data_out.x)
     data_out.num_classes = max(data_out.y).item() + 1
 
     return data_out
+
+
 def pyg2gsp(edge_index):
-    G = graphs.Graph(W=to_dense_adj(to_undirected(edge_index))[0])
+    G = graphs.Graph(to_dense_adj(to_undirected(edge_index))[0])
     return G
 
 
 def csr2ei(adjacency_matrix_csr):
     adjacency_matrix_coo = adjacency_matrix_csr.tocoo()
     # Convert numpy arrays directly to a tensor
-    edge_index = torch.tensor(np.vstack([adjacency_matrix_coo.row, adjacency_matrix_coo.col]), dtype=torch.long)
+    edge_index = torch.tensor(
+        np.vstack([adjacency_matrix_coo.row, adjacency_matrix_coo.col]), dtype=torch.long
+    )
     return edge_index
 
 
 def ei2csr(edge_index, num_nodes):
     edge_index = edge_index.numpy()
-    scoo = coo_matrix((np.ones_like(edge_index[0]), (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes))
+    scoo = coo_matrix(
+        (np.ones_like(edge_index[0]), (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes)
+    )
     adjacency_matrix_csr = scoo.tocsr()
     return adjacency_matrix_csr
 
@@ -124,20 +147,28 @@ def pyg_to_networkit(pyg_graph):
 
     # Add edges to the Networkit graph
     edge_index = pyg_graph.edge_index.numpy()
-    if hasattr(pyg_graph, 'edge_attr') and pyg_graph.edge_attr is not None:
+    if hasattr(pyg_graph, "edge_attr") and pyg_graph.edge_attr is not None:
         edge_attr = pyg_graph.edge_attr.numpy()
-        graph = nk.GraphFromCoo(inputData=(edge_attr, (edge_index[0], edge_index[1])), n=pyg_graph.num_nodes,
-                                weighted=True, directed=False)
+        graph = nk.GraphFromCoo(
+            inputData=(edge_attr, (edge_index[0], edge_index[1])),
+            n=pyg_graph.num_nodes,
+            weighted=True,
+            directed=False,
+        )
     else:
-        graph = nk.GraphFromCoo(inputData=((edge_index[0], edge_index[1])), n=pyg_graph.num_nodes,
-                                weighted=False, directed=False)
+        graph = nk.GraphFromCoo(
+            inputData=((edge_index[0], edge_index[1])),
+            n=pyg_graph.num_nodes,
+            weighted=False,
+            directed=False,
+        )
 
     graph.indexEdges()
 
     return graph
 
 
-def loadSparseGraph(dataset_name):
+def loadSparseGraph(dataset_name, load_path="../data"):
     """Load original graph from file from paper
     CHEN Y, YE H, VEDULA S, et al. Demystifying graph sparsification algorithms in graph properties preservation[M/OL].
 
@@ -168,9 +199,16 @@ def loadSparseGraph(dataset_name):
     #         originalGraph = nk.readGraph(f"../data/{dataset_name}/raw/uduw.el", nk.Format.EdgeListSpaceZero,
     #                                      directed=False)
 
-    nk.overview(originalGraph)
-    nk.graph.Graph.indexEdges(originalGraph)
+    from pathlib import Path
+
+    graph = nk.readGraph(
+        str(Path(load_path) / dataset_name / "raw" / "uduw.el"),
+        nk.Format.EdgeListSpaceZero,
+        directed=False,
+    )
+    graph.indexEdges()
     return graph
+
 
 # class Pyg2Dpr(Dataset):
 # def __init__(self, pyg_data, **kwargs):

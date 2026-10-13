@@ -1,0 +1,20 @@
+{
+  "epochs": 100,
+  "clustgdd_prop_steps": 5,
+  "clustgdd_alpha": 0.8,
+  "clustgdd_hidden": 256,
+  "clustgdd_layers": 2,
+  "clustgdd_dropout": 0.6,
+  "clustgdd_pre_epochs": 80,
+  "clustgdd_pre_lr": 0.01,
+  "clustgdd_pre_wd": 0.0,
+  "clustgdd_sampling_ratio": 0.4,
+  "clustgdd_post_steps": 2,
+  "clustgdd_post_lr": 0.01,
+  "clustgdd_post_wd": 0.0005,
+  "clustgdd_feature_lr": 0.0001,
+  "clustgdd_refinement_scale": 0.01,
+  "clustgdd_prediction_weight": 1.0,
+  "clustgdd_consistency_weight": 0.1,
+  "clustgdd_temperature": 0.5
+}

@@ -4,3 +4,15 @@
 *.out
 checkpoints/
 dist/
+.venv/
+.venv-gpu/
+runs/
+build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+data/
+*.egg-info/
+.env

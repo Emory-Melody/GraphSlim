@@ -1,8 +1,11 @@
 {
-  "lr_feat": 0.005,
-  "lr_adj": 0.001,
-  "lr_teacher": 1e-5,
+  "lr_feat": 0.05,
+  "lr_adj": 0.01,
+  "lr_teacher": 0.01,
+  "teacher_epochs": 600,
+  "feat_alpha": 100,
+  "smoothness_alpha": 0.1,
   "threshold": 0.01,
   "condense_model": "SGC",
-  "epochs": 5000
+  "epochs": 2500
 }

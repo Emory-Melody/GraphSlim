@@ -1,3 +1,4 @@
+from graphslim.models import get_model_class
 from torch import nn
 from tqdm import trange
 
@@ -15,6 +16,7 @@ class MSGC(GCondBase):
     """
     "Multiple sparse graphs condensation" https://www.sciencedirect.com/science/article/pii/S0950705123006548
     """
+
     def __init__(self, setting, data, args, **kwargs):
         super(MSGC, self).__init__(setting, data, args, **kwargs)
         x_channels = data.feat_train.shape[1]
@@ -26,7 +28,9 @@ class MSGC(GCondBase):
         self.n_classes = data.nclass
         self.device = args.device
 
-        self.num_class_dict = self.data.num_class_dict = {index: value for index, value in enumerate(n_each_y)}
+        self.num_class_dict = self.data.num_class_dict = {
+            index: value for index, value in enumerate(n_each_y)
+        }
 
         self.pge = nn.Sequential(
             nn.Linear(x_channels * 2, edge_hidden_channels),
@@ -35,7 +39,7 @@ class MSGC(GCondBase):
             nn.Linear(edge_hidden_channels, edge_hidden_channels),
             nn.BatchNorm1d(edge_hidden_channels),
             nn.ReLU(),
-            nn.Linear(edge_hidden_channels, 1)
+            nn.Linear(edge_hidden_channels, 1),
         ).to(args.device)
 
     def generate_labels_syn(self, data):
@@ -55,27 +59,32 @@ class MSGC(GCondBase):
         start = 0
         starts = torch.zeros_like(n_each_y)
         for c in range(data.nclass):
-            y_syn[start:start + n_each_y[c]] = c
+            y_syn[start : start + n_each_y[c]] = c
             starts[c] = start
             start += n_each_y[c]
         self.y_syn = y_syn
         if self.args.verbose:
-            print(f'num_class:{n_each_y}')
+            print(f"num_class:{n_each_y}")
         return n_each_y
 
     def reduce(self, data, verbose=True):
 
         args = self.args
-        if args.setting == 'trans':
-            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        if args.setting == "trans":
+            features, adj, labels = to_tensor(
+                data.feat_full, data.adj_full, label=data.labels_full, device=self.device
+            )
         else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
-                                              device=self.device)
+            features, adj, labels = to_tensor(
+                data.feat_train, data.adj_train, label=data.labels_train, device=self.device
+            )
 
         adj = normalize_adj_tensor(adj, sparse=True)
         y_syn = to_tensor(label=self.y_syn, device=self.device).repeat(self.batch_size)
         # assert args.condense_model != 'GAT'
-        basic_model = eval(args.condense_model)(self.feat_syn.shape[1], args.hidden, data.nclass, args).to(self.device)
+        basic_model = get_model_class(args.condense_model)(
+            self.feat_syn.shape[1], args.hidden, data.nclass, args
+        ).to(self.device)
 
         self.reset_adj_batch()
         feat_init = self.init()
@@ -119,13 +128,15 @@ class MSGC(GCondBase):
                     inner_loss = F.nll_loss(logits, y_syn)
                     inner_loss.backward()
                     optimizer_basic_model.step()
-            loss_avg /= (data.nclass * args.outer_loop)
+            loss_avg /= data.nclass * args.outer_loop
             losses.append(loss_avg)
             x_syns.append(x_syn.clone())
             adj_t_syns.append(adj_t_syn.clone())
             loss_window = sum(losses.data) / len(losses.data)
             if args.verbose:
-                print(f'loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}')
+                print(
+                    f"loss:{loss_window:.4f} feat:{x_syn.sum().item():.4f} adj:{adj_t_syn.sum().item():.4f}"
+                )
             if it in args.checkpoints:
                 best_x_syn = sum(x_syns.data) / len(x_syns.data)
                 best_adj_t_syn = sum(adj_t_syns.data) / len(adj_t_syns.data)
@@ -202,7 +213,9 @@ class MSGC(GCondBase):
                         col_id = index[c_mask][selected].item()
                     else:
                         candidates = index[c_mask][candidates_mask]
-                        col_id = candidates[torch.randperm(candidates.shape[0], device=self.device)[0]].item()
+                        col_id = candidates[
+                            torch.randperm(candidates.shape[0], device=self.device)[0]
+                        ].item()
                     n_neighbor[row_id, c] += 1
                     n_neighbor[col_id, self.y_syn[row_id]] += 1
                     row.append(row_id)
@@ -218,18 +231,21 @@ class MSGC(GCondBase):
         self.batch = torch.cat(batch).to(self.device)
         n_edge = self.rows.shape[0] / self.batch_size / 2
         if self.args.verbose:
-            print(f'n_edge:{n_edge}')
+            print(f"n_edge:{n_edge}")
 
     def get_adj_t_syn(self):
         adj = torch.zeros(size=(self.batch_size, self.n_syn, self.n_syn), device=self.device)
-        adj[self.batch, self.rows, self.cols] = torch.sigmoid(self.pge(
-            torch.cat([self.feat_syn[self.rows], self.feat_syn[self.cols]], dim=1)).flatten())
+        adj[self.batch, self.rows, self.cols] = torch.sigmoid(
+            self.pge(
+                torch.cat([self.feat_syn[self.rows], self.feat_syn[self.cols]], dim=1)
+            ).flatten()
+        )
         adj = (torch.transpose(adj, 1, 2) + adj) / 2
 
         adj += torch.eye(self.n_syn, device=self.device).view(1, self.n_syn, self.n_syn)
         deg = adj.sum(2)
         deg_inv = deg.pow(-1 / 2)
-        deg_inv[torch.isinf(deg_inv)] = 0.
+        deg_inv[torch.isinf(deg_inv)] = 0.0
         adj = adj * deg_inv.view(self.batch_size, -1, 1)
         adj = adj * deg_inv.view(self.batch_size, 1, -1)
         return adj

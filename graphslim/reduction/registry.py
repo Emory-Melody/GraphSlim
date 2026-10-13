@@ -57,19 +57,35 @@ _METHODS: Dict[str, MethodSpec] = {
         "HerdingAgg",
     ),
     "random": MethodSpec("random", "sparsification", "graphslim.sparsification.random", "Random"),
-    "cent_p": MethodSpec("cent_p", "sparsification", "graphslim.sparsification.cent_pagerank", "CentP"),
-    "cent_d": MethodSpec("cent_d", "sparsification", "graphslim.sparsification.cent_degree", "CentD"),
+    "cent_p": MethodSpec(
+        "cent_p", "sparsification", "graphslim.sparsification.cent_pagerank", "CentP"
+    ),
+    "cent_d": MethodSpec(
+        "cent_d", "sparsification", "graphslim.sparsification.cent_degree", "CentD"
+    ),
     # Sparsification: edge methods.
-    "random_edge": MethodSpec("random_edge", "sparsification", "graphslim.sparsification.random_edge", "RandomEdge"),
+    "random_edge": MethodSpec(
+        "random_edge", "sparsification", "graphslim.sparsification.random_edge", "RandomEdge"
+    ),
     "spanning_forest": MethodSpec(
-        "spanning_forest", "sparsification", "graphslim.sparsification.spanning_forest", "SpanningForest"
+        "spanning_forest",
+        "sparsification",
+        "graphslim.sparsification.spanning_forest",
+        "SpanningForest",
     ),
     "g_spar": MethodSpec("g_spar", "sparsification", "graphslim.sparsification.g_spar", "GSpar"),
-    "local_degree": MethodSpec("local_degree", "sparsification", "graphslim.sparsification.local_degree", "LocalDegree"),
-    "rank_degree": MethodSpec("rank_degree", "sparsification", "graphslim.sparsification.rank_degree", "RankDegree"),
+    "local_degree": MethodSpec(
+        "local_degree", "sparsification", "graphslim.sparsification.local_degree", "LocalDegree"
+    ),
+    "rank_degree": MethodSpec(
+        "rank_degree", "sparsification", "graphslim.sparsification.rank_degree", "RankDegree"
+    ),
     "scan": MethodSpec("scan", "sparsification", "graphslim.sparsification.scan", "Scan"),
-    "t_spanner": MethodSpec("t_spanner", "sparsification", "graphslim.sparsification.t_spanner", "TSpanner"),
+    "t_spanner": MethodSpec(
+        "t_spanner", "sparsification", "graphslim.sparsification.t_spanner", "TSpanner"
+    ),
     # Coarsening methods.
+    "nope": MethodSpec("nope", "coarsening", "graphslim.coarsening.nope", "NOPE"),
     "vng": MethodSpec("vng", "coarsening", "graphslim.coarsening.vng", "VNG"),
     "clustering": MethodSpec(
         "clustering",
@@ -86,18 +102,36 @@ _METHODS: Dict[str, MethodSpec] = {
         "graphslim.coarsening.variation_neighborhoods",
         "VariationNeighborhoods",
     ),
-    "variation_edges": MethodSpec("variation_edges", "coarsening", "graphslim.coarsening.variation_edges", "VariationEdges"),
-    "variation_cliques": MethodSpec(
-        "variation_cliques", "coarsening", "graphslim.coarsening.variation_cliques", "VariationCliques"
+    "variation_edges": MethodSpec(
+        "variation_edges", "coarsening", "graphslim.coarsening.variation_edges", "VariationEdges"
     ),
-    "heavy_edge": MethodSpec("heavy_edge", "coarsening", "graphslim.coarsening.heavy_edge", "HeavyEdge"),
-    "algebraic_jc": MethodSpec("algebraic_jc", "coarsening", "graphslim.coarsening.algebraic_jc", "AlgebraicJc"),
-    "affinity_gs": MethodSpec("affinity_gs", "coarsening", "graphslim.coarsening.affinity_gs", "AffinityGs"),
+    "variation_cliques": MethodSpec(
+        "variation_cliques",
+        "coarsening",
+        "graphslim.coarsening.variation_cliques",
+        "VariationCliques",
+    ),
+    "heavy_edge": MethodSpec(
+        "heavy_edge", "coarsening", "graphslim.coarsening.heavy_edge", "HeavyEdge"
+    ),
+    "algebraic_jc": MethodSpec(
+        "algebraic_jc", "coarsening", "graphslim.coarsening.algebraic_jc", "AlgebraicJc"
+    ),
+    "affinity_gs": MethodSpec(
+        "affinity_gs", "coarsening", "graphslim.coarsening.affinity_gs", "AffinityGs"
+    ),
     "kron": MethodSpec("kron", "coarsening", "graphslim.coarsening.kron", "Kron"),
     # Condensation methods.
+    "cgc": MethodSpec("cgc", "condensation", "graphslim.condensation.cgc", "CGC"),
+    "clustgdd": MethodSpec(
+        "clustgdd", "condensation", "graphslim.condensation.clustgdd", "ClustGDD"
+    ),
+    "gcgp": MethodSpec("gcgp", "condensation", "graphslim.condensation.gcgp", "GCGP"),
     "gcond": MethodSpec("gcond", "condensation", "graphslim.condensation.gcond", "GCond"),
     "doscond": MethodSpec("doscond", "condensation", "graphslim.condensation.doscond", "DosCond"),
-    "doscondx": MethodSpec("doscondx", "condensation", "graphslim.condensation.doscondx", "DosCondX"),
+    "doscondx": MethodSpec(
+        "doscondx", "condensation", "graphslim.condensation.doscondx", "DosCondX"
+    ),
     "gcondx": MethodSpec("gcondx", "condensation", "graphslim.condensation.gcondx", "GCondX"),
     "sfgc": MethodSpec("sfgc", "condensation", "graphslim.condensation.sfgc", "SFGC"),
     "sgdd": MethodSpec("sgdd", "condensation", "graphslim.condensation.sgdd", "SGDD"),
@@ -124,7 +158,9 @@ def get_method_spec(method: str) -> MethodSpec:
         return _METHODS[key]
     except KeyError as exc:
         choices = ", ".join(sorted(_METHODS))
-        raise ValueError(f"Unknown graph reduction method '{method}'. Available methods: {choices}") from exc
+        raise ValueError(
+            f"Unknown graph reduction method '{method}'. Available methods: {choices}"
+        ) from exc
 
 
 def list_methods(family: Optional[str] = None) -> Iterable[str]:

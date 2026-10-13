@@ -56,7 +56,9 @@ def draw_graph_pair(
     return fig, axes
 
 
-def load_reduced_graph(adj_path: str, feat_path: Optional[str] = None, label_path: Optional[str] = None):
+def load_reduced_graph(
+    adj_path: str, feat_path: Optional[str] = None, label_path: Optional[str] = None
+):
     from torch_geometric.data import Data
 
     adj = torch.load(adj_path, map_location="cpu")

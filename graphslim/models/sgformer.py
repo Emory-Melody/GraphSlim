@@ -33,21 +33,23 @@ def normalize_adj(adj):
 
         # Compute degree for normalization
         d = degree(col, N).float()
-        d_norm_in = (1. / d[col]).sqrt()
-        d_norm_out = (1. / d[row]).sqrt()
+        d_norm_in = (1.0 / d[col]).sqrt()
+        d_norm_out = (1.0 / d[row]).sqrt()
 
         # Normalize the values directly
         normalized_values = values * d_norm_in * d_norm_out
         normalized_values = torch.nan_to_num(normalized_values, nan=0.0, posinf=0.0, neginf=0.0)
 
         # Create a new sparse COO tensor with normalized values
-        adj_normalized = torch.sparse_coo_tensor(torch.stack([row, col]), normalized_values, size=(N, N))
+        adj_normalized = torch.sparse_coo_tensor(
+            torch.stack([row, col]), normalized_values, size=(N, N)
+        )
     else:
         N = adj.size(0)
 
         # Compute degree for normalization
         d = adj.sum(dim=1).float()
-        d_norm = torch.diag((1. / d).sqrt())
+        d_norm = torch.diag((1.0 / d).sqrt())
 
         # Normalize the dense adjacency matrix
         adj_normalized = d_norm @ adj @ d_norm
@@ -94,8 +96,18 @@ class GraphConvLayer(nn.Module):
 
 
 class GraphConv(nn.Module):
-    def __init__(self, in_channels, hidden_channels, num_layers=2, dropout=0.5, use_bn=True, use_residual=True,
-                 use_weight=True, use_init=False, use_act=True):
+    def __init__(
+        self,
+        in_channels,
+        hidden_channels,
+        num_layers=2,
+        dropout=0.5,
+        use_bn=True,
+        use_residual=True,
+        use_weight=True,
+        use_init=False,
+        use_act=True,
+    ):
         super(GraphConv, self).__init__()
 
         self.convs = nn.ModuleList()
@@ -106,7 +118,8 @@ class GraphConv(nn.Module):
         self.bns.append(nn.BatchNorm1d(hidden_channels))
         for _ in range(num_layers):
             self.convs.append(
-                GraphConvLayer(hidden_channels, hidden_channels, use_weight, use_init))
+                GraphConvLayer(hidden_channels, hidden_channels, use_weight, use_init)
+            )
             self.bns.append(nn.BatchNorm1d(hidden_channels))
 
         self.dropout = dropout
@@ -147,14 +160,11 @@ class GraphConv(nn.Module):
 
 
 class TransConvLayer(nn.Module):
-    '''
+    """
     transformer with fast attention
-    '''
+    """
 
-    def __init__(self, in_channels,
-                 out_channels,
-                 num_heads,
-                 use_weight=True):
+    def __init__(self, in_channels, out_channels, num_heads, use_weight=True):
         super().__init__()
         self.Wk = nn.Linear(in_channels, out_channels * num_heads)
         self.Wq = nn.Linear(in_channels, out_channels * num_heads)
@@ -191,13 +201,15 @@ class TransConvLayer(nn.Module):
         attention_num += N * vs
 
         # denominator
-        all_ones = torch.ones([ks.shape[0]]).to(ks.device)
+        # Identical constants; avoid a pageable CPU->GPU transfer inside capture.
+        all_ones = torch.ones([ks.shape[0]], device=ks.device)
         ks_sum = torch.einsum("lhm,l->hm", ks, all_ones)
         attention_normalizer = torch.einsum("nhm,hm->nh", qs, ks_sum)  # [N, H]
 
         # attentive aggregated results
         attention_normalizer = torch.unsqueeze(
-            attention_normalizer, len(attention_normalizer.shape))  # [N, H, 1]
+            attention_normalizer, len(attention_normalizer.shape)
+        )  # [N, H, 1]
         attention_normalizer += torch.ones_like(attention_normalizer) * N
         attn_output = attention_num / attention_normalizer  # [N, H, D]
 
@@ -216,8 +228,18 @@ class TransConvLayer(nn.Module):
 
 
 class TransConv(nn.Module):
-    def __init__(self, in_channels, hidden_channels, num_layers=2, num_heads=1,
-                 dropout=0.5, use_bn=True, use_residual=True, use_weight=True, use_act=True):
+    def __init__(
+        self,
+        in_channels,
+        hidden_channels,
+        num_layers=2,
+        num_heads=1,
+        dropout=0.5,
+        use_bn=True,
+        use_residual=True,
+        use_weight=True,
+        use_act=True,
+    ):
         super().__init__()
 
         self.convs = nn.ModuleList()
@@ -227,7 +249,10 @@ class TransConv(nn.Module):
         self.bns.append(nn.LayerNorm(hidden_channels))
         for i in range(num_layers):
             self.convs.append(
-                TransConvLayer(hidden_channels, hidden_channels, num_heads=num_heads, use_weight=use_weight))
+                TransConvLayer(
+                    hidden_channels, hidden_channels, num_heads=num_heads, use_weight=use_weight
+                )
+            )
             self.bns.append(nn.LayerNorm(hidden_channels))
 
         self.dropout = dropout
@@ -261,7 +286,7 @@ class TransConv(nn.Module):
             # graph convolution with full attention aggregation
             x = conv(x, x)
             if self.use_residual:
-                x = (x + layer_[i]) / 2.
+                x = (x + layer_[i]) / 2.0
             if self.use_bn:
                 x = self.bns[i + 1](x)
             if self.use_act:
@@ -282,7 +307,7 @@ class TransConv(nn.Module):
             x, attn = conv(x, x, output_attn=True)
             attentions.append(attn)
             if self.use_residual:
-                x = (x + layer_[i]) / 2.
+                x = (x + layer_[i]) / 2.0
             if self.use_bn:
                 x = self.bns[i + 1](x)
             if self.use_act:
@@ -292,46 +317,83 @@ class TransConv(nn.Module):
 
 
 class SGFormer(nn.Module):
-    def __init__(self, in_channels, hidden_channels, out_channels, args, mode='eval',
-                 trans_num_layers=3, trans_num_heads=1, trans_dropout=0.2, trans_weight_decay=0.001, trans_use_bn=False,
-                 trans_use_residual=True,
-                 trans_use_weight=False, trans_use_act=False,
-                 gnn_num_layers=2, gnn_dropout=0.5, gnn_use_weight=False, gnn_weight_decay=5e-4, gnn_use_init=False,
-                 gnn_use_bn=False,
-                 gnn_use_residual=False, gnn_use_act=False,
-                 use_graph=True, graph_weight=0.8, aggregate='add'):
+    def __init__(
+        self,
+        in_channels,
+        hidden_channels,
+        out_channels,
+        args,
+        mode="eval",
+        trans_num_layers=3,
+        trans_num_heads=1,
+        trans_dropout=0.2,
+        trans_weight_decay=0.001,
+        trans_use_bn=False,
+        trans_use_residual=True,
+        trans_use_weight=False,
+        trans_use_act=False,
+        gnn_num_layers=2,
+        gnn_dropout=0.5,
+        gnn_use_weight=False,
+        gnn_weight_decay=5e-4,
+        gnn_use_init=False,
+        gnn_use_bn=False,
+        gnn_use_residual=False,
+        gnn_use_act=False,
+        use_graph=True,
+        graph_weight=0.8,
+        aggregate="add",
+    ):
         super().__init__()
+        self.args = args
         self.device = args.device
         self.lr = args.lr
-        if hasattr(args, 'train_weight_decay'):
+        if hasattr(args, "train_weight_decay"):
             self.trans_weight_decay = args.trans_weight_decay
         else:
             self.trans_weight_decay = trans_weight_decay
-        if hasattr(args, 'trans_dropout'):
+        if hasattr(args, "trans_dropout"):
             self.trans_dropout = args.trans_dropout
         else:
             self.trans_dropout = trans_dropout
-        if hasattr(args, 'trans_num_layers'):
+        if hasattr(args, "trans_num_layers"):
             self.trans_num_layers = args.trans_num_layers
         else:
             self.trans_num_layers = trans_num_layers
         self.gnn_weight_decay = gnn_weight_decay
-        self.trans_conv = TransConv(in_channels, hidden_channels, self.trans_num_layers, trans_num_heads,
-                                    self.trans_dropout,
-                                    trans_use_bn, trans_use_residual, trans_use_weight, trans_use_act)
-        self.graph_conv = GraphConv(in_channels, hidden_channels, gnn_num_layers, gnn_dropout, gnn_use_bn,
-                                    gnn_use_residual, gnn_use_weight, gnn_use_init, gnn_use_act)
+        self.trans_conv = TransConv(
+            in_channels,
+            hidden_channels,
+            self.trans_num_layers,
+            trans_num_heads,
+            self.trans_dropout,
+            trans_use_bn,
+            trans_use_residual,
+            trans_use_weight,
+            trans_use_act,
+        )
+        self.graph_conv = GraphConv(
+            in_channels,
+            hidden_channels,
+            gnn_num_layers,
+            gnn_dropout,
+            gnn_use_bn,
+            gnn_use_residual,
+            gnn_use_weight,
+            gnn_use_init,
+            gnn_use_act,
+        )
         self.use_graph = use_graph
         self.graph_weight = graph_weight
 
         self.aggregate = aggregate
 
-        if aggregate == 'add':
+        if aggregate == "add":
             self.fc = nn.Linear(hidden_channels, out_channels)
-        elif aggregate == 'cat':
+        elif aggregate == "cat":
             self.fc = nn.Linear(2 * hidden_channels, out_channels)
         else:
-            raise ValueError(f'Invalid aggregate type:{aggregate}')
+            raise ValueError(f"Invalid aggregate type:{aggregate}")
 
         self.params1 = list(self.trans_conv.parameters())
         self.params2 = list(self.graph_conv.parameters()) if self.graph_conv is not None else []
@@ -341,7 +403,7 @@ class SGFormer(nn.Module):
         x1 = self.trans_conv(x)
         if self.use_graph:
             x2 = self.graph_conv(x, edge_index)
-            if self.aggregate == 'add':
+            if self.aggregate == "add":
                 x = self.graph_weight * x2 + (1 - self.graph_weight) * x1
             else:
                 x = torch.cat((x1, x2), dim=1)
@@ -360,27 +422,58 @@ class SGFormer(nn.Module):
         if self.use_graph:
             self.graph_conv.reset_parameters()
 
-    def fit_with_val(self, data, train_iters=600, verbose=False,
-                     normadj=True, setting='trans', reduced=False, reindex=False,
-                     **kwargs):
+    def fit_with_val(
+        self,
+        data,
+        train_iters=600,
+        verbose=False,
+        normadj=True,
+        setting="trans",
+        reduced=False,
+        reindex=False,
+        **kwargs,
+    ):
+        args = self.args
+        from graphslim.acceleration import CUDAGraphStep
 
         self.reset_parameters()
         # data for training
         if reduced:
-            adj, features, labels, labels_val = to_tensor(data.adj_syn, data.feat_syn, data.labels_syn,
-                                                          label2=data.labels_val,
-                                                          device=self.device)
-        elif setting == 'trans':
-            adj, features, labels, labels_val = to_tensor(data.adj_full, data.feat_full, label=data.labels_train,
-                                                          label2=data.labels_val, device=self.device)
+            adj, features, labels, labels_val = to_tensor(
+                data.adj_syn,
+                data.feat_syn,
+                data.labels_syn,
+                label2=data.labels_val,
+                device=self.device,
+            )
+        elif setting == "trans":
+            adj, features, labels, labels_val = to_tensor(
+                data.adj_full,
+                data.feat_full,
+                label=data.labels_train,
+                label2=data.labels_val,
+                device=self.device,
+            )
         else:
-            adj, features, labels, labels_val = to_tensor(data.adj_train, data.feat_train, label=data.labels_train,
-                                                          label2=data.labels_val, device=self.device)
+            adj, features, labels, labels_val = to_tensor(
+                data.adj_train,
+                data.feat_train,
+                label=data.labels_train,
+                label2=data.labels_val,
+                device=self.device,
+            )
 
         # edge_index = torch.stack([adj.indices()[0], adj.indices()[1]], dim=0).to(self.device)
 
-        labels = to_tensor(label=labels, device=self.device)
-        self.loss = F.nll_loss
+        if labels.ndim == 2:
+            labels = labels.float()
+            if args.eval_loss == "MSE":
+                self.loss = lambda output, target: F.mse_loss(output.exp(), target)
+            else:
+                self.loss = lambda output, target: -(target.softmax(1) * output).sum(1).mean()
+        else:
+            labels = to_tensor(label=labels, device=self.device)
+            self.loss = F.nll_loss
 
         # elif len(data.labels_full.shape) > 1:
         #     self.multi_label = True
@@ -389,42 +482,62 @@ class SGFormer(nn.Module):
         #     self.multi_label = False
         #     self.loss = F.nll_loss
 
-        if reduced or setting == 'ind':
+        if reduced or setting == "ind":
             reindex = True
 
         if verbose:
-            print('=== training ===')
+            print("=== training ===")
 
         best_acc_val = 0
-        if setting == 'ind':
+        if setting == "ind":
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
             feat_full, adj_full = data.feat_full, data.adj_full
         feat_full, adj_full = to_tensor(feat_full, adj_full, device=self.device)
-        optimizer = torch.optim.Adam([
-            {'params': self.params1, 'weight_decay': self.trans_weight_decay},
-            {'params': self.params2, 'weight_decay': self.gnn_weight_decay}
-        ], lr=self.lr)
+        optimizer = torch.optim.Adam(
+            [
+                {"params": self.params1, "weight_decay": self.trans_weight_decay},
+                {"params": self.params2, "weight_decay": self.gnn_weight_decay},
+            ],
+            lr=self.lr,
+        )
 
+        training_index = (
+            torch.as_tensor(data.idx_train, device=self.device)
+            if getattr(args, "cuda_graph", False) and not reindex
+            else data.idx_train
+        )
+
+        def training_loss():
+            output = self.forward(features, adj)
+            return output, self.loss(output if reindex else output[training_index], labels)
+
+        training_step = CUDAGraphStep(
+            training_loss,
+            self.parameters(),
+            args,
+            stage=f"{args.method}.SGFormer.fit",
+            steps=train_iters,
+            modules=(self,),
+            inputs=(features, labels),
+        )
         self.train()
         for i in range(train_iters):
+            self.train()
             optimizer.zero_grad()
-            output = self.forward(features, adj)
-            loss_train = self.loss(output if reindex else output[data.idx_train], labels)
-
-            loss_train.backward()
+            output, loss_train = training_step()
             optimizer.step()
 
             if verbose and i % 100 == 0:
-                print('Epoch {}, training loss: {}'.format(i, loss_train.item()))
+                print("Epoch {}, training loss: {}".format(i, loss_train.item()))
                 acc_train = accuracy(output if reindex else output[data.idx_train], labels)
-                print('Epoch {}, training acc: {}'.format(i, acc_train))
+                print("Epoch {}, training acc: {}".format(i, acc_train))
 
             with torch.no_grad():
                 self.eval()
                 output = self.forward(feat_full, adj_full)
 
-                if setting == 'ind':
+                if setting == "ind":
                     # loss_val = F.nll_loss(output, labels_val)
                     acc_val = accuracy(output, labels_val)
                 else:
@@ -436,12 +549,12 @@ class SGFormer(nn.Module):
                     weights = deepcopy(self.state_dict())
 
         if verbose:
-            print('=== picking the best model according to the performance on validation ===')
+            print("=== picking the best model according to the performance on validation ===")
         self.load_state_dict(weights)
         return best_acc_val
 
     @torch.no_grad()
-    def test(self, data, setting='trans', verbose=False):
+    def test(self, data, setting="trans", verbose=False):
         """Evaluate GCN performance on test set.
         Parameters
         ----------
@@ -453,7 +566,7 @@ class SGFormer(nn.Module):
         labels_test = torch.LongTensor(data.labels_test).to(self.device)
         # whether condensed or not, use the raw graph to test
 
-        if setting == 'ind':
+        if setting == "ind":
             output = self.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
             acc_test = accuracy(output, labels_test)
@@ -463,9 +576,11 @@ class SGFormer(nn.Module):
             acc_test = accuracy(output[idx_test], labels_test)
 
         if verbose:
-            print("Test set results:",
-                  "loss= {:.4f}".format(loss_test.item()),
-                  "accuracy= {:.4f}".format(acc_test.item()))
+            print(
+                "Test set results:",
+                "loss= {:.4f}".format(loss_test.item()),
+                "accuracy= {:.4f}".format(acc_test.item()),
+            )
         return acc_test.item()
 
     @torch.no_grad()

@@ -1,0 +1,363 @@
+{
+  "schema_version": 1,
+  "purpose": "Bounded integration validation, not paper accuracy or repeated benchmark",
+  "run_dir": "runs/lightweight_cora_20261010_v5",
+  "manifest": {
+    "version": 1,
+    "created_utc": "2026-10-10T22:12:28.037718+00:00",
+    "source_sha256": "ffc655aea569996bd8511033a5f1c6c8f268053037cdb16a56a2f55b26cd87d0",
+    "profile": "smoke",
+    "conditions": [
+      "clean",
+      "random_adj",
+      "edge_drop",
+      "random_feat",
+      "feature_mask",
+      "gaussian",
+      "label_noise",
+      "metattack"
+    ],
+    "rate": 0.5,
+    "noise_rate": 0.1,
+    "eval_seeds": [
+      0
+    ],
+    "models": [
+      "GCN",
+      "SGC",
+      "APPNP",
+      "Cheby",
+      "GraphSage",
+      "GAT",
+      "SGFormer"
+    ],
+    "jobs": [
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "clean",
+        "seed": 1,
+        "id": "cora__cgc__clean__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "random_adj",
+        "seed": 1,
+        "id": "cora__cgc__random_adj__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "edge_drop",
+        "seed": 1,
+        "id": "cora__cgc__edge_drop__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "random_feat",
+        "seed": 1,
+        "id": "cora__cgc__random_feat__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "feature_mask",
+        "seed": 1,
+        "id": "cora__cgc__feature_mask__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "gaussian",
+        "seed": 1,
+        "id": "cora__cgc__gaussian__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "label_noise",
+        "seed": 1,
+        "id": "cora__cgc__label_noise__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "cgc",
+        "noise": "metattack",
+        "seed": 1,
+        "id": "cora__cgc__metattack__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "clean",
+        "seed": 1,
+        "id": "cora__clustgdd__clean__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "random_adj",
+        "seed": 1,
+        "id": "cora__clustgdd__random_adj__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "edge_drop",
+        "seed": 1,
+        "id": "cora__clustgdd__edge_drop__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "random_feat",
+        "seed": 1,
+        "id": "cora__clustgdd__random_feat__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "feature_mask",
+        "seed": 1,
+        "id": "cora__clustgdd__feature_mask__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "gaussian",
+        "seed": 1,
+        "id": "cora__clustgdd__gaussian__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "label_noise",
+        "seed": 1,
+        "id": "cora__clustgdd__label_noise__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "clustgdd",
+        "noise": "metattack",
+        "seed": 1,
+        "id": "cora__clustgdd__metattack__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "clean",
+        "seed": 1,
+        "id": "cora__gcgp__clean__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "random_adj",
+        "seed": 1,
+        "id": "cora__gcgp__random_adj__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "edge_drop",
+        "seed": 1,
+        "id": "cora__gcgp__edge_drop__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "random_feat",
+        "seed": 1,
+        "id": "cora__gcgp__random_feat__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "feature_mask",
+        "seed": 1,
+        "id": "cora__gcgp__feature_mask__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "gaussian",
+        "seed": 1,
+        "id": "cora__gcgp__gaussian__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "label_noise",
+        "seed": 1,
+        "id": "cora__gcgp__label_noise__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "gcgp",
+        "noise": "metattack",
+        "seed": 1,
+        "id": "cora__gcgp__metattack__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "clean",
+        "seed": 1,
+        "id": "cora__nope__clean__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "random_adj",
+        "seed": 1,
+        "id": "cora__nope__random_adj__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "edge_drop",
+        "seed": 1,
+        "id": "cora__nope__edge_drop__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "random_feat",
+        "seed": 1,
+        "id": "cora__nope__random_feat__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "feature_mask",
+        "seed": 1,
+        "id": "cora__nope__feature_mask__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "gaussian",
+        "seed": 1,
+        "id": "cora__nope__gaussian__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "label_noise",
+        "seed": 1,
+        "id": "cora__nope__label_noise__s1"
+      },
+      {
+        "dataset": "cora",
+        "method": "nope",
+        "noise": "metattack",
+        "seed": 1,
+        "id": "cora__nope__metattack__s1"
+      }
+    ],
+    "purpose": "integration validation, not a paper reproduction or HPO score",
+    "device": "cpu",
+    "threads": 4
+  },
+  "verification": {
+    "repository_tests_passed": 246,
+    "wheel_method_tests_passed": 112,
+    "author_core_checks_passed": 11,
+    "inference_predictions": 140,
+    "nas_fits": 16,
+    "checkpoint_files": 96,
+    "sphinx_strict": "passed"
+  },
+  "author_core": {
+    "utc": "2026-10-10T22:12:47.425960+00:00",
+    "scope": "core mathematics only; not end-to-end paper training parity",
+    "references": {
+      "CGC": {
+        "commit": "08ff04dc0d23110ff53445438f30bcff887e7c31",
+        "url": "https://github.com/XYGaoG/CGC"
+      },
+      "ClustGDD": {
+        "commit": "60825c536f794e7a3bb0ff22ae4efc07ea2d3e3a",
+        "url": "https://github.com/HKBU-LAGAS/ClustGDD"
+      },
+      "GCGP": {
+        "commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+        "url": "https://github.com/WANGLin0126/GCGP"
+      },
+      "NOPE": {
+        "commit": "9b9ee38b3966ab550ca9c9e5dd6b393aff8f444a",
+        "url": "https://github.com/dazonglian/NOPE-main"
+      }
+    },
+    "checks": {
+      "CGC reconstruction": {
+        "max_absolute_error": 4.440892098500626e-16,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP SGNK": {
+        "max_absolute_error": 4.440892098500626e-16,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP SGNK input gradient": {
+        "max_absolute_error": 8.881784197001252e-16,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP NTK": {
+        "max_absolute_error": 1.7763568394002505e-15,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP SNTK": {
+        "max_absolute_error": 1.0658141036401503e-14,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP GP prediction": {
+        "max_absolute_error": 1.146889250236427e-9,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "GCGP adjacency threshold": {
+        "max_absolute_error": 0,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "ClustGDD graph compression": {
+        "max_absolute_error": 0,
+        "tolerance": 0.000001,
+        "status": "passed"
+      },
+      "ClustGDD consistency": {
+        "max_absolute_error": 0,
+        "tolerance": 1e-8,
+        "status": "passed"
+      },
+      "NOPE interference": {
+        "max_absolute_error": 6.658253965952099e-7,
+        "tolerance": 0.00001,
+        "status": "passed"
+      },
+      "NOPE star interference": {
+        "max_absolute_error": 0,
+        "tolerance": 0.00001,
+        "status": "passed"
+      }
+    }
+  },
+  "summary": {
+    "source_sha256": "ffc655aea569996bd8511033a5f1c6c8f268053037cdb16a56a2f55b26cd87d0",
+    "complete": 32,
+    "failed": 0,
+    "downstream_fits": 224,
+    "inference_predictions": 140,
+    "nas_fits": 16,
+    "verified_checkpoint_files": 96,
+    "model_cells": 224
+  },
+  "scores": "benchmark/results/lightweight_integration.csv"
+}

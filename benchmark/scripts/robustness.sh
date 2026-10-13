@@ -1,15 +1,6 @@
-# Robustness
-for method in random kcenter gcondx geom gcond; do
-  for dataset in cora citeseer flickr; do
-    for attack in metattack random_adj random_feat; do
-     python ../train_all.py -M $method -D $dataset -A $attack -P 0.5
-    done
-  done
-done
-
-# Whole results
-for dataset in cora citeseer flickr; do
-  for attack in metattack random_adj random_feat; do
-   python ../train_all.py -M $method -D $dataset -A $attack -P 0.5 -W
-  done
-done
+#!/usr/bin/env bash
+set -euo pipefail
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_dir="$(cd -- "$script_dir/../.." && pwd)"
+cd "$repo_dir"
+exec "${PYTHON:-python}" -m benchmark.reproduce robustness "$@"

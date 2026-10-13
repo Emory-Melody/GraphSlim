@@ -5,12 +5,11 @@ import torch.nn.functional as F
 
 
 class PGE(nn.Module):
-
     def __init__(self, nfeat, nnodes, nhid=128, nlayers=3, device=None, args=None):
         super(PGE, self).__init__()
-        if args.dataset in ['ogbn-arxiv', 'arxiv', 'flickr']:
+        if args.dataset in ["ogbn-arxiv", "arxiv", "flickr"]:
             nhid = 256
-        if args.dataset in ['reddit']:
+        if args.dataset in ["reddit"]:
             nhid = 256
             if args.reduction_rate == 0.01:
                 nhid = 128
@@ -27,7 +26,7 @@ class PGE(nn.Module):
         self.layers.append(nn.Linear(nhid, 1))
 
         # edge_index = np.array(list(product(range(nnodes), range(nnodes))))
-        X, Y = np.meshgrid(np.arange(nnodes), np.arange(nnodes),copy=False)
+        X, Y = np.meshgrid(np.arange(nnodes), np.arange(nnodes), copy=False)
         edge_index = np.column_stack((X.ravel(), Y.ravel()))
         self.edge_index = edge_index.T
         self.nnodes = nnodes
@@ -38,14 +37,13 @@ class PGE(nn.Module):
         self.nnodes = nnodes
 
     def forward(self, x, inference=False):
-        if self.args.dataset == 'reddit' and self.args.reduction_rate >= 0.01:
+        if self.args.dataset == "reddit" and self.args.reduction_rate >= 0.01:
             edge_index = self.edge_index
             n_part = 5
             splits = np.array_split(np.arange(edge_index.shape[1]), n_part)
             edge_embed = []
             for idx in splits:
-                tmp_edge_embed = torch.cat([x[edge_index[0][idx]],
-                                            x[edge_index[1][idx]]], axis=1)
+                tmp_edge_embed = torch.cat([x[edge_index[0][idx]], x[edge_index[1][idx]]], axis=1)
                 for ix, layer in enumerate(self.layers):
                     tmp_edge_embed = layer(tmp_edge_embed)
                     if ix != len(self.layers) - 1:
@@ -55,8 +53,7 @@ class PGE(nn.Module):
             edge_embed = torch.cat(edge_embed)
         else:
             edge_index = self.edge_index
-            edge_embed = torch.cat([x[edge_index[0]],
-                                    x[edge_index[1]]], axis=1)
+            edge_embed = torch.cat([x[edge_index[0]], x[edge_index[1]]], axis=1)
             for ix, layer in enumerate(self.layers):
                 edge_embed = layer(edge_embed)
                 if ix != len(self.layers) - 1:

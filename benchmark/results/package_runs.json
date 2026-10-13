@@ -1,0 +1,26 @@
+{
+    "runs": [
+        {
+            "path": "runs/nr_20261009_v2",
+            "format": "nr",
+            "methods": ["clustering", "doscondx", "gcdm", "gecc"],
+            "datasets": ["citeseer", "cora", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp"],
+            "label": "NR batch: fixed GCN, 300 updates"
+        },
+        {
+            "path": "runs/paper_hpo_20261010_v2",
+            "format": "hpo",
+            "methods": ["gecc"],
+            "datasets": ["yelp"],
+            "label": "Completed GECC Yelp paper-grid search"
+        },
+        {
+            "path": "runs/simgc_repaired_hpo_20261010",
+            "format": "hpo",
+            "methods": ["simgc"],
+            "datasets": ["citeseer", "cora", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp"],
+            "label": "Repaired SimGC: fresh reductions and validation-only GCN search"
+        }
+    ],
+    "policy": "Explicit method/dataset source assignment; later entries replace earlier coverage including pending cells. No fallback to superseded SimGC scores; no cross-batch ranking."
+}

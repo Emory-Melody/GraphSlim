@@ -11,16 +11,25 @@ import torch.nn.functional as F
 from ogb.nodeproppred import PygNodePropPredDataset
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
-from torch_geometric.datasets import Planetoid, Coauthor, CitationFull, Amazon, Flickr, Reddit2
+from torch_geometric.datasets import (
+    Planetoid,
+    Coauthor,
+    CitationFull,
+    Amazon,
+    Flickr,
+    Reddit2,
+    HeterophilousGraphDataset,
+)
 from torch_geometric.loader import NeighborSampler
 from torch_geometric.utils import to_undirected, add_self_loops
 from torch_sparse import SparseTensor
-from dgl.data import FraudDataset
 import shutil
+from contextlib import nullcontext
 
 from graphslim.dataset.convertor import ei2csr, csr2ei, from_dgl
 from graphslim.dataset.utils import splits
 from graphslim.utils import index_to_mask, to_tensor
+
 try:
     from torch_geometric.data.data import DataEdgeAttr, DataTensorAttr  # type: ignore
 except ImportError:
@@ -36,37 +45,72 @@ except ImportError:
     torch_serialization = None
 
 
-def get_dataset(name='cora', args=None, load_path='./data'):
+def ogb_cache_context():
+    """Allow only PyG's required storage classes, retaining weights-only loading."""
+    safe_globals = getattr(torch_serialization, "safe_globals", None)
+    classes = [
+        value for value in (DataEdgeAttr, DataTensorAttr, GlobalStorage) if value is not None
+    ]
+    return safe_globals(classes) if callable(safe_globals) else nullcontext()
+
+
+def get_dataset(name="cora", args=None, load_path="./data"):
     path = osp.join(load_path)
     # Create a dictionary that maps standard names to normalized names
-    standard_names = ['flickr', 'reddit', 'dblp', 'cora_ml', 'physics', 'cs', 'cora', 'citeseer', 'pubmed', 'photo',
-                      'computers', 'ogbn-products', 'ogbn-proteins', 'ogbn-papers100m', 'ogbn-arxiv', 'yelp', 'amazon']
-    normalized_names = [name.lower().replace('-', '').replace('_', '') for name in standard_names]
+    standard_names = [
+        "flickr",
+        "reddit",
+        "dblp",
+        "cora_ml",
+        "physics",
+        "cs",
+        "cora",
+        "citeseer",
+        "pubmed",
+        "photo",
+        "computers",
+        "ogbn-products",
+        "ogbn-proteins",
+        "ogbn-papers100m",
+        "ogbn-arxiv",
+        "roman-empire",
+        "amazon-ratings",
+        "yelp",
+        "amazon",
+    ]
+    normalized_names = [name.lower().replace("-", "").replace("_", "") for name in standard_names]
     name_dict = dict(zip(normalized_names, standard_names))
 
     # Normalize the name input
-    normalized_name = name.lower().replace('-', '').replace('_', '')
+    normalized_name = name.lower().replace("-", "").replace("_", "")
 
     if normalized_name in name_dict:
         name = name_dict[normalized_name]  # Transfer to standard name
-        if name in ['flickr']:
-            dataset = Flickr(root=path + '/flickr')
-        elif name in ['reddit']:
-            dataset = Reddit2(root=path + '/reddit')
-        elif name in ['dblp', 'cora_ml', 'cora_full', 'citeseer_full']:
+        if name in ["flickr"]:
+            dataset = Flickr(root=path + "/flickr")
+        elif name in ["reddit"]:
+            dataset = Reddit2(root=path + "/reddit")
+        elif name in ["dblp", "cora_ml", "cora_full", "citeseer_full"]:
             dataset = CitationFull(root=path, name=name)
-        elif name in ['physics', 'cs']:
+        elif name in ["physics", "cs"]:
             dataset = Coauthor(root=path, name=name)
-        elif name in ['cora', 'citeseer', 'pubmed']:
+        elif name in ["cora", "citeseer", "pubmed"]:
             dataset = Planetoid(root=path, name=name)
-        elif name in ['photo', 'computers']:
+        elif name in ["photo", "computers"]:
             dataset = Amazon(root=path, name=name)
-        elif name in ['ogbn-arxiv']:
+        elif name in ["ogbn-arxiv"]:
             dataset = DataGraphSAINT(root=path, dataset=name)
             dataset.num_classes = 40
-        elif name in ['ogbn-products', 'ogbn-proteins', 'ogbn-papers100m']:
-            dataset = PygNodePropPredDataset(name, root=path)
-        elif name in ['yelp', 'amazon']:
+        elif name in ["ogbn-products", "ogbn-proteins", "ogbn-papers100m"]:
+            with ogb_cache_context():
+                dataset = PygNodePropPredDataset(name, root=path)
+        elif name in ["roman-empire", "amazon-ratings"]:
+            dataset = HeterophilousGraphDataset(root=path, name=name)
+        elif name in ["yelp", "amazon"]:
+            try:
+                from dgl.data import FraudDataset
+            except ImportError as exc:
+                raise ImportError("Yelp/Amazon require the optional graphslim[dgl] extra.") from exc
             # dataset = pickle.load(open(f'{path}/{args.dataset}.dat', 'rb'))
             # dataset.num_classes = 2
             dataset = FraudDataset(name, raw_dir=path)
@@ -80,10 +124,27 @@ def get_dataset(name='cora', args=None, load_path='./data'):
     except:
         data = dataset
 
-    # pyg2TransAndInd: add splits
+    if name in ["ogbn-products", "ogbn-proteins", "ogbn-papers100m"]:
+        official = dataset.get_idx_split()
+        for key, source in (("train", "train"), ("val", "valid"), ("test", "test")):
+            setattr(data, f"{key}_mask", index_to_mask(official[source], data.num_nodes))
+        data.y = data.y.squeeze(-1)
+    if name in ["roman-empire", "amazon-ratings"]:
+        split_id = getattr(args, "dataset_split_id", 0)
+        for key in ("train", "val", "test"):
+            masks = getattr(data, f"{key}_mask")
+            if masks.ndim != 2 or not 0 <= split_id < masks.shape[1]:
+                raise ValueError(f"Invalid official split ID {split_id} for {name}")
+            setattr(data, f"{key}_mask", masks[:, split_id].clone())
+
+    # pyg2TransAndInd: preserve provided splits, create only absent splits.
     data = splits(data, args.split)
 
     data = TransAndInd(data, name, args.pre_norm)
+    if name in ["roman-empire", "amazon-ratings"]:
+        data.split_provenance = {"source": "official", "split_id": split_id}
+    elif name in ["ogbn-products", "ogbn-proteins", "ogbn-papers100m"]:
+        data.split_provenance = {"source": "ogb.get_idx_split"}
 
     try:
         data.nclass = dataset.num_classes
@@ -98,9 +159,10 @@ def get_dataset(name='cora', args=None, load_path='./data'):
 
 
 class TransAndInd:
-
     def __init__(self, data, dataset, norm=True):
-        self.class_dict = None  # sample the training data per class when initializing synthetic graph
+        self.class_dict = (
+            None  # sample the training data per class when initializing synthetic graph
+        )
         self.samplers = None
         self.class_dict2 = None  # sample from the same class when training
         self.sparse_adj = None
@@ -108,16 +170,20 @@ class TransAndInd:
         self.feat_full = None
         self.labels_full = None
         self.num_nodes = data.num_nodes
-        self.train_mask, self.val_mask, self.test_mask = data.train_mask, data.val_mask, data.test_mask
+        self.train_mask, self.val_mask, self.test_mask = (
+            data.train_mask,
+            data.val_mask,
+            data.test_mask,
+        )
         self.pyg_saint(data)
-        if dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
+        if dataset in ["flickr", "reddit", "ogbn-arxiv"]:
             self.edge_index = to_undirected(self.edge_index, self.num_nodes)
             feat_train = self.x[data.idx_train]
             scaler = StandardScaler()
             scaler.fit(feat_train)
             self.feat_full = scaler.transform(self.x)
             self.feat_full = torch.from_numpy(self.feat_full).float()
-        if norm and dataset in ['cora', 'citeseer', 'pubmed']:
+        if norm and dataset in ["cora", "citeseer", "pubmed"]:
             self.feat_full = F.normalize(self.feat_full, p=1, dim=1)
         self.idx_train, self.idx_val, self.idx_test = data.idx_train, data.idx_val, data.idx_test
         # self.nclass = max(self.labels_full).item() + 1
@@ -155,7 +221,7 @@ class TransAndInd:
     def pyg_saint(self, data):
         # reference type
         # pyg format use x,y,edge_index
-        if hasattr(data, 'x'):
+        if hasattr(data, "x"):
             self.x = data.x
             self.y = data.y
             self.feat_full = data.x
@@ -164,7 +230,7 @@ class TransAndInd:
             self.edge_index = data.edge_index
             self.sparse_adj = SparseTensor.from_edge_index(data.edge_index)
         # saint format use feat,labels,adj
-        elif hasattr(data, 'feat_full'):
+        elif hasattr(data, "feat_full"):
             self.adj_full = data.adj_full
             self.feat_full = data.feat_full
             self.labels_full = data.labels_full
@@ -179,16 +245,16 @@ class TransAndInd:
         if self.class_dict is None:
             self.class_dict = {}
             for i in range(self.nclass):
-                self.class_dict['class_%s' % i] = (self.labels_train == i)
+                self.class_dict["class_%s" % i] = self.labels_train == i
         idx = np.arange(len(self.labels_train))
-        idx = idx[self.class_dict['class_%s' % c]]
+        idx = idx[self.class_dict["class_%s" % c]]
         return np.random.permutation(idx)[:num]
 
     def retrieve_class_sampler(self, c, adj, args, num=256):
         if self.class_dict2 is None:
             self.class_dict2 = {}
             for i in range(self.nclass):
-                if args.setting == 'trans':
+                if args.setting == "trans":
                     idx = self.idx_train[self.labels_train == i]
                 else:
                     idx = np.arange(len(self.labels_train))[self.labels_train == i]
@@ -197,7 +263,7 @@ class TransAndInd:
         if args.nlayers == 1:
             sizes = [15]
         if args.nlayers == 2:
-            if args.dataset in ['reddit', 'flickr']:
+            if args.dataset in ["reddit", "flickr"]:
                 sizes = [15, 8]
             else:
                 sizes = [10, 5]
@@ -213,12 +279,18 @@ class TransAndInd:
             self.samplers = []
             for i in range(self.nclass):
                 node_idx = torch.LongTensor(self.class_dict2[i])
-                self.samplers.append(NeighborSampler(adj,
-                                                     node_idx=node_idx,
-                                                     sizes=sizes, batch_size=num,
-                                                     num_workers=8, return_e_id=False,
-                                                     num_nodes=adj.size(0),
-                                                     shuffle=True))
+                self.samplers.append(
+                    NeighborSampler(
+                        adj,
+                        node_idx=node_idx,
+                        sizes=sizes,
+                        batch_size=num,
+                        num_workers=8,
+                        return_e_id=False,
+                        num_nodes=adj.size(0),
+                        shuffle=True,
+                    )
+                )
         batch = np.random.permutation(self.class_dict2[c])[:num]
         out = self.samplers[c].sample(batch.astype(np.int64))
         return out
@@ -230,10 +302,10 @@ class TransAndInd:
 
 
 class LargeDataLoader(nn.Module):
-    def __init__(self, name='Flickr', split='train', batch_size=200, split_method='kmeans'):
+    def __init__(self, name="Flickr", split="train", batch_size=200, split_method="kmeans"):
         super(LargeDataLoader, self).__init__()
-        path = osp.join('./data')
-        if name in ['ogbn-arxiv']:
+        path = osp.join("./data")
+        if name in ["ogbn-arxiv"]:
             dataset = DataGraphSAINT(root=path, dataset=name)
             dataset.num_classes = 40
             data = dataset[0]
@@ -243,8 +315,9 @@ class LargeDataLoader(nn.Module):
             edge_index = csr2ei(data.adj_full)
             values = torch.ones(edge_index.shape[1])
             Adj = torch.sparse_coo_tensor(edge_index, values, torch.Size([self.n, self.n]))
-            sparse_eye = torch.sparse_coo_tensor(torch.arange(self.n).repeat(2, 1), torch.ones(self.n),
-                                                 (self.n, self.n))
+            sparse_eye = torch.sparse_coo_tensor(
+                torch.arange(self.n).repeat(2, 1), torch.ones(self.n), (self.n, self.n)
+            )
             self.Adj = Adj + sparse_eye
 
             features = self.normalize_data(features)
@@ -259,22 +332,23 @@ class LargeDataLoader(nn.Module):
             self.split_method = split_method
             self.n_classes = dataset.num_classes
         else:
-            if name == 'flickr':
+            if name == "flickr":
                 from torch_geometric.datasets import Flickr as DataSet
-            elif name == 'reddit':
+            elif name == "reddit":
                 from torch_geometric.datasets import Reddit2 as DataSet
 
-            Dataset = DataSet(root=path + f'/{name}')
+            Dataset = DataSet(root=path + f"/{name}")
             self.n, self.dim = Dataset[0].x.shape
-            mask = split + '_mask'
+            mask = split + "_mask"
             features = Dataset[0].x
             labels = Dataset[0].y
             edge_index = Dataset[0].edge_index
 
             values = torch.ones(edge_index.shape[1])
             Adj = torch.sparse_coo_tensor(edge_index, values, torch.Size([self.n, self.n]))
-            sparse_eye = torch.sparse_coo_tensor(torch.arange(self.n).repeat(2, 1), torch.ones(self.n),
-                                                 (self.n, self.n))
+            sparse_eye = torch.sparse_coo_tensor(
+                torch.arange(self.n).repeat(2, 1), torch.ones(self.n), (self.n, self.n)
+            )
             self.Adj = Adj + sparse_eye
             features = self.normalize_data(features)
             # features      = self.GCF(self.Adj, features, k=2)
@@ -284,8 +358,12 @@ class LargeDataLoader(nn.Module):
 
             # Masked Adjacency Matrix
             optor_index = torch.cat(
-                (self.split_idx.reshape(1, self.n_split), torch.tensor(range(self.n_split)).reshape(1, self.n_split)),
-                dim=0)
+                (
+                    self.split_idx.reshape(1, self.n_split),
+                    torch.tensor(range(self.n_split)).reshape(1, self.n_split),
+                ),
+                dim=0,
+            )
             optor_value = torch.ones(self.n_split)
             optor_shape = torch.Size([self.n, self.n_split])
             optor = torch.sparse_coo_tensor(optor_index, optor_value, optor_shape)
@@ -305,9 +383,9 @@ class LargeDataLoader(nn.Module):
         return:
             torch.Tensor, normalized data
         """
-        mean = data.mean(dim=0)  
-        std = data.std(dim=0)  
-        std[std == 0] = 1  
+        mean = data.mean(dim=0)
+        std = data.std(dim=0)
+        std[std == 0] = 1
         normalized_data = (data - mean) / std
         return normalized_data
 
@@ -342,7 +420,7 @@ class LargeDataLoader(nn.Module):
         parameters:
             split_method: str, method to split data, default is 'kmeans'
         """
-        if self.split_method == 'kmeans':
+        if self.split_method == "kmeans":
             kmeans = KMeans(n_clusters=self.k.item(), n_init=10)
             kmeans.fit(self.split_feat.numpy())
             self.batch_labels = kmeans.predict(self.split_feat.numpy())
@@ -358,7 +436,9 @@ class LargeDataLoader(nn.Module):
         label = self.split_label[idx]
         # idx   = idx.tolist()
 
-        optor_index = torch.cat((idx_raw.reshape(1, n_idx), torch.tensor(range(n_idx)).reshape(1, n_idx)), dim=0)
+        optor_index = torch.cat(
+            (idx_raw.reshape(1, n_idx), torch.tensor(range(n_idx)).reshape(1, n_idx)), dim=0
+        )
         optor_value = torch.ones(n_idx)
         optor_shape = torch.Size([self.n, n_idx])
         optor = torch.sparse_coo_tensor(optor_index, optor_value, optor_shape)
@@ -373,28 +453,33 @@ class LargeDataLoader(nn.Module):
 
 
 class OgbDataLoader(nn.Module):
-    def __init__(self, dataset_name='ogbn-arxiv', split='train', batch_size=5000, split_method='kmeans'):
+    def __init__(
+        self, dataset_name="ogbn-arxiv", split="train", batch_size=5000, split_method="kmeans"
+    ):
         super(OgbDataLoader, self).__init__()
 
 
 class DataGraphSAINT:
-    '''datasets used in GraphSAINT paper'''
+    """datasets used in GraphSAINT paper"""
 
     def __init__(self, root, dataset, **kwargs):
         import gdown
-        dataset = dataset.replace('-', '_')
-        dataset_str = root + '/' + dataset + '/raw/'
+
+        dataset = dataset.replace("-", "_")
+        dataset_str = root + "/" + dataset + "/raw/"
         if not osp.exists(dataset_str):
             os.makedirs(dataset_str)
-        required_files = ['adj_full.npz', 'role.json', 'feats.npy', 'class_map.json']
-        missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
+        required_files = ["adj_full.npz", "role.json", "feats.npy", "class_map.json"]
+        missing_files = [
+            fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))
+        ]
         if missing_files:
-            print('Downloading dataset')
-            url = 'https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa'  # Change this to your actual file ID
+            print("Downloading dataset")
+            url = "https://drive.google.com/drive/folders/1VDobXR5KqKoov6WhYXFMwH4rN0FMnVOa"  # Change this to your actual file ID
             try:
                 downloaded_items = gdown.download_folder(url=url, output=dataset_str, quiet=False)
             except Exception as exc:
-                print(f'gdown download failed: {exc}')
+                print(f"gdown download failed: {exc}")
                 downloaded_items = None
             if downloaded_items:
                 if isinstance(downloaded_items, str):
@@ -415,39 +500,46 @@ class DataGraphSAINT:
                         dst = osp.join(dataset_str, osp.basename(item_path))
                         if osp.abspath(item_path) != osp.abspath(dst):
                             shutil.move(item_path, dst)
-            missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
-            if missing_files and dataset == 'ogbn_arxiv':
-                print('Falling back to OGB loader for ogbn-arxiv.')
+            missing_files = [
+                fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))
+            ]
+            if missing_files and dataset == "ogbn_arxiv":
+                print("Falling back to OGB loader for ogbn-arxiv.")
                 self._prepare_ogbn_arxiv_from_ogb(dataset_str, root)
-                missing_files = [fname for fname in required_files if not osp.exists(osp.join(dataset_str, fname))]
+                missing_files = [
+                    fname
+                    for fname in required_files
+                    if not osp.exists(osp.join(dataset_str, fname))
+                ]
             if missing_files:
-                raise RuntimeError(f'Unable to prepare dataset files: {missing_files}')
+                raise RuntimeError(f"Unable to prepare dataset files: {missing_files}")
 
-        if dataset == 'ogbn_arxiv':
-            self.adj_full = sp.load_npz(dataset_str + 'adj_full.npz')
+        if dataset == "ogbn_arxiv":
+            self.adj_full = sp.load_npz(dataset_str + "adj_full.npz")
             self.adj_full = self.adj_full + self.adj_full.T
             self.adj_full[self.adj_full > 1] = 1
 
         self.num_nodes = self.adj_full.shape[0]
 
-        role = json.load(open(dataset_str + 'role.json', 'r'))
-        self.idx_train = role['tr']
-        self.idx_test = role['te']
-        self.idx_val = role['va']
+        role = json.load(open(dataset_str + "role.json", "r"))
+        self.idx_train = role["tr"]
+        self.idx_test = role["te"]
+        self.idx_val = role["va"]
         self.train_mask = index_to_mask(self.idx_train, self.num_nodes)
         self.test_mask = index_to_mask(self.idx_test, self.num_nodes)
         self.val_mask = index_to_mask(self.idx_val, self.num_nodes)
 
-        self.feat_full = np.load(dataset_str + 'feats.npy')
+        self.feat_full = np.load(dataset_str + "feats.npy")
         # ---- normalize feat ----
 
-        class_map = json.load(open(dataset_str + 'class_map.json', 'r'))
+        class_map = json.load(open(dataset_str + "class_map.json", "r"))
         self.labels_full = to_tensor(label=self.process_labels(class_map))
 
     def _prepare_ogbn_arxiv_from_ogb(self, dataset_str, root):
         from ogb.nodeproppred import PygNodePropPredDataset
+
         if torch_serialization is not None:
-            add_safe_globals = getattr(torch_serialization, 'add_safe_globals', None)
+            add_safe_globals = getattr(torch_serialization, "add_safe_globals", None)
             if callable(add_safe_globals):
                 safe_classes = []
                 if DataEdgeAttr is not None:
@@ -458,8 +550,8 @@ class DataGraphSAINT:
                     safe_classes.append(GlobalStorage)
                 if safe_classes:
                     add_safe_globals(safe_classes)
-        ogb_root = osp.join(root, 'ogb_cache')
-        dataset = PygNodePropPredDataset(name='ogbn-arxiv', root=ogb_root)
+        ogb_root = osp.join(root, "ogb_cache")
+        dataset = PygNodePropPredDataset(name="ogbn-arxiv", root=ogb_root)
         data = dataset[0]
         split_idx = dataset.get_idx_split()
 
@@ -474,19 +566,19 @@ class DataGraphSAINT:
         adj = adj + adj.T
         adj[adj > 1] = 1
 
-        sp.save_npz(osp.join(dataset_str, 'adj_full.npz'), adj)
-        np.save(osp.join(dataset_str, 'feats.npy'), features)
+        sp.save_npz(osp.join(dataset_str, "adj_full.npz"), adj)
+        np.save(osp.join(dataset_str, "feats.npy"), features)
 
         role = {
-            'tr': split_idx['train'].cpu().tolist(),
-            'va': split_idx['valid'].cpu().tolist(),
-            'te': split_idx['test'].cpu().tolist(),
+            "tr": split_idx["train"].cpu().tolist(),
+            "va": split_idx["valid"].cpu().tolist(),
+            "te": split_idx["test"].cpu().tolist(),
         }
-        with open(osp.join(dataset_str, 'role.json'), 'w') as f:
+        with open(osp.join(dataset_str, "role.json"), "w") as f:
             json.dump(role, f)
 
         class_map = {str(idx): int(label) for idx, label in enumerate(labels)}
-        with open(osp.join(dataset_str, 'class_map.json'), 'w') as f:
+        with open(osp.join(dataset_str, "class_map.json"), "w") as f:
             json.dump(class_map, f)
 
     def process_labels(self, class_map):

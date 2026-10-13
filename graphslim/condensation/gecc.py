@@ -19,9 +19,6 @@ import concurrent.futures
 from sklearn.metrics import pairwise_distances  # Faster than cdist
 
 
-
-
-
 class GECC(GCondBase):
     """
     ECA (Evolving Clustering Aggregation) is a variant of Coarsen that performs
@@ -76,26 +73,23 @@ class GECC(GCondBase):
 
                 # Pre-compute weights for each hop
                 weights = [gamma, alpha, beta]  # For first 3 hops
-                for _ in range(3, args.depth+1):
+                for _ in range(3, args.depth + 1):
                     weights.append(0.5)  # Use 1.0 for deeper layers
 
                 # Aggregate features using NeighborSampler
                 for batch_size, n_id, adjs in train_loader:
                     # Move all adjacency matrices to GPU at once
                     adjs = [adj.to(device) for adj in adjs]
-                    
+
                     # Initialize feature tensors for each hop
                     feat_hops = [data.feat_full[n_id]]  # 0-hop features
-                    
+
                     # Compute features for each hop
                     for i, adj in enumerate(adjs):
                         row, col = adj.edge_index
                         # Use scatter_add for efficient aggregation
                         feat_next = scatter_add(
-                            feat_hops[-1][row], 
-                            col, 
-                            dim=0, 
-                            dim_size=feat_hops[0].size(0)
+                            feat_hops[-1][row], col, dim=0, dim_size=feat_hops[0].size(0)
                         )
                         feat_hops.append(feat_next)
 
@@ -103,7 +97,7 @@ class GECC(GCondBase):
                     feat_agg = torch.zeros_like(feat_hops[0])
                     for i, (weight, feat) in enumerate(zip(weights, feat_hops)):
                         feat_agg.add_(weight * feat)
-                    
+
                     # Update final features in-place
                     final_feat_agg[n_id] = feat_agg
 
@@ -114,14 +108,14 @@ class GECC(GCondBase):
 
                 # Pre-compute weights for each hop
                 weights = [gamma, alpha, beta]  # For first 3 hops
-                for _ in range(3, args.depth+1):
+                for _ in range(3, args.depth + 1):
                     weights.append(0.5)  # Use 1.0 for deeper layers
 
                 # Initialize feature tensors
                 feat_hops = [to_tensor(data.feat_full, device=device)]
-                
+
                 # Compute features for each hop
-                for i in range(1, args.depth+1):
+                for i in range(1, args.depth + 1):
                     feat_next = matmul(data.first_hop, feat_hops[-1]).float()
                     feat_hops.append(feat_next)
 
@@ -145,14 +139,14 @@ class GECC(GCondBase):
 
             # Pre-compute weights for each hop
             weights = [gamma, alpha, beta]  # For first 3 hops
-            for _ in range(3, args.depth):
+            for _ in range(3, args.depth + 1):
                 weights.append(1.0)  # Use 2.0 for deeper layers
 
             # Initialize feature tensors
             feat_hops = [to_tensor(data.feat_train, device=device)]
-            
+
             # Compute features for each hop
-            for i in range(1, args.depth):
+            for i in range(1, args.depth + 1):
                 feat_next = matmul(data.first_hop, feat_hops[-1]).float()
                 feat_hops.append(feat_next)
 
@@ -202,9 +196,7 @@ class GECC(GCondBase):
 
         # Basic sanity checks
         y_train = data.labels_train
-        data.nclass = (
-            len(torch.unique(y_train)) if not hasattr(data, "nclass") else data.nclass
-        )
+        data.nclass = len(torch.unique(y_train)) if not hasattr(data, "nclass") else data.nclass
         if verbose:
             print(x_train.shape)
             print(y_train.shape)
@@ -222,7 +214,7 @@ class GECC(GCondBase):
         #     if prev_si:  # If a previous split exists
         #         # Update args.save_path to replace current_si with prev_si
         #         args.save_path = args.save_path.replace(args.si, prev_si)
-                
+
         #         # Temporarily update args.si and load data for the previous split
         #         args.si = prev_si
         #         _, pre_feat, pre_labels = load_reduced(args)
@@ -239,11 +231,11 @@ class GECC(GCondBase):
         #     else:
         #         # If there's no previous split (e.g., si = "1"), initialize centroids as None
         #         print("No previous split found. Initializing centroids as None.")
-                # centroids_per_class = {c: None for c in range(data.nclass)}
+        # centroids_per_class = {c: None for c in range(data.nclass)}
         # else:
         # If evolve is not enabled or si is "1", initialize centroids as None
         print("Evolve is not enabled or si is '1'. Initializing centroids as None.")
-        centroids_per_class = {c: None for c in range(data.nclass)} 
+        centroids_per_class = {c: None for c in range(data.nclass)}
         synthetic_labels = []
         synthetic_features = []
 
@@ -285,9 +277,9 @@ class GECC(GCondBase):
                 epsilon=1e-8,
                 max_iters=300,
                 save_p=False,
-                class_id=c
+                class_id=c,
             )
-              
+
             if updated_centroids_c is None:
                 raise ValueError(f"No centroids returned for class {c}.")
 
@@ -301,9 +293,7 @@ class GECC(GCondBase):
 
             # Collect centroids and labels
             synthetic_features.append(updated_centroids_c.clone().detach())
-            synthetic_labels.append(
-                torch.full((n_c,), c, dtype=torch.long, device=device)
-            )
+            synthetic_labels.append(torch.full((n_c,), c, dtype=torch.long, device=device))
 
         # Combine all synthetic features and labels
         if not synthetic_features:
@@ -314,7 +304,7 @@ class GECC(GCondBase):
                 x_syn = torch.empty(0, data.feat_full.shape[1], device=device)
                 y_syn_incremental = torch.empty(0, dtype=torch.long, device=device)
                 adj_syn = torch.empty(0, 0, device=device)
-                
+
                 # Save the empty tensors
                 save_reduced(adj_syn, x_syn, y_syn_incremental, args)
                 if verbose:
@@ -329,54 +319,64 @@ class GECC(GCondBase):
             adj_syn = torch.eye(x_syn.shape[0], device=device)
 
             # Create assignment matrix (maps synthetic nodes to original training nodes)
-            print(f"Creating assignment matrix with shape ({x_syn.shape[0]}, {data.feat_full.shape[0]})")
+            print(
+                f"Creating assignment matrix with shape ({x_syn.shape[0]}, {data.feat_full.shape[0]})"
+            )
             assignment = torch.zeros((x_syn.shape[0], data.feat_full.shape[0]), device=device)
-            
+
             # Print class statistics to understand assignments better
             for i in range(data.nclass):
                 class_indices = torch.where(data.labels_train == i)[0]
-                print(f"Class {i}: {len(class_indices)} original training nodes, {sum(y_syn_incremental == i).item()} synthetic nodes")
-            
+                print(
+                    f"Class {i}: {len(class_indices)} original training nodes, {sum(y_syn_incremental == i).item()} synthetic nodes"
+                )
+
             # Check if using Fuzzy C-Means (fuzziness > 1.0)
             if args.fuzziness > 1.0:
-                print(f"Using top-1 distance for assignment (Fuzzy C-Means with m={args.fuzziness})")
-                
+                print(
+                    f"Using top-1 distance for assignment (Fuzzy C-Means with m={args.fuzziness})"
+                )
+
                 # For each class, compute distances and create assignment based on closest nodes
                 for i in range(data.nclass):
                     # Get indices for this class
                     class_indices = torch.where(data.labels_train == i)[0]
                     syn_indices = torch.where(y_syn_incremental == i)[0]
-                    
+
                     if len(syn_indices) == 0 or len(class_indices) == 0:
                         continue
-                    
+
                     # Get features for synthetic and original nodes
                     syn_features = x_syn[syn_indices]
                     orig_features = data.feat_train[data.labels_train == i]
-                    
+
                     # Make sure both tensors are on the same device
                     if syn_features.device != orig_features.device:
-                        print(f"Moving orig_features from {orig_features.device} to {syn_features.device}")
+                        print(
+                            f"Moving orig_features from {orig_features.device} to {syn_features.device}"
+                        )
                         orig_features = orig_features.to(syn_features.device)
-                    
+
                     # Compute pairwise distances between synthetic and original nodes
                     # [syn_nodes, orig_nodes]
                     dist_matrix = torch.cdist(syn_features, orig_features, p=2)
-                    
+
                     # For each synthetic node, find the closest original node
                     closest_indices = torch.argmin(dist_matrix, dim=1)
-                    
+
                     # Assign each synthetic node to its closest original node
                     for j, syn_idx in enumerate(syn_indices):
                         orig_idx = class_indices[closest_indices[j]]
                         assignment[syn_idx, orig_idx] = 1.0
-                        
+
                     # Print the first few assignments for debugging
                     for j in range(min(5, len(syn_indices))):
                         syn_idx = syn_indices[j]
                         orig_idx = class_indices[closest_indices[j]]
-                        print(f"Synthetic node {syn_idx} (class {i}) assigned to original node {orig_idx}")
-                        
+                        print(
+                            f"Synthetic node {syn_idx} (class {i}) assigned to original node {orig_idx}"
+                        )
+
                 print("Assignment matrix created using top-1 distances")
             else:
                 # Original method: uniform assignment across all nodes of the same class
@@ -385,37 +385,55 @@ class GECC(GCondBase):
                 for i, (start, end) in enumerate(syn_class_indices.values()):
                     # Get the original indices for this class
                     class_indices = torch.where(data.labels_train == i)[0]
-                    print(f"Creating assignments for class {i}: {end-start} synthetic nodes mapped to {len(class_indices)} original nodes")
-                    
+                    print(
+                        f"Creating assignments for class {i}: {end - start} synthetic nodes mapped to {len(class_indices)} original nodes"
+                    )
+
                     # Assign each synthetic node to its corresponding original nodes
                     for j in range(start, end):
                         assignment[j, class_indices] = 1.0 / len(class_indices)
-                    
+
                     # Print the first assignment for debugging
                     if start < end:
-                        print(f"Synthetic node {start} (class {i}) uniformly assigned to {len(class_indices)} original nodes")
+                        print(
+                            f"Synthetic node {start} (class {i}) uniformly assigned to {len(class_indices)} original nodes"
+                        )
                         assigned_original = torch.where(assignment[start] > 0)[0]
                         if isinstance(assigned_original, torch.Tensor):
                             first_few = assigned_original[:5].cpu().tolist()
                         else:
-                            first_few = assigned_original[:5].tolist() if hasattr(assigned_original, 'tolist') else list(assigned_original[:5])
+                            first_few = (
+                                assigned_original[:5].tolist()
+                                if hasattr(assigned_original, "tolist")
+                                else list(assigned_original[:5])
+                            )
                         print(f"  Sample of assigned original nodes: {first_few}...")
-            
+
             # Print information about the assignment matrix
             print(f"Assignment matrix created with shape {assignment.shape}")
             non_zero_counts = (assignment > 0).sum(dim=1)
-            print(f"Each synthetic node is connected to {non_zero_counts.float().mean().item():.2f} original nodes on average")
-            print(f"Min connections: {non_zero_counts.min().item()}, Max connections: {non_zero_counts.max().item()}")
-            
+            print(
+                f"Each synthetic node is connected to {non_zero_counts.float().mean().item():.2f} original nodes on average"
+            )
+            print(
+                f"Min connections: {non_zero_counts.min().item()}, Max connections: {non_zero_counts.max().item()}"
+            )
+
             # Verify assignments for the first few synthetic nodes
             for i in range(min(5, assignment.shape[0])):
                 assigned_original = torch.where(assignment[i] > 0)[0]
-                print(f"Synthetic node {i} (class {y_syn_incremental[i].item()}) has {len(assigned_original)} connections")
+                print(
+                    f"Synthetic node {i} (class {y_syn_incremental[i].item()}) has {len(assigned_original)} connections"
+                )
                 if len(assigned_original) > 0:
                     if isinstance(assigned_original, torch.Tensor):
                         first_few = assigned_original[:5].cpu().tolist()
                     else:
-                        first_few = assigned_original[:5].tolist() if hasattr(assigned_original, 'tolist') else list(assigned_original[:5])
+                        first_few = (
+                            assigned_original[:5].tolist()
+                            if hasattr(assigned_original, "tolist")
+                            else list(assigned_original[:5])
+                        )
                     print(f"  Connected to original nodes: {first_few}...")
 
             # Assign to data object
@@ -435,9 +453,7 @@ class GECC(GCondBase):
 
         if verbose:
             end_total = timer()
-            args.logger.info(
-                f"=== Finished ECA Reduction in {end_total - start_total:.2f} sec ==="
-            )
+            args.logger.info(f"=== Finished ECA Reduction in {end_total - start_total:.2f} sec ===")
 
         return data
 
@@ -694,9 +710,8 @@ def perform_balance_evolve_clusteringjk(
     n_c: int,  # number of clusters for class c
     epsilon: float = 1e-5,  # Convergence threshold
     max_iters: int = 100,  # Maximum number of iterations
-    save_p = False,
-    class_id=0
-
+    save_p=False,
+    class_id=0,
 ) -> torch.Tensor:
     """
     Incremental Clustering with support for both K-Means and Fuzzy C-Means based on the fuzziness parameter.
@@ -718,17 +733,19 @@ def perform_balance_evolve_clusteringjk(
     x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
 
     # For reproducibility
-    with torch.random.fork_rng():
+    rng_devices = [device.index or torch.cuda.current_device()] if device.type == "cuda" else []
+    with torch.random.fork_rng(devices=rng_devices):
         torch.manual_seed(args.seed)
-         # ----- Initialization -----
+        # ----- Initialization -----
         # For K-Means: work with torch tensors; for Fuzzy C-Means: work with numpy arrays.
         if args.fuzziness == 1.0:
             x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
             if x_syn_c is None:
                 if x_c_torch.size(0) < n_c:
-                    raise ValueError(f"Not enough data to pick {n_c} distinct centroids for class {c}.")
-                rand_indices = torch.randperm(x_c_torch.size(0))[:n_c]
-                centers = x_c_torch[rand_indices].clone()
+                    raise ValueError(
+                        f"Not enough data to pick {n_c} distinct centroids for class {c}."
+                    )
+                centers = incremental_kmeanspp_init(x_c_torch, None, n_c, device=device)
             else:
                 old_count = x_syn_c.shape[0]
                 if old_count == n_c:
@@ -737,7 +754,9 @@ def perform_balance_evolve_clusteringjk(
                     centers = x_syn_c.clone()
                     needed = n_c - old_count
                     if x_c_torch.size(0) < needed:
-                        raise ValueError(f"Not enough data to add {needed} new centroids for class {c}.")
+                        raise ValueError(
+                            f"Not enough data to add {needed} new centroids for class {c}."
+                        )
                     # Use your custom incremental_kmeanspp_init to choose new centroids
                     new_centers = incremental_kmeanspp_init(
                         new_data=x_c_torch,
@@ -752,12 +771,18 @@ def perform_balance_evolve_clusteringjk(
         else:  # Fuzzy C-Means branch: work in NumPy
             if x_syn_c is None:
                 if x_c_current.shape[0] < n_c:
-                    raise ValueError(f"Not enough data to pick {n_c} distinct centroids for class {c}.")
+                    raise ValueError(
+                        f"Not enough data to pick {n_c} distinct centroids for class {c}."
+                    )
                 rand_indices = random.permutation(x_c_current.shape[0])[:n_c]
                 centers_np = x_c_current[rand_indices].copy()
             else:
                 # Convert previous centroids to NumPy (if they aren't already)
-                x_syn_np = x_syn_c.cpu().numpy() if isinstance(x_syn_c, torch.Tensor) else np.array(x_syn_c)
+                x_syn_np = (
+                    x_syn_c.cpu().numpy()
+                    if isinstance(x_syn_c, torch.Tensor)
+                    else np.array(x_syn_c)
+                )
                 old_count = x_syn_np.shape[0]
                 if old_count == n_c:
                     centers_np = x_syn_np.copy()
@@ -765,7 +790,9 @@ def perform_balance_evolve_clusteringjk(
                     centers_np = x_syn_np.copy()
                     needed = n_c - old_count
                     if x_c_current.shape[0] < needed:
-                        raise ValueError(f"Not enough data to add {needed} new centroids for class {c}.")
+                        raise ValueError(
+                            f"Not enough data to add {needed} new centroids for class {c}."
+                        )
                     rand_indices = random.permutation(x_c_current.shape[0])[:needed]
                     new_centers = x_c_current[rand_indices].copy()
                     centers_np = np.concatenate([centers_np, new_centers], axis=0)
@@ -776,59 +803,61 @@ def perform_balance_evolve_clusteringjk(
         if args.fuzziness == 1.0:
             # K-Means clustering (using Torch)
             rep_runs = args.rep_fuzz  # Use the same number of restarts as fuzzy C-means
-            best_obj = float('inf')
+            best_obj = float("inf")
             best_centers = None
             best_assignments = None
 
             for rep in range(rep_runs):
                 current_seed = args.seed + rep
-                with torch.random.fork_rng():
+                with torch.random.fork_rng(devices=rng_devices):
                     torch.manual_seed(current_seed)
-                    
+
                     # Initialize centers for this run
                     if rep == 0 and centers is not None:
                         current_centers = centers.clone()
                     else:
-                        # Random initialization
-                        rand_indices = torch.randperm(x_c_torch.size(0))[:n_c]
-                        current_centers = x_c_torch[rand_indices].clone()
+                        current_centers = incremental_kmeanspp_init(
+                            x_c_torch, None, n_c, device=device
+                        )
 
                     # Run K-Means
                     for iteration in range(max_iters):
                         # Compute squared Euclidean distances: [points, n_c]
                         diff = x_c_torch.unsqueeze(1) - current_centers.unsqueeze(0)
-                        dist = (diff ** 2).sum(dim=2)
+                        dist = (diff**2).sum(dim=2)
                         # Hard assignment to the nearest center
                         current_assignments = dist.argmin(dim=1)
                         new_centers = current_centers.clone()
-                        
+
                         # Update centers
                         for j in range(n_c):
-                            mask = (current_assignments == j)
+                            mask = current_assignments == j
                             if mask.sum() > 0:
                                 new_centers[j] = x_c_torch[mask].mean(dim=0)
                             else:
                                 # Reinitialize an empty cluster to a random point
-                                new_centers[j] = x_c_torch[torch.randint(0, x_c_torch.size(0), (1,)).item()]
-                        
+                                new_centers[j] = x_c_torch[
+                                    torch.randint(0, x_c_torch.size(0), (1,)).item()
+                                ]
+
                         center_shift = (new_centers - current_centers).pow(2).sum().sqrt().item()
                         current_centers = new_centers
-                        
+
                         if center_shift < epsilon:
                             break
 
                     # Compute balanced SSE objective
                     # 1. Compute base SSE
                     base_sse = dist.min(dim=1)[0].sum().item()
-                    
+
                     # 2. Compute balance penalty
                     cluster_sizes = torch.bincount(current_assignments, minlength=n_c).float()
                     ideal_size = x_c_torch.size(0) / n_c
                     balance_penalty = ((cluster_sizes - ideal_size) ** 2).sum().item()
-                    
+
                     # 3. Combine into final objective
                     print(f"base_sse: {base_sse}, balance_penalty: {balance_penalty}")
-                    final_obj = base_sse + args.balance_alpha*balance_penalty
+                    final_obj = base_sse + args.balance_alpha * balance_penalty
 
                     # Update best result if this run is better
                     if final_obj < best_obj:
@@ -849,7 +878,9 @@ def perform_balance_evolve_clusteringjk(
 
             # Save the partition matrix as a NumPy file if required
             if save_p:
-                np.save(f"{args.dataset}_{args.si}_{class_id}_partition_matrix.npy", partition_matrix_np)
+                np.save(
+                    f"{args.dataset}_{args.si}_{class_id}_partition_matrix.npy", partition_matrix_np
+                )
 
         else:
             # centers = parallel_fuzzy_cmeans(args, x_c_current, n_c=n_c, epsilon=epsilon, max_iters=max_iters, device=args.device, save_p=save_p,class_id=class_id)
@@ -871,9 +902,8 @@ def perform_balance_evolve_clusteringjk(
                 U = inv_dists / sum_inv_dists  # Normalize
                 return U.T  # Transpose to match expected output
 
-
             # If we have previous centroids (centers_np), compute initial membership; otherwise, random init.
-            if 'centers_np' in locals():
+            if "centers_np" in locals():
                 init_u = init_membership_from_centers(centers_np, data_T)
             else:
                 init_u = np.random.rand(n_c, n_samples)
@@ -887,7 +917,7 @@ def perform_balance_evolve_clusteringjk(
             for rep in range(rep_runs):
                 current_seed = args.seed + rep
                 # For the first run, if we computed an init membership, reuse it; else generate a random one.
-                if rep == 0 and 'centers_np' in locals():
+                if rep == 0 and "centers_np" in locals():
                     current_init_u = init_u.copy()
                 else:
                     current_init_u = np.random.rand(n_c, n_samples)
@@ -900,7 +930,7 @@ def perform_balance_evolve_clusteringjk(
                     error=epsilon,
                     maxiter=max_iters,
                     init=current_init_u,
-                    seed=current_seed
+                    seed=current_seed,
                 )
                 base_obj = jm[-1]
                 # Compute effective cluster sizes: sum fuzzy memberships for each cluster.
@@ -911,7 +941,7 @@ def perform_balance_evolve_clusteringjk(
                     sizes = np.asarray(sizes)
                 ideal = float(n_samples) / float(n_c)
                 balance_penalty = np.sum((sizes - ideal) ** 2)
-                final_obj = base_obj + args.balance_alpha*balance_penalty
+                final_obj = base_obj + args.balance_alpha * balance_penalty
 
                 if final_obj < best_obj:
                     best_obj = final_obj
@@ -920,6 +950,7 @@ def perform_balance_evolve_clusteringjk(
             print("Best final objective value:", best_obj)
             centers = torch.from_numpy(best_cntr).float().to(device)
         return centers
+
 
 def init_membership_from_centers(centers_array, data, m):
     n_samples_local = data.shape[1]
@@ -932,25 +963,20 @@ def init_membership_from_centers(centers_array, data, m):
     U = inv_dists / sum_inv_dists  # Normalize
     return U.T  # Transpose to match expected output
 
+
 def run_fuzzy_cmeans(rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_samples):
     current_seed = args.seed + rep
-    
+
     if rep == 0 and init_u is not None:
         current_init_u = init_u.copy()
     else:
         current_init_u = random.rand(n_c, n_samples)
         current_init_u /= current_init_u.sum(axis=0, keepdims=True)
-    
+
     cntr, u, u0, d, jm, p, fpc = fuzz.cluster.cmeans(
-        data_T,
-        c=n_c,
-        m=m,
-        error=epsilon,
-        maxiter=max_iters,
-        init=current_init_u,
-        seed=current_seed
+        data_T, c=n_c, m=m, error=epsilon, maxiter=max_iters, init=current_init_u, seed=current_seed
     )
-    
+
     base_obj = jm[-1]
     sizes = u.sum(axis=1)
     if isinstance(sizes, torch.Tensor):
@@ -959,33 +985,37 @@ def run_fuzzy_cmeans(rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_sa
         sizes = np.asarray(sizes)
     ideal = float(n_samples) / float(n_c)
     balance_penalty = np.sum((sizes - ideal) ** 2)
-    final_obj = base_obj + args.balance_alpha*balance_penalty
-    
-    return final_obj, cntr,u 
+    final_obj = base_obj + args.balance_alpha * balance_penalty
 
-# def parallel_fuzzy_cmeans(args, x_c_current, n_c, epsilon, max_iters, device='cpu', save_p=False, class_id=0):
+    return final_obj, cntr, u
+
+
+def parallel_fuzzy_cmeans(
+    args, x_c_current, n_c, epsilon, max_iters, device="cpu", save_p=False, class_id=0
+):
     m = args.fuzziness
     data_T = np.array(x_c_current, dtype=np.float64).T  # shape: (d, n_samples)
     n_samples = data_T.shape[1]
 
-    if 'centers_np' in locals():
-        init_u = init_membership_from_centers(centers_np, data_T, m)
-    else:
-        init_u = None
+    init_u = None
 
     rep_runs = args.rep_fuzz
-    best_obj = float('inf')
+    best_obj = float("inf")
     best_cntr = None
     best_partition_matrix = None  # Store the best U matrix
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         futures = [
-            executor.submit(run_fuzzy_cmeans, rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_samples)
+            executor.submit(
+                run_fuzzy_cmeans, rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_samples
+            )
             for rep in range(rep_runs)
         ]
 
         for future in concurrent.futures.as_completed(futures):
-            final_obj, cntr, U_matrix = future.result()  # Expecting U_matrix as an additional return value
+            final_obj, cntr, U_matrix = (
+                future.result()
+            )  # Expecting U_matrix as an additional return value
             if final_obj < best_obj:
                 best_obj = final_obj
                 best_cntr = cntr
@@ -1002,6 +1032,8 @@ def run_fuzzy_cmeans(rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_sa
         print(f"Soft partition matrix saved to {partition_save_path}")
 
     return updated_centroids_c
+
+
 def incremental_kmeanspp_init(
     new_data: torch.Tensor, old_centers: torch.Tensor, needed: int, device: torch.device
 ) -> torch.Tensor:
@@ -1011,7 +1043,7 @@ def incremental_kmeanspp_init(
     """
     # If nothing to pick, return empty
     if needed <= 0:
-        return torch.empty(0, old_centers.size(1), device=device)
+        return torch.empty(0, new_data.size(1), device=device)
 
     # We'll store chosen new centers here
     chosen = []
@@ -1035,21 +1067,11 @@ def incremental_kmeanspp_init(
         dist_sq = nearest_dist  # shape [N]
         total = dist_sq.sum()
 
-        if total <= 1e-12:
+        if not torch.isfinite(total) or total <= 1e-12:
             # If sum of distances is extremely small, pick random to avoid numerical issues
             idx = torch.randint(0, new_data.size(0), (1,), device=device).item()
         else:
-            # Sample a random threshold
-            r = torch.rand(1, device=device).item() * total.item()
-
-            # Walk through the cumulative sum to find which point crosses r
-            cumulative = 0.0
-            idx = 0
-            for j in range(new_data.size(0)):
-                cumulative += dist_sq[j].item()
-                if cumulative >= r:
-                    idx = j
-                    break
+            idx = torch.multinomial(dist_sq, 1).item()
 
         # Add the chosen center
         center_chosen = new_data[idx : idx + 1]  # shape [1, d]

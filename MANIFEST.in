@@ -1,4 +1,10 @@
-recursive-include graphslim/configs *
-recursive-include graphslim/sparsification/fixed_idx *
-exclude graphslim/train_all.py
-recursive-exclude graphslim/checkpoint *
+recursive-include graphslim/configs *.json
+include graphslim/THIRD_PARTY_NOTICES.md
+recursive-include graphslim/sparsification/fixed_idx *.npy
+recursive-include graphslim/scripts *.sh *.txt
+recursive-include graphslim/evaluation/scripts *.sh
+recursive-include examples *.py
+recursive-include tests *.py
+recursive-include benchmark *.py *.md *.sh *.json *.csv *.txt
+recursive-include docs *.rst *.md *.py *.txt
+recursive-exclude docs/_build *

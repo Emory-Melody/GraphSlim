@@ -5,7 +5,7 @@ import torch.nn as nn
 
 
 class StructureBasedNeuralTangentKernel(nn.Module):
-    def __init__(self, K=2, L=2, scale='add'):
+    def __init__(self, K=2, L=2, scale="add"):
         super(StructureBasedNeuralTangentKernel, self).__init__()
         self.K = K
         self.L = L
@@ -26,9 +26,13 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         indices_A[0, :] = indices_A[0, :] * p
         indices_A[1, :] = indices_A[1, :] * q
 
-        indices = (indices_A.repeat(n_B, 1) + indices_B.t().reshape(2 * n_B, 1))
-        ind_row = indices.index_select(0, torch.arange(start=0, end=2 * n_B, step=2, device=A.device)).reshape(-1)
-        ind_col = indices.index_select(0, torch.arange(start=1, end=2 * n_B, step=2, device=A.device)).reshape(-1)
+        indices = indices_A.repeat(n_B, 1) + indices_B.t().reshape(2 * n_B, 1)
+        ind_row = indices.index_select(
+            0, torch.arange(start=0, end=2 * n_B, step=2, device=A.device)
+        ).reshape(-1)
+        ind_col = indices.index_select(
+            0, torch.arange(start=1, end=2 * n_B, step=2, device=A.device)
+        ).reshape(-1)
 
         new_ind = torch.cat((ind_row, ind_col)).reshape(2, n_A * n_B)
         values = torch.ones(n_A * n_B).to(A.device)
@@ -60,10 +64,10 @@ class StructureBasedNeuralTangentKernel(nn.Module):
     def diag(self, g, E):
         n = E.shape[0]
         aggr_optor = self.sparse_kron(E, E)
-        if self.scale == 'add':
-            scale_mat = 1.
+        if self.scale == "add":
+            scale_mat = 1.0
         else:
-            scale_mat = (1. / torch.sparse.sum(aggr_optor, 1).to_dense()).reshape(n, n)
+            scale_mat = (1.0 / torch.sparse.sum(aggr_optor, 1).to_dense()).reshape(n, n)
         diag_list = []
         sigma = torch.matmul(g, g.t())
         for k in range(self.K):
@@ -76,10 +80,10 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         n1, n2 = len(g1), len(g2)
         aggr_optor = self.sparse_kron(E1, E2)
 
-        if self.scale == 'add':
-            scale_mat = 1.
+        if self.scale == "add":
+            scale_mat = 1.0
         else:
-            scale_mat = (1. / torch.sparse.sum(aggr_optor, 1).to_dense()).reshape(n1, n2)
+            scale_mat = (1.0 / torch.sparse.sum(aggr_optor, 1).to_dense()).reshape(n1, n2)
 
         sigma = torch.matmul(g1, g2.t())
         theta = sigma

@@ -1,3 +1,4 @@
+from graphslim.models import get_model_class
 from collections import Counter
 
 import torch.nn as nn
@@ -15,16 +16,17 @@ class SGDD(GCondBase):
     """
     "Does Graph Distillation See Like Vision Dataset Counterpart?" https://openreview.net/pdf?id=VqIWgUVsXc
     """
+
     def __init__(self, setting, data, args, **kwargs):
         super(SGDD, self).__init__(setting, data, args, **kwargs)
 
-        self.pge = IGNR(node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
-                        ).to(self.device)
+        self.pge = IGNR(
+            node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
+        ).to(self.device)
         # self.reset_parameters()
         self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
         self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
-        print('adj_syn:', (self.nnodes_syn, self.nnodes_syn), 'feat_syn:', self.feat_syn.shape)
-
+        print("adj_syn:", (self.nnodes_syn, self.nnodes_syn), "feat_syn:", self.feat_syn.shape)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
@@ -36,11 +38,14 @@ class SGDD(GCondBase):
             data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
 
         feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
-        if args.setting == 'trans':
-            features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full, device=self.device)
+        if args.setting == "trans":
+            features, adj, labels = to_tensor(
+                data.feat_full, data.adj_full, label=data.labels_full, device=self.device
+            )
         else:
-            features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
-                                              device=self.device)
+            features, adj, labels = to_tensor(
+                data.feat_train, data.adj_train, label=data.labels_train, device=self.device
+            )
 
         # initialization the features
         feat_init = self.init()
@@ -52,10 +57,10 @@ class SGDD(GCondBase):
         loss_avg = 0
         best_val = 0
 
-        model = eval(args.condense_model)(feat_syn.shape[1], args.hidden,
-                                          data.nclass, args).to(self.device)
+        model = get_model_class(args.condense_model)(
+            feat_syn.shape[1], args.hidden, data.nclass, args
+        ).to(self.device)
         for it in trange(args.epochs):
-
             model.initialize()
             model_parameters = list(model.parameters())
             optimizer_model = torch.optim.Adam(model_parameters, lr=args.lr)
@@ -95,11 +100,15 @@ class SGDD(GCondBase):
                     loss_syn_inner.backward()
                     optimizer_model.step()
 
-            loss_avg /= (data.nclass * outer_loop)
+            loss_avg /= data.nclass * outer_loop
 
             if it in args.checkpoints:
                 self.adj_syn = adj_syn_inner
-                data.adj_syn, data.feat_syn, data.labels_syn = self.adj_syn.detach(), self.feat_syn.detach(), labels_syn.detach()
+                data.adj_syn, data.feat_syn, data.labels_syn = (
+                    self.adj_syn.detach(),
+                    self.feat_syn.detach(),
+                    labels_syn.detach(),
+                )
                 best_val = self.intermediate_evaluation(best_val, loss_avg)
 
         return data

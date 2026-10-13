@@ -1,95 +1,130 @@
-import os
-import sys
-import torch
+"""Noise and PRBCD adversarial corruption, with split-safe source-keyed caches."""
+
+from copy import deepcopy
+import json
+from pathlib import Path
 
 import numpy as np
-
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
-from graphslim.config import *
-from graphslim.dataset import *
-import logging
-from graphslim.models import *
 import scipy.sparse as sp
+import torch
+
+from graphslim.dataset.noise import cached_noise, graph_fingerprint
+from graphslim.reduction.lightweight import as_csr
+from graphslim.utils import seed_everything
 
 
 def attack(data, args):
+    if args.attack in (
+        "random_adj",
+        "random_feat",
+        "edge_drop",
+        "feature_mask",
+        "gaussian",
+        "label_noise",
+    ):
+        return cached_noise(data, args)
+    if args.attack != "metattack":
+        raise ValueError(f"Unknown attack {args.attack!r}")
+    if not 0 <= args.ptb_r <= 1:
+        raise ValueError("ptb_r must be in [0,1]")
+    signature = {
+        "kind": "metattack",
+        "rate": args.ptb_r,
+        "seed": args.seed,
+        "setting": args.setting,
+        "stage": "training",
+    }
+    if getattr(data, "noise_metadata", None) == signature:
+        return data
+    from graphslim.models import PRBCD
+    from torch_geometric.data import Data
+
     seed_everything(args.seed)
-    save_path = f'{args.save_path}/corrupt_graph/{args.attack}'
-    gcn_model = GCN(nfeat=data.x.shape[1], nhid=args.hidden, nclass=data.nclass, args=args, mode='attack').to(
-        args.device)
-    if not os.path.exists(save_path):
-        os.makedirs(save_path)
+    prefix = "full" if args.setting == "trans" else "train"
+    features = torch.as_tensor(getattr(data, f"feat_{prefix}")).to(args.device)
+    adjacency = as_csr(getattr(data, f"adj_{prefix}"))
+    source = graph_fingerprint(data, args.setting)
+    budget = {
+        "epochs": getattr(args, "attack_epochs", 400),
+        "pretrain_epochs": getattr(args, "attack_pretrain_epochs", 600),
+        "search_space": getattr(args, "attack_search_space", 100000),
+        "final_samples": getattr(args, "attack_final_samples", 20),
+    }
+    # Labels used by surrogate training/selection are also part of cache identity.
+    from hashlib import sha256
 
-    if args.attack in ['metattack', 'random_adj']:
-        if os.path.exists(f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz'):
-            if args.setting == 'ind':
-                data.adj_train = sp.load_npz(
-                    f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz')
-            else:
-                data.adj_full = sp.load_npz(
-                    f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz')
-            print(f'load corrupt graph at {save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz')
-
+    label_hash = sha256(
+        torch.as_tensor(data.labels_train).cpu().numpy().tobytes()
+        + torch.as_tensor(data.labels_val).cpu().numpy().tobytes()
+    ).hexdigest()[:12]
+    budget_hash = sha256(json.dumps(budget, sort_keys=True).encode()).hexdigest()[:12]
+    folder = Path(args.save_path) / "corrupt_graph/metattack"
+    folder.mkdir(parents=True, exist_ok=True)
+    name = f"{args.dataset}_{args.ptb_r}_{args.seed}_{source[:16]}_{label_hash}_{budget_hash}"
+    cache, metadata = folder / (name + ".npz"), folder / (name + ".json")
+    expected = {
+        **signature,
+        "source_sha256": source,
+        "budget": budget,
+        "implementation": "PRBCD, not a literal MetaAttack",
+    }
+    if cache.is_file() and metadata.is_file() and json.loads(metadata.read_text()) == expected:
+        modified = sp.load_npz(cache)
+        if modified.shape != adjacency.shape:
+            raise ValueError("Adversarial cache shape mismatch")
+    elif int(args.ptb_r * adjacency.nnz // 2) == 0:
+        modified = adjacency
+    else:
+        n = len(features)
+        train_mask, val_mask = torch.zeros(n, dtype=torch.bool), torch.zeros(n, dtype=torch.bool)
+        labels = torch.zeros(n, dtype=torch.long)
+        if args.setting == "trans":
+            train_mask[data.idx_train] = True
+            val_mask[data.idx_val] = True
+            labels[data.idx_train] = torch.as_tensor(data.labels_train)
+            labels[data.idx_val] = torch.as_tensor(data.labels_val)
+            # Test nodes get placeholders; PRBCD replaces non-train labels by
+            # surrogate predictions before optimization. Never read labels_test.
         else:
-            if args.setting == 'ind':
-                adj = data.adj_train
-                args.ptb_n = int(args.ptb_r * (adj.sum() // 2))
-            else:
-                adj = data.adj_full
-                args.ptb_n = int(args.ptb_r * (adj.sum() // 2))
-            if args.attack == 'metattack':
-                if args.setting == 'ind':
-                    model = PRBCD(data, device=args.device)
-                    # ignore the test results!
-                    edge_index, _ = model.attack(ptb_rate=args.ptb_r)
-                    data.adj_train = ei2csr(edge_index.cpu(), data.num_nodes)[np.ix_(data.idx_train, data.idx_train)]
-                    sp.save_npz(f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz',
-                                data.adj_train)
-                else:
-                    model = PRBCD(data, device=args.device)
-                    data.edge_index, _ = model.attack(data.edge_index, ptb_rate=args.ptb_r)
-                    data.adj_full = ei2csr(data.edge_index.cpu(), data.num_nodes)
-                    sp.save_npz(f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz',
-                                data.adj_full)
-            elif args.attack == 'random_adj':
-                model = RandomAttack()
-                if args.setting == 'ind':
-                    model.attack(data.adj_train, n_perturbations=args.ptb_n, type='add')
-                    data.adj_train = model.modified_adj.tocsr()
-                    sp.save_npz(f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz',
-                                data.adj_train)
-                else:
-                    model.attack(data.adj_full, n_perturbations=args.ptb_n, type='add')
-                    data.adj_full = model.modified_adj.tocsr()
-                    sp.save_npz(f'{save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz',
-                                data.adj_full)
-            gcn_model.fit_with_val(data, train_iters=args.eval_epochs, verbose=args.verbose, setting=args.setting)
-            test_acc = gcn_model.test(data, setting=args.setting, verbose=True)
-            args.logger.info(f'attack {args.attack}_{args.ptb_r} test acc: {test_acc}')
-            print(f'save corrupt graph at {save_path}/adj_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.npz')
-    elif args.attack == 'random_feat':
-        if os.path.exists(f'{save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.pt'):
-            if args.setting == 'ind':
-                data.feat_train = torch.load(f'{args.save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}.pt')
-            else:
-                data.feat_full = torch.load(f'{args.save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}.pt')
-            print(f'load corrupt graph at {args.save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}.pt')
-        else:
-            model = RandomAttack(attack_structure=False, attack_features=True)
-            args.ptb_n = int(args.ptb_r * data.x.shape[1])
-            if args.setting == 'ind':
-                model.attack(data.feat_train, n_perturbations=args.ptb_n)
-                data.feat_train = model.modified_features
-            else:
-                model.attack(data.feat_full, n_perturbations=args.ptb_n)
-                data.feat_full = model.modified_features
-            gcn_model.fit_with_val(data, train_iters=args.eval_epochs, verbose=args.verbose, setting=args.setting)
-            test_acc = gcn_model.test(data, setting=args.setting, verbose=True)
-            args.logger.info(f'attack {args.attack}_{args.ptb_r} test acc: {test_acc}')
-            sp.save_npz(f'{args.save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.pt',
-                        data.adj_train)
-            print(
-                f'save corrupt graph at {args.save_path}/feat_{args.dataset}_{args.attack}_{args.ptb_r}_{args.seed}.pt')
-
-    return data
+            heldout = max(1, min(n // 5, n - 1))
+            train_mask[:-heldout], val_mask[-heldout:] = True, True
+            labels[:] = torch.as_tensor(data.labels_train)
+        surrogate_graph = Data(
+            x=features,
+            y=labels.to(args.device),
+            edge_index=torch.tensor(
+                np.stack(adjacency.nonzero()), dtype=torch.long, device=args.device
+            ),
+            train_mask=train_mask.to(args.device),
+            val_mask=val_mask.to(args.device),
+            test_mask=torch.zeros(n, dtype=torch.bool, device=args.device),
+        )
+        optimizer = PRBCD(
+            surrogate_graph,
+            device=args.device,
+            epochs=budget["epochs"],
+            fine_tune_epochs=min(100, budget["epochs"]),
+            pretrain_epochs=budget["pretrain_epochs"],
+            search_space_size=budget["search_space"],
+            max_final_samples=budget["final_samples"],
+            do_synchronize=False,
+        )
+        edge_index, _ = optimizer.attack(ptb_rate=args.ptb_r)
+        edge_index = edge_index.cpu().numpy()
+        modified = sp.csr_matrix(
+            (np.ones(edge_index.shape[1], dtype=np.float32), edge_index), shape=adjacency.shape
+        )
+        sp.save_npz(cache, modified)
+        metadata.write_text(json.dumps(expected, indent=2) + "\n")
+    result = deepcopy(data)
+    setattr(result, f"adj_{prefix}", modified)
+    if args.setting == "trans":
+        result.edge_index = torch.tensor(np.stack(modified.nonzero()), dtype=torch.long)
+        for split in ("train", "val", "test"):
+            index = torch.as_tensor(getattr(result, f"idx_{split}")).cpu().numpy()
+            setattr(result, f"adj_{split}", modified[index][:, index])
+    for name in ("sparse_adj", "samplers", "class_dict", "class_dict2"):
+        if hasattr(result, name):
+            setattr(result, name, None)
+    result.noise_metadata = signature
+    return result

@@ -1,0 +1,15 @@
+{
+  "epochs": 200,
+  "pre_norm": false,
+  "eval_loss": "MSE",
+  "eval_mode": "cross",
+  "soft_label": 1,
+  "gcgp_kernel": "SGNK",
+  "gcgp_k": 4,
+  "gcgp_layers": 2,
+  "gcgp_hops": 2,
+  "gcgp_ridge": 0.5,
+  "gcgp_lr": 0.01,
+  "gcgp_learn_adj": false,
+  "gcgp_batch_size": 1024
+}

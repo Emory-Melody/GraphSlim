@@ -1,0 +1,1507 @@
+{
+  "schema_version": 1,
+  "scope": "Paired GCGP core mathematics and controlled Cora replay, not author-repository end-to-end or whole-package speedup; runtime probes certify only listed profiles",
+  "regression_tests": {
+    "torch26_cpu": 260,
+    "torch28_cpu": 260
+  },
+  "compatibility_profiles": {
+    "doctor_torch26_cpu_cli": {
+      "utc": "2026-10-12T02:03:32.621807+00:00",
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "device_requested": "cpu",
+      "versions": {
+        "graphslim": "1.2.1",
+        "torch": "2.6.0+cpu",
+        "torch-geometric": "2.8.0.post1",
+        "torch-scatter": "2.1.2+pt26cpu",
+        "torch-sparse": "0.6.18+pt26cpu",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "dgl": "1.1.3"
+      },
+      "checks": {
+        "python_support": {
+          "status": "passed",
+          "detail": "supported Python minor"
+        },
+        "torch_import": {
+          "status": "passed"
+        },
+        "torch_native_sparse": {
+          "status": "passed",
+          "detail": "COO sparse matmul and value/feature backward; isolated node retained"
+        },
+        "torch_native_csr": {
+          "status": "passed",
+          "detail": "CSR matmul and feature backward; edge-value backward not probed"
+        },
+        "torch_solve_backward": {
+          "status": "passed",
+          "detail": "dense linear solve and matrix backward"
+        },
+        "torch_sparse_extension": {
+          "status": "passed",
+          "detail": "torch-sparse matmul and feature backward"
+        },
+        "torch_scatter_extension": {
+          "status": "passed",
+          "detail": "torch-scatter grouped sum and backward"
+        },
+        "pyg_gcn": {
+          "status": "passed",
+          "detail": "PyG GCN forward/backward on requested device"
+        },
+        "dgl_roundtrip_cpu": {
+          "status": "passed",
+          "detail": "actual DGL CPU interchange with weights, splits and isolated nodes; not a DGL GPU/GraphBolt test"
+        }
+      },
+      "scope": "runtime/operator probes, not certification of every method or CUDA/DGL combination",
+      "source_sha256": {
+        "doctor.py": "6af1278f2fd31c4ef5daf10a1884a298a7de1a3eaf6d1e5aed2df8dd14fe3d88",
+        "compat.py": "5c45b846654e692adc6db8d7e50cfcf3fc57a77f98df8f4d31d98334146d4ebf",
+        "dataset/convertor.py": "055e4049e4af240fb4bf08eb18381460bcc347ed6a11da11db6bc99e755d193f"
+      },
+      "torch_cuda_runtime": null
+    },
+    "doctor_torch28_cpu_cli": {
+      "utc": "2026-10-12T02:03:53.318597+00:00",
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "device_requested": "cpu",
+      "versions": {
+        "graphslim": "1.2.1",
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "torch-scatter": "2.1.2+pt28cu128",
+        "torch-sparse": "0.6.18+pt28cu128",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "dgl": "1.1.3"
+      },
+      "checks": {
+        "python_support": {
+          "status": "passed",
+          "detail": "supported Python minor"
+        },
+        "torch_import": {
+          "status": "passed"
+        },
+        "torch_native_sparse": {
+          "status": "passed",
+          "detail": "COO sparse matmul and value/feature backward; isolated node retained"
+        },
+        "torch_native_csr": {
+          "status": "passed",
+          "detail": "CSR matmul and feature backward; edge-value backward not probed"
+        },
+        "torch_solve_backward": {
+          "status": "passed",
+          "detail": "dense linear solve and matrix backward"
+        },
+        "torch_sparse_extension": {
+          "status": "passed",
+          "detail": "torch-sparse matmul and feature backward"
+        },
+        "torch_scatter_extension": {
+          "status": "passed",
+          "detail": "torch-scatter grouped sum and backward"
+        },
+        "pyg_gcn": {
+          "status": "passed",
+          "detail": "PyG GCN forward/backward on requested device"
+        },
+        "dgl_roundtrip_cpu": {
+          "status": "passed",
+          "detail": "actual DGL CPU interchange with weights, splits and isolated nodes; not a DGL GPU/GraphBolt test"
+        }
+      },
+      "scope": "runtime/operator probes, not certification of every method or CUDA/DGL combination",
+      "source_sha256": {
+        "doctor.py": "6af1278f2fd31c4ef5daf10a1884a298a7de1a3eaf6d1e5aed2df8dd14fe3d88",
+        "compat.py": "5c45b846654e692adc6db8d7e50cfcf3fc57a77f98df8f4d31d98334146d4ebf",
+        "dataset/convertor.py": "055e4049e4af240fb4bf08eb18381460bcc347ed6a11da11db6bc99e755d193f"
+      },
+      "torch_cuda_runtime": "12.8"
+    },
+    "doctor_torch28_cu128_cli": {
+      "utc": "2026-10-12T02:07:08.989379+00:00",
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "device_requested": "cuda:0",
+      "versions": {
+        "graphslim": "1.2.1",
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "torch-scatter": "2.1.2+pt28cu128",
+        "torch-sparse": "0.6.18+pt28cu128",
+        "numpy": "1.26.4",
+        "scipy": "1.17.1",
+        "dgl": "1.1.3"
+      },
+      "checks": {
+        "python_support": {
+          "status": "passed",
+          "detail": "supported Python minor"
+        },
+        "torch_import": {
+          "status": "passed"
+        },
+        "torch_native_sparse": {
+          "status": "passed",
+          "detail": "COO sparse matmul and value/feature backward; isolated node retained"
+        },
+        "torch_native_csr": {
+          "status": "passed",
+          "detail": "CSR matmul and feature backward; edge-value backward not probed"
+        },
+        "torch_solve_backward": {
+          "status": "passed",
+          "detail": "dense linear solve and matrix backward"
+        },
+        "torch_sparse_extension": {
+          "status": "passed",
+          "detail": "torch-sparse matmul and feature backward"
+        },
+        "torch_scatter_extension": {
+          "status": "passed",
+          "detail": "torch-scatter grouped sum and backward"
+        },
+        "pyg_gcn": {
+          "status": "passed",
+          "detail": "PyG GCN forward/backward on requested device"
+        },
+        "dgl_roundtrip_cpu": {
+          "status": "passed",
+          "detail": "actual DGL CPU interchange with weights, splits and isolated nodes; not a DGL GPU/GraphBolt test"
+        },
+        "cuda_synchronize": {
+          "status": "passed",
+          "detail": null
+        }
+      },
+      "scope": "runtime/operator probes, not certification of every method or CUDA/DGL combination",
+      "source_sha256": {
+        "doctor.py": "6af1278f2fd31c4ef5daf10a1884a298a7de1a3eaf6d1e5aed2df8dd14fe3d88",
+        "compat.py": "5c45b846654e692adc6db8d7e50cfcf3fc57a77f98df8f4d31d98334146d4ebf",
+        "dataset/convertor.py": "055e4049e4af240fb4bf08eb18381460bcc347ed6a11da11db6bc99e755d193f"
+      },
+      "torch_cuda_runtime": "12.8",
+      "gpu": {
+        "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "capability": [
+          12,
+          0
+        ],
+        "torch_architectures": [
+          "sm_70",
+          "sm_75",
+          "sm_80",
+          "sm_86",
+          "sm_90",
+          "sm_100",
+          "sm_120"
+        ]
+      }
+    }
+  },
+  "benchmarks": {
+    "sgnk_cpu_replay_final": {
+      "created_utc": "2026-10-12T01:35:50.596233+00:00",
+      "purpose": "Paired GCGP SGNK microbenchmarks against pinned author mathematics.\n\nEqual shapes/dtype/inputs and forward/gradient checks precede every timing row.\nThis is NOT end-to-end condensation, accuracy reproduction, or an all-method\nspeed claim. CUDA timing is synchronized; raw alternating repeats are retained.\n",
+      "device": "cpu",
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "numpy": "1.26.4"
+      },
+      "torch_cuda_runtime": "12.8",
+      "threads": 4,
+      "iterations_per_repeat": 3,
+      "repeats": 7,
+      "warmups": 3,
+      "reference_commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+      "source_archive_sha256": "31d542292150dd18309e6a2fb50d7e7fe7ad6332bfc6fb450e53b4ce4e59238a",
+      "reference_url": "https://github.com/WANGLin0126/GCGP/blob/d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb/gcgp/sgnk.py",
+      "source_sha256": {
+        "benchmark_script": "40ecf6d7ad75737fc540de231e11d7a094dcaa34c0e1fdfdb5c66ed7effc7808",
+        "package_kernel": "89c067847f3136ebd4eaea9d348eb41a123623e2cea4099d7596582967f883a2",
+        "author_kernel": "7b31c0e571735ea2469104c79872a13e9b46a9847d999970fea326b38b0b8cf3"
+      },
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "rows": [
+        {
+          "query_nodes": 140,
+          "synthetic_nodes": 70,
+          "features": 1433,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 8.731149137020111e-11,
+          "gp_prediction_max_absolute_error": 2.9802322387695312e-8,
+          "avoided_full_self_gram_bytes": 98000,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.005599409341812134,
+                "raw_seconds": [
+                  0.007520667587717374,
+                  0.007348491499821345,
+                  0.006757871558268865,
+                  0.0045540233453114825,
+                  0.004993626226981481,
+                  0.005332636026044686,
+                  0.005599409341812134
+                ]
+              },
+              "package": {
+                "median_seconds": 0.0028216013063987098,
+                "raw_seconds": [
+                  0.00270005160321792,
+                  0.0040635935341318445,
+                  0.0028216013063987098,
+                  0.0034110707541306815,
+                  0.0021011686573425927,
+                  0.0026484314973155656,
+                  0.0028251012166341147
+                ]
+              },
+              "speedup": 1.9844792845516575
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.012506870863338312,
+                "raw_seconds": [
+                  0.01578808855265379,
+                  0.015038378847142061,
+                  0.01224663108587265,
+                  0.011629058048129082,
+                  0.013638386813302835,
+                  0.012506870863338312,
+                  0.011625478354593119
+                ]
+              },
+              "package": {
+                "median_seconds": 0.007922574567298094,
+                "raw_seconds": [
+                  0.009130453380445639,
+                  0.009401503329475721,
+                  0.007922574567298094,
+                  0.0083201772843798,
+                  0.007422567966083686,
+                  0.007761894414822261,
+                  0.006830664972464244
+                ]
+              },
+              "speedup": 1.5786371913699313
+            }
+          }
+        },
+        {
+          "query_nodes": 1024,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 1.8189894035458565e-11,
+          "gp_prediction_max_absolute_error": 1.341104507446289e-7,
+          "avoided_full_self_gram_bytes": 4456448,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.01907471256951491,
+                "raw_seconds": [
+                  0.019402829309304554,
+                  0.019557418922583263,
+                  0.01868126665552457,
+                  0.01487863560517629,
+                  0.01684383147706588,
+                  0.01907471256951491,
+                  0.01942029253890117
+                ]
+              },
+              "package": {
+                "median_seconds": 0.006996477954089642,
+                "raw_seconds": [
+                  0.008136790556212267,
+                  0.007429091259837151,
+                  0.005651792511343956,
+                  0.005353906191885471,
+                  0.006996477954089642,
+                  0.0058490559458732605,
+                  0.007605134509503841
+                ]
+              },
+              "speedup": 2.726330690196086
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.03568567708134651,
+                "raw_seconds": [
+                  0.03504719461003939,
+                  0.03857230208814144,
+                  0.03378937548647324,
+                  0.03994508429119984,
+                  0.03568567708134651,
+                  0.04083670054872831,
+                  0.03397938205550114
+                ]
+              },
+              "package": {
+                "median_seconds": 0.023762029285232227,
+                "raw_seconds": [
+                  0.03410499884436528,
+                  0.03173067358632883,
+                  0.023762029285232227,
+                  0.02188570735355218,
+                  0.01852566997210185,
+                  0.019521545618772507,
+                  0.02462774235755205
+                ]
+              },
+              "speedup": 1.5017941714062555
+            }
+          }
+        },
+        {
+          "query_nodes": 4096,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 1.8189894035458565e-11,
+          "gp_prediction_max_absolute_error": 1.4901161193847656e-7,
+          "avoided_full_self_gram_bytes": 67371008,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.1453028575827678,
+                "raw_seconds": [
+                  0.1314353176082174,
+                  0.14928769785910845,
+                  0.14383151568472385,
+                  0.13529891520738602,
+                  0.1458991812542081,
+                  0.1453028575827678,
+                  0.16047425009310246
+                ]
+              },
+              "package": {
+                "median_seconds": 0.02654509401569764,
+                "raw_seconds": [
+                  0.02696697072436412,
+                  0.02654509401569764,
+                  0.021638754444817703,
+                  0.02132359767953555,
+                  0.03182591653118531,
+                  0.024977742073436577,
+                  0.030417834719022114
+                ]
+              },
+              "speedup": 5.473812128781382
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.18616331461817026,
+                "raw_seconds": [
+                  0.19075525800387064,
+                  0.1924715799589952,
+                  0.1826141538719336,
+                  0.1718089086934924,
+                  0.18616331461817026,
+                  0.18569011831035218,
+                  0.18770366037885347
+                ]
+              },
+              "package": {
+                "median_seconds": 0.05768273491412401,
+                "raw_seconds": [
+                  0.07178815795729558,
+                  0.059106470396121345,
+                  0.050328973680734634,
+                  0.04237001885970434,
+                  0.05622853897511959,
+                  0.06550982935974996,
+                  0.05768273491412401
+                ]
+              },
+              "speedup": 3.2273662976508226
+            }
+          }
+        }
+      ],
+      "cpu_model": "AMD EPYC 9115 16-Core Processor",
+      "completed_utc": "2026-10-12T01:38:43.674671+00:00",
+      "cora_replay": {
+        "scope": "Controlled SGNK/GP implementation replacement in shared package preprocessing and GCN evaluation; NOT an author-repository end-to-end reproduction",
+        "dataset": "Cora public split",
+        "reduction_seed": 1,
+        "evaluation_seeds": [
+          0,
+          1,
+          2
+        ],
+        "coarse_nodes": 70,
+        "reduction_steps": 200,
+        "downstream_steps": 300,
+        "hidden": 256,
+        "lr": 0.01,
+        "ridge": 0.5,
+        "features": "raw BOW; four-hop normalized propagation",
+        "timing_scope": "200 Adam updates, kernel/GP forward/backward and scalar loss records; the reference retains its extra training-accuracy computation. Preprocessing, parameter/optimizer construction and downstream fitting excluded.",
+        "timed_optimization_runs_per_backend": 1,
+        "optimizer_warmup_steps_per_backend": 2,
+        "source_data_sha256": {
+          "feat_full": "c12081a37e469c69186db645c2a938090f7595e544a9842d228f7ca3799b9392",
+          "labels_train": "640afb97d08b1c327b3e78a71ae4574d44ea7d8eb253b19e5b1a7bfedc8d9ff4",
+          "idx_train": "cf18518090009d4092d53fd4edec190fb47703b1f1674376706395fd97d1eb51",
+          "idx_val": "6cb76e0fcdbff3aa4ff45e48d45b774adecdc5e736d8c0277d313fc7621f9763",
+          "idx_test": "2182186a0f90fafdcb2897e9999c6027d248d1e20b1459602abdceb2c5a60032"
+        },
+        "initial_features_sha256": "e90767baca3f631a093c405ab398c60ef7f15ce339da52bd53c95adbc17c008b",
+        "initial_labels_sha256": "0b1cbe505ec30691e0e7b797f1dd583b3f6dae1d87e992f7bcd615020ec62227",
+        "backends": {
+          "author_math": {
+            "optimization_seconds": 5.34717998560518,
+            "final_features_sha256": "293dc54ec5fb720807976d40a69203675d6dc0952f169838be399f3f5793e4bc",
+            "final_labels_sha256": "35327ad99933c04eaf22be4973b4f0c0ba678d8c491b760ad038a5a21da7c553",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.676,
+                "test": 0.66
+              },
+              {
+                "seed": 1,
+                "validation": 0.62,
+                "test": 0.623
+              },
+              {
+                "seed": 2,
+                "validation": 0.648,
+                "test": 0.656
+              }
+            ],
+            "test_mean": 0.6463333333333333,
+            "test_population_std": 0.0165797734872612,
+            "final_training_loss": 0.01676121912896633,
+            "loss_history_sha256": "d13903aafc7757f35de092433de5c47235999bda7ac5679a30709bc28cf6fccc"
+          },
+          "package_math": {
+            "optimization_seconds": 4.1069138972088695,
+            "final_features_sha256": "fe8b516f948e0e4842912893ccbe915e9dbb3eda49e63dcc5b1ac0618358dd61",
+            "final_labels_sha256": "f71eb80c66a82f2ce5d2184e53f929fed686c802bfb9221df5042a84fcdbee9e",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.664,
+                "test": 0.652
+              },
+              {
+                "seed": 1,
+                "validation": 0.516,
+                "test": 0.512
+              },
+              {
+                "seed": 2,
+                "validation": 0.53,
+                "test": 0.518
+              }
+            ],
+            "test_mean": 0.5606666666666666,
+            "test_population_std": 0.06462885492478487,
+            "final_training_loss": 0.004774962551891804,
+            "loss_history_sha256": "6d97fc7710c12c36b86cc3a9af4cbbc31adf16200ca870ffcda534f6a8ef5eb8"
+          }
+        },
+        "optimization_speedup": 1.301994665444342,
+        "final_features_max_absolute_difference": 0.2884500026702881,
+        "final_labels_max_absolute_difference": 0.3244616985321045
+      }
+    },
+    "sgnk_cuda128_replay_final": {
+      "created_utc": "2026-10-12T01:36:12.517755+00:00",
+      "purpose": "Paired GCGP SGNK microbenchmarks against pinned author mathematics.\n\nEqual shapes/dtype/inputs and forward/gradient checks precede every timing row.\nThis is NOT end-to-end condensation, accuracy reproduction, or an all-method\nspeed claim. CUDA timing is synchronized; raw alternating repeats are retained.\n",
+      "device": "cuda:0",
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "numpy": "1.26.4"
+      },
+      "torch_cuda_runtime": "12.8",
+      "threads": 4,
+      "iterations_per_repeat": 3,
+      "repeats": 7,
+      "warmups": 3,
+      "reference_commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+      "source_archive_sha256": "31d542292150dd18309e6a2fb50d7e7fe7ad6332bfc6fb450e53b4ce4e59238a",
+      "reference_url": "https://github.com/WANGLin0126/GCGP/blob/d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb/gcgp/sgnk.py",
+      "source_sha256": {
+        "benchmark_script": "40ecf6d7ad75737fc540de231e11d7a094dcaa34c0e1fdfdb5c66ed7effc7808",
+        "package_kernel": "89c067847f3136ebd4eaea9d348eb41a123623e2cea4099d7596582967f883a2",
+        "author_kernel": "7b31c0e571735ea2469104c79872a13e9b46a9847d999970fea326b38b0b8cf3"
+      },
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "rows": [
+        {
+          "query_nodes": 140,
+          "synthetic_nodes": 70,
+          "features": 1433,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 8.731149137020111e-11,
+          "gp_prediction_max_absolute_error": 2.9802322387695312e-8,
+          "avoided_full_self_gram_bytes": 98000,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.002305705100297928,
+                "raw_seconds": [
+                  0.0025539016351103783,
+                  0.0024747649828592935,
+                  0.002305705100297928,
+                  0.002307825100918611,
+                  0.0019974755123257637,
+                  0.002291551480690638,
+                  0.0018178851654132207
+                ],
+                "additional_peak_cuda_allocated_bytes": 200192
+              },
+              "package": {
+                "median_seconds": 0.0016330787912011147,
+                "raw_seconds": [
+                  0.0016330787912011147,
+                  0.0017943155641357105,
+                  0.0019443118944764137,
+                  0.0017884084954857826,
+                  0.0014429691558082898,
+                  0.0013404789691170056,
+                  0.0010529989376664162
+                ],
+                "additional_peak_cuda_allocated_bytes": 843264
+              },
+              "speedup": 1.4118762136406797
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.009191153260568777,
+                "raw_seconds": [
+                  0.010095275938510895,
+                  0.008092737135787805,
+                  0.008284017133216063,
+                  0.009191153260568777,
+                  0.00782434114565452,
+                  0.010421352771421274,
+                  0.009502422995865345
+                ],
+                "additional_peak_cuda_allocated_bytes": 1646080
+              },
+              "package": {
+                "median_seconds": 0.007265327808757623,
+                "raw_seconds": [
+                  0.008708170304695765,
+                  0.00842410046607256,
+                  0.0061125388989845915,
+                  0.005927238923807939,
+                  0.007047508222361405,
+                  0.008661923930048943,
+                  0.007265327808757623
+                ],
+                "additional_peak_cuda_allocated_bytes": 1284608
+              },
+              "speedup": 1.265070689513798
+            }
+          }
+        },
+        {
+          "query_nodes": 1024,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 1.4551915228366852e-11,
+          "gp_prediction_max_absolute_error": 1.341104507446289e-7,
+          "avoided_full_self_gram_bytes": 4456448,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.003686230629682541,
+                "raw_seconds": [
+                  0.002686194765071074,
+                  0.004741819885869821,
+                  0.0024166914323965707,
+                  0.0030468512947360673,
+                  0.0044105735917886095,
+                  0.004841172757248084,
+                  0.003686230629682541
+                ],
+                "additional_peak_cuda_allocated_bytes": 5253120
+              },
+              "package": {
+                "median_seconds": 0.0027202811713020005,
+                "raw_seconds": [
+                  0.002964167855679989,
+                  0.0015853919709722202,
+                  0.003372687535981337,
+                  0.0025169551372528076,
+                  0.0027202811713020005,
+                  0.003135897529621919,
+                  0.002165251411497593
+                ],
+                "additional_peak_cuda_allocated_bytes": 5248000
+              },
+              "speedup": 1.3550917708694836
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.007454354626437028,
+                "raw_seconds": [
+                  0.008229257228473822,
+                  0.006477598411341508,
+                  0.006614395417273045,
+                  0.011705031308035055,
+                  0.010630579044421514,
+                  0.007454354626437028,
+                  0.006513882117966811
+                ],
+                "additional_peak_cuda_allocated_bytes": 16794624
+              },
+              "package": {
+                "median_seconds": 0.007656581078966458,
+                "raw_seconds": [
+                  0.0065001752227544785,
+                  0.005194392986595631,
+                  0.008346350553135077,
+                  0.010001899364093939,
+                  0.009269116756816706,
+                  0.007656581078966458,
+                  0.006033218776186307
+                ],
+                "additional_peak_cuda_allocated_bytes": 16791552
+              },
+              "speedup": 0.9735878911953312
+            }
+          }
+        },
+        {
+          "query_nodes": 4096,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float32",
+          "forward_max_absolute_error": 1.1920928955078125e-7,
+          "gradient_max_absolute_error": 1.8189894035458565e-11,
+          "gp_prediction_max_absolute_error": 2.384185791015625e-7,
+          "avoided_full_self_gram_bytes": 67371008,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.0023423349484801292,
+                "raw_seconds": [
+                  0.003248457175989946,
+                  0.0023371316492557526,
+                  0.002613554708659649,
+                  0.0029240443060795465,
+                  0.002220404955248038,
+                  0.0023423349484801292,
+                  0.0017830220361550648
+                ],
+                "additional_peak_cuda_allocated_bytes": 67125248
+              },
+              "package": {
+                "median_seconds": 0.0019719752793510756,
+                "raw_seconds": [
+                  0.0019719752793510756,
+                  0.0019140221799413364,
+                  0.002066048172612985,
+                  0.0022345551600058875,
+                  0.002117488533258438,
+                  0.001534195306400458,
+                  0.0016587690139810245
+                ],
+                "additional_peak_cuda_allocated_bytes": 20988928
+              },
+              "speedup": 1.1878115172168533
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.00867687352001667,
+                "raw_seconds": [
+                  0.007784980970124404,
+                  0.010277935614188513,
+                  0.00867687352001667,
+                  0.008570387028157711,
+                  0.00923012321194013,
+                  0.007411201484501362,
+                  0.009643053015073141
+                ],
+                "additional_peak_cuda_allocated_bytes": 67150848
+              },
+              "package": {
+                "median_seconds": 0.007001805119216442,
+                "raw_seconds": [
+                  0.007811054276923339,
+                  0.007008398262163003,
+                  0.006754081696271896,
+                  0.005636729300022125,
+                  0.006081062369048595,
+                  0.007083341479301453,
+                  0.007001805119216442
+                ],
+                "additional_peak_cuda_allocated_bytes": 67147776
+              },
+              "speedup": 1.2392337936117368
+            }
+          }
+        }
+      ],
+      "cpu_model": "AMD EPYC 9115 16-Core Processor",
+      "gpu": {
+        "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "capability": [
+          12,
+          0
+        ]
+      },
+      "completed_utc": "2026-10-12T01:36:54.819002+00:00",
+      "cora_replay": {
+        "scope": "Controlled SGNK/GP implementation replacement in shared package preprocessing and GCN evaluation; NOT an author-repository end-to-end reproduction",
+        "dataset": "Cora public split",
+        "reduction_seed": 1,
+        "evaluation_seeds": [
+          0,
+          1,
+          2
+        ],
+        "coarse_nodes": 70,
+        "reduction_steps": 200,
+        "downstream_steps": 300,
+        "hidden": 256,
+        "lr": 0.01,
+        "ridge": 0.5,
+        "features": "raw BOW; four-hop normalized propagation",
+        "timing_scope": "200 Adam updates, kernel/GP forward/backward and scalar loss records; the reference retains its extra training-accuracy computation. Preprocessing, parameter/optimizer construction and downstream fitting excluded.",
+        "timed_optimization_runs_per_backend": 1,
+        "optimizer_warmup_steps_per_backend": 2,
+        "source_data_sha256": {
+          "feat_full": "c12081a37e469c69186db645c2a938090f7595e544a9842d228f7ca3799b9392",
+          "labels_train": "640afb97d08b1c327b3e78a71ae4574d44ea7d8eb253b19e5b1a7bfedc8d9ff4",
+          "idx_train": "cf18518090009d4092d53fd4edec190fb47703b1f1674376706395fd97d1eb51",
+          "idx_val": "6cb76e0fcdbff3aa4ff45e48d45b774adecdc5e736d8c0277d313fc7621f9763",
+          "idx_test": "2182186a0f90fafdcb2897e9999c6027d248d1e20b1459602abdceb2c5a60032"
+        },
+        "initial_features_sha256": "e90767baca3f631a093c405ab398c60ef7f15ce339da52bd53c95adbc17c008b",
+        "initial_labels_sha256": "0b1cbe505ec30691e0e7b797f1dd583b3f6dae1d87e992f7bcd615020ec62227",
+        "backends": {
+          "author_math": {
+            "optimization_seconds": 4.9300252282992005,
+            "final_features_sha256": "e51662d60ab3f12b587f80a7a5b77cf5f5ec92fd68d8174ca465b01f23474547",
+            "final_labels_sha256": "4edc194f7594cf6fd01f30a3fd34ea42cca14b57b738ce7dee8785f52f3456c9",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.64,
+                "test": 0.67
+              },
+              {
+                "seed": 1,
+                "validation": 0.654,
+                "test": 0.684
+              },
+              {
+                "seed": 2,
+                "validation": 0.662,
+                "test": 0.706
+              }
+            ],
+            "test_mean": 0.6866666666666666,
+            "test_population_std": 0.01481740718059521,
+            "final_training_loss": 0.0016466446686536074,
+            "loss_history_sha256": "4eb93d730e83856d48261a2a203b3d232d9f3817048b4de930407635acaf58d4"
+          },
+          "package_math": {
+            "optimization_seconds": 3.9923362098634243,
+            "final_features_sha256": "77365d3c2b2610d5bba2ee24f62073ebd4b8f3ffe88c340e77a522132e724a2c",
+            "final_labels_sha256": "453d576bc86bb8b807a5efd8e9484e3286374f653a28b514a4005fc84b04fc63",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.63,
+                "test": 0.628
+              },
+              {
+                "seed": 1,
+                "validation": 0.622,
+                "test": 0.639
+              },
+              {
+                "seed": 2,
+                "validation": 0.63,
+                "test": 0.64
+              }
+            ],
+            "test_mean": 0.6356666666666667,
+            "test_population_std": 0.005436502143433369,
+            "final_training_loss": 0.0033791782334446907,
+            "loss_history_sha256": "935ec763f37c58faee788f48608d2de9dc8028157c8b2e75256bd61635a40693"
+          }
+        },
+        "optimization_speedup": 1.2348722575316005,
+        "final_features_max_absolute_difference": 0.2091388702392578,
+        "final_labels_max_absolute_difference": 0.3643392324447632
+      }
+    },
+    "sgnk_cpu_fp64": {
+      "created_utc": "2026-10-12T01:45:23.759677+00:00",
+      "purpose": "Paired GCGP SGNK microbenchmarks against pinned author mathematics.\n\nEqual shapes/dtype/inputs and forward/gradient checks precede every timing row.\nThis is NOT end-to-end condensation, accuracy reproduction, or an all-method\nspeed claim. CUDA timing is synchronized; raw alternating repeats are retained.\n",
+      "device": "cpu",
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "numpy": "1.26.4"
+      },
+      "torch_cuda_runtime": "12.8",
+      "threads": 4,
+      "iterations_per_repeat": 3,
+      "repeats": 7,
+      "warmups": 3,
+      "reference_commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+      "source_archive_sha256": "4c64ed73d63a78f85869aca1422c4e5dd648a4674587fe4266036ac51c255e58",
+      "reference_url": "https://github.com/WANGLin0126/GCGP/blob/d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb/gcgp/sgnk.py",
+      "source_sha256": {
+        "benchmark_script": "9e92fc092ee816958bea0bfc6df89a32868caf694ffb4c6bbe4f0e09e7795867",
+        "package_kernel": "89c067847f3136ebd4eaea9d348eb41a123623e2cea4099d7596582967f883a2",
+        "author_kernel": "7b31c0e571735ea2469104c79872a13e9b46a9847d999970fea326b38b0b8cf3"
+      },
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "rows": [
+        {
+          "query_nodes": 140,
+          "synthetic_nodes": 70,
+          "features": 1433,
+          "dtype": "float64",
+          "forward_max_absolute_error": 2.220446049250313e-16,
+          "gradient_max_absolute_error": 3.2526065174565133e-19,
+          "gp_prediction_max_absolute_error": 5.551115123125783e-17,
+          "avoided_full_self_gram_bytes": 196000,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.0026570080469051995,
+                "raw_seconds": [
+                  0.0042876436685522394,
+                  0.0026570080469051995,
+                  0.004333706572651863,
+                  0.0039999475702643394,
+                  0.002610201326509317,
+                  0.002623705193400383,
+                  0.002560048053661982
+                ]
+              },
+              "package": {
+                "median_seconds": 0.0025458581124742827,
+                "raw_seconds": [
+                  0.001257792425652345,
+                  0.0028598246475060782,
+                  0.0025681049252549806,
+                  0.0025458581124742827,
+                  0.00265655480325222,
+                  0.001226428896188736,
+                  0.0025323349982500076
+                ]
+              },
+              "speedup": 1.0436591237690351
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.004751463420689106,
+                "raw_seconds": [
+                  0.0043738034243385,
+                  0.00426524318754673,
+                  0.004246857017278671,
+                  0.005805392439166705,
+                  0.004751463420689106,
+                  0.005114612790445487,
+                  0.005072689615190029
+                ]
+              },
+              "package": {
+                "median_seconds": 0.0027531546850999198,
+                "raw_seconds": [
+                  0.0027952613309025764,
+                  0.002570341651638349,
+                  0.002503011686106523,
+                  0.0025495548422137895,
+                  0.0027531546850999198,
+                  0.00279180146753788,
+                  0.003058744284013907
+                ]
+              },
+              "speedup": 1.7258250858202913
+            }
+          }
+        },
+        {
+          "query_nodes": 1024,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float64",
+          "forward_max_absolute_error": 2.220446049250313e-16,
+          "gradient_max_absolute_error": 3.3881317890172014e-20,
+          "gp_prediction_max_absolute_error": 4.163336342344337e-16,
+          "avoided_full_self_gram_bytes": 8912896,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.007426054837803046,
+                "raw_seconds": [
+                  0.007426054837803046,
+                  0.009455683330694834,
+                  0.010389845818281174,
+                  0.006311948721607526,
+                  0.012620437269409498,
+                  0.006065648980438709,
+                  0.006247121840715408
+                ]
+              },
+              "package": {
+                "median_seconds": 0.0035435507694880166,
+                "raw_seconds": [
+                  0.004599579920371373,
+                  0.002695848233997822,
+                  0.0038855973010261855,
+                  0.003135401134689649,
+                  0.0033209876467784247,
+                  0.003795457382996877,
+                  0.0035435507694880166
+                ]
+              },
+              "speedup": 2.095653574867783
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.030655058100819588,
+                "raw_seconds": [
+                  0.06385279322663943,
+                  0.030655058100819588,
+                  0.03192734997719526,
+                  0.018966616441806156,
+                  0.017138310708105564,
+                  0.036479606914023556,
+                  0.02113865160693725
+                ]
+              },
+              "package": {
+                "median_seconds": 0.01735091395676136,
+                "raw_seconds": [
+                  0.02487569209188223,
+                  0.035248094238340855,
+                  0.014634329204758009,
+                  0.015509428766866526,
+                  0.01229653445382913,
+                  0.01735091395676136,
+                  0.02384135251243909
+                ]
+              },
+              "speedup": 1.766769069180579
+            }
+          }
+        },
+        {
+          "query_nodes": 4096,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float64",
+          "forward_max_absolute_error": 3.3306690738754696e-16,
+          "gradient_max_absolute_error": 4.743384504624082e-20,
+          "gp_prediction_max_absolute_error": 4.440892098500626e-16,
+          "avoided_full_self_gram_bytes": 134742016,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.1320370171839992,
+                "raw_seconds": [
+                  0.13092182825009027,
+                  0.1320370171839992,
+                  0.14182687054077783,
+                  0.21014628714571396,
+                  0.14721991618474325,
+                  0.12683774096270403,
+                  0.1276947371661663
+                ]
+              },
+              "package": {
+                "median_seconds": 0.02715380024164915,
+                "raw_seconds": [
+                  0.03422896843403578,
+                  0.021512204470733803,
+                  0.03634834382683039,
+                  0.038716718864937626,
+                  0.026538890786468983,
+                  0.01888883610566457,
+                  0.02715380024164915
+                ]
+              },
+              "speedup": 4.86256126247396
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.21632012631744146,
+                "raw_seconds": [
+                  0.18708396734048924,
+                  0.24150742093722025,
+                  0.21876557481785616,
+                  0.21632012631744146,
+                  0.21242194219181934,
+                  0.2372943079099059,
+                  0.2074346992497643
+                ]
+              },
+              "package": {
+                "median_seconds": 0.08109646445761125,
+                "raw_seconds": [
+                  0.06533599272370338,
+                  0.10144607319186132,
+                  0.07833131309598684,
+                  0.0628510108217597,
+                  0.08109646445761125,
+                  0.10156144915769498,
+                  0.12662859447300434
+                ]
+              },
+              "speedup": 2.6674421352919895
+            }
+          }
+        }
+      ],
+      "cpu_model": "AMD EPYC 9115 16-Core Processor",
+      "completed_utc": "2026-10-12T01:48:14.767557+00:00",
+      "cora_replay": {
+        "scope": "Controlled SGNK/GP implementation replacement in shared package preprocessing and GCN evaluation; NOT an author-repository end-to-end reproduction",
+        "dataset": "Cora public split",
+        "reduction_seed": 1,
+        "evaluation_seeds": [
+          0,
+          1,
+          2
+        ],
+        "coarse_nodes": 70,
+        "reduction_steps": 200,
+        "optimization_dtype": "float64",
+        "downstream_dtype": "float32",
+        "downstream_steps": 300,
+        "hidden": 256,
+        "lr": 0.01,
+        "ridge": 0.5,
+        "features": "raw BOW; four-hop normalized propagation",
+        "timing_scope": "200 Adam updates, kernel/GP forward/backward and scalar loss records; the reference retains its extra training-accuracy computation. Preprocessing, parameter/optimizer construction and downstream fitting excluded.",
+        "timed_optimization_runs_per_backend": 1,
+        "optimizer_warmup_steps_per_backend": 2,
+        "source_data_sha256": {
+          "feat_full": "c12081a37e469c69186db645c2a938090f7595e544a9842d228f7ca3799b9392",
+          "labels_train": "640afb97d08b1c327b3e78a71ae4574d44ea7d8eb253b19e5b1a7bfedc8d9ff4",
+          "idx_train": "cf18518090009d4092d53fd4edec190fb47703b1f1674376706395fd97d1eb51",
+          "idx_val": "6cb76e0fcdbff3aa4ff45e48d45b774adecdc5e736d8c0277d313fc7621f9763",
+          "idx_test": "2182186a0f90fafdcb2897e9999c6027d248d1e20b1459602abdceb2c5a60032"
+        },
+        "initial_features_sha256": "10bc53b1ac116a57bc1ff6f4bd7fc03c7d4070765caad4a81e6e8b3f57daf530",
+        "initial_labels_sha256": "7f2442219be3cd7eafbc7251f883c6617363fe1e3f6b147f77e5b58d90c9f688",
+        "backends": {
+          "author_math": {
+            "optimization_seconds": 7.8267703037709,
+            "final_features_sha256": "807f260540894f9008a7c0a06b79ae37cfb63e04cefe45a0d49b154b35d363c9",
+            "final_labels_sha256": "ebfe18c8f5708f2f6538b48bf7c14769db7289b1110e0ce177f3addbe4c3747f",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.716,
+                "test": 0.73
+              },
+              {
+                "seed": 1,
+                "validation": 0.726,
+                "test": 0.738
+              },
+              {
+                "seed": 2,
+                "validation": 0.724,
+                "test": 0.742
+              }
+            ],
+            "test_mean": 0.7366666666666667,
+            "test_population_std": 0.004988876515698593,
+            "final_training_loss": 0.00022509252066090605,
+            "loss_history_sha256": "cd8906b211fb5966c612bf3a9c4d38590ab3e2db6c5204086eec3e928e57dfc6"
+          },
+          "package_math": {
+            "optimization_seconds": 4.8165393313393,
+            "final_features_sha256": "62a9fcb8b6edab200019e8ee93b285df1be02d9fb4e58074d0f09c57f4a962f1",
+            "final_labels_sha256": "2b06e79afafdf109185314318433ce84e8de25af4611cb9bdb199db4c1b6018b",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.716,
+                "test": 0.735
+              },
+              {
+                "seed": 1,
+                "validation": 0.726,
+                "test": 0.738
+              },
+              {
+                "seed": 2,
+                "validation": 0.724,
+                "test": 0.742
+              }
+            ],
+            "test_mean": 0.7383333333333333,
+            "test_population_std": 0.002867441755680878,
+            "final_training_loss": 0.00022518308193158145,
+            "loss_history_sha256": "5a8a673e1d6f2bbd9a5a5b64e9c25d80d02eaaf2c6344614c7c618af97b4dbad"
+          }
+        },
+        "optimization_speedup": 1.6249779697313438,
+        "final_features_max_absolute_difference": 0.0000038631432597502,
+        "final_labels_max_absolute_difference": 7.102348817955573e-7
+      }
+    },
+    "sgnk_cuda128_fp64": {
+      "created_utc": "2026-10-12T01:45:26.247227+00:00",
+      "purpose": "Paired GCGP SGNK microbenchmarks against pinned author mathematics.\n\nEqual shapes/dtype/inputs and forward/gradient checks precede every timing row.\nThis is NOT end-to-end condensation, accuracy reproduction, or an all-method\nspeed claim. CUDA timing is synchronized; raw alternating repeats are retained.\n",
+      "device": "cuda:0",
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "torch-geometric": "2.8.0.post1",
+        "numpy": "1.26.4"
+      },
+      "torch_cuda_runtime": "12.8",
+      "threads": 4,
+      "iterations_per_repeat": 3,
+      "repeats": 7,
+      "warmups": 3,
+      "reference_commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+      "source_archive_sha256": "4c64ed73d63a78f85869aca1422c4e5dd648a4674587fe4266036ac51c255e58",
+      "reference_url": "https://github.com/WANGLin0126/GCGP/blob/d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb/gcgp/sgnk.py",
+      "source_sha256": {
+        "benchmark_script": "9e92fc092ee816958bea0bfc6df89a32868caf694ffb4c6bbe4f0e09e7795867",
+        "package_kernel": "89c067847f3136ebd4eaea9d348eb41a123623e2cea4099d7596582967f883a2",
+        "author_kernel": "7b31c0e571735ea2469104c79872a13e9b46a9847d999970fea326b38b0b8cf3"
+      },
+      "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+      "python": "3.11.15",
+      "rows": [
+        {
+          "query_nodes": 140,
+          "synthetic_nodes": 70,
+          "features": 1433,
+          "dtype": "float64",
+          "forward_max_absolute_error": 4.440892098500626e-16,
+          "gradient_max_absolute_error": 1.6263032587282567e-19,
+          "gp_prediction_max_absolute_error": 5.551115123125783e-17,
+          "avoided_full_self_gram_bytes": 196000,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.0009173359721899033,
+                "raw_seconds": [
+                  0.0009331861510872841,
+                  0.0009173359721899033,
+                  0.0008280028899510702,
+                  0.0009298194199800491,
+                  0.0009250060344735781,
+                  0.0008853962644934654,
+                  0.0008865563819805781
+                ],
+                "additional_peak_cuda_allocated_bytes": 399360
+              },
+              "package": {
+                "median_seconds": 0.0006486425797144572,
+                "raw_seconds": [
+                  0.0006486425797144572,
+                  0.0006736228242516518,
+                  0.0006022664407889048,
+                  0.0005946426341931025,
+                  0.000669566293557485,
+                  0.0006157727912068367,
+                  0.000651349313557148
+                ],
+                "additional_peak_cuda_allocated_bytes": 2407424
+              },
+              "speedup": 1.414239522471265
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.004146430330971877,
+                "raw_seconds": [
+                  0.006651315217216809,
+                  0.004146430330971877,
+                  0.004319723695516586,
+                  0.004127467051148415,
+                  0.004856996548672517,
+                  0.0036962972953915596,
+                  0.003509064204990864
+                ],
+                "additional_peak_cuda_allocated_bytes": 3291136
+              },
+              "package": {
+                "median_seconds": 0.003586850749949614,
+                "raw_seconds": [
+                  0.004136573833723863,
+                  0.0037354535112778344,
+                  0.003586850749949614,
+                  0.002907224620381991,
+                  0.0030451848482092223,
+                  0.002944790758192539,
+                  0.004609586670994759
+                ],
+                "additional_peak_cuda_allocated_bytes": 2568192
+              },
+              "speedup": 1.1560086047712255
+            }
+          }
+        },
+        {
+          "query_nodes": 1024,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float64",
+          "forward_max_absolute_error": 2.220446049250313e-16,
+          "gradient_max_absolute_error": 5.421010862427522e-20,
+          "gp_prediction_max_absolute_error": 3.608224830031759e-16,
+          "avoided_full_self_gram_bytes": 8912896,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.0009327695394555727,
+                "raw_seconds": [
+                  0.0009327695394555727,
+                  0.0009211727107564608,
+                  0.0009063926214973131,
+                  0.000931215782960256,
+                  0.0009596959377328554,
+                  0.0010555759072303772,
+                  0.0010292893275618553
+                ],
+                "additional_peak_cuda_allocated_bytes": 10736128
+              },
+              "package": {
+                "median_seconds": 0.0006509963423013687,
+                "raw_seconds": [
+                  0.0006509963423013687,
+                  0.000637452428539594,
+                  0.0006460665414730707,
+                  0.0006309763217965761,
+                  0.0007006662587324778,
+                  0.0007261925687392553,
+                  0.0007428126409649849
+                ],
+                "additional_peak_cuda_allocated_bytes": 10725888
+              },
+              "speedup": 1.4328337639472657
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.003326203984518846,
+                "raw_seconds": [
+                  0.0033671443040172258,
+                  0.0036662171284357705,
+                  0.0034451978281140327,
+                  0.003326203984518846,
+                  0.003195257857441902,
+                  0.0031761874755223594,
+                  0.003232670947909355
+                ],
+                "additional_peak_cuda_allocated_bytes": 33818112
+              },
+              "package": {
+                "median_seconds": 0.0027106947576006255,
+                "raw_seconds": [
+                  0.002898907599349817,
+                  0.002857721410691738,
+                  0.0027299445743362107,
+                  0.0027106947576006255,
+                  0.002577308565378189,
+                  0.002548258130749067,
+                  0.0025240915517012277
+                ],
+                "additional_peak_cuda_allocated_bytes": 33811968
+              },
+              "speedup": 1.2270669632544828
+            }
+          }
+        },
+        {
+          "query_nodes": 4096,
+          "synthetic_nodes": 256,
+          "features": 128,
+          "dtype": "float64",
+          "forward_max_absolute_error": 3.3306690738754696e-16,
+          "gradient_max_absolute_error": 5.421010862427522e-20,
+          "gp_prediction_max_absolute_error": 4.996003610813204e-16,
+          "avoided_full_self_gram_bytes": 134742016,
+          "timings": {
+            "forward": {
+              "author": {
+                "median_seconds": 0.003357234410941601,
+                "raw_seconds": [
+                  0.003372881251076857,
+                  0.0033472909902532897,
+                  0.003357234410941601,
+                  0.003351794555783272,
+                  0.003364484446744124,
+                  0.003355960982541243,
+                  0.0033658441777030625
+                ],
+                "additional_peak_cuda_allocated_bytes": 134250496
+              },
+              "package": {
+                "median_seconds": 0.0005600995694597563,
+                "raw_seconds": [
+                  0.0005584560955564181,
+                  0.00048442961027224857,
+                  0.0005884993200500807,
+                  0.0004996263111631075,
+                  0.0006450194244583448,
+                  0.0005600995694597563,
+                  0.0005768463015556335
+                ],
+                "additional_peak_cuda_allocated_bytes": 41977856
+              },
+              "speedup": 5.993995700049939
+            },
+            "forward_backward": {
+              "author": {
+                "median_seconds": 0.004890763200819492,
+                "raw_seconds": [
+                  0.00529369277258714,
+                  0.0048711734513441724,
+                  0.005319762974977493,
+                  0.004875743140776952,
+                  0.004890763200819492,
+                  0.004883209553857644,
+                  0.004916369604567687
+                ],
+                "additional_peak_cuda_allocated_bytes": 134300672
+              },
+              "package": {
+                "median_seconds": 0.002388525133331617,
+                "raw_seconds": [
+                  0.002388525133331617,
+                  0.002115698220829169,
+                  0.003569570370018482,
+                  0.002284974791109562,
+                  0.0028199845304091773,
+                  0.0022878749296069145,
+                  0.0028260412315527597
+                ],
+                "additional_peak_cuda_allocated_bytes": 134294528
+              },
+              "speedup": 2.047608012396188
+            }
+          }
+        }
+      ],
+      "cpu_model": "AMD EPYC 9115 16-Core Processor",
+      "gpu": {
+        "name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "capability": [
+          12,
+          0
+        ]
+      },
+      "completed_utc": "2026-10-12T01:45:58.996550+00:00",
+      "cora_replay": {
+        "scope": "Controlled SGNK/GP implementation replacement in shared package preprocessing and GCN evaluation; NOT an author-repository end-to-end reproduction",
+        "dataset": "Cora public split",
+        "reduction_seed": 1,
+        "evaluation_seeds": [
+          0,
+          1,
+          2
+        ],
+        "coarse_nodes": 70,
+        "reduction_steps": 200,
+        "optimization_dtype": "float64",
+        "downstream_dtype": "float32",
+        "downstream_steps": 300,
+        "hidden": 256,
+        "lr": 0.01,
+        "ridge": 0.5,
+        "features": "raw BOW; four-hop normalized propagation",
+        "timing_scope": "200 Adam updates, kernel/GP forward/backward and scalar loss records; the reference retains its extra training-accuracy computation. Preprocessing, parameter/optimizer construction and downstream fitting excluded.",
+        "timed_optimization_runs_per_backend": 1,
+        "optimizer_warmup_steps_per_backend": 2,
+        "source_data_sha256": {
+          "feat_full": "c12081a37e469c69186db645c2a938090f7595e544a9842d228f7ca3799b9392",
+          "labels_train": "640afb97d08b1c327b3e78a71ae4574d44ea7d8eb253b19e5b1a7bfedc8d9ff4",
+          "idx_train": "cf18518090009d4092d53fd4edec190fb47703b1f1674376706395fd97d1eb51",
+          "idx_val": "6cb76e0fcdbff3aa4ff45e48d45b774adecdc5e736d8c0277d313fc7621f9763",
+          "idx_test": "2182186a0f90fafdcb2897e9999c6027d248d1e20b1459602abdceb2c5a60032"
+        },
+        "initial_features_sha256": "10bc53b1ac116a57bc1ff6f4bd7fc03c7d4070765caad4a81e6e8b3f57daf530",
+        "initial_labels_sha256": "7f2442219be3cd7eafbc7251f883c6617363fe1e3f6b147f77e5b58d90c9f688",
+        "backends": {
+          "author_math": {
+            "optimization_seconds": 2.230229340493679,
+            "final_features_sha256": "8d30bc6586e76e2a4f6fea922019e59e8d52b79331ca3cb9bcb80afb1fc2a5f4",
+            "final_labels_sha256": "b288371ae847717a9ae1fb6280cbc4e9d0cc0b19efbaea5aa92f84efd4001965",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.626,
+                "test": 0.645
+              },
+              {
+                "seed": 1,
+                "validation": 0.61,
+                "test": 0.639
+              },
+              {
+                "seed": 2,
+                "validation": 0.628,
+                "test": 0.64
+              }
+            ],
+            "test_mean": 0.6413333333333333,
+            "test_population_std": 0.0026246692913372725,
+            "final_training_loss": 0.019587683618655705,
+            "loss_history_sha256": "3ef292d1f3f86d4b374359fd149675336cafda095a67c66678e32e225191cc63"
+          },
+          "package_math": {
+            "optimization_seconds": 3.7183366492390633,
+            "final_features_sha256": "8121634c39b50fe3016a22aa4428d0e4d221343649d71006c873021b4028df93",
+            "final_labels_sha256": "e3ed8f95650238305f065c76823fe8a8aad7a64886807f6b4969525a026be311",
+            "downstream": [
+              {
+                "seed": 0,
+                "validation": 0.63,
+                "test": 0.65
+              },
+              {
+                "seed": 1,
+                "validation": 0.61,
+                "test": 0.639
+              },
+              {
+                "seed": 2,
+                "validation": 0.628,
+                "test": 0.64
+              }
+            ],
+            "test_mean": 0.643,
+            "test_population_std": 0.004966554808583784,
+            "final_training_loss": 0.01958750916879471,
+            "loss_history_sha256": "8ebc1517a916d374cc41baad100486d27b859d14fb00f716b11ed782057ffe22"
+          }
+        },
+        "optimization_speedup": 0.5997922057299688,
+        "final_features_max_absolute_difference": 0.000007005027016150633,
+        "final_labels_max_absolute_difference": 0.0000036330753075963784
+      }
+    }
+  },
+  "fp32_long_optimization_warning": "Single-call parity does not guarantee trajectory or downstream-score equality; Float32 replay drift is retained. Float64 replay is a separate precision experiment, not a silent replacement of defaults."
+}

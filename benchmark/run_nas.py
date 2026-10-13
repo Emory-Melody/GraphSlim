@@ -1,47 +1,46 @@
-import os
+"""Run the published APPNP architecture-search evaluation."""
+
+from pathlib import Path
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from graphslim.config import cli
-from graphslim.dataset import *
-from graphslim.evaluation import NasEvaluator
+import numpy as np
+from graphslim.config import get_args
 
-if __name__ == '__main__':
-    args = cli(standalone_mode=False)
 
-    data = get_dataset(args.dataset, args)
+def main(argv=None):
+    args = get_args(argv)
+    if not hasattr(args, "method"):
+        return None
+    from graphslim.dataset import get_dataset
+    from graphslim.evaluation import NasEvaluator
+    from graphslim.utils import seed_everything
 
-    NasEval = NasEvaluator(args)
+    seed_everything(args.seed)
+    data = get_dataset(args.dataset, args, args.load_path)
+    evaluator = NasEvaluator(args)
+    save_path = Path(evaluator.save_path)
+    if not (save_path / "results_ori.csv").exists():
+        args.logger.info("No original results found; evaluating the original architectures.")
+        evaluator.evaluate_ori(data)
+        evaluator.test_params_ori(data)
 
-    save_path = f'checkpoints/nas/{args.dataset}'
-    if not os.path.exists(f'{save_path}/results_ori.csv'):
-        args.logger.info("No original results found. Run evaluate_ori and test_params_ori.")
-        NasEvaluator.evaluate_ori(data)
-        NasEvaluator.test_params_ori(data)
-    else:
-        args.logger.info("Find original results. Run evaluate_syn and test_params_syn.")
+    results = []
+    seeds = (1, 2, 3) if args.method in ("random", "kcenter", "averaging", "vng") else (args.seed,)
+    for seed in seeds:
+        args.seed = seed
+        seed_everything(seed)
+        evaluator = NasEvaluator(args)
+        evaluator.evaluate_syn(data)
+        accuracy = evaluator.test_params_syn(data)
+        correlation, rank_correlation = evaluator.cal_pearson()
+        results.append((accuracy, correlation, rank_correlation))
+    summary = np.asarray(results).mean(axis=0)
+    args.logger.info("NAS accuracy=%s, accuracy correlation=%s, rank correlation=%s", *summary)
+    return summary
 
-    if args.method in ['random', 'kcenter', 'averaging', 'vng']:
-        res_accs, res_person_accs, res_person_ranks = [], [], []
-        for seed in [1, 2, 3]:
-            NasEval = NasEvaluator(args)
-            args.seed = seed
-            NasEval.evaluate_syn(data)
-            res_acc = NasEval.test_params_syn(data)
-            res_person_acc, res_person_rank = NasEval.cal_pearson()
-            res_accs.append(res_acc)
-            res_person_accs.append(res_person_acc)
-            res_person_ranks.append(res_person_rank)
-        args.logger.info(f"{res_accs.mean()}")
-        args.logger.info(f"{res_person_accs.mean()}")
-        args.logger.info(f"{res_person_ranks.mean()}")
-    else:
-        NasEval = NasEvaluator(args)
-        NasEval.evaluate_syn(data)
-        res_acc = NasEval.test_params_syn(data)
-        res_person_acc, res_person_rank = NasEval.cal_pearson()
-        args.logger.info(f"{res_acc}")
-        args.logger.info(f"{res_person_acc}")
-        args.logger.info(f"{res_person_rank}")
+
+if __name__ == "__main__":
+    main()

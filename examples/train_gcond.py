@@ -1,17 +1,13 @@
-import os, sys
+"""Run the gcond example through the shared GraphSlim pipeline."""
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
-from graphslim.config import *
-from graphslim.evaluation.eval_agent import Evaluator
+from pathlib import Path
+import sys
 
-from graphslim.condensation import GCond
-from graphslim.dataset import *
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-args = cli(standalone_mode=False)
+from graphslim.train_all import main
 
-graph = get_dataset(args.dataset, args)
-agent = GCond(setting=args.setting, data=graph, args=args)
-reduced_graph = agent.reduce(graph, verbose=args.verbose)
-evaluator = Evaluator(args)
-evaluator.evaluate(reduced_graph, model_type='GCN')
+
+if __name__ == "__main__":
+    main(default_method="gcond")

@@ -1,0 +1,8 @@
+{
+  "epochs": 2000,
+  "rate_profiles": {
+    "0.25": {"clustgdd_prop_steps": 5, "clustgdd_dropout": 0.7, "clustgdd_sampling_ratio": 0.06},
+    "0.5": {"clustgdd_prop_steps": 5, "clustgdd_dropout": 0.6, "clustgdd_sampling_ratio": 0.4},
+    "1.0": {"clustgdd_prop_steps": 20, "clustgdd_dropout": 0.6, "clustgdd_sampling_ratio": 0.4}
+  }
+}

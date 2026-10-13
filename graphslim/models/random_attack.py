@@ -8,7 +8,7 @@ import torch
 
 
 class RandomAttack(BaseAttack):
-    """ Randomly adding noise to the input graph
+    """Randomly adding noise to the input graph
 
     Parameters
     ----------
@@ -36,11 +36,18 @@ class RandomAttack(BaseAttack):
 
     """
 
-    def __init__(self, model=None, nnodes=None, attack_structure=True, attack_features=False, device='cpu'):
-        super(RandomAttack, self).__init__(model, nnodes, attack_structure=attack_structure,
-                                           attack_features=attack_features, device=device)
+    def __init__(
+        self, model=None, nnodes=None, attack_structure=True, attack_features=False, device="cpu"
+    ):
+        super(RandomAttack, self).__init__(
+            model,
+            nnodes,
+            attack_structure=attack_structure,
+            attack_features=attack_features,
+            device=device,
+        )
 
-    def attack(self, target, n_perturbations, type='add', **kwargs):
+    def attack(self, target, n_perturbations, type="add", **kwargs):
         """Generate attacks on the input graph.
 
         Parameters
@@ -64,7 +71,7 @@ class RandomAttack(BaseAttack):
         if self.attack_features:
             self.modified_features = self.perturb_features(target, n_perturbations)
 
-    def perturb_adj(self, adj, n_perturbations, type='add'):
+    def perturb_adj(self, adj, n_perturbations, type="add"):
         """Randomly add, remove or flip edges.
 
         Parameters
@@ -85,16 +92,16 @@ class RandomAttack(BaseAttack):
         modified_adj = adj.tolil()
 
         type = type.lower()
-        assert type in ['add', 'remove', 'flip']
+        assert type in ["add", "remove", "flip"]
 
-        if type == 'flip':
+        if type == "flip":
             # sample edges to flip
             edges = self.random_sample_edges(adj, n_perturbations, exclude=set())
             for n1, n2 in edges:
                 modified_adj[n1, n2] = 1 - modified_adj[n1, n2]
                 modified_adj[n2, n1] = 1 - modified_adj[n2, n1]
 
-        if type == 'add':
+        if type == "add":
             # sample edges to add
             nonzero = set(zip(*adj.nonzero()))
             edges = self.random_sample_edges(adj, n_perturbations, exclude=nonzero)
@@ -102,10 +109,10 @@ class RandomAttack(BaseAttack):
                 modified_adj[n1, n2] = 1
                 modified_adj[n2, n1] = 1
 
-        if type == 'remove':
+        if type == "remove":
             # sample edges to remove
             nonzero = np.array(sp.triu(adj, k=1).nonzero()).T
-            indices = np.random.permutation(nonzero)[: n_perturbations].T
+            indices = np.random.permutation(nonzero)[:n_perturbations].T
             modified_adj[indices[0], indices[1]] = 0
             modified_adj[indices[1], indices[0]] = 0
 
@@ -135,10 +142,9 @@ class RandomAttack(BaseAttack):
         return modified_features
 
     def inject_nodes(self, adj, n_add, n_perturbations):
-        """For each added node, randomly connect with other nodes.
-        """
+        """For each added node, randomly connect with other nodes."""
         # adj: sp.csr_matrix
-        print('number of pertubations: %s' % n_perturbations)
+        print("number of pertubations: %s" % n_perturbations)
         raise NotImplementedError
 
         modified_adj = adj.tolil()

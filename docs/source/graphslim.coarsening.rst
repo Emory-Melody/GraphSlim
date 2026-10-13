@@ -1,6 +1,12 @@
 graphslim.coarsening package
 ============================
 
+NOPE and NOPE*
+--------------
+
+.. automodule:: graphslim.coarsening.nope
+   :members:
+
 graphslim.coarsening.coarsening\_base
 --------------------------------------------
 

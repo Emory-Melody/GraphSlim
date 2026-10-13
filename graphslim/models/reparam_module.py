@@ -8,10 +8,10 @@ from contextlib import contextmanager
 
 class ReparamModule(nn.Module):
     def _get_module_from_name(self, mn):
-        if mn == '':
+        if mn == "":
             return self
         m = self
-        for p in mn.split('.'):
+        for p in mn.split("."):
             m = getattr(m, p)
         return m
 
@@ -38,8 +38,9 @@ class ReparamModule(nn.Module):
                         param_numels.append(p.numel())
                         param_shapes.append(p.size())
 
-        assert len(set(p.dtype for p in params)) <= 1, \
+        assert len(set(p.dtype for p in params)) <= 1, (
             "expects all parameters in module to have same dtype"
+        )
 
         # store the info for unflatten
         self._param_infos = tuple(param_infos)
@@ -49,7 +50,7 @@ class ReparamModule(nn.Module):
 
         # flatten
         flat_param = nn.Parameter(torch.cat([p.reshape(-1) for p in params], 0))
-        self.register_parameter('flat_param', flat_param)
+        self.register_parameter("flat_param", flat_param)
         self.param_numel = flat_param.numel()
         del params
         del shared_param_memo
@@ -75,7 +76,7 @@ class ReparamModule(nn.Module):
         self._traced_self = None
 
     def trace(self, example_input, **trace_kwargs):
-        assert self._traced_self is None, 'This ReparamModule is already traced'
+        assert self._traced_self is None, "This ReparamModule is already traced"
 
         if isinstance(example_input, torch.Tensor):
             example_input = (example_input,)
@@ -110,8 +111,12 @@ class ReparamModule(nn.Module):
         ps = (t.view(s) for (t, s) in zip(flat_param.split(self._param_numels), self._param_shapes))
         for (mn, n), p in zip(self._param_infos, ps):
             setattr(self._get_module_from_name(mn), n, p)  # This will set as plain attr
-        for (mn, n, shared_mn, shared_n) in self._shared_param_infos:
-            setattr(self._get_module_from_name(mn), n, getattr(self._get_module_from_name(shared_mn), shared_n))
+        for mn, n, shared_mn, shared_n in self._shared_param_infos:
+            setattr(
+                self._get_module_from_name(mn),
+                n,
+                getattr(self._get_module_from_name(shared_mn), shared_n),
+            )
 
     @contextmanager
     def unflattened_param(self, flat_param):
@@ -120,8 +125,12 @@ class ReparamModule(nn.Module):
         yield
         for (mn, n), p in zip(self._param_infos, saved_views):
             setattr(self._get_module_from_name(mn), n, p)
-        for (mn, n, shared_mn, shared_n) in self._shared_param_infos:
-            setattr(self._get_module_from_name(mn), n, getattr(self._get_module_from_name(shared_mn), shared_n))
+        for mn, n, shared_mn, shared_n in self._shared_param_infos:
+            setattr(
+                self._get_module_from_name(mn),
+                n,
+                getattr(self._get_module_from_name(shared_mn), shared_n),
+            )
 
     @contextmanager
     def replaced_buffers(self, buffers):
@@ -147,4 +156,6 @@ class ReparamModule(nn.Module):
         if buffers is None:
             return self._forward_with_param(flat_param, *inputs, **kwinputs)
         else:
-            return self._forward_with_param_and_buffers(flat_param, tuple(buffers), *inputs, **kwinputs)
+            return self._forward_with_param_and_buffers(
+                flat_param, tuple(buffers), *inputs, **kwinputs
+            )

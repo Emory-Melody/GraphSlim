@@ -2,24 +2,31 @@ import numpy as np
 import scipy as sp
 from pygsp import graphs
 
-from graphslim.coarsening.utils import get_proximity_measure, \
-    matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
+from graphslim.coarsening.utils import (
+    get_proximity_measure,
+    matching_optimal,
+    matching_greedy,
+    get_coarsening_matrix,
+    coarsen_matrix,
+    coarsen_vector,
+    zero_diag,
+)
 
 from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class AffinityGs(Coarsen):
-
     def __init__(self, setting, data, args):
         super(AffinityGs, self).__init__(setting, data, args)
         args.method = "affinity_GS"
+
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate
         max_levels = 10
         Uk = None
         lk = None
-        max_level_r = 0.99,
+        max_level_r = (0.99,)
         r = np.clip(r, 0, 0.999)
         G0 = G
         N = G.N
@@ -76,4 +83,3 @@ class AffinityGs(Coarsen):
                 break
 
         return C, Gc, Call, Gall
-

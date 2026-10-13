@@ -1,5 +1,14 @@
-from .eval_agent import Evaluator
-from .nas_eval import NasEvaluator
-from .graph_property import PropertyEvaluator
+"""Public evaluation API, imported on demand."""
 
-from .utils import evaluate, verbose_time_memory
+from graphslim._lazy import lazy_exports
+
+__all__, __getattr__, __dir__ = lazy_exports(
+    globals(),
+    {
+        "Evaluator": (".eval_agent", "Evaluator"),
+        "NasEvaluator": (".nas_eval", "NasEvaluator"),
+        "PropertyEvaluator": (".graph_property", "PropertyEvaluator"),
+        "evaluate": (".utils", "evaluate"),
+        "verbose_time_memory": (".utils", "verbose_time_memory"),
+    },
+)

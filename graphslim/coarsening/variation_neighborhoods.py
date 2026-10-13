@@ -6,8 +6,17 @@ import torch
 from pygsp import graphs
 from torch_geometric.utils import to_dense_adj
 
-from graphslim.coarsening.utils import contract_variation_edges, contract_variation_linear, get_proximity_measure, \
-    matching_optimal, matching_greedy, get_coarsening_matrix, coarsen_matrix, coarsen_vector, zero_diag
+from graphslim.coarsening.utils import (
+    contract_variation_edges,
+    contract_variation_linear,
+    get_proximity_measure,
+    matching_optimal,
+    matching_greedy,
+    get_coarsening_matrix,
+    coarsen_matrix,
+    coarsen_vector,
+    zero_diag,
+)
 from graphslim.dataset.convertor import pyg2gsp, csr2ei, ei2csr
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation import *
@@ -19,13 +28,14 @@ class VariationNeighborhoods(Coarsen):
     def __init__(self, setting, data, args):
         super(VariationNeighborhoods, self).__init__(setting, data, args)
         args.method = "variation_neighborhoods"
+
     def coarsen(self, G):
         K = 10
         r = self.args.reduction_rate
         max_levels = 10
         Uk = None
         lk = None
-        max_level_r = 0.99,
+        max_level_r = (0.99,)
         r = np.clip(r, 0, 0.999)
         G0 = G
         N = G.N
@@ -40,14 +50,12 @@ class VariationNeighborhoods(Coarsen):
         Gall.append(G)
         method = "variation_neighborhoods"
         for level in range(1, max_levels + 1):
-
             G = Gc
 
             # how much more we need to reduce the current graph
             r_cur = np.clip(1 - n_target / n, 0.0, max_level_r)
 
             if "variation" in method:
-
                 if level == 1:
                     if (Uk is not None) and (lk is not None) and (len(lk) >= K):
                         mask = lk < 1e-10
@@ -76,9 +84,7 @@ class VariationNeighborhoods(Coarsen):
                     dinvsqrt[mask] = 0
                     A = B @ np.diag(dinvsqrt) @ V
 
-                coarsening_list = contract_variation_linear(
-                    G, K=K, A=A, r=r_cur, mode=method
-                )
+                coarsening_list = contract_variation_linear(G, K=K, A=A, r=r_cur, mode=method)
 
             iC = get_coarsening_matrix(G, coarsening_list)
 

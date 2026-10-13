@@ -40,11 +40,15 @@ class WandbTracker:
 
     enabled = True
 
-    def __init__(self, args: Any = None, project: Optional[str] = None, run_name: Optional[str] = None):
+    def __init__(
+        self, args: Any = None, project: Optional[str] = None, run_name: Optional[str] = None
+    ):
         try:
             import wandb
         except ImportError as exc:
-            raise RuntimeError("WandB tracking requested but the 'wandb' package is not installed.") from exc
+            raise RuntimeError(
+                "WandB tracking requested but the 'wandb' package is not installed."
+            ) from exc
 
         self._wandb = wandb
         self._run = wandb.init(

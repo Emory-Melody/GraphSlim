@@ -31,14 +31,13 @@ def match_loss(gw_syn, gw_real, args, device):
     """
     dis = torch.tensor(0.0).to(device)
 
-    if args.dis_metric == 'ours':
-
+    if args.dis_metric == "ours":
         for ig in range(len(gw_real)):
             gwr = gw_real[ig]
             gws = gw_syn[ig]
             dis += distance_wb(gwr, gws)
 
-    elif args.dis_metric == 'mse':
+    elif args.dis_metric == "mse":
         gw_real_vec = []
         gw_syn_vec = []
         for ig in range(len(gw_real)):
@@ -48,7 +47,7 @@ def match_loss(gw_syn, gw_real, args, device):
         gw_syn_vec = torch.cat(gw_syn_vec, dim=0)
         dis = torch.sum((gw_syn_vec - gw_real_vec) ** 2)
 
-    elif args.dis_metric == 'cos':
+    elif args.dis_metric == "cos":
         gw_real_vec = []
         gw_syn_vec = []
         for ig in range(len(gw_real)):
@@ -57,10 +56,11 @@ def match_loss(gw_syn, gw_real, args, device):
         gw_real_vec = torch.cat(gw_real_vec, dim=0)
         gw_syn_vec = torch.cat(gw_syn_vec, dim=0)
         dis = 1 - torch.sum(gw_real_vec * gw_syn_vec, dim=-1) / (
-                torch.norm(gw_real_vec, dim=-1) * torch.norm(gw_syn_vec, dim=-1) + 0.000001)
+            torch.norm(gw_real_vec, dim=-1) * torch.norm(gw_syn_vec, dim=-1) + 0.000001
+        )
 
     else:
-        exit('DC error: unknown distance function')
+        exit("DC error: unknown distance function")
 
     return dis
 
@@ -94,14 +94,17 @@ def distance_wb(gwr, gws):
         gwr = gwr.reshape(shape[0], shape[1] * shape[2])
         gws = gws.reshape(shape[0], shape[1] * shape[2])
     elif len(shape) == 2:  # linear, out*in
-        tmp = 'do nothing'
+        tmp = "do nothing"
     elif len(shape) == 1:  # batchnorm/instancenorm, C; groupnorm x, bias
         gwr = gwr.reshape(1, shape[0])
         gws = gws.reshape(1, shape[0])
         return 0
 
     dis_weight = torch.sum(
-        1 - torch.sum(gwr * gws, dim=-1) / (torch.norm(gwr, dim=-1) * torch.norm(gws, dim=-1) + 0.000001))
+        1
+        - torch.sum(gwr * gws, dim=-1)
+        / (torch.norm(gwr, dim=-1) * torch.norm(gws, dim=-1) + 0.000001)
+    )
     dis = dis_weight
     return dis
 
@@ -257,7 +260,9 @@ def neighborhood_difficulty_measurer(data, adj, label):
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
-    neighbor_label, _ = torch_geometric.utils.add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
+    neighbor_label, _ = torch_geometric.utils.add_self_loops(
+        edge_index
+    )  # [[1, 1, 1, 1],[2, 3, 4, 5]]
 
     neighbor_label[1] = label[neighbor_label[1]]  # [[1, 1, 1, 1],[40, 20, 19, 21]]
 
@@ -270,7 +275,9 @@ def neighborhood_difficulty_measurer(data, adj, label):
 
     neighbor_class = neighbor_class[data.idx_train]
     neighbor_class = F.normalize(neighbor_class, 1.0, 1)
-    neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
+    neighbor_entropy = (
+        -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))
+    )  # 防止log里面是0出现异常
     local_difficulty = neighbor_entropy.sum(1)
 
     return local_difficulty
@@ -352,7 +359,9 @@ def neighborhood_difficulty_measurer_in(data, adj, label):
     edge_index = adj.coalesce().indices()
     edge_value = adj.coalesce().values()
 
-    neighbor_label, _ = torch_geometric.utils.add_self_loops(edge_index)  # [[1, 1, 1, 1],[2, 3, 4, 5]]
+    neighbor_label, _ = torch_geometric.utils.add_self_loops(
+        edge_index
+    )  # [[1, 1, 1, 1],[2, 3, 4, 5]]
 
     neighbor_label[1] = label[neighbor_label[1]]  # [[1, 1, 1, 1],[40, 20, 19, 21]]
 
@@ -364,7 +373,9 @@ def neighborhood_difficulty_measurer_in(data, adj, label):
     neighbor_class = neighbor_class.to_dense().float()
 
     neighbor_class = F.normalize(neighbor_class, 1.0, 1)
-    neighbor_entropy = -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))  # 防止log里面是0出现异常
+    neighbor_entropy = (
+        -1 * neighbor_class * torch.log(neighbor_class + torch.exp(torch.tensor(-20)))
+    )  # 防止log里面是0出现异常
     local_difficulty = neighbor_entropy.sum(1)
 
     return local_difficulty
@@ -422,7 +433,7 @@ def sort_training_nodes_in(data, adj, label):
     return indices
 
 
-def training_scheduler(lam, t, T, scheduler='geom'):
+def training_scheduler(lam, t, T, scheduler="geom"):
     """
     Adjust the value of a parameter based on the chosen scheduling strategy.
 
@@ -446,11 +457,11 @@ def training_scheduler(lam, t, T, scheduler='geom'):
     float
         The adjusted value of the parameter at iteration `t` based on the scheduling strategy.
     """
-    if scheduler == 'linear':
+    if scheduler == "linear":
         return min(1, lam + (1 - lam) * t / T)
-    elif scheduler == 'root':
-        return min(1, math.sqrt(lam ** 2 + (1 - lam ** 2) * t / T))
-    elif scheduler == 'geom':
+    elif scheduler == "root":
+        return min(1, math.sqrt(lam**2 + (1 - lam**2) * t / T))
+    elif scheduler == "geom":
         return min(1, 2 ** (math.log2(lam) - math.log2(lam) * t / T))
 
 
@@ -473,6 +484,7 @@ def get_largest_cc(adj, num_nodes, data_name):
 
     return idx_lcc, adj_norm_lcc, adj_lcc
 
+
 def get_syn_eigen(real_eigenvals, real_eigenvecs, eigen_k, ratio, step=1):
     k1 = math.ceil(eigen_k * ratio)
     k2 = eigen_k - k1
@@ -482,11 +494,10 @@ def get_syn_eigen(real_eigenvals, real_eigenvecs, eigen_k, ratio, step=1):
     k2_end = eigen_sum - (k2 - 1) * step - 1
     k1_list = range(0, k1_end, step)
     k2_list = range(k2_end, eigen_sum, step)
-    eigenvals = torch.cat(
-        [real_eigenvals[k1_list], real_eigenvals[k2_list]]
-    )
+    eigenvals = torch.cat([real_eigenvals[k1_list], real_eigenvals[k2_list]])
     eigenvecs = torch.cat(
-        [real_eigenvecs[:, k1_list], real_eigenvecs[:, k2_list]], dim=1,
+        [real_eigenvecs[:, k1_list], real_eigenvecs[:, k2_list]],
+        dim=1,
     )
 
     return eigenvals, eigenvecs
@@ -515,9 +526,9 @@ def get_embed_sum(eigenvals, eigenvecs, x):
     return embed_sum
 
 
-def get_embed_mean(embed_sum, label):
-    class_matrix = F.one_hot(label).float()  # nc
-    class_matrix = class_matrix.T  # cn
+def get_embed_mean(embed_sum, label, class_matrix=None):
+    if class_matrix is None:
+        class_matrix = F.one_hot(label).float().T  # cn
     embed_sum = class_matrix @ embed_sum  # cd
     mean_weight = (1 / class_matrix.sum(1)).unsqueeze(-1)  # c1
     embed_mean = mean_weight * embed_sum
@@ -540,7 +551,7 @@ def get_eigh(laplacian_matrix, data_name, save=True):
         eigenvalues = np.load(eigvals_path)
         eigenvectors = np.load(eigvecs_path)
     else:
-        if data_name in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+        if data_name in ["ogbn-arxiv", "flickr", "reddit", "twitch-gamer"]:
             eigenvalues, eigenvectors = eigsh(A=laplacian_matrix, k=1000, which="SA", tol=1e-5)
         else:
             if sp.issparse(laplacian_matrix):
@@ -551,7 +562,7 @@ def get_eigh(laplacian_matrix, data_name, save=True):
             np.save(eigvals_path, eigenvalues)
             np.save(eigvecs_path, eigenvectors)
 
-    if data_name in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+    if data_name in ["ogbn-arxiv", "flickr", "reddit", "twitch-gamer"]:
         val_file_name = "eigenvalues_la.npy"
         vec_file_name = "eigenvectors_la.npy"
         eigvals_path = os.path.join(dir, val_file_name)
@@ -561,7 +572,9 @@ def get_eigh(laplacian_matrix, data_name, save=True):
             eigenvalues_la = np.load(eigvals_path)
             eigenvectors_la = np.load(eigvecs_path)
         else:
-            eigenvalues_la, eigenvectors_la = eigsh(A=laplacian_matrix, k=1000, which="LA", tol=1e-5)
+            eigenvalues_la, eigenvectors_la = eigsh(
+                A=laplacian_matrix, k=1000, which="LA", tol=1e-5
+            )
             if save:
                 np.save(eigvals_path, eigenvalues_la)
                 np.save(eigvecs_path, eigenvectors_la)
@@ -576,8 +589,8 @@ def get_eigh(laplacian_matrix, data_name, save=True):
     return eigenvalues, eigenvectors
 
 
-def load_eigen(dataset,load_path):
-    dir = os.path.join(load_path, dataset) 
+def load_eigen(dataset, load_path):
+    dir = os.path.join(load_path, dataset)
     val_file_name = "eigenvalues.npy"
     vec_file_name = "eigenvectors.npy"
 
@@ -586,7 +599,7 @@ def load_eigen(dataset,load_path):
     eigenvalues = np.load(eigvals_path)
     eigenvectors = np.load(eigvecs_path)
 
-    if dataset in ['ogbn-arxiv', 'flickr', 'reddit', 'twitch-gamer']:
+    if dataset in ["ogbn-arxiv", "flickr", "reddit", "twitch-gamer"]:
         val_file_name = "eigenvalues_la.npy"
         vec_file_name = "eigenvectors_la.npy"
         eigvals_path = os.path.join(dir, val_file_name)

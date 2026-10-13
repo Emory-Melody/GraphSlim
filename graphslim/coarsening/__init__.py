@@ -1,12 +1,22 @@
-from .coarsening_base import Coarsen
-from .vng import VNG
-from .clustering import Cluster
-from .clusteringagg import ClusterAgg
-from .averaging import Average
-from .variation_neighborhoods import VariationNeighborhoods
-from .variation_edges import VariationEdges
-from .variation_cliques import VariationCliques
-from .heavy_edge import HeavyEdge
-from .algebraic_jc import AlgebraicJc
-from .affinity_gs import AffinityGs
-from .kron import Kron
+"""Public coarsening API, imported on demand."""
+
+from graphslim._lazy import lazy_exports
+
+__all__, __getattr__, __dir__ = lazy_exports(
+    globals(),
+    {
+        "NOPE": (".nope", "NOPE"),
+        "Coarsen": (".coarsening_base", "Coarsen"),
+        "VNG": (".vng", "VNG"),
+        "Cluster": (".clustering", "Cluster"),
+        "ClusterAgg": (".clusteringagg", "ClusterAgg"),
+        "Average": (".averaging", "Average"),
+        "VariationNeighborhoods": (".variation_neighborhoods", "VariationNeighborhoods"),
+        "VariationEdges": (".variation_edges", "VariationEdges"),
+        "VariationCliques": (".variation_cliques", "VariationCliques"),
+        "HeavyEdge": (".heavy_edge", "HeavyEdge"),
+        "AlgebraicJc": (".algebraic_jc", "AlgebraicJc"),
+        "AffinityGs": (".affinity_gs", "AffinityGs"),
+        "Kron": (".kron", "Kron"),
+    },
+)

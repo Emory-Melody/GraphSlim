@@ -10,16 +10,15 @@ from graphslim.models.layers import MyLinear
 
 
 class SGC(BaseGNN):
-    '''
+    """
     multiple transformation layers
-    '''
+    """
 
-    def __init__(self, nfeat, nhid, nclass, args, mode='train'):
-
+    def __init__(self, nfeat, nhid, nclass, args, mode="train"):
         """nlayers indicates the number of propagations"""
         super(SGC, self).__init__(nfeat, nhid, nclass, args, mode)
 
-        if mode in ['eval']:
+        if mode in ["eval"]:
             self.ntrans = 1
         if self.ntrans == 1:
             self.layers.append(MyLinear(nfeat, nclass))
@@ -39,7 +38,8 @@ class SGC(BaseGNN):
             x = layer(x)
             if ix != len(self.layers) - 1:
                 x = self.bns[ix](x) if self.with_bn else x
-                x = F.relu(x)
+                if self.with_relu:
+                    x = self.activation(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
         for i in range(self.nlayers):

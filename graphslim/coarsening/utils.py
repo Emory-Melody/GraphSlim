@@ -71,7 +71,7 @@ def maxWeightMatching(edges, maxcardinality=False):
     # Count vertices.
     nedge = len(edges)
     nvertex = 0
-    for (i, j, w) in edges:
+    for i, j, w in edges:
         assert i >= 0 and j >= 0 and i != j
         if i >= nvertex:
             nvertex = i + 1
@@ -203,7 +203,8 @@ def maxWeightMatching(edges, maxcardinality=False):
     # and record the fact that w was reached through the edge with
     # remote endpoint p.
     def assignLabel(w, t, p):
-        if DEBUG: DEBUG('assignLabel(%d,%d,%d)' % (w, t, p))
+        if DEBUG:
+            DEBUG("assignLabel(%d,%d,%d)" % (w, t, p))
         b = inblossom[w]
         assert label[w] == 0 and label[b] == 0
         label[w] = label[b] = t
@@ -212,7 +213,8 @@ def maxWeightMatching(edges, maxcardinality=False):
         if t == 1:
             # b became an S-vertex/blossom; add it(s vertices) to the queue.
             queue.extend(blossomLeaves(b))
-            if DEBUG: DEBUG('PUSH ' + str(list(blossomLeaves(b))))
+            if DEBUG:
+                DEBUG("PUSH " + str(list(blossomLeaves(b))))
         elif t == 2:
             # b became a T-vertex/blossom; assign label S to its mate.
             # (If b is a non-trivial blossom, its base is the only vertex
@@ -224,7 +226,8 @@ def maxWeightMatching(edges, maxcardinality=False):
     # Trace back from vertices v and w to discover either a new blossom
     # or an augmenting path. Return the base vertex of the new blossom or -1.
     def scanBlossom(v, w):
-        if DEBUG: DEBUG('scanBlossom(%d,%d)' % (v, w))
+        if DEBUG:
+            DEBUG("scanBlossom(%d,%d)" % (v, w))
         # Trace back from v and w, placing breadcrumbs as we go.
         path = []
         base = -1
@@ -268,7 +271,8 @@ def maxWeightMatching(edges, maxcardinality=False):
         bw = inblossom[w]
         # Create blossom.
         b = unusedblossoms.pop()
-        if DEBUG: DEBUG('addBlossom(%d,%d) (v=%d w=%d) -> %d' % (base, k, v, w, b))
+        if DEBUG:
+            DEBUG("addBlossom(%d,%d) (v=%d w=%d) -> %d" % (base, k, v, w, b))
         blossombase[b] = base
         blossomparent[b] = -1
         blossomparent[bb] = b
@@ -281,8 +285,7 @@ def maxWeightMatching(edges, maxcardinality=False):
             blossomparent[bv] = b
             path.append(bv)
             endps.append(labelend[bv])
-            assert (label[bv] == 2 or
-                    (label[bv] == 1 and labelend[bv] == mate[blossombase[bv]]))
+            assert label[bv] == 2 or (label[bv] == 1 and labelend[bv] == mate[blossombase[bv]])
             # Trace one step back.
             assert labelend[bv] >= 0
             v = endpoint[labelend[bv]]
@@ -298,8 +301,7 @@ def maxWeightMatching(edges, maxcardinality=False):
             blossomparent[bw] = b
             path.append(bw)
             endps.append(labelend[bw] ^ 1)
-            assert (label[bw] == 2 or
-                    (label[bw] == 1 and labelend[bw] == mate[blossombase[bw]]))
+            assert label[bw] == 2 or (label[bw] == 1 and labelend[bw] == mate[blossombase[bw]])
             # Trace one step back.
             assert labelend[bw] >= 0
             w = endpoint[labelend[bw]]
@@ -323,8 +325,7 @@ def maxWeightMatching(edges, maxcardinality=False):
             if blossombestedges[bv] is None:
                 # This subblossom does not have a list of least-slack edges;
                 # get the information from the vertices.
-                nblists = [[p // 2 for p in neighbend[v]]
-                           for v in blossomLeaves(bv)]
+                nblists = [[p // 2 for p in neighbend[v]] for v in blossomLeaves(bv)]
             else:
                 # Walk this subblossom's least-slack edges.
                 nblists = [blossombestedges[bv]]
@@ -334,9 +335,11 @@ def maxWeightMatching(edges, maxcardinality=False):
                     if inblossom[j] == b:
                         i, j = j, i
                     bj = inblossom[j]
-                    if (bj != b and label[bj] == 1 and
-                            (bestedgeto[bj] == -1 or
-                             slack(k) < slack(bestedgeto[bj]))):
+                    if (
+                        bj != b
+                        and label[bj] == 1
+                        and (bestedgeto[bj] == -1 or slack(k) < slack(bestedgeto[bj]))
+                    ):
                         bestedgeto[bj] = k
             # Forget about least-slack edges of the subblossom.
             blossombestedges[bv] = None
@@ -347,11 +350,13 @@ def maxWeightMatching(edges, maxcardinality=False):
         for k in blossombestedges[b]:
             if bestedge[b] == -1 or slack(k) < slack(bestedge[b]):
                 bestedge[b] = k
-        if DEBUG: DEBUG('blossomchilds[%d]=' % b + repr(blossomchilds[b]))
+        if DEBUG:
+            DEBUG("blossomchilds[%d]=" % b + repr(blossomchilds[b]))
 
     # Expand the given top-level blossom.
     def expandBlossom(b, endstage):
-        if DEBUG: DEBUG('expandBlossom(%d,%d) %s' % (b, endstage, repr(blossomchilds[b])))
+        if DEBUG:
+            DEBUG("expandBlossom(%d,%d) %s" % (b, endstage, repr(blossomchilds[b])))
         # Convert sub-blossoms into top-level blossoms.
         for s in blossomchilds[b]:
             blossomparent[s] = -1
@@ -439,7 +444,8 @@ def maxWeightMatching(edges, maxcardinality=False):
     # Swap matched/unmatched edges over an alternating path through blossom b
     # between vertex v and the base vertex. Keep blossom bookkeeping consistent.
     def augmentBlossom(b, v):
-        if DEBUG: DEBUG('augmentBlossom(%d,%d)' % (b, v))
+        if DEBUG:
+            DEBUG("augmentBlossom(%d,%d)" % (b, v))
         # Bubble up through the blossom tree from vertex v to an immediate
         # sub-blossom of b.
         t = v
@@ -475,7 +481,8 @@ def maxWeightMatching(edges, maxcardinality=False):
             # Match the edge connecting those sub-blossoms.
             mate[endpoint[p]] = p ^ 1
             mate[endpoint[p ^ 1]] = p
-            if DEBUG: DEBUG('PAIR %d %d (k=%d)' % (endpoint[p], endpoint[p ^ 1], p // 2))
+            if DEBUG:
+                DEBUG("PAIR %d %d (k=%d)" % (endpoint[p], endpoint[p ^ 1], p // 2))
         # Rotate the list of sub-blossoms to put the new base at the front.
         blossomchilds[b] = blossomchilds[b][i:] + blossomchilds[b][:i]
         blossomendps[b] = blossomendps[b][i:] + blossomendps[b][:i]
@@ -487,9 +494,11 @@ def maxWeightMatching(edges, maxcardinality=False):
     # connects a pair of S vertices.
     def augmentMatching(k):
         (v, w, wt) = edges[k]
-        if DEBUG: DEBUG('augmentMatching(%d) (v=%d w=%d)' % (k, v, w))
-        if DEBUG: DEBUG('PAIR %d %d (k=%d)' % (v, w, k))
-        for (s, p) in ((v, 2 * k + 1), (w, 2 * k)):
+        if DEBUG:
+            DEBUG("augmentMatching(%d) (v=%d w=%d)" % (k, v, w))
+        if DEBUG:
+            DEBUG("PAIR %d %d (k=%d)" % (v, w, k))
+        for s, p in ((v, 2 * k + 1), (w, 2 * k)):
             # Match vertex s to remote endpoint p. Then trace back from s
             # until we find a single vertex, swapping matched and unmatched
             # edges as we go.
@@ -522,7 +531,8 @@ def maxWeightMatching(edges, maxcardinality=False):
                 # Keep the opposite endpoint;
                 # it will be assigned to mate[s] in the next step.
                 p = labelend[bt] ^ 1
-                if DEBUG: DEBUG('PAIR %d %d (k=%d)' % (s, t, p // 2))
+                if DEBUG:
+                    DEBUG("PAIR %d %d (k=%d)" % (s, t, p // 2))
 
     # Verify that the optimum solution has been reached.
     def verifyOptimum():
@@ -548,7 +558,7 @@ def maxWeightMatching(edges, maxcardinality=False):
                 jblossoms.append(blossomparent[jblossoms[-1]])
             iblossoms.reverse()
             jblossoms.reverse()
-            for (bi, bj) in zip(iblossoms, jblossoms):
+            for bi, bj in zip(iblossoms, jblossoms):
                 if bi != bj:
                     break
                 s += 2 * dualvar[bi]
@@ -582,10 +592,26 @@ def maxWeightMatching(edges, maxcardinality=False):
                         if bk == -1 or d < bd:
                             bk = k
                             bd = d
-                if DEBUG and (bestedge[v] != -1 or bk != -1) and (bestedge[v] == -1 or bd != slack(bestedge[v])):
-                    DEBUG('v=' + str(v) + ' bk=' + str(bk) + ' bd=' + str(bd) + ' bestedge=' + str(
-                        bestedge[v]) + ' slack=' + str(slack(bestedge[v])))
-                assert (bk == -1 and bestedge[v] == -1) or (bestedge[v] != -1 and bd == slack(bestedge[v]))
+                if (
+                    DEBUG
+                    and (bestedge[v] != -1 or bk != -1)
+                    and (bestedge[v] == -1 or bd != slack(bestedge[v]))
+                ):
+                    DEBUG(
+                        "v="
+                        + str(v)
+                        + " bk="
+                        + str(bk)
+                        + " bd="
+                        + str(bd)
+                        + " bestedge="
+                        + str(bestedge[v])
+                        + " slack="
+                        + str(slack(bestedge[v]))
+                    )
+                assert (bk == -1 and bestedge[v] == -1) or (
+                    bestedge[v] != -1 and bd == slack(bestedge[v])
+                )
 
     # Check optimized delta3 against a trivial computation.
     def checkDelta3():
@@ -613,16 +639,16 @@ def maxWeightMatching(edges, maxcardinality=False):
                         tbk = bestedge[b]
                         tbd = slack(bestedge[b])
         if DEBUG and bd != tbd:
-            DEBUG('bk=%d tbk=%d bd=%s tbd=%s' % (bk, tbk, repr(bd), repr(tbd)))
+            DEBUG("bk=%d tbk=%d bd=%s tbd=%s" % (bk, tbk, repr(bd), repr(tbd)))
         assert bd == tbd
 
     # Main loop: continue until no further improvement is possible.
     for t in range(nvertex):
-
         # Each iteration of this loop is a "stage".
         # A stage finds an augmenting path and uses that to improve
         # the matching.
-        if DEBUG: DEBUG('STAGE %d' % t)
+        if DEBUG:
+            DEBUG("STAGE %d" % t)
 
         # Remove labels from top-level blossoms/vertices.
         label[:] = (2 * nvertex) * [0]
@@ -646,22 +672,22 @@ def maxWeightMatching(edges, maxcardinality=False):
         # Loop until we succeed in augmenting the matching.
         augmented = 0
         while 1:
-
             # Each iteration of this loop is a "substage".
             # A substage tries to find an augmenting path;
             # if found, the path is used to improve the matching and
             # the stage ends. If there is no augmenting path, the
             # primal-dual method is used to pump some slack out of
             # the dual variables.
-            if DEBUG: DEBUG('SUBSTAGE')
+            if DEBUG:
+                DEBUG("SUBSTAGE")
 
             # Continue labeling until all vertices which are reachable
             # through an alternating path have got a label.
             while queue and not augmented:
-
                 # Take an S vertex from the queue.
                 v = queue.pop()
-                if DEBUG: DEBUG('POP v=%d' % v)
+                if DEBUG:
+                    DEBUG("POP v=%d" % v)
                 assert label[inblossom[v]] == 1
 
                 # Scan its neighbours:
@@ -751,8 +777,7 @@ def maxWeightMatching(edges, maxcardinality=False):
             # Compute delta3: half the minimum slack on any edge between
             # a pair of S-blossoms.
             for b in range(2 * nvertex):
-                if (blossomparent[b] == -1 and label[b] == 1 and
-                        bestedge[b] != -1):
+                if blossomparent[b] == -1 and label[b] == 1 and bestedge[b] != -1:
                     kslack = slack(bestedge[b])
                     if isinstance(kslack, numbers.Integral):
                         assert (kslack % 2) == 0
@@ -766,9 +791,12 @@ def maxWeightMatching(edges, maxcardinality=False):
 
             # Compute delta4: minimum z variable of any T-blossom.
             for b in range(nvertex, 2 * nvertex):
-                if (blossombase[b] >= 0 and blossomparent[b] == -1 and
-                        label[b] == 2 and
-                        (deltatype == -1 or dualvar[b] < delta)):
+                if (
+                    blossombase[b] >= 0
+                    and blossomparent[b] == -1
+                    and label[b] == 2
+                    and (deltatype == -1 or dualvar[b] < delta)
+                ):
                     delta = dualvar[b]
                     deltatype = 4
                     deltablossom = b
@@ -799,7 +827,8 @@ def maxWeightMatching(edges, maxcardinality=False):
                         dualvar[b] -= delta
 
             # Take action at the point where minimum delta occurred.
-            if DEBUG: DEBUG('delta%d=%f' % (deltatype, delta))
+            if DEBUG:
+                DEBUG("delta%d=%f" % (deltatype, delta))
             if deltatype == 1:
                 # No further improvement possible; optimum reached.
                 break
@@ -829,8 +858,7 @@ def maxWeightMatching(edges, maxcardinality=False):
 
         # End of a stage; expand all S-blossoms which have dualvar = 0.
         for b in range(nvertex, 2 * nvertex):
-            if (blossomparent[b] == -1 and blossombase[b] >= 0 and
-                    label[b] == 1 and dualvar[b] == 0):
+            if blossomparent[b] == -1 and blossombase[b] >= 0 and label[b] == 1 and dualvar[b] == 0:
                 expandBlossom(b, True)
 
     # Verify that we reached the optimum solution.
@@ -953,7 +981,6 @@ def coarsen_matrix(W, C):
     coarsened_W = (Pinv.T).dot(W.dot(Pinv))
 
     return coarsened_W
-
 
 
 def lift_matrix(W, C):
@@ -1142,7 +1169,7 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     for kIdx in range(1, kmax):
         error_subspace[kIdx] = np.abs(np.linalg.norm(M[:, : kIdx + 1], ord=2) - 1)
         error_sintheta[kIdx] = (
-                np.linalg.norm(metrics["angle_matrix"][0: kIdx + 1, kIdx + 1:], ord="fro") ** 2
+            np.linalg.norm(metrics["angle_matrix"][0 : kIdx + 1, kIdx + 1 :], ord="fro") ** 2
         )
 
     metrics["error_subspace"] = error_subspace
@@ -1576,13 +1603,9 @@ def get_proximity_measure(G, name, K=10):
             G, num_vectors=num_vectors, method="Chebychev", lambda_cut=G.e[K + 1]
         )
     elif "JC" in name:
-        X_jc = generate_test_vectors(
-            G, num_vectors=num_vectors, method="JC", iterations=20
-        )
+        X_jc = generate_test_vectors(G, num_vectors=num_vectors, method="JC", iterations=20)
     elif "GS" in name:
-        X_gs = generate_test_vectors(
-            G, num_vectors=num_vectors, method="GS", iterations=1
-        )
+        X_gs = generate_test_vectors(G, num_vectors=num_vectors, method="GS", iterations=1)
     if "expected" in name:
         X = X_lan
         assert not np.isnan(X).any()
@@ -1595,9 +1618,7 @@ def get_proximity_measure(G, name, K=10):
     if name == "heavy_edge":
         wmax = np.array(np.max(G.W, 0).todense())[0] + 1e-5
         for e in range(M):
-            proximity[e] = weights[e] / max(
-                wmax[edges[:, e]]
-            )  # Select edges with large proximity
+            proximity[e] = weights[e] / max(wmax[edges[:, e]])  # Select edges with large proximity
         return proximity
 
     # heuristic for multigrid
@@ -1618,7 +1639,7 @@ def get_proximity_measure(G, name, K=10):
         for e in range(M):
             i, j = edges[:, e]
             c[i, j] = (X_gs[i, :] @ X_gs[j, :].T) ** 2 / (
-                    (X_gs[i, :] @ X_gs[i, :].T) ** 2 * (X_gs[j, :] @ X_gs[j, :].T) ** 2
+                (X_gs[i, :] @ X_gs[i, :].T) ** 2 * (X_gs[j, :] @ X_gs[j, :].T) ** 2
             )  # Select edges with large proximity
         c += c.T
         c -= np.diag(np.diag(c))
@@ -1631,9 +1652,7 @@ def get_proximity_measure(G, name, K=10):
         i, j = edges[:, e]
 
         if name == "heavy_edge_degree":
-            proximity[e] = (
-                    deg[i] + deg[j] + 2 * G.W[i, j]
-            )  # Select edges with large proximity
+            proximity[e] = deg[i] + deg[j] + 2 * G.W[i, j]  # Select edges with large proximity
 
         # Custom: minimize expected loss
         elif "min_expected_loss" in name:
@@ -1662,9 +1681,7 @@ def get_proximity_measure(G, name, K=10):
                 proximity[e] = sum(
                     [
                         proximity[e],
-                        (xk[i] - xk[j]) ** 2
-                        * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4)
-                        / lk,
+                        (xk[i] - xk[j]) ** 2 * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4) / lk,
                     ]
                 )  # Select edges with small proximity
 
@@ -1691,9 +1708,9 @@ def get_proximity_measure(G, name, K=10):
                     [
                         proximity[e],
                         (
-                                (xk[i] - xk[j]) ** 2
-                                * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4 - 0 * lk)
-                                / lk
+                            (xk[i] - xk[j]) ** 2
+                            * ((deg[i] + deg[j] + 2 * G.W[i, j]) / 4 - 0 * lk)
+                            / lk
                         ),
                     ]
                 )  # Select edges with small proximity
@@ -1713,10 +1730,7 @@ def get_proximity_measure(G, name, K=10):
     return proximity
 
 
-
-def generate_test_vectors(
-        G, num_vectors=10, method="Gauss-Seidel", iterations=5, lambda_cut=0.1
-):
+def generate_test_vectors(G, num_vectors=10, method="Gauss-Seidel", iterations=5, lambda_cut=0.1):
     """
     Generate test vectors for graph processing using different iterative methods.
 
@@ -1781,7 +1795,6 @@ def generate_test_vectors(
         # Chebychev method
         f = filters.Filter(G, lambda x: ((x <= lambda_cut) * 1).astype(np.float32))
         return f.filter(X, method="chebyshev", order=50)
-
 
 
 def matching_optimal(G, weights, r=0.4):
@@ -1850,9 +1863,7 @@ def matching_optimal(G, weights, r=0.4):
         i = matching[mIdx, 0]
         j = matching[mIdx, 1]
         eIdx = [
-            e
-            for e, t in enumerate(edges[:, :].T)
-            if ((t == [i, j]).all() or (t == [j, i]).all())
+            e for e, t in enumerate(edges[:, :].T) if ((t == [i, j]).all() or (t == [j, i]).all())
         ]
         matched_weights[mIdx] = weights[eIdx]
 
@@ -1863,7 +1874,6 @@ def matching_optimal(G, weights, r=0.4):
         matching = matching[idx, :]
 
     return matching
-
 
 
 def matching_greedy(G, weights, r=0.4):
@@ -1912,7 +1922,6 @@ def matching_greedy(G, weights, r=0.4):
 
     n, n_target = N, (1 - r) * N  # Initial and target number of nodes
     while len(candidate_edges) > 0:
-
         # Pop a candidate edge
         [i, j] = candidate_edges.pop(0)
 
@@ -1932,7 +1941,6 @@ def matching_greedy(G, weights, r=0.4):
             break
 
     return np.array(matching)
-
 
 
 ##############################################################################
@@ -2112,15 +2120,15 @@ def kron_interpolate(G, Gc, x):
 
 
 def my_graph_multiresolution(
-        G,
-        levels,
-        r=0.5,
-        sparsify=True,
-        sparsify_eps=None,
-        downsampling_method="largest_eigenvector",
-        reduction_method="kron",
-        compute_full_eigen=False,
-        reg_eps=0.005,
+    G,
+    levels,
+    r=0.5,
+    sparsify=True,
+    sparsify_eps=None,
+    downsampling_method="largest_eigenvector",
+    reduction_method="kron",
+    compute_full_eigen=False,
+    reg_eps=0.005,
 ):
     r"""Compute a pyramid of graphs (by Kron reduction).
 
@@ -2293,12 +2301,10 @@ def graph_sparsify(M, epsilon, maxiter=10):
         # Determine the number of samples needed
         C0 = 1 / 30.0
         C = 4 * C0
-        q = round(N * np.log(N) * 9 * C ** 2 / (epsilon ** 2))
+        q = round(N * np.log(N) * 9 * C**2 / (epsilon**2))
 
         # Sample edges based on their probabilities
-        results = sp.stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(
-            size=int(q)
-        )
+        results = sp.stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(size=int(q))
         spin_counts = sp.stats.itemfreq(results).astype(int)
         per_spin_weights = weights / (q * Pe)
 
@@ -2307,9 +2313,7 @@ def graph_sparsify(M, epsilon, maxiter=10):
         new_weights = counts * per_spin_weights
 
         # Construct the new sparser weight matrix
-        sparserW = sp.sparse.csc_matrix(
-            (new_weights, (start_nodes, end_nodes)), shape=(N, N)
-        )
+        sparserW = sp.sparse.csc_matrix((new_weights, (start_nodes, end_nodes)), shape=(N, N))
         sparserW = sparserW + sparserW.T
         sparserL = sp.sparse.diags(sparserW.diagonal(), 0) - sparserW
 
@@ -2318,7 +2322,7 @@ def graph_sparsify(M, epsilon, maxiter=10):
         if not M.is_directed():
             sparserW = (sparserW + sparserW.T) / 2.0
 
-        Mnew = graphs.Graph(W=sparserW)
+        Mnew = graphs.Graph(sparserW)
     else:
         Mnew = sp.sparse.lil_matrix(sparserL)
 
@@ -2355,7 +2359,7 @@ def get_S(G):
     return S
 
 
-def eig(A, order='ascend'):
+def eig(A, order="ascend"):
     """
     Perform eigenvalue decomposition on a symmetric matrix and sort the eigenvalues
     and eigenvectors in ascending or descending order.
@@ -2380,7 +2384,7 @@ def eig(A, order='ascend'):
 
     # Reordering indices
     idx = l.argsort()
-    if order == 'descend':
+    if order == "descend":
         idx = idx[::-1]
 
     # Reordering eigenvalues and eigenvectors
@@ -2388,7 +2392,6 @@ def eig(A, order='ascend'):
     X = X[:, idx]
 
     return X, np.real(l)
-
 
 
 def zero_diag(A):
@@ -2410,11 +2413,14 @@ def zero_diag(A):
     if sp.sparse.issparse(A):
         # For sparse matrices, create a diagonal matrix from the original diagonal
         # and subtract it from the original matrix
-        return A - sp.sparse.dia_matrix((A.diagonal()[np.newaxis, :], [0]), shape=(A.shape[0], A.shape[1]))
+        return A - sp.sparse.dia_matrix(
+            (A.diagonal()[np.newaxis, :], [0]), shape=(A.shape[0], A.shape[1])
+        )
     else:
         # For dense matrices, extract the diagonal, create a diagonal matrix from it,
         # and subtract it from the original matrix
         D = A.diagonal()
         return A - np.diag(D)
+
 
 ##############################################################################

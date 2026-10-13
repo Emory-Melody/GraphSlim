@@ -1,3 +1,4 @@
+from graphslim.models import get_model_class
 import copy
 
 import numpy as np
@@ -54,30 +55,53 @@ class VNG:
         setting = self.setting
         cpu_data = copy.deepcopy(data)
 
-        if args.setting == 'trans':
-            model = eval(args.condense_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
-            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose, setting=args.setting,
-                               reduced=False)
+        if args.setting == "trans":
+            model = get_model_class(args.condense_model)(
+                data.feat_full.shape[1], args.hidden, data.nclass, args
+            ).to(self.device)
+            model.fit_with_val(
+                data,
+                train_iters=args.eval_epochs,
+                normadj=True,
+                verbose=verbose,
+                setting=args.setting,
+                reduced=False,
+            )
             embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)
             embeds = [embed[data.train_mask] for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
 
-            coarsen_edge, coarsen_features, coarsen_labels = self.vng(data.feat_full[data.train_mask], embeds,
-                                                                      data.adj_train, labels)
+            coarsen_edge, coarsen_features, coarsen_labels = self.vng(
+                data.feat_full[data.train_mask], embeds, data.adj_train, labels
+            )
 
         else:
-            model = eval(args.condense_model)(data.feat_full.shape[1], args.hidden, data.nclass, args).to(self.device)
-            model.fit_with_val(data, train_iters=args.eval_epochs, normadj=True, verbose=verbose, setting=args.setting,
-                               reduced=False, reindex=True)
+            model = get_model_class(args.condense_model)(
+                data.feat_full.shape[1], args.hidden, data.nclass, args
+            ).to(self.device)
+            model.fit_with_val(
+                data,
+                train_iters=args.eval_epochs,
+                normadj=True,
+                verbose=verbose,
+                setting=args.setting,
+                reduced=False,
+                reindex=True,
+            )
             model.eval()
             embeds = model.predict(data.feat_train, data.adj_train, output_layer_features=True)
             embeds = [embed for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
 
-            coarsen_edge, coarsen_features, coarsen_labels = self.vng(data.feat_full[data.train_mask], embeds,
-                                                                      data.adj_train, labels)
+            coarsen_edge, coarsen_features, coarsen_labels = self.vng(
+                data.feat_full[data.train_mask], embeds, data.adj_train, labels
+            )
 
-        data.adj_syn, data.feat_syn, data.labels_syn = coarsen_edge, coarsen_features, coarsen_labels
+        data.adj_syn, data.feat_syn, data.labels_syn = (
+            coarsen_edge,
+            coarsen_features,
+            coarsen_labels,
+        )
 
         save_reduced(coarsen_edge, coarsen_features, coarsen_labels, args)
 
@@ -162,4 +186,3 @@ class VNG:
         coarsen_labels = torch.argmax(torch.FloatTensor(M.dot(labels)), dim=1).long()
 
         return coarsen_edge, coarsen_features, coarsen_labels
-

@@ -1,22 +1,13 @@
-import os
+"""Compatibility entry point; use the same pipeline as the package."""
+
+from pathlib import Path
 import sys
 
-if os.path.abspath('..') not in sys.path:
-    sys.path.append(os.path.abspath('..'))
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from graphslim.config import cli
-from graphslim.dataset import *
-from graphslim.evaluation import Evaluator
+from graphslim.run_eval import main
 
-if __name__ == '__main__':
-    args = cli(standalone_mode=False)
-    data = get_dataset(args.dataset, args)
-    if args.eval_whole:
-        evaluator = Evaluator(args)
-        evaluator.evaluate(data, model_type=args.eval_model, reduced=False)
-    else:
-        if args.attack is not None:
-            data = attack(data, args)
-            args.save_path = f'checkpoints'
-        evaluator = Evaluator(args)
-        evaluator.evaluate(data, model_type=args.eval_model)
+
+if __name__ == "__main__":
+    main()

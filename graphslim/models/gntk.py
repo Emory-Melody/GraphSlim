@@ -20,7 +20,7 @@ class GNTK(object):
         # self.num_agg_layers = num_agg_layers
         self.jk = jk
         self.scale = scale
-        assert (scale in ['uniform', 'degree'])
+        assert scale in ["uniform", "degree"]
 
     def __next_diag(self, S):
         """
@@ -64,15 +64,15 @@ class GNTK(object):
         """
         return adj_block.dot(S.reshape(-1)).reshape(N1, N2) * scale_mat
 
-    def show_memory(self, unit='KB', threshold=1):
-        '''查看变量占用内存情况
+    def show_memory(self, unit="KB", threshold=1):
+        """查看变量占用内存情况
 
         :param unit: 显示的单位，可为`B`,`KB`,`MB`,`GB`
         :param threshold: 仅显示内存数值大于等于threshold的变量
-        '''
+        """
         from sys import getsizeof
-        scale = {
-            'B': 1, 'KB': 1024, 'MB': 1048576, 'GB': 1073741824}[unit]
+
+        scale = {"B": 1, "KB": 1024, "MB": 1048576, "GB": 1073741824}[unit]
         for i in list(globals().keys()):
             memory = eval("getsizeof({})".format(i)) // scale
             if memory >= threshold:
@@ -87,7 +87,7 @@ class GNTK(object):
         N = A.shape[0]
         # tmp0 = np.sum(A, axis=1)
         # tmp1 = np.array(np.sum(A, axis=1) * np.sum(A, axis=0))
-        if self.scale == 'uniform':
+        if self.scale == "uniform":
             scale_mat = 1.0
         else:
             scale_mat = 1.0 / np.array(np.sum(A, axis=1) * np.sum(A, axis=0))
@@ -125,10 +125,10 @@ class GNTK(object):
         n1 = A1.shape[0]
         n2 = A2.shape[0]
 
-        if self.scale == 'uniform':
-            scale_mat = 1.
+        if self.scale == "uniform":
+            scale_mat = 1.0
         else:
-            scale_mat = 1. / np.array(np.sum(A1, axis=1) * np.sum(A2, axis=0))
+            scale_mat = 1.0 / np.array(np.sum(A1, axis=1) * np.sum(A2, axis=0))
 
         adj_block = sp.sparse.kron(A1, A2)
 
@@ -145,9 +145,11 @@ class GNTK(object):
 
         for layer in range(1, self.num_layers):
             for mlp_layer in range(self.num_mlp_layers):
-                sigma, dot_sigma = self.__next(sigma,
-                                               diag_list1[(layer - 1) * self.num_mlp_layers + mlp_layer],
-                                               diag_list2[(layer - 1) * self.num_mlp_layers + mlp_layer])
+                sigma, dot_sigma = self.__next(
+                    sigma,
+                    diag_list1[(layer - 1) * self.num_mlp_layers + mlp_layer],
+                    diag_list2[(layer - 1) * self.num_mlp_layers + mlp_layer],
+                )
                 ntk = ntk * dot_sigma + sigma
 
             jump_ntk += ntk

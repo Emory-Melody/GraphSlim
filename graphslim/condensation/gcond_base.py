@@ -1,13 +1,16 @@
+from graphslim.models import get_model_class
 from collections import Counter
+from copy import copy
+from pathlib import Path
+import numpy as np
+import torch
+import torch.nn.functional as F
 
 import torch.nn as nn
 
-from graphslim.coarsening import *
-from graphslim.condensation.utils import *
-from graphslim.models import *
+from graphslim.condensation.utils import match_loss
+from graphslim.models import PGE
 from graphslim.reduction import create_reducer
-from graphslim.sparsification import *
-from graphslim.utils import *
 from graphslim.dataset.utils import save_reduced
 
 
@@ -47,27 +50,27 @@ class GCondBase:
         self.device = args.device
         self.setting = setting
 
-        if args.method not in ['msgc']:
+        if args.method not in ["msgc"]:
             self.labels_syn = self.data.labels_syn = self.generate_labels_syn(data)
             n = self.nnodes_syn = self.data.labels_syn.shape[0]
         else:
             n = self.nnodes_syn = int(data.feat_train.shape[0] * args.reduction_rate)
         self.d = d = data.feat_train.shape[1]
         # self.d = d = 64
-        print(f'target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}')
-        print(f'actual reduced size:{n}')
+        print(f"target reduced size:{int(data.feat_train.shape[0] * args.reduction_rate)}")
+        print(f"actual reduced size:{n}")
 
         # from collections import Counter; print(Counter(data.labels_train))
 
         self.feat_syn = nn.Parameter(torch.empty(n, d).to(self.device))
-        if args.method not in ['sgdd', 'gcsntk', 'msgc']:
+        if args.method not in ["sgdd", "gcsntk", "msgc"]:
             self.pge = PGE(nfeat=d, nnodes=n, device=self.device, args=args).to(self.device)
             self.adj_syn = None
 
             # self.reset_parameters()
             self.optimizer_feat = torch.optim.Adam([self.feat_syn], lr=args.lr_feat)
             self.optimizer_pge = torch.optim.Adam(self.pge.parameters(), lr=args.lr_adj)
-            print('adj_syn:', (n, n), 'feat_syn:', self.feat_syn.shape)
+            print("adj_syn:", (n, n), "feat_syn:", self.feat_syn.shape)
 
     def reset_parameters(self):
         """
@@ -129,29 +132,25 @@ class GCondBase:
             A tuple containing the synthetic features and (optionally) the adjacency matrix.
         """
         args = self.args
-        agent = create_reducer(args.init, setting=args.setting, data=self.data, args=args)
-
         if reuse_init:
-            save_path = f'{args.save_path}/reduced_graph/{args.init}'
-            if with_adj and os.path.exists(f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'):
-                feat_syn = torch.load(
-                        f'{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
-                return feat_syn, adj_syn
-            if os.path.exists(f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt'):
-                feat_syn = torch.load(
-                        f'{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}.pt', map_location=args.device)
+            save_path = Path(args.save_path) / "reduced_graph" / args.init
+            suffix = f"{args.dataset}_{args.reduction_rate}_{args.seed}.pt"
+            feat_path, adj_path = save_path / f"feat_{suffix}", save_path / f"adj_{suffix}"
+            if feat_path.is_file() and (not with_adj or adj_path.is_file()):
+                feat_syn = torch.load(feat_path, map_location=args.device, weights_only=True)
+                if with_adj:
+                    adj_syn = torch.load(adj_path, map_location=args.device, weights_only=True)
+                    return feat_syn, adj_syn
                 return feat_syn
-        temp = args.method
-        args.method = args.init
+        init_args = copy(args)
+        init_args.method = args.init
+        agent = create_reducer(args.init, setting=args.setting, data=self.data, args=init_args)
         reduced_data = agent.reduce(self.data, verbose=True, save=True)
-        args.method = temp
         if with_adj:
             return reduced_data.feat_syn, reduced_data.adj_syn
         else:
             return reduced_data.feat_syn
-            #return reduced_data.feat_syn_0, reduced_data.feat_syn_1,reduced_data.feat_syn_2
-
-
+            # return reduced_data.feat_syn_0, reduced_data.feat_syn_1,reduced_data.feat_syn_2
 
     def train_class(self, model, adj, features, labels, labels_syn, args, soft=False):
         """
@@ -225,10 +224,13 @@ class GCondBase:
 
             output_syn = model(feat_syn, adj_syn)
             if soft:
-                loss_syn = loss_fn(output_syn[hard_labels_syn == c], soft_labels_syn[hard_labels_syn == c])
+                loss_syn = loss_fn(
+                    output_syn[hard_labels_syn == c], soft_labels_syn[hard_labels_syn == c]
+                )
             else:
-                loss_syn = loss_fn(output_syn[hard_labels_syn == c], hard_labels_syn[hard_labels_syn == c])
-
+                loss_syn = loss_fn(
+                    output_syn[hard_labels_syn == c], hard_labels_syn[hard_labels_syn == c]
+                )
 
             # Compute gradients w.r.t. model parameters for synthetic data
             gw_syn = torch.autograd.grad(loss_syn, model.parameters(), create_graph=True)
@@ -274,13 +276,13 @@ class GCondBase:
         """
         BN_flag = False
         for module in model.modules():
-            if 'BatchNorm' in module._get_name():  # BatchNorm
+            if "BatchNorm" in module._get_name():  # BatchNorm
                 BN_flag = True
         if BN_flag:
             model.train()  # for updating the mu, sigma of BatchNorm
             # output_real = model.forward(features, adj)
             for module in model.modules():
-                if 'BatchNorm' in module._get_name():  # BatchNorm
+                if "BatchNorm" in module._get_name():  # BatchNorm
                     module.eval()  # fix mu and sigma of every BatchNorm layer
         return model
 
@@ -305,25 +307,37 @@ class GCondBase:
         data = self.data
         args = self.args
         if args.verbose:
-            print('loss_avg: {}'.format(loss_avg))
+            print("loss_avg: {}".format(loss_avg))
 
         res = []
 
         for i in range(args.run_inter_eval):
             res.append(
-                self.test_with_val(verbose=False, setting=args.setting, iters=args.eval_epochs))
+                self.test_with_val(
+                    verbose=False,
+                    setting=args.setting,
+                    iters=self.validation_model_args().eval_epochs,
+                )
+            )
 
         res = np.array(res).T
         current_val = res[0].mean()
-        args.logger.info('\nVal:  {:.4f} +/- {:.4f}'.format(100*current_val, 100*res[0].std()))
-        args.logger.info('Test: {:.4f} +/- {:.4f}'.format(100*res[1].mean(), 100*res[1].std()))
+        args.logger.info("\nVal:  {:.4f} +/- {:.4f}".format(100 * current_val, 100 * res[0].std()))
+        if not getattr(args, "validation_only", False):
+            args.logger.info(
+                "Test: {:.4f} +/- {:.4f}".format(100 * res[1].mean(), 100 * res[1].std())
+            )
 
         if save and current_val > best_val:
             best_val = current_val
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
         return best_val
 
-    def test_with_val(self, verbose=False, setting='trans', iters=200, best_val=None):
+    def validation_model_args(self):
+        """Separate method-specific graph selection from downstream model tuning."""
+        return self.args
+
+    def test_with_val(self, verbose=False, setting="trans", iters=200, best_val=None):
         """
         Conducts validation testing and returns results.
 
@@ -342,16 +356,31 @@ class GCondBase:
             A list containing validation results.
         """
 
-        args, data, device = self.args, self.data, self.device
+        args = self.validation_model_args()
+        data, device = self.data, self.device
 
-        model = eval(args.eval_model)(data.feat_syn.shape[1], args.hidden, data.nclass, args, mode='eval').to(device)
+        model = get_model_class(args.eval_model)(
+            data.feat_syn.shape[1],
+            args.hidden,
+            data.nclass,
+            args,
+            mode=getattr(args, "eval_mode", "eval"),
+        ).to(device)
 
-        acc_val = model.fit_with_val(data,
-                                     train_iters=iters, normadj=True, verbose=False,
-                                     setting=setting, reduced=True, best_val=best_val)
+        acc_val = model.fit_with_val(
+            data,
+            train_iters=iters,
+            normadj=True,
+            verbose=False,
+            setting=setting,
+            reduced=True,
+            best_val=best_val,
+        )
 
         model.eval()
-        acc_test = model.test(data, setting=setting,verbose=False)
+        if getattr(args, "validation_only", False):
+            return [acc_val]
+        acc_test = model.test(data, setting=setting, verbose=False)
         # if verbose:
         #     print('Val Accuracy and Std:',
         #           repr([res.mean(0), res.std(0)]))

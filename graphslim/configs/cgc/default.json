@@ -1,0 +1,9 @@
+{
+  "epochs": 1,
+  "pre_norm": false,
+  "cgc_clustering": "spectral",
+  "cgc_tau": 10.0,
+  "cgc_alpha": 3.0,
+  "cgc_aug_ratio": 0.55,
+  "cgc_adj_threshold": 0.95
+}

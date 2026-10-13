@@ -1,7 +1,6 @@
-# Neural Architecture Search
-# Must obtain condensed graph of each methods by running performance.sh before running this script.
-for method in random kcenter gcondx geom sfgc doscond gcond msgc; do
-  for dataset in cora ogbn-arxiv reddit; do
-      python ../run_nas.py -M $method -D $dataset
-  done
-done
+#!/usr/bin/env bash
+set -euo pipefail
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+repo_dir="$(cd -- "$script_dir/../.." && pwd)"
+cd "$repo_dir"
+exec "${PYTHON:-python}" -m benchmark.reproduce nas "$@"

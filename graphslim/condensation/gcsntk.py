@@ -20,6 +20,7 @@ class GCSNTK(GCondBase):
     """
     "GFast Graph Conensation with Structure-based Neural Tangent Kernel" https://arxiv.org/pdf/2310.11046
     """
+
     def __init__(self, setting, data, args, **kwargs):
         super(GCSNTK, self).__init__(setting, data, args, **kwargs)
         self.k = args.k
@@ -28,7 +29,21 @@ class GCSNTK(GCondBase):
         self.L = args.L
         self.scale = args.scale
 
-    def train(self, KRR, G_t, G_s, y_t, y_s, E_t, E_s, loss_fn, optimizer, accumulate_steps=None, i=None, TRAIN_K=None):
+    def train(
+        self,
+        KRR,
+        G_t,
+        G_s,
+        y_t,
+        y_s,
+        E_t,
+        E_s,
+        loss_fn,
+        optimizer,
+        accumulate_steps=None,
+        i=None,
+        TRAIN_K=None,
+    ):
         pred, acc = KRR.forward(G_t, G_s, y_t, y_s, E_t, E_s)
 
         pred = pred.to(torch.float32)
@@ -65,15 +80,19 @@ class GCSNTK(GCondBase):
             test_loss += loss_fn(pred, y_t).item()
             correct += (pred.argmax(1) == y_t.argmax(1)).type(torch.float).sum().item()
         correct /= size
-        print(f"Val Acc: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f}", end='\n')
+        print(f"Val Acc: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f}", end="\n")
         return test_loss, correct * 100
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
         args = self.args
-        if args.dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
-            train_loader = LargeDataLoader(name=self.args.dataset, split='train', batch_size=self.args.batch_size,
-                                           split_method='kmeans')
+        if args.dataset in ["flickr", "reddit", "ogbn-arxiv"]:
+            train_loader = LargeDataLoader(
+                name=self.args.dataset,
+                split="train",
+                batch_size=self.args.batch_size,
+                split_method="kmeans",
+            )
             TRAIN_K, n_train, n_class, dim, n = train_loader.properties()
             train_loader.split_batch()
         else:
@@ -81,7 +100,9 @@ class GCSNTK(GCondBase):
             n_class = len(torch.unique(data.y))
             n, dim = data.x.shape
 
-            adj = sp.coo_matrix((torch.ones(data.edge_index.shape[1]), edge_index), shape=(n, n)).toarray()
+            adj = sp.coo_matrix(
+                (torch.ones(data.edge_index.shape[1]), edge_index), shape=(n, n)
+            ).toarray()
             adj = torch.tensor(adj)
             adj = adj + torch.eye(adj.shape[0])
 
@@ -100,18 +121,22 @@ class GCSNTK(GCondBase):
         idx_s = torch.tensor(range(Cond_size))
         optimizer = torch.optim.Adam([x_s, y_s], lr=self.args.lr)
 
-        SNTK = StructureBasedNeuralTangentKernel(K=self.K, L=self.L, scale=self.scale).to(self.device)
+        SNTK = StructureBasedNeuralTangentKernel(K=self.K, L=self.L, scale=self.scale).to(
+            self.device
+        )
         ridge = torch.tensor(self.ridge).to(self.device)
         KRR = KernelRidgeRegression(SNTK.nodes_gram, ridge).to(self.device)
         MSEloss = nn.MSELoss().to(self.device)
-        if args.dataset in ['flickr', 'reddit', 'ogbn-arxiv']:
-
+        if args.dataset in ["flickr", "reddit", "ogbn-arxiv"]:
             if self.args.adj:
                 feat = x_s.data
                 A_s = update_E(feat, 3)
             else:
-                A_s = torch.sparse_coo_tensor(torch.stack([idx_s, idx_s], dim=0), torch.ones(Cond_size),
-                                              torch.Size([Cond_size, Cond_size])).to(x_s.device)
+                A_s = torch.sparse_coo_tensor(
+                    torch.stack([idx_s, idx_s], dim=0),
+                    torch.ones(Cond_size),
+                    torch.Size([Cond_size, Cond_size]),
+                ).to(x_s.device)
 
             A_s = A_s.to(self.device)
 
@@ -127,15 +152,28 @@ class GCSNTK(GCondBase):
                     y_train_one_hot = y_train_one_hot.to(self.device)
                     sub_A_t = sub_A_t.to(self.device)
 
-                    _, _, training_loss, train_correct = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, sub_A_t,
-                                                                    A_s,
-                                                                    MSEloss, optimizer, args.accumulate_steps, i,
-                                                                    TRAIN_K)
+                    _, _, training_loss, train_correct = self.train(
+                        KRR,
+                        x_train,
+                        x_s,
+                        y_train_one_hot,
+                        y_s,
+                        sub_A_t,
+                        A_s,
+                        MSEloss,
+                        optimizer,
+                        args.accumulate_steps,
+                        i,
+                        TRAIN_K,
+                    )
                 if it in args.checkpoints:
                     # y_long = torch.argmax(y_s, dim=1)
-                    data.adj_syn, data.feat_syn, data.labels_syn = A_s.detach().to_dense(), x_s.detach(), y_s.detach()
+                    data.adj_syn, data.feat_syn, data.labels_syn = (
+                        A_s.detach().to_dense(),
+                        x_s.detach(),
+                        y_s.detach(),
+                    )
                     best_val = self.intermediate_evaluation(best_val, training_loss)
-
 
         else:
             E_train = sub_E(idx_train, adj).to(self.device)
@@ -146,18 +184,25 @@ class GCSNTK(GCondBase):
                 feat = x_s.data
                 A_s = update_E(feat, 4)
             else:
-                A_s = torch.sparse_coo_tensor(torch.stack([idx_s, idx_s], dim=0), torch.ones(Cond_size),
-                                              torch.Size([Cond_size, Cond_size])).to(x_s.device)
+                A_s = torch.sparse_coo_tensor(
+                    torch.stack([idx_s, idx_s], dim=0),
+                    torch.ones(Cond_size),
+                    torch.Size([Cond_size, Cond_size]),
+                ).to(x_s.device)
 
             best_val = 0
             for it in trange(args.epochs):
-
-                x_s, y_s, training_loss, training_acc = self.train(KRR, x_train, x_s, y_train_one_hot, y_s, E_train,
-                                                                   A_s, MSEloss, optimizer)
+                x_s, y_s, training_loss, training_acc = self.train(
+                    KRR, x_train, x_s, y_train_one_hot, y_s, E_train, A_s, MSEloss, optimizer
+                )
 
                 if it in args.checkpoints:
                     # y_long = torch.argmax(y_s, dim=1)
-                    data.adj_syn, data.feat_syn, data.labels_syn = A_s.detach().to_dense(), x_s.detach(), y_s.detach()
+                    data.adj_syn, data.feat_syn, data.labels_syn = (
+                        A_s.detach().to_dense(),
+                        x_s.detach(),
+                        y_s.detach(),
+                    )
                     best_val = self.intermediate_evaluation(best_val, training_loss)
 
         return data

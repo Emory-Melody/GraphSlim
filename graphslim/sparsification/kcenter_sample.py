@@ -6,7 +6,6 @@ import random
 
 
 class KCenterSample(MBCoreSet):
-
     def select(self, embeds):
         idx_selected = []
         for class_id, cnt in self.num_class_dict.items():
@@ -26,6 +25,8 @@ class KCenterSample(MBCoreSet):
             idx_selected.append(idx[idx_centers])
         # return np.array(idx_selected).reshape(-1)
         return np.hstack(idx_selected)
+
+
 #
 #   def get_sub_adj_feat(self, features):
 #       data = self.data

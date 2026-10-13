@@ -25,9 +25,9 @@ class EdgeSparsifier:
 
         data.adj_syn = ei2csr(new_edge_list, graph.numberOfNodes())
         if verbose:
-            print('selected edges:', data.adj_syn.sum())
+            print("selected edges:", data.adj_syn.sum())
 
-        data.adj_syn = to_tensor(data.adj_syn, device='cpu')
+        data.adj_syn = to_tensor(data.adj_syn, device="cpu")
         if save:
             save_reduced(adj_syn=data.adj_syn, args=args)
 

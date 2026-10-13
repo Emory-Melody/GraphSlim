@@ -10,6 +10,7 @@ from torch import nn
 
 # from graph import mx_inv, mx_inv_sqrt, mx_tr
 
+
 def mx_inv(mx, device):
     if isinstance(mx, torch_sparse.tensor.SparseTensor):
         mx = mx.to_dense()
@@ -41,6 +42,7 @@ def mx_inv_sqrt(mx):
     # D_1 = 1 / D.clamp(min=0.005).sqrt()
     return U @ D_1.sqrt().diag() @ V.t(), U @ D_1.diag() @ V.t()
 
+
 def mx_tr(mx):
     return mx.diag().sum()
 
@@ -50,15 +52,15 @@ def get_mgrid(sidelen, dim=2):
         sidelen = dim * (sidelen,)
 
     if dim == 2:
-        pixel_coords = np.stack(np.mgrid[: sidelen[0], : sidelen[1]], axis=-1)[
-            None, ...
-        ].astype(np.float32)
+        pixel_coords = np.stack(np.mgrid[: sidelen[0], : sidelen[1]], axis=-1)[None, ...].astype(
+            np.float32
+        )
         pixel_coords[0, :, :, 0] = pixel_coords[0, :, :, 0] / (sidelen[0] - 1)
         pixel_coords[0, :, :, 1] = pixel_coords[0, :, :, 1] / (sidelen[1] - 1)
     elif dim == 3:
-        pixel_coords = np.stack(
-            np.mgrid[: sidelen[0], : sidelen[1], : sidelen[2]], axis=-1
-        )[None, ...].astype(np.float32)
+        pixel_coords = np.stack(np.mgrid[: sidelen[0], : sidelen[1], : sidelen[2]], axis=-1)[
+            None, ...
+        ].astype(np.float32)
         pixel_coords[..., 0] = pixel_coords[..., 0] / max(sidelen[0] - 1, 1)
         pixel_coords[..., 1] = pixel_coords[..., 1] / (sidelen[1] - 1)
         pixel_coords[..., 2] = pixel_coords[..., 2] / (sidelen[2] - 1)
@@ -94,14 +96,14 @@ class EdgeBlock(nn.Module):
 
 class GraphonLearner(nn.Module):
     def __init__(
-            self,
-            node_feature,
-            nfeat=256,
-            nnodes=50,
-            device="cuda",
-            args={},
-            num_hidden_layers=3,
-            **kwargs
+        self,
+        node_feature,
+        nfeat=256,
+        nnodes=50,
+        device="cuda",
+        args={},
+        num_hidden_layers=3,
+        **kwargs,
     ):
         super().__init__()
         self.num_hidden_layers = num_hidden_layers
@@ -110,9 +112,7 @@ class GraphonLearner(nn.Module):
         self.sinkhorn_iter = args.sinkhorn_iter
         self.mx_size = args.mx_size
 
-        self.edge_index = np.array(
-            list(product(range(self.step_size), range(self.step_size)))
-        ).T
+        self.edge_index = np.array(list(product(range(self.step_size), range(self.step_size)))).T
 
         self.net0 = nn.ModuleList(
             [
@@ -200,12 +200,8 @@ class GraphonLearner(nn.Module):
 
         # if self.args.use_symeig:
         # sqrt = torch.symeig(
-        sqrt = torch.linalg.eigh(
-            Ly_inv_rt @ self.P.t() @ self.Lx_inv @ self.P @ Ly_inv_rt
-        )
-        loss = torch.abs(
-            mx_tr(Ly_inv) * m - 2 * torch.sqrt(sqrt[0].clamp(min=2e-20)).sum()
-        )
+        sqrt = torch.linalg.eigh(Ly_inv_rt @ self.P.t() @ self.Lx_inv @ self.P @ Ly_inv_rt)
+        loss = torch.abs(mx_tr(Ly_inv) * m - 2 * torch.sqrt(sqrt[0].clamp(min=2e-20)).sum())
         return loss
 
     @torch.no_grad()

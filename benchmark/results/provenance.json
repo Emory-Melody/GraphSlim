@@ -1,0 +1,46 @@
+{
+  "source_url": "https://arxiv.org/html/2406.16715v3#A1.T9",
+  "source_version": "2406.16715v3 (2025-11-09)",
+  "source_table": "Table 9",
+  "retrieved_date": "2026-10-09",
+  "source_html_sha256": "e2e5e24009c7acb0a721c7fa26d5ce692a0237d579531587769165578da78d1a",
+  "rows": 21,
+  "published_methods": [
+    "Cent-D",
+    "Cent-P",
+    "Random",
+    "Herding",
+    "K-Center",
+    "TSpanner",
+    "Averaging",
+    "VN",
+    "VNG",
+    "GEOM",
+    "SFGC",
+    "GCSNTK",
+    "GCDMX",
+    "GCondX",
+    "GCond",
+    "DosCond",
+    "MSGC",
+    "SGDD",
+    "GDEM"
+  ],
+  "metric": "Test accuracy (%), except Yelp: F1-macro (%)",
+  "uncertainty": "Reported +/- values reproduced verbatim; the Table 9 caption calls these standard errors.",
+  "unreported_methods": [
+    "Clustering",
+    "DosCondX",
+    "GCDM",
+    "SimGC",
+    "GECC"
+  ],
+  "unreported_marker": "NR",
+  "notes": [
+    "Whole results repeat the published rowspanned baseline at all three rates.",
+    "NR is not a score: these methods have no result in Table 9.",
+    "Paper Table 9 labels GCDMX explicitly; do not treat its values as GCDM results.",
+    "Paper Table 8 has inconsistent Pubmed rates; retain Table 9 percentages and show CLI labeled-node fractions separately.",
+    "These are published results, not measurements from this cleanup."
+  ]
+}

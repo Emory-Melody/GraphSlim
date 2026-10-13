@@ -32,8 +32,9 @@ class RankDegree(EdgeSparsifier):
             if count > int(0.01 * targetNum):
                 iter_count = 0
                 count = 0
-            elif iter_count > 1000 and count <= int(
-                    0.01 * targetNum) and rho < 0.99:  # less than 10 edges added in the last 1000 iterations
+            elif (
+                iter_count > 1000 and count <= int(0.01 * targetNum) and rho < 0.99
+            ):  # less than 10 edges added in the last 1000 iterations
                 iter_count = 0
                 rho += 0.1
                 seen = set()
@@ -50,7 +51,7 @@ class RankDegree(EdgeSparsifier):
                 # rank neighbors by degree
                 neighbors = sorted(neighbors, key=lambda x: G.degree(x), reverse=True)
                 # select top rho * len(neighbors)
-                neighbors = neighbors[:max(1, int(len(neighbors) * rho))]
+                neighbors = neighbors[: max(1, int(len(neighbors) * rho))]
                 # add edges
                 for neighbor in neighbors:
                     if not new_G.hasEdge(seed, neighbor):

@@ -16,7 +16,7 @@ class MFCoreSet(CoreSet):
     def reduce(self, data, verbose=False, save=True):
 
         args = self.args
-        if self.setting == 'trans':
+        if self.setting == "trans":
             if args.agg:
                 data.adj_fully = to_tensor(data.adj_full)
                 data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
@@ -33,7 +33,7 @@ class MFCoreSet(CoreSet):
                 data.feat_syn = data.feat_full[idx_selected]
                 data.labels_syn = data.labels_full[idx_selected]
 
-        if self.setting == 'ind':
+        if self.setting == "ind":
             if args.agg:
                 data.adj_fully = to_tensor(data.adj_train)
                 data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
@@ -51,10 +51,11 @@ class MFCoreSet(CoreSet):
                 data.labels_syn = data.labels_train[idx_selected]
 
         if verbose:
-            print('selected nodes:', idx_selected.shape[0])
-            print('induced edges:', data.adj_syn.sum())
-        data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(data.adj_syn, data.feat_syn, label=data.labels_syn,
-                                                                 device='cpu')
+            print("selected nodes:", idx_selected.shape[0])
+            print("induced edges:", data.adj_syn.sum())
+        data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(
+            data.adj_syn, data.feat_syn, label=data.labels_syn, device="cpu"
+        )
         if save:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)
 

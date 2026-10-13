@@ -1,3 +1,4 @@
+from graphslim.models import get_model_class
 import os
 from copy import deepcopy
 
@@ -13,19 +14,23 @@ from graphslim.sparsification import *
 from graphslim.utils import *
 from tqdm import trange
 from torch.optim import Adam, SGD
+from graphslim.acceleration import CUDAGraphStep
 
 
 class SFGC(GCondBase):
     """
     "Structure-free Graph Condensation: From Large-scale Graphs to Condensed Graph-free Data." https://arxiv.org/pdf/2306.02664.pdf
     """
+
     def __init__(self, setting, data, args, **kwargs):
         super(SFGC, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
-        args.condense_model = 'GCN'
+        args.condense_model = "GCN"
         # args.init = 'kcenter'
 
-        self.buf_dir = '../sfgc_buffer/{}_{}_{}_{}'.format(args.dataset, args.attack, args.ptb_r, args.seed)
+        self.buf_dir = "../sfgc_buffer/{}_{}_{}_{}".format(
+            args.dataset, args.attack, args.ptb_r, args.seed
+        )
 
         if not os.path.exists(self.buf_dir):
             os.makedirs(self.buf_dir)
@@ -37,41 +42,64 @@ class SFGC(GCondBase):
         # can skip to save time
 
         if not args.no_buff:
-            args.condense_model = 'GCN'
+            args.condense_model = "GCN"
             args.num_experts = 20  # 200
 
-            if args.setting == 'ind':
-                features, adj, labels = to_tensor(data.feat_train, data.adj_train, label=data.labels_train,
-                                                  device=self.device)
+            if args.setting == "ind":
+                features, adj, labels = to_tensor(
+                    data.feat_train, data.adj_train, label=data.labels_train, device=self.device
+                )
             else:
-                features, adj, labels = to_tensor(data.feat_full, data.adj_full, label=data.labels_full,
-                                                  device=self.device)
+                features, adj, labels = to_tensor(
+                    data.feat_full, data.adj_full, label=data.labels_full, device=self.device
+                )
             adj = normalize_adj_tensor(adj, sparse=True)
             device = args.device
 
             trajectories = []
-            model = eval(args.condense_model)(features.shape[1], args.hidden, data.nclass, args).to(device)
+            model = get_model_class(args.condense_model)(
+                features.shape[1], args.hidden, data.nclass, args
+            ).to(device)
             for it in trange(args.num_experts):
-
                 # model.initialize()
 
                 model_parameters = list(model.parameters())
 
-                optimizer_model = eval(args.optim)(model_parameters, lr=args.lr_teacher,
-                                                   weight_decay=args.wd_teacher)
+                optimizer_model = eval(args.optim)(
+                    model_parameters, lr=args.lr_teacher, weight_decay=args.wd_teacher
+                )
                 timestamps = []
 
                 timestamps.append([p.detach().cpu() for p in model.parameters()])
 
+                training_index = (
+                    torch.as_tensor(data.idx_train, device=device)
+                    if getattr(args, "cuda_graph", False)
+                    else data.idx_train
+                )
+
+                def expert_loss():
+                    output = model.forward(features, adj)
+                    loss = (
+                        F.nll_loss(output, labels)
+                        if args.setting == "ind"
+                        else F.nll_loss(output[training_index], labels[training_index])
+                    )
+                    return output, loss
+
+                expert_step = CUDAGraphStep(
+                    expert_loss,
+                    model_parameters,
+                    args,
+                    "sfgc.expert_training",
+                    args.teacher_epochs,
+                    modules=(model,),
+                    inputs=(features, labels),
+                )
                 for e in range(args.teacher_epochs):
                     model.train()
                     optimizer_model.zero_grad()
-                    output = model.forward(features, adj)
-                    if args.setting == 'ind':
-                        loss_buffer = F.nll_loss(output, labels)
-                    else:
-                        loss_buffer = F.nll_loss(output[data.idx_train], labels[data.idx_train])
-                    loss_buffer.backward()
+                    output, loss_buffer = expert_step()
                     optimizer_model.step()
 
                     if e % 10 == 0 and e > 1:
@@ -82,10 +110,18 @@ class SFGC(GCondBase):
                 # need too many space to save
                 if len(trajectories) == 10:
                     n = 0
-                    while os.path.exists(os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))):
+                    while os.path.exists(
+                        os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))
+                    ):
                         n += 1
-                    print("Saving {}".format(os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))))
-                    torch.save(trajectories, os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n)))
+                    print(
+                        "Saving {}".format(
+                            os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))
+                        )
+                    )
+                    torch.save(
+                        trajectories, os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))
+                    )
                     trajectories = []
         # =============stage 2 trajectory alignment and GCN evaluation==================#
         # kcenter select
@@ -104,7 +140,9 @@ class SFGC(GCondBase):
 
         bar = trange(args.epochs, ncols=100)
         for it in bar:
-            model = eval(args.condense_model)(data.feat_train.shape[1], args.hidden, data.nclass, args).to(self.device)
+            model = get_model_class(args.condense_model)(
+                data.feat_train.shape[1], args.hidden, data.nclass, args
+            ).to(self.device)
 
             model = ReparamModule(model)
 
@@ -126,19 +164,26 @@ class SFGC(GCondBase):
 
             start = np.linspace(0, args.start_epoch, num=args.start_epoch // 10 + 1)
             start_epoch = int(np.random.choice(start, 1)[0])
-            if args.optim == 'Adam':
+            if args.optim == "Adam":
                 start_epoch = start_epoch // 10
 
             starting_params = expert_trajectory[start_epoch]
 
             target_params = expert_trajectory[start_epoch + args.expert_epochs // 10]
 
-            target_params = torch.cat([p.data.to(self.device).reshape(-1) for p in target_params], 0)
+            target_params = torch.cat(
+                [p.data.to(self.device).reshape(-1) for p in target_params], 0
+            )
 
             student_params = [
-                torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0).requires_grad_(True)]
+                torch.cat(
+                    [p.data.to(self.device).reshape(-1) for p in starting_params], 0
+                ).requires_grad_(True)
+            ]
 
-            starting_params = torch.cat([p.data.to(self.device).reshape(-1) for p in starting_params], 0)
+            starting_params = torch.cat(
+                [p.data.to(self.device).reshape(-1) for p in starting_params], 0
+            )
             param_loss_list = []
             param_dist_list = []
 
@@ -181,11 +226,15 @@ class SFGC(GCondBase):
             if torch.isnan(total_loss):
                 break  # Break out of the loop if either is NaN
             bar.set_postfix_str(
-                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {syn_lr.item():.4f}")
+                f"File ID = {file_idx} Total_Loss = {total_loss.item():.4f} Syn_Lr = {syn_lr.item():.4f}"
+            )
 
             if it in args.checkpoints:
-                data.adj_syn, data.feat_syn, data.labels_syn = torch.eye(
-                    feat_syn.shape[0]), feat_syn.detach(), labels_syn.detach()
+                data.adj_syn, data.feat_syn, data.labels_syn = (
+                    torch.eye(feat_syn.shape[0]),
+                    feat_syn.detach(),
+                    labels_syn.detach(),
+                )
                 best_val = self.intermediate_evaluation(best_val, total_loss.item())
 
             for _ in student_params:
@@ -194,9 +243,9 @@ class SFGC(GCondBase):
         return data
 
     def expert_load(self, expert_dir):
-        '''
+        """
         randomly select one expert from expert files
-        '''
+        """
 
         expert_files = []
         n = 0

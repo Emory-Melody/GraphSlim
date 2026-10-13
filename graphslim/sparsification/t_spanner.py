@@ -14,12 +14,14 @@ class TSpanner(EdgeSparsifier):
         args = self.args
         new_G = nk.graph.Graph(G.numberOfNodes(), weighted=G.isWeighted())
 
-
         G_copy = copy.deepcopy(G)
         while G_copy.numberOfEdges():
             edge = nk.graphtools.randomEdge(G_copy)
             G_copy.removeEdge(*edge)
-            if nk.distance.BidirectionalDijkstra(G_copy, edge[0], edge[1]).run().getDistance() > args.ts:
+            if (
+                nk.distance.BidirectionalDijkstra(G_copy, edge[0], edge[1]).run().getDistance()
+                > args.ts
+            ):
                 new_G.addEdge(*edge)
         if args.verbose:
             nk.overview(new_G)

@@ -8,7 +8,9 @@ from numpy.linalg import norm
 class CentP(MFCoreSet):
     # select nodes with topk PR value in each class
     def select(self, embedds=None):
-        pr = self.pagerank_algorithm()  # Retrieve PageRank values, assumed to be a dictionary or array
+        pr = (
+            self.pagerank_algorithm()
+        )  # Retrieve PageRank values, assumed to be a dictionary or array
         idx_selected = []
 
         for class_id, cnt in self.num_class_dict.items():
@@ -25,8 +27,10 @@ class CentP(MFCoreSet):
         # Concatenate all selected indices into a single array
         return np.hstack(idx_selected)
 
-    def pagerank_algorithm(self, damping_factor=0.85, max_iterations=100, convergence_threshold=0.0001):
-        if self.args.setting == 'ind':
+    def pagerank_algorithm(
+        self, damping_factor=0.85, max_iterations=100, convergence_threshold=0.0001
+    ):
+        if self.args.setting == "ind":
             adj = self.data.adj_train.astype(np.uint8)
         else:
             adj = self.data.adj_full.astype(np.uint8)

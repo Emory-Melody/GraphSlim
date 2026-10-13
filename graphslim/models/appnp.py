@@ -1,4 +1,5 @@
 """multiple transformaiton and multiple propagation"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,8 +11,7 @@ from graphslim.models.layers import MyLinear
 
 
 class APPNP(BaseGNN):
-
-    def __init__(self, nfeat, nhid, nclass, args, mode='train'):
+    def __init__(self, nfeat, nhid, nclass, args, mode="train"):
 
         super(APPNP, self).__init__(nfeat, nhid, nclass, args, mode)
 
@@ -32,24 +32,16 @@ class APPNP(BaseGNN):
 
         self.sparse_dropout = SparseDropout(dprob=0)
 
-        activation_functions = {
-            'sigmoid': torch.sigmoid,
-            'tanh': torch.tanh,
-            'relu': F.relu,
-            'linear': lambda x: x,
-            'softplus': F.softplus,
-            'leakyrelu': F.leaky_relu,
-            'relu6': F.relu6,
-            'elu': F.elu
-        }
-        self.activation = activation_functions.get(args.activation)
+        # BaseGNN already resolves an nn.Module (or None). Replacing a registered
+        # activation module with a functional callable raises TypeError in Torch.
 
     def forward(self, x, adj, output_layer_features=False):
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:
                 x = self.bns[ix](x) if self.with_bn else x
-                x = self.activation(x)
+                if self.activation is not None:
+                    x = self.activation(x)
                 x = F.dropout(x, self.dropout, training=self.training)
 
         h = x
@@ -101,6 +93,7 @@ class SparseDropout(torch.nn.Module):
             return torch.sparse.FloatTensor(rc, val, x.size())
         else:
             return x
+
 
 # class APPNPRich(BaseGNN):
 #     '''

@@ -6,8 +6,7 @@ from graphslim.models.layers import ChebConvolution
 
 
 class Cheby(BaseGNN):
-
-    def __init__(self, nfeat, nhid, nclass, args, mode='train'):
+    def __init__(self, nfeat, nhid, nclass, args, mode="train"):
 
         super(Cheby, self).__init__(nfeat, nhid, nclass, args, mode)
 

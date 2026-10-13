@@ -1,0 +1,5 @@
+{
+  "epochs": 1,
+  "nope_relaxed": false,
+  "nope_budget_base": "training"
+}

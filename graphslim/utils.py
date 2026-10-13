@@ -7,42 +7,65 @@ import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score, roc_auc_score
-from torch_sparse import SparseTensor,fill_diag,matmul,mul
+from torch_sparse import SparseTensor, fill_diag, matmul, mul
 from torch_sparse import sum as sparsesum
 from torch_geometric.utils import degree
 from torch_geometric.utils import add_remaining_self_loops
 from torch_geometric.utils.num_nodes import maybe_num_nodes
 from torch_scatter import scatter_add
 import scipy.sparse as sp
+
+
 @torch.jit._overload
-def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
-             add_self_loops=True, flow="source_to_target", dtype=None):
+def gcn_norm(
+    edge_index,
+    edge_weight=None,
+    num_nodes=None,
+    improved=False,
+    add_self_loops=True,
+    flow="source_to_target",
+    dtype=None,
+):
     # type: (Tensor, OptTensor, Optional[int], bool, bool, str, Optional[int]) -> PairTensor  # noqa
     pass
 
 
 @torch.jit._overload
-def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
-             add_self_loops=True, flow="source_to_target", dtype=None):
+def gcn_norm(
+    edge_index,
+    edge_weight=None,
+    num_nodes=None,
+    improved=False,
+    add_self_loops=True,
+    flow="source_to_target",
+    dtype=None,
+):
     # type: (SparseTensor, OptTensor, Optional[int], bool, bool, str, Optional[int]) -> SparseTensor  # noqa
     pass
 
 
-def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
-             add_self_loops=True, flow="source_to_target", dtype=None):
+def gcn_norm(
+    edge_index,
+    edge_weight=None,
+    num_nodes=None,
+    improved=False,
+    add_self_loops=True,
+    flow="source_to_target",
+    dtype=None,
+):
 
-    fill_value = 2. if improved else 1.
+    fill_value = 2.0 if improved else 1.0
 
     if isinstance(edge_index, SparseTensor):
         assert flow in ["source_to_target"]
         adj_t = edge_index
         if not adj_t.has_value():
-            adj_t = adj_t.fill_value(1., dtype=dtype)
+            adj_t = adj_t.fill_value(1.0, dtype=dtype)
         if add_self_loops:
             adj_t = fill_diag(adj_t, fill_value)
         deg = sparsesum(adj_t, dim=1)
         deg_inv_sqrt = deg.pow_(-0.5)
-        deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0.)
+        deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float("inf"), 0.0)
         adj_t = mul(adj_t, deg_inv_sqrt.view(-1, 1))
         adj_t = mul(adj_t, deg_inv_sqrt.view(1, -1))
         return adj_t
@@ -52,12 +75,12 @@ def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
         num_nodes = maybe_num_nodes(edge_index, num_nodes)
 
         if edge_weight is None:
-            edge_weight = torch.ones((edge_index.size(1), ), dtype=dtype,
-                                     device=edge_index.device)
+            edge_weight = torch.ones((edge_index.size(1),), dtype=dtype, device=edge_index.device)
 
         if add_self_loops:
             edge_index, tmp_edge_weight = add_remaining_self_loops(
-                edge_index, edge_weight, fill_value, num_nodes)
+                edge_index, edge_weight, fill_value, num_nodes
+            )
             assert tmp_edge_weight is not None
             edge_weight = tmp_edge_weight
 
@@ -65,8 +88,9 @@ def gcn_norm(edge_index, edge_weight=None, num_nodes=None, improved=False,
         idx = col if flow == "source_to_target" else row
         deg = scatter_add(edge_weight, idx, dim=0, dim_size=num_nodes)
         deg_inv_sqrt = deg.pow_(-0.5)
-        deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float('inf'), 0)
+        deg_inv_sqrt.masked_fill_(deg_inv_sqrt == float("inf"), 0)
         return edge_index, deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
+
 
 # from deeprobust.graph.utils import *
 def is_identity(mx, device):
@@ -79,7 +103,9 @@ def is_identity(mx, device):
     elif isinstance(mx, SparseTensor):
         dense_tensor = mx.to_dense().float()
     else:
-        raise ValueError("Input must be a torch.Tensor or torch.sparse.FloatTensor or torch_sparse.SparseTensor")
+        raise ValueError(
+            "Input must be a torch.Tensor or torch.sparse.FloatTensor or torch_sparse.SparseTensor"
+        )
     return torch.allclose(dense_tensor, identity)
 
 
@@ -88,7 +114,7 @@ def seed_everything(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
+    os.environ["PYTHONHASHSEED"] = str(seed)
 
 
 def regularization(adj, x, eig_real=None):
@@ -106,7 +132,7 @@ def maxdegree(adj):
 
 def sparsity2(adj):
     n = adj.shape[0]
-    loss_degree = - torch.log(adj.sum(1)).sum() / n
+    loss_degree = -torch.log(adj.sum(1)).sum() / n
     loss_fro = torch.norm(adj) / n
     return 0 * loss_degree + loss_fro
 
@@ -127,7 +153,7 @@ def feature_smoothing(adj, X):
 
     r_inv = r_inv + 1e-8
     r_inv = r_inv.pow(-1 / 2).flatten()
-    r_inv[torch.isinf(r_inv)] = 0.
+    r_inv[torch.isinf(r_inv)] = 0.0
     r_mat_inv = torch.diag(r_inv)
     # L = r_mat_inv @ L
     L = r_mat_inv @ L @ r_mat_inv
@@ -150,14 +176,12 @@ def row_normalize_tensor(mx):
 
 # sfgc utils#
 
-def one_hot_sfgc(x,
-                 num_classes,
-                 center=True,
-                 dtype=np.float32):
+
+def one_hot_sfgc(x, num_classes, center=True, dtype=np.float32):
     assert len(x.shape) == 1
     one_hot_vectors = np.array(x[:, None] == np.arange(num_classes), dtype)
     if center:
-        one_hot_vectors = one_hot_vectors - 1. / num_classes
+        one_hot_vectors = one_hot_vectors - 1.0 / num_classes
     return one_hot_vectors
 
 
@@ -179,7 +203,7 @@ def calc(gntk, feat1, feat2, diag1, diag2, A1, A2):
 
 
 def loss_acc_fn_eval(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
-    k_ss_reg = (k_ss + np.abs(reg) * np.trace(k_ss) * np.eye(k_ss.shape[0]) / k_ss.shape[0])
+    k_ss_reg = k_ss + np.abs(reg) * np.trace(k_ss) * np.eye(k_ss.shape[0]) / k_ss.shape[0]
     pred = np.dot(k_ts, np.linalg.inv(k_ss_reg).dot(y_support))
     mse_loss = 0.5 * np.mean((pred - y_target) ** 2)
     acc = np.mean(np.argmax(pred, axis=1) == np.argmax(y_target, axis=1))
@@ -205,8 +229,8 @@ def index_to_mask(index, size):
 
 
 def to_camel_case(snake_str):
-    components = snake_str.split('_')
-    return ''.join(x.title() for x in components)
+    components = snake_str.split("_")
+    return "".join(x.title() for x in components)
 
 
 # def cal_storage(data, setting):
@@ -217,16 +241,17 @@ def to_camel_case(snake_str):
 #     condensed_storage = getsize_mb([data.feat_syn, data.adj_syn, data.labels_syn])
 #     print(f'Origin graph:{origin_storage:.2f}Mb  Condensed graph:{condensed_storage:.2f}Mb')
 
+
 def to_tensor(*vars, **kwargs):
-    device = kwargs.get('device', 'cpu')
+    device = kwargs.get("device", "cpu")
     tensor_list = []
     for var in vars:
         var = check_type(var, device)
         tensor_list.append(var)
     for key, value in kwargs.items():
-        if key != 'device':
+        if key != "device":
             value = check_type(value, device)
-            if 'label' in key and len(value.shape) == 1:
+            if "label" in key and len(value.shape) == 1:
                 tensor = value.long()
             else:
                 tensor = value
@@ -309,26 +334,25 @@ def normalize_feature(mx):
             pass
     rowsum = np.array(mx.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
+    r_inv[np.isinf(r_inv)] = 0.0
     r_mat_inv = sp.diags(r_inv)
     mx = r_mat_inv.dot(mx)
     return mx
 
 
 def normalize_sparse_tensor(adj, fill_value=1):
-    """Normalize sparse tensor. Need to import torch_scatter
-    """
+    """Normalize sparse tensor. Need to import torch_scatter"""
     edge_index = adj._indices()
     edge_weight = adj._values()
     num_nodes = adj.size(0)
-    edge_index, edge_weight = add_self_loops(
-        edge_index, edge_weight, fill_value, num_nodes)
+    edge_index, edge_weight = add_self_loops(edge_index, edge_weight, fill_value, num_nodes)
 
     row, col = edge_index
     from torch_scatter import scatter_add
+
     deg = scatter_add(edge_weight, row, dim=0, dim_size=num_nodes)
     deg_inv_sqrt = deg.pow(-0.5)
-    deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
+    deg_inv_sqrt[deg_inv_sqrt == float("inf")] = 0
 
     values = deg_inv_sqrt[row] * edge_weight * deg_inv_sqrt[col]
 
@@ -339,8 +363,7 @@ def normalize_sparse_tensor(adj, fill_value=1):
 def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
     # num_nodes = maybe_num_nodes(edge_index, num_nodes)
 
-    loop_index = torch.arange(0, num_nodes, dtype=torch.long,
-                              device=edge_index.device)
+    loop_index = torch.arange(0, num_nodes, dtype=torch.long, device=edge_index.device)
     loop_index = loop_index.unsqueeze(0).repeat(2, 1)
 
     if edge_weight is not None:
@@ -376,15 +399,17 @@ def normalize_adj_sgformer(adj):
 
         # Compute degree for normalization
         d = degree(col, N).float()
-        d_norm_in = (1. / d[col]).sqrt()
-        d_norm_out = (1. / d[row]).sqrt()
+        d_norm_in = (1.0 / d[col]).sqrt()
+        d_norm_out = (1.0 / d[row]).sqrt()
 
         # Normalize the values directly
         normalized_values = values * d_norm_in * d_norm_out
         normalized_values = torch.nan_to_num(normalized_values, nan=0.0, posinf=0.0, neginf=0.0)
 
         # Create a new SparseTensor with normalized values
-        adj_normalized = SparseTensor(row=row, col=col, value=normalized_values, sparse_sizes=(N, N))
+        adj_normalized = SparseTensor(
+            row=row, col=col, value=normalized_values, sparse_sizes=(N, N)
+        )
 
     else:
         # Dense matrix normalization
@@ -392,7 +417,7 @@ def normalize_adj_sgformer(adj):
 
         # Compute degree for normalization
         d = adj.sum(dim=1).float()
-        d_norm = torch.diag((1. / d).sqrt())
+        d_norm = torch.diag((1.0 / d).sqrt())
 
         # Normalize the dense adjacency matrix
         adj_normalized = d_norm @ adj @ d_norm
@@ -401,15 +426,15 @@ def normalize_adj_sgformer(adj):
 
 
 def normalize_adj_tensor(adj, sparse=False):
-    """Normalize adjacency tensor matrix, return sparse or not
-    """
+    """Normalize adjacency tensor matrix, return sparse or not"""
     device = adj.device
     if sparse:
         adj = to_scipy(adj)
         mx = gcn_normalize_adj(adj)
         adj = sparse_mx_to_torch_sparse_tensor(mx).to(device).coalesce()
-        adj = SparseTensor(row=adj.indices()[0], col=adj.indices()[1],
-                           value=adj.values(), sparse_sizes=adj.size()).t()
+        adj = SparseTensor(
+            row=adj.indices()[0], col=adj.indices()[1], value=adj.values(), sparse_sizes=adj.size()
+        ).t()
         return adj
 
     else:
@@ -432,14 +457,14 @@ def dense_gcn_norm(adj, device):
     mx = adj + torch.eye(adj.shape[0]).to(device)
     rowsum = mx.sum(1)
     r_inv = rowsum.pow(-1 / 2).flatten()
-    r_inv[torch.isinf(r_inv)] = 0.
+    r_inv[torch.isinf(r_inv)] = 0.0
     r_mat_inv = torch.diag(r_inv)
     mx = r_mat_inv @ mx
     mx = mx @ r_mat_inv
     return mx
 
 
-def gcn_normalize_adj(adj, device='cpu'):
+def gcn_normalize_adj(adj, device="cpu"):
     if sp.issparse(adj):
         return sparse_gcn_norm(adj)
     elif type(adj) is torch.Tensor:
@@ -452,7 +477,7 @@ def sparse_gcn_norm(adj):
     adj = adj + sp.eye(adj.shape[0])
     rowsum = np.array(adj.sum(1))
     r_inv = np.power(rowsum, -0.5).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
+    r_inv[np.isinf(r_inv)] = 0.0
     r_mat_inv = sp.diags(r_inv)
     adj = r_mat_inv.dot(adj).dot(r_mat_inv)
     return adj
@@ -465,7 +490,7 @@ def degree_normalize_adj(mx):
         mx = mx + sp.eye(mx.shape[0])
     rowsum = np.array(mx.sum(1))
     r_inv = np.power(rowsum, -1).flatten()
-    r_inv[np.isinf(r_inv)] = 0.
+    r_inv[np.isinf(r_inv)] = 0.0
     r_mat_inv = sp.diags(r_inv)
     # mx = mx.dot(r_mat_inv)
     mx = r_mat_inv.dot(mx)
@@ -473,20 +498,19 @@ def degree_normalize_adj(mx):
 
 
 def degree_normalize_sparse_tensor(adj, fill_value=1):
-    """degree_normalize_sparse_tensor.
-    """
+    """degree_normalize_sparse_tensor."""
     edge_index = adj._indices()
     edge_weight = adj._values()
     num_nodes = adj.size(0)
 
-    edge_index, edge_weight = add_self_loops(
-        edge_index, edge_weight, fill_value, num_nodes)
+    edge_index, edge_weight = add_self_loops(edge_index, edge_weight, fill_value, num_nodes)
 
     row, col = edge_index
     from torch_scatter import scatter_add
+
     deg = scatter_add(edge_weight, row, dim=0, dim_size=num_nodes)
     deg_inv_sqrt = deg.pow(-1)
-    deg_inv_sqrt[deg_inv_sqrt == float('inf')] = 0
+    deg_inv_sqrt[deg_inv_sqrt == float("inf")] = 0
 
     values = deg_inv_sqrt[row] * edge_weight
     shape = adj.shape
@@ -494,8 +518,7 @@ def degree_normalize_sparse_tensor(adj, fill_value=1):
 
 
 def degree_normalize_adj_tensor(adj, sparse=True):
-    """degree_normalize_adj_tensor.
-    """
+    """degree_normalize_adj_tensor."""
 
     device = adj.device
     if sparse:
@@ -507,7 +530,7 @@ def degree_normalize_adj_tensor(adj, sparse=True):
         mx = adj + torch.eye(adj.shape[0]).to(device)
         rowsum = mx.sum(1)
         r_inv = rowsum.pow(-1).flatten()
-        r_inv[torch.isinf(r_inv)] = 0.
+        r_inv[torch.isinf(r_inv)] = 0.0
         r_mat_inv = torch.diag(r_inv)
         mx = r_mat_inv @ mx
     return mx
@@ -528,7 +551,7 @@ def accuracy(output, labels):
     float
         accuracy
     """
-    if not hasattr(labels, '__len__'):
+    if not hasattr(labels, "__len__"):
         labels = [labels]
     if type(labels) is not torch.Tensor:
         labels = torch.LongTensor(labels)
@@ -536,6 +559,8 @@ def accuracy(output, labels):
     correct = preds.eq(labels).double()
     correct = correct.sum()
     return correct / len(labels)
+
+
 def roc_auc(output, labels, is_sigmoid=False):
     """Return ROC-AUC score of output compared to labels.
 
@@ -553,7 +578,7 @@ def roc_auc(output, labels, is_sigmoid=False):
     float
         ROC-AUC score
     """
-    if not hasattr(labels, '__len__'):
+    if not hasattr(labels, "__len__"):
         labels = [labels]
     if type(labels) is not torch.Tensor:
         labels = torch.LongTensor(labels)
@@ -592,7 +617,7 @@ def f1_macro(output, labels, is_sigmoid=False):
     float
         F1-macro score
     """
-    if not hasattr(labels, '__len__'):
+    if not hasattr(labels, "__len__"):
         labels = [labels]
     if type(labels) is not torch.Tensor:
         labels = torch.LongTensor(labels)
@@ -611,6 +636,7 @@ def f1_macro(output, labels, is_sigmoid=False):
 
     return f1
 
+
 # def loss_acc(output, labels, targets, avg_loss=True):
 #     if type(labels) is not torch.Tensor:
 #         labels = torch.LongTensor(labels)
@@ -621,8 +647,8 @@ def f1_macro(output, labels, is_sigmoid=False):
 #     if avg_loss:
 #         return loss, correct.sum() / len(targets)
 #     return loss, correct
-    # correct = correct.sum()
-    # return loss, correct / len(labels)
+# correct = correct.sum()
+# return loss, correct / len(labels)
 
 
 # def get_perf(output, labels, mask, verbose=True):
@@ -737,27 +763,31 @@ def get_train_val_test(nnodes, val_size=0.1, test_size=0.8, stratify=None, seed=
         node test indices
     """
 
-    assert stratify is not None, 'stratify cannot be None!'
+    assert stratify is not None, "stratify cannot be None!"
 
     if seed is not None:
         np.random.seed(seed)
 
     idx = np.arange(nnodes)
     train_size = 1 - val_size - test_size
-    idx_train_and_val, idx_test = train_test_split(idx,
-                                                   random_state=None,
-                                                   train_size=train_size + val_size,
-                                                   test_size=test_size,
-                                                   stratify=stratify)
+    idx_train_and_val, idx_test = train_test_split(
+        idx,
+        random_state=None,
+        train_size=train_size + val_size,
+        test_size=test_size,
+        stratify=stratify,
+    )
 
     if stratify is not None:
         stratify = stratify[idx_train_and_val]
 
-    idx_train, idx_val = train_test_split(idx_train_and_val,
-                                          random_state=None,
-                                          train_size=(train_size / (train_size + val_size)),
-                                          test_size=(val_size / (train_size + val_size)),
-                                          stratify=stratify)
+    idx_train, idx_val = train_test_split(
+        idx_train_and_val,
+        random_state=None,
+        train_size=(train_size / (train_size + val_size)),
+        test_size=(val_size / (train_size + val_size)),
+        stratify=stratify,
+    )
 
     return idx_train, idx_val, idx_test
 
@@ -784,17 +814,16 @@ def get_train_test(nnodes, test_size=0.8, stratify=None, seed=None):
     idx_test :
         node test indices
     """
-    assert stratify is not None, 'stratify cannot be None!'
+    assert stratify is not None, "stratify cannot be None!"
 
     if seed is not None:
         np.random.seed(seed)
 
     idx = np.arange(nnodes)
     train_size = 1 - test_size
-    idx_train, idx_test = train_test_split(idx, random_state=None,
-                                           train_size=train_size,
-                                           test_size=test_size,
-                                           stratify=stratify)
+    idx_train, idx_test = train_test_split(
+        idx, random_state=None, train_size=train_size, test_size=test_size, stratify=stratify
+    )
 
     return idx_train, idx_test
 
@@ -831,18 +860,17 @@ def get_train_val_test_gcn(labels, seed=None):
     for i in range(nclass):
         labels_i = idx[labels == i]
         labels_i = np.random.permutation(labels_i)
-        idx_train = np.hstack((idx_train, labels_i[: 20])).astype(np.int)
+        idx_train = np.hstack((idx_train, labels_i[:20])).astype(np.int)
         idx_unlabeled = np.hstack((idx_unlabeled, labels_i[20:])).astype(np.int)
 
     idx_unlabeled = np.random.permutation(idx_unlabeled)
-    idx_val = idx_unlabeled[: 500]
-    idx_test = idx_unlabeled[500: 1500]
+    idx_val = idx_unlabeled[:500]
+    idx_test = idx_unlabeled[500:1500]
     return idx_train, idx_val, idx_test
 
 
 def get_train_test_labelrate(labels, label_rate):
-    """Get train test according to given label rate.
-    """
+    """Get train test according to given label rate."""
     nclass = labels.max() + 1
     train_size = int(round(len(labels) * label_rate / nclass))
     print("=== train_size = %s ===" % train_size)
@@ -851,8 +879,7 @@ def get_train_test_labelrate(labels, label_rate):
 
 
 def get_splits_each_class(labels, train_size):
-    """We randomly sample n instances for class, where n = train_size.
-    """
+    """We randomly sample n instances for class, where n = train_size."""
     idx = np.arange(len(labels))
     nclass = labels.max() + 1
     idx_train = []
@@ -861,16 +888,19 @@ def get_splits_each_class(labels, train_size):
     for i in range(nclass):
         labels_i = idx[labels == i]
         labels_i = np.random.permutation(labels_i)
-        idx_train = np.hstack((idx_train, labels_i[: train_size])).astype(np.int)
-        idx_val = np.hstack((idx_val, labels_i[train_size: 2 * train_size])).astype(np.int)
-        idx_test = np.hstack((idx_test, labels_i[2 * train_size:])).astype(np.int)
+        idx_train = np.hstack((idx_train, labels_i[:train_size])).astype(np.int)
+        idx_val = np.hstack((idx_val, labels_i[train_size : 2 * train_size])).astype(np.int)
+        idx_test = np.hstack((idx_test, labels_i[2 * train_size :])).astype(np.int)
 
-    return np.random.permutation(idx_train), np.random.permutation(idx_val), \
-        np.random.permutation(idx_test)
+    return (
+        np.random.permutation(idx_train),
+        np.random.permutation(idx_val),
+        np.random.permutation(idx_test),
+    )
 
 
 def unravel_index(index, array_shape):
-    rows = torch.div(index, array_shape[1], rounding_mode='trunc')
+    rows = torch.div(index, array_shape[1], rounding_mode="trunc")
     cols = index % array_shape[1]
     return rows, cols
 
@@ -901,8 +931,7 @@ def degree_sequence_log_likelihood(degree_sequence, d_min):
 
 
 def updated_log_likelihood_for_edge_changes(node_pairs, adjacency_matrix, d_min):
-    """ Adopted from https://github.com/danielzuegner/nettack
-    """
+    """Adopted from https://github.com/danielzuegner/nettack"""
     # For each node pair find out whether there is an edge or not in the input adjacency matrix.
 
     edge_entries_before = adjacency_matrix[node_pairs.T]
@@ -916,7 +945,9 @@ def updated_log_likelihood_for_edge_changes(node_pairs, adjacency_matrix, d_min)
     d_edges_after = degree_sequence[node_pairs] + deltas[:, None]
 
     # Sum the log of the degrees after the potential changes which are >= d_min
-    sum_log_degrees_after, new_n = update_sum_log_degrees(sum_log_degrees, n, d_edges_before, d_edges_after, d_min)
+    sum_log_degrees_after, new_n = update_sum_log_degrees(
+        sum_log_degrees, n, d_edges_before, d_edges_after, d_min
+    )
     # Updated estimates of the Powerlaw exponents
     new_alpha = compute_alpha(new_n, sum_log_degrees_after, d_min)
     # Updated log likelihood values for the Powerlaw distributions
@@ -932,8 +963,11 @@ def update_sum_log_degrees(sum_log_degrees_before, n_old, d_old, d_new, d_min):
     d_new_in_range = d_new * new_in_range.float()
 
     # Update the sum by subtracting the old values and then adding the updated logs of the degrees.
-    sum_log_degrees_after = sum_log_degrees_before - (torch.log(torch.clamp(d_old_in_range, min=1))).sum(1) \
-                            + (torch.log(torch.clamp(d_new_in_range, min=1))).sum(1)
+    sum_log_degrees_after = (
+        sum_log_degrees_before
+        - (torch.log(torch.clamp(d_old_in_range, min=1))).sum(1)
+        + (torch.log(torch.clamp(d_new_in_range, min=1))).sum(1)
+    )
 
     # Update the number of degrees >= d_min
 
@@ -990,6 +1024,7 @@ def ravel_multiple_indices(ixs, shape, reverse=False):
 #     make_dot(your_var).view()
 #
 
+
 def reshape_mx(mx, shape):
     indices = mx.nonzero()
     return sp.csr_matrix((mx.data, (indices[0], indices[1])), shape=shape)
@@ -1018,7 +1053,9 @@ def add_feature_noise(data, noise_ratio, seed):
     np.random.seed(seed)
     n, d = data.x.shape
     # noise = torch.normal(mean=torch.zeros(int(noise_ratio*n), d), std=1)
-    noise = torch.FloatTensor(np.random.normal(0, 1, size=(int(noise_ratio * n), d))).to(data.x.device)
+    noise = torch.FloatTensor(np.random.normal(0, 1, size=(int(noise_ratio * n), d))).to(
+        data.x.device
+    )
     indices = np.arange(n)
     indices = np.random.permutation(indices)[: int(noise_ratio * n)]
     delta_feat = torch.zeros_like(data.x)

@@ -1,5 +1,47 @@
 # Efficiency Notes
 
+## Current validated evidence
+
+The development checkout now has paired GCGP author-kernel timing, controlled
+Cora prediction-matching replay and real runtime/operator probes. See
+[efficiency evidence](docs/efficiency.md) and [runtime compatibility](docs/compatibility.md).
+The comparison distinguishes kernel latency, optimization-loop time, accuracy,
+precision and complete-method execution. It retains Float32 trajectory drift
+and CUDA Float64 slowdown instead of asserting a universal speed/quality gain.
+The historical smoke tables below do not supply a matched before/after baseline
+and must not be used as such.
+
+## Repository cleanup verification (2026-10-09)
+
+The package, examples, benchmark entry points and legacy shell adapters now share
+the same method registry and training/evaluation pipeline. Python formatting is
+consistent across the repository. No speedup or full scientific rerun is claimed.
+
+Verification used Python 3.11 and PyTorch 2.6.0 on CPU. The regression suite covers
+configuration precedence, short runs, reduction seeds, lazy imports, saved graph
+loading, graph conversion, clustering, cached initialization, and reproduction
+planning. Real Cora smoke runs completed for Clustering, Averaging, KCenter, GCond,
+and VariationNeighborhoods with one reduction, three evaluation epochs, one
+evaluation repetition, and CPU execution. These runs establish pipeline health;
+their accuracies are excluded from the published results table.
+
+All 399 published method cells and 21 repeated whole-graph cells in the frozen CSV
+were checked against GC4NC arXiv:2406.16715v3 Table 9. The README renderer checks
+the embedded tables against that CSV. Unreported method cells remain NR. Shell
+syntax checks cover all 31 shell scripts. Wheel and source-distribution builds
+were verified, including packaged CLI modules, configs and source-only benchmark
+assets. These checks do not establish GPU behavior or paper-score reproduction.
+
+Re-run the local checks with:
+
+```bash
+python -m pytest -q
+ruff check graphslim examples benchmark tests interface
+ruff format --check graphslim examples benchmark tests interface
+python -m benchmark.render_results --check
+python -m build
+```
+
 This file records performance-related package changes and benchmark expectations.
 
 ## Baseline

@@ -1,0 +1,9 @@
+{
+  "clustgdd_prop_steps": 2,
+  "clustgdd_post_steps": 1,
+  "rate_profiles": {
+    "0.25": {"epochs": 80, "clustgdd_pre_epochs": 120, "clustgdd_dropout": 0.7, "clustgdd_sampling_ratio": 0.06},
+    "0.5": {"epochs": 200, "clustgdd_pre_epochs": 100, "clustgdd_alpha": 0.5, "clustgdd_hidden": 128, "clustgdd_dropout": 0.8, "clustgdd_pre_wd": 0.0, "clustgdd_sampling_ratio": 0.21, "clustgdd_prediction_weight": 0.05},
+    "1.0": {"epochs": 200, "clustgdd_pre_epochs": 200, "clustgdd_alpha": 0.5, "clustgdd_dropout": 0.7, "clustgdd_sampling_ratio": 0.2, "clustgdd_prediction_weight": 0.9}
+  }
+}

@@ -4,29 +4,28 @@ import numpy as np
 
 
 class CoreSet:
-
     def __init__(self, setting, data, args, **kwargs):
         self.data = data
         self.args = args
         self.setting = setting
 
         self.device = args.device
-        if hasattr(data, 'labels_syn') and data.labels_syn is not None:
+        if hasattr(data, "labels_syn") and data.labels_syn is not None:
             self.num_class_dict = data.num_class_dict
             self.labels_train = data.labels_train
-            if args.setting == 'ind':
+            if args.setting == "ind":
                 self.idx_train = np.arange(len(data.idx_train))
             else:
                 self.idx_train = data.idx_train
         else:
             self.num_class_dict, self.labels_train, self.idx_train = self.prepare_select(data, args)
-        self.condense_model = 'GCN'
+        self.condense_model = "GCN"
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 
     def prepare_select(self, data, args):
         num_class_dict = {}
         syn_class_indices = {}
-        if args.setting == 'ind':
+        if args.setting == "ind":
             idx_train = np.arange(len(data.idx_train))
         else:
             idx_train = data.idx_train
