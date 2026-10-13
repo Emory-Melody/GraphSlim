@@ -60,7 +60,7 @@ Tested CUDA profile:
 
 ```bash
 uv pip install torch==2.8.0 torchvision==0.23.0 --index-url https://download.pytorch.org/whl/cu128
-uv pip install torch-scatter torch-sparse --no-index -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
+uv pip install torch-scatter torch-sparse --no-deps --no-index -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
 uv pip install -e '.[dev,docs,fuzzy]' --constraint <(printf 'torch==2.8.0\ntorchvision==0.23.0\n')
 uv pip install 'dgl==1.1.3' 'numpy==1.26.4'
 python -m graphslim.doctor --device cuda:0 --dgl

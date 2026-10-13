@@ -116,7 +116,7 @@ cd GraphSlim
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
-uv pip install torch-scatter torch-sparse --no-index -f https://data.pyg.org/whl/torch-2.6.0+cpu.html
+uv pip install torch-scatter torch-sparse --no-deps --no-index -f https://data.pyg.org/whl/torch-2.6.0+cpu.html
 uv pip install -e ".[dev]" --constraint <(printf 'torch==2.6.0\ntorchvision==0.21.0\n')
 ```
 
@@ -125,6 +125,8 @@ For CUDA, choose matching PyTorch and extension wheels from
 [PyG](https://data.pyg.org/whl/). Keep the installed Torch version constrained while
 installing the remaining dependencies. Install `.[dgl]` for the Yelp/Amazon fraud
 datasets, `.[fuzzy]` for GECC's fuzzy clustering, and `.[viz]` for the web interface.
+The extension-wheel step uses `--no-deps` because the PyG wheel directory does
+not contain SciPy; the subsequent GraphSlim installation supplies dependencies.
 
 The checked-in `uv.lock` records dependency resolution. `uv sync --locked` reads it;
 `uv pip sync` requires a requirements file and does not consume `uv.lock`.

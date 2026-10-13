@@ -17,7 +17,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - uses: astral-sh/setup-uv@v6
       - run: uv pip install --system torch==${{ matrix.torch }} torchvision==${{ matrix.torchvision }} --index-url https://download.pytorch.org/whl/cpu
-      - run: uv pip install --system torch-scatter torch-sparse --no-index -f https://data.pyg.org/whl/torch-${{ matrix.torch }}+cpu.html
+      - run: uv pip install --system torch-scatter torch-sparse --no-deps --no-index -f https://data.pyg.org/whl/torch-${{ matrix.torch }}+cpu.html
       - run: uv pip install --system -e '.[dev,docs,fuzzy]' 'dgl==1.1.3' 'numpy==1.26.4' --constraint <(printf 'torch==${{ matrix.torch }}\ntorchvision==${{ matrix.torchvision }}\n')
         shell: bash
       - run: python -m graphslim.doctor --device cpu --dgl --json --output doctor.json
