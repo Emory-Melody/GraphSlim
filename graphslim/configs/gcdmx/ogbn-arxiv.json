@@ -1,0 +1,8 @@
+{
+  "lr_feat": 0.01,
+  "outer_loop": 5,
+  "inner_loop": 1,
+  "dis_metric": "l1",
+  "condense_model": "GCN",
+  "epochs": 600
+}

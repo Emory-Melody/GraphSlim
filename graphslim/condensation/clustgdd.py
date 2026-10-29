@@ -60,27 +60,42 @@ def compress_graph(adjacency, assignments, size):
     return compressed
 
 
-def class_aware_views(adjacency, embeddings, ratio):
-    """Class-wise attention x effective-resistance lower-bound top-edge sampling."""
+def iter_class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_000):
+    """Yield exact global top-k views with bounded edge-feature working memory.
+
+    Chunk only independent cosine calculations; degrees, resistance and global
+    top-k retain their original arithmetic. Consume each view before requesting
+    the next one so large original-node graphs need not all remain in memory.
+    """
     if not 0 <= ratio <= 1:
         raise ValueError("clustgdd_sampling_ratio must be in [0, 1]")
+    if not isinstance(edge_chunk_size, int) or edge_chunk_size < 1:
+        raise ValueError("clustgdd_edge_chunk_size must be a positive integer")
     adjacency = adjacency.coalesce()
     src, dst = adjacency.indices()
-    similarity = F.cosine_similarity(embeddings[src], embeddings[dst], dim=1).clamp_min(0)
-    values = adjacency.values() * similarity
+    values = torch.empty_like(adjacency.values())
+    for start in range(0, len(values), edge_chunk_size):
+        stop = min(start + edge_chunk_size, len(values))
+        similarity = F.cosine_similarity(
+            embeddings[src[start:stop]], embeddings[dst[start:stop]], dim=1
+        ).clamp_min(0)
+        values[start:stop] = adjacency.values()[start:stop] * similarity
     degrees = torch.zeros(len(embeddings), device=embeddings.device).scatter_add_(0, src, values)
     resistance = values / degrees[src].clamp_min(1e-12) + values / degrees[dst].clamp_min(1e-12)
     probabilities = embeddings.softmax(1)
     size = int(len(values) * ratio)
-    views = []
     for label in range(embeddings.shape[1]):
         weights = probabilities[src, label] * probabilities[dst, label] * resistance
         chosen = torch.topk(weights, size).indices
         indices = adjacency.indices()[:, chosen].cpu().numpy()
         graph = sp.csr_matrix((values[chosen].cpu().numpy(), indices), shape=adjacency.shape)
         # The released directed top-k ties can break symmetry. Restore it for GNNs.
-        views.append((graph + graph.T) * 0.5)
-    return views
+        yield (graph + graph.T) * 0.5
+
+
+def class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_000):
+    """Compatibility list interface; reducers stream the iterator directly."""
+    return list(iter_class_aware_views(adjacency, embeddings, ratio, edge_chunk_size))
 
 
 class ClustGDD(LightweightReducer):
@@ -174,8 +189,11 @@ class ClustGDD(LightweightReducer):
             shape=adjacency.shape,
         )
         reduced_csr = compress_graph(adjacency_csr, assignment, size)
-        views = class_aware_views(
-            normalized, embeddings, getattr(args, "clustgdd_sampling_ratio", 0.4)
+        views = iter_class_aware_views(
+            normalized,
+            embeddings,
+            getattr(args, "clustgdd_sampling_ratio", 0.4),
+            getattr(args, "clustgdd_edge_chunk_size", 1_000_000),
         )
         compressed_views = [
             torch.as_tensor(

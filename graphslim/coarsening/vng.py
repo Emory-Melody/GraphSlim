@@ -9,6 +9,7 @@ from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.models import GCN
 from graphslim.utils import one_hot
+from graphslim.reduction.cluster_ops import fitted_labels, sparse_membership
 
 
 class VNG:
@@ -53,7 +54,6 @@ class VNG:
         """
         args = self.args
         setting = self.setting
-        cpu_data = copy.deepcopy(data)
 
         if args.setting == "trans":
             model = get_model_class(args.condense_model)(
@@ -140,24 +140,15 @@ class VNG:
 
         column_sum = np.sum(A_tr, axis=0)
         column_sum = np.asarray(column_sum).reshape(-1)
-        for i in range(X_tr_0.shape[0]):  # Prevent column_sum from being zero
-            if column_sum[i] == 0:
-                column_sum[i] = 1
+        column_sum[column_sum == 0] = 1
 
         num_coarsen_node = int(self.args.reduction_rate * X_tr_0.shape[0])
 
         # PROPAGATION FROM VIRTUAL REPRESENTATIVE NODES TO TESTING NODES
         kmeans = KMeans(n_clusters=num_coarsen_node, random_state=2024, n_init=1)
-        kmeans.fit(X_tr_head, sample_weight=column_sum)
-
-        E = np.zeros((num_coarsen_node, X_tr_0.shape[0]))
-        M = np.zeros((num_coarsen_node, X_tr_0.shape[0]))
-        for i in range(X_tr_0.shape[0]):
-            cluster_label = kmeans.labels_[i]
-            E[cluster_label, i] = column_sum[i]
-            M[cluster_label, i] = 1
-        row_sums = E.sum(axis=1)
-        E = E / row_sums[:, np.newaxis]
+        assignments = fitted_labels(kmeans, X_tr_head, sample_weight=column_sum)
+        E = sparse_membership(assignments, num_coarsen_node, column_sum, normalize=True)
+        M = sparse_membership(assignments, num_coarsen_node)
 
         X_vr_0 = E @ X_tr_0
 

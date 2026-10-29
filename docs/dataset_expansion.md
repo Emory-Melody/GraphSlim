@@ -108,3 +108,52 @@ outside the OGB loader are copied byte-for-byte from the sealed v2 archive,
 keeping concurrent development outside this experimental protocol. A cell never
 mixes source versions. Incomplete v2 groups remain archived and are rerun as a
 whole group in the new source; complete groups are not retrained.
+
+## Continuing evaluation timeouts
+
+The completed v3 queue retained 51 timeouts: 45 NOPE reductions and six
+ogbn-products jobs interrupted during downstream evaluation. Those six jobs
+already saved 42 of their 60 GCN fits. Continue only their missing fits with:
+
+```bash
+.venv-gpu/bin/python -m benchmark.resume_expansion \
+  --parent runs/dataset_expansion_20261012_v3 \
+  --run-dir runs/dataset_expansion_20261028_resume \
+  --gpus 3 4 5 --timeout 14400 --max-rss-gib 100
+```
+
+This creates a separate continuation manifest, verifies the original source ZIP
+and frozen workspace, copies verified checkpoints and completed evaluations,
+and retains the original terminal outcomes. Workers use the original frozen
+code, data, training budgets and seeds. Only execution resource limits change;
+the manifest records both limits and each copied file hash. A numeric cell still
+requires every declared seed. Successful compute totals reuse saved timings but
+exclude time lost in interrupted attempts. Other terminal failures remain
+unavailable. GECC is outside this expansion roster; its historical seven-dataset
+results have their own provenance in `benchmark/results/package_local_results.json`.
+
+## Products memory optimization
+
+`runs/products_streaming_20261028` is a separate frozen-source ClustGDD run with
+chunked edge similarities and streamed class-view compression. It retains the
+original three rates, three reduction seeds, ten GCN seeds, official split and
+80 pretraining / 100 refinement / 300 downstream updates. Original OOM records
+remain in v3; source versions are not pooled into one result cell.
+
+```bash
+.venv-gpu/bin/python -m benchmark.expand_datasets \
+  --run-dir runs/products_streaming_20261028 \
+  --datasets ogbn-products --methods clustgdd --reductions-only \
+  --gpus 2 --timeout 14400 --max-rss-gib 100
+```
+
+`--reductions-only` omits additional whole-graph and parity jobs. New dispatches
+bind CUDA visibility to the locked physical GPU UUID, record that UUID in each
+job's `launch.json`, and validate the visible UUID before executing the worker.
+This avoids dependence on the CUDA driver's integer device ordering.
+
+The subsequent `runs/products_cluster_ops_20261028` batch adds GECC, Clustering
+and VNG and reruns the clustering methods against a fresh whole-graph baseline.
+It has 46 jobs and a separate source snapshot. See
+[clustering operators](clustering_operators.md) for all optimized paths, numerical
+checks, the GECC Products propagation repair and the exact launch command.

@@ -9,6 +9,7 @@
   "clustgdd_pre_lr": 0.01,
   "clustgdd_pre_wd": 0.0,
   "clustgdd_sampling_ratio": 0.4,
+  "clustgdd_edge_chunk_size": 1000000,
   "clustgdd_post_steps": 2,
   "clustgdd_post_lr": 0.01,
   "clustgdd_post_wd": 0.0005,

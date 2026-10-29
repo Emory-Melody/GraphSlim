@@ -62,6 +62,13 @@ Raise that JSON setting only with enough memory; storage grows quadratically.
 Common defaults on datasets without a released dataset profile are extensions,
 not paper-optimal settings. Cora/Citeseer CGC and ClustGDD rate profiles are shipped.
 
+ClustGDD computes edge cosine similarities in chunks of 1,000,000 edges
+(`clustgdd_edge_chunk_size`) and streams class-aware views through compression.
+This bounds temporary edge-feature storage and avoids retaining every large
+class view at once. Degree normalization, full-graph top-k selection, sampling
+ratio, propagation and training budgets are unchanged. Reducing the chunk size
+can further lower temporary GPU memory without sampling or dropping extra edges.
+
 ## Run and customize
 
 ```bash

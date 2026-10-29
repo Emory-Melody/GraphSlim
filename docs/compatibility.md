@@ -1,10 +1,38 @@
 # Runtime compatibility
 
-GraphSlim verifies concrete Python, Torch, PyG, extension-wheel and device
-combinations. Compatibility is not a promise that every CUDA version, DGL build
-or reduction method works in every environment. DGL is optional: the reduction
-and downstream training code uses Torch/PyG, while DGL graph interchange and
-selected dataset loaders are separate capabilities.
+GraphSlim uses Torch/PyG for graph reduction and downstream training. Its
+optimizations use standard PyTorch tensor operations and native CUDA Graphs.
+DGL provides optional graph interchange and selected dataset loaders.
+
+## GPU portability
+
+The GPU backend targets NVIDIA A100 and newer GPUs through the same PyTorch
+implementation. GraphSlim has no architecture-specific CUDA extension, SM120
+dispatch branch or locally compiled kernel. PyTorch selects the device kernels;
+install Torch and PyG extension wheels that support your GPU and CUDA runtime.
+
+| Architecture | Example GPUs | Compute capability | GraphSlim backend |
+| --- | --- | --- | --- |
+| Ampere | A100 | 8.0 | Native PyTorch operations and CUDA Graphs |
+| Ada | L40S, RTX 4090 | 8.9 | Same implementation |
+| Hopper | H100, H200 | 9.0 | Same implementation |
+| Blackwell | B200; RTX PRO 6000 Server Edition | 10.0; 12.0 | Same implementation |
+
+The [NVIDIA device table](https://developer.nvidia.com/cuda/gpus) lists these
+architecture identifiers. [PyTorch's CUDA Graph API](https://docs.pytorch.org/docs/2.8/notes/cuda.html#cuda-graphs)
+provides capture and replay. The current Products timing figures use the
+Blackwell device recorded below; A100 and Hopper timing records can be added
+using the same experiment protocol.
+
+On the selected GPU, check the installed operators and the acceleration backend:
+
+```bash
+python -m graphslim.doctor --device cuda:0 --json --output doctor.json
+python -m pytest -q tests/test_acceleration.py
+```
+
+The acceleration tests exercise actual capture/replay, gradients, optimizer
+updates, random state and kernel outputs on the visible GPU.
 
 ## Verified local profiles
 

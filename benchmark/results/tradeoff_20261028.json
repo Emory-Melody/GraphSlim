@@ -1,0 +1,805 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-10-28",
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "protocol": {
+    "reduction_seeds": [
+      1,
+      2,
+      3
+    ],
+    "evaluation_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "downstream": "GCN",
+    "hidden": 256,
+    "layers": 2,
+    "eval_epochs": 300,
+    "learning_rate": 0.01,
+    "weight_decay": 0.0005,
+    "dropout": 0.0,
+    "activation": "relu",
+    "val_interval": 10,
+    "data_seed": 1,
+    "dataset_split_id": 0,
+    "threads": 4,
+    "selection": "validation only",
+    "reduction": "package method defaults; no HPO; eager backend",
+    "rate_denominator": "labeled training nodes; NOPE reports actual retained nodes",
+    "parity": "author SGNK eager versus native CUDA kernel capture; GP/Adam eager",
+    "timeout_seconds": 3600,
+    "max_rss_gib": 100.0,
+    "failure_policy": "terminal failures retained; no partial numeric cells",
+    "precision": "float32; CGC reconstruction solve float64 as in package",
+    "metric": "accuracy except FraudYelp macro-F1",
+    "settings": "original package trans/ind settings; new datasets transductive",
+    "comparison_scope": "new source/budgets only; no pooling of historical batches"
+  },
+  "source": {
+    "run_dir": "runs/dataset_expansion_20261012_v3",
+    "source_sha256": "66e175c052a27271d5dbda4adb1d587e02fa9ae69c3171d7c78f3f315481dda0",
+    "archive_sha256": "19c726c10aecfca7c20d68216d685bd7d5c41d3492cf0872ace684dfd8f6aeb3",
+    "manifest_sha256": "90a65c7f6ac2e84acd9c1733f80154b0553457a1da6daceb8cb09d34ac5b65e5"
+  },
+  "statistics": {
+    "accuracy": "mean and population standard deviation over 3 reduction seeds x 10 GCN seeds per reduced cell; the full graph has 10 GCN seeds",
+    "reduction_time": "median of the three timing.reduction_seconds values; includes the reducer call and reduced-graph saving, excludes data loading and GCN fits"
+  },
+  "notes": {
+    "reddit": "The package loader uses the PyG Reddit2 graph.",
+    "nope": "NOPE reached the 3600 s job limit on both datasets and has no cell."
+  },
+  "cells": [
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "whole",
+      "training_node_rate": null,
+      "job_ids": [
+        "whole__ogbn-arxiv"
+      ],
+      "result_sha256": [
+        "82f68cfe2343d26034d6aac329f40641e3a0fb3a70a1dfb37e8d06d6f0b42f11"
+      ],
+      "actual_nodes": [
+        169343
+      ],
+      "n_evaluations": 10,
+      "test_accuracy_mean": 0.7061415961977655,
+      "test_accuracy_population_std": 0.0006667144147390278,
+      "reduction_seconds": [
+        0.0
+      ],
+      "median_reduction_seconds": 0.0
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "cgc",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "ogbn-arxiv__cgc__r0.001__s1",
+        "ogbn-arxiv__cgc__r0.001__s2",
+        "ogbn-arxiv__cgc__r0.001__s3"
+      ],
+      "result_sha256": [
+        "41d3d0965c3498770bf3ea772d6389cf9f47db7d26aebfd8c6a61df36c815a5d",
+        "3f80f19f80e36fd58a8be0621423dfda001ea14889de8445732571b9d09c82a5",
+        "dd581bc166baa429ac90446d776dee0fbc11a51b2b8f6094166c0a489ac15903"
+      ],
+      "actual_nodes": [
+        90,
+        90,
+        90
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6123771509303266,
+      "test_accuracy_population_std": 0.0038288797896073724,
+      "reduction_seconds": [
+        12.782054273411632,
+        9.48974839411676,
+        13.066470888443291
+      ],
+      "median_reduction_seconds": 12.782054273411632
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "cgc",
+      "training_node_rate": "0.005",
+      "job_ids": [
+        "ogbn-arxiv__cgc__r0.005__s1",
+        "ogbn-arxiv__cgc__r0.005__s2",
+        "ogbn-arxiv__cgc__r0.005__s3"
+      ],
+      "result_sha256": [
+        "efee3851dedd0cf1ecb0f958a5e176795012dc11f4e618fc6249ba7ed7e49dce",
+        "b5ba5b9a3716a34fed245d2cb2d469f58fa5762ed6b0f6d98e1c2995eb05d451",
+        "064f745ad48526ae91ca06da5b3615d39fae13565144edc935a38d99d3b52433"
+      ],
+      "actual_nodes": [
+        454,
+        454,
+        454
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6427099836086935,
+      "test_accuracy_population_std": 0.003129455993758643,
+      "reduction_seconds": [
+        22.686628310009837,
+        27.634181663393974,
+        39.760658115148544
+      ],
+      "median_reduction_seconds": 27.634181663393974
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "cgc",
+      "training_node_rate": "0.01",
+      "job_ids": [
+        "ogbn-arxiv__cgc__r0.01__s1",
+        "ogbn-arxiv__cgc__r0.01__s2",
+        "ogbn-arxiv__cgc__r0.01__s3"
+      ],
+      "result_sha256": [
+        "0840dda9e65904eb01fd236d698ac24f9a6da00df87fc03f5b53f1a0fc679ee2",
+        "5dc452dc187e414af618c40c15b9760e4ea1e098d765c23d53c362fb4cbd71a0",
+        "c9f99afda4dd3ba5213429f16d161e259f3a75ff4e00b8d831bbff2a8a4fd9a0"
+      ],
+      "actual_nodes": [
+        909,
+        909,
+        909
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6519343799079618,
+      "test_accuracy_population_std": 0.005781334719576403,
+      "reduction_seconds": [
+        82.58199566975236,
+        117.55927470233291,
+        84.0447446713224
+      ],
+      "median_reduction_seconds": 84.0447446713224
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "clustgdd",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "ogbn-arxiv__clustgdd__r0.001__s1",
+        "ogbn-arxiv__clustgdd__r0.001__s2",
+        "ogbn-arxiv__clustgdd__r0.001__s3"
+      ],
+      "result_sha256": [
+        "7c16b553f632d5b954f23eb415233893037a96cfb6d021536958aedbb460938e",
+        "25e362cec16fcd818f65e8a7877bf8f7b51c56722441f8214f686e71a2fec0f9",
+        "c2fbbb515f39aa8a8bead149bb1bbb28b2b83bf3fe52d330e7c75e27a71ea426"
+      ],
+      "actual_nodes": [
+        90,
+        90,
+        90
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.5986982970872854,
+      "test_accuracy_population_std": 0.0035124036168429117,
+      "reduction_seconds": [
+        9.435729025863111,
+        19.7080051722005,
+        14.91753832437098
+      ],
+      "median_reduction_seconds": 14.91753832437098
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "clustgdd",
+      "training_node_rate": "0.005",
+      "job_ids": [
+        "ogbn-arxiv__clustgdd__r0.005__s1",
+        "ogbn-arxiv__clustgdd__r0.005__s2",
+        "ogbn-arxiv__clustgdd__r0.005__s3"
+      ],
+      "result_sha256": [
+        "7dff31298989d94fc6f12afebbb28a60b0943edae619c2c5529325df3f7dcdef",
+        "0f72ccfc6d9ff707af9fcb855d410ba280f71191b990491fb612f17a71ae181d",
+        "e37d916d2850790f35c0f57651fdf01746c8b793540a762f1360d08f2e2637ce"
+      ],
+      "actual_nodes": [
+        454,
+        454,
+        454
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6313286559814552,
+      "test_accuracy_population_std": 0.0023385737664607087,
+      "reduction_seconds": [
+        11.523229788988829,
+        12.46128494758159,
+        9.693145568482578
+      ],
+      "median_reduction_seconds": 11.523229788988829
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "clustgdd",
+      "training_node_rate": "0.01",
+      "job_ids": [
+        "ogbn-arxiv__clustgdd__r0.01__s1",
+        "ogbn-arxiv__clustgdd__r0.01__s2",
+        "ogbn-arxiv__clustgdd__r0.01__s3"
+      ],
+      "result_sha256": [
+        "6a3edb68295e4c72f017919a955a9d10019aea8924d138e400382fab3909905b",
+        "3a00c6a408791c1f4e605c064b5de03e49e548b307497f97a2e995985d175bf4",
+        "d5686403787915dce5e4bb10a7b494c05c33ca3172b40ec6e534cdda5082cba6"
+      ],
+      "actual_nodes": [
+        909,
+        909,
+        909
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6376369085584567,
+      "test_accuracy_population_std": 0.003795278236784871,
+      "reduction_seconds": [
+        19.216035660356283,
+        18.135411606170237,
+        24.294958552345634
+      ],
+      "median_reduction_seconds": 19.216035660356283
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "gcgp",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "ogbn-arxiv__gcgp__r0.001__s1",
+        "ogbn-arxiv__gcgp__r0.001__s2",
+        "ogbn-arxiv__gcgp__r0.001__s3"
+      ],
+      "result_sha256": [
+        "e980b5726f0a7c059fe88c96741139ed295d1dee4d8e8c1b0bdeb8716b53e7da",
+        "b018192ea1366900ad1e1505b183b484c604eb660f35dcaf333af4bdf0166727",
+        "f84790bc2bdeedeffb3f1ad1379935464e72a4c6e54a394d247d300c43544caa"
+      ],
+      "actual_nodes": [
+        91,
+        91,
+        91
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.14745454670150676,
+      "test_accuracy_population_std": 0.09260673544160872,
+      "reduction_seconds": [
+        5.531213912181556,
+        7.273058484308422,
+        6.949416432529688
+      ],
+      "median_reduction_seconds": 6.949416432529688
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "gcgp",
+      "training_node_rate": "0.005",
+      "job_ids": [
+        "ogbn-arxiv__gcgp__r0.005__s1",
+        "ogbn-arxiv__gcgp__r0.005__s2",
+        "ogbn-arxiv__gcgp__r0.005__s3"
+      ],
+      "result_sha256": [
+        "71c38c2d0da4b48547c263753479bed37b97fac9f5eec49b6eb92548263dfe0b",
+        "28e01e2ad613483daf593bb8535daf56a868e7b467a50433898b7fff50488c6f",
+        "51b0bd75225db61269eb1a63be09754cebf2e685fbf960b609927248874dc31d"
+      ],
+      "actual_nodes": [
+        455,
+        455,
+        455
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.08423074021493872,
+      "test_accuracy_population_std": 0.05691830226536476,
+      "reduction_seconds": [
+        2.1497624376788735,
+        2.087397643364966,
+        3.716189839877188
+      ],
+      "median_reduction_seconds": 2.1497624376788735
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "gcgp",
+      "training_node_rate": "0.01",
+      "job_ids": [
+        "ogbn-arxiv__gcgp__r0.01__s1",
+        "ogbn-arxiv__gcgp__r0.01__s2",
+        "ogbn-arxiv__gcgp__r0.01__s3"
+      ],
+      "result_sha256": [
+        "cb428db28db229c60c149db1679c31337a9ba0b752dfd09f9740e75a274b58ba",
+        "ba2ea42e882d4c74237dd5c674cb2649e66e5a271c73c7bf9c9bd3baa23c35c0",
+        "2209ee03cd96282a10e6e87a8d94647c51ce381bb35be528285e2d12e7a79b63"
+      ],
+      "actual_nodes": [
+        909,
+        909,
+        909
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.10629316434513643,
+      "test_accuracy_population_std": 0.07832407852622739,
+      "reduction_seconds": [
+        10.487896552309394,
+        4.42209638748318,
+        3.2110473085194826
+      ],
+      "median_reduction_seconds": 4.42209638748318
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "random",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "ogbn-arxiv__random__r0.001__s1",
+        "ogbn-arxiv__random__r0.001__s2",
+        "ogbn-arxiv__random__r0.001__s3"
+      ],
+      "result_sha256": [
+        "d7fafd71089ab68d862951a4cb6dc9794b8af4c2587e3fa202ab3b465df4f8d5",
+        "b018004275b8deac7be6491309b92c6a9a77faa97c44f2ddb8881ffb3fc8666d",
+        "a49d14297cb1a7a782a932dbd214a68b9176cef2799755c7d74f71a50799095e"
+      ],
+      "actual_nodes": [
+        89,
+        89,
+        89
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.44224019093471595,
+      "test_accuracy_population_std": 0.052172796118958434,
+      "reduction_seconds": [
+        0.2023334028199315,
+        0.15214955899864435,
+        0.23166762199252844
+      ],
+      "median_reduction_seconds": 0.2023334028199315
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "random",
+      "training_node_rate": "0.005",
+      "job_ids": [
+        "ogbn-arxiv__random__r0.005__s1",
+        "ogbn-arxiv__random__r0.005__s2",
+        "ogbn-arxiv__random__r0.005__s3"
+      ],
+      "result_sha256": [
+        "242e5867e849555e96b7e4c57f569e0fb7a0fc9a3ce1d6f0bee9e1fc64f63f83",
+        "a709a1034ebd65db250c8f3a4f9ca0245ba03f324aa7261f233537145c87dbd2",
+        "a6861d5ea7d83394e7c03a65602f24e343d1883f54cebdaf60ca7cff2c028fca"
+      ],
+      "actual_nodes": [
+        439,
+        439,
+        439
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.572614173336351,
+      "test_accuracy_population_std": 0.009280501390607182,
+      "reduction_seconds": [
+        0.3160320399329066,
+        0.22766117565333843,
+        0.2934493459761143
+      ],
+      "median_reduction_seconds": 0.2934493459761143
+    },
+    {
+      "dataset": "ogbn-arxiv",
+      "method": "random",
+      "training_node_rate": "0.01",
+      "job_ids": [
+        "ogbn-arxiv__random__r0.01__s1",
+        "ogbn-arxiv__random__r0.01__s2",
+        "ogbn-arxiv__random__r0.01__s3"
+      ],
+      "result_sha256": [
+        "4cb17b4b78d55e1430126905350d5f7e7da91aeb1fb4e8b9ddb920872872e2f4",
+        "d728e82e86fcddf05cd6ba8243d6b67ba3b285cc7f96834fcf6209be1fa08ea3",
+        "285531610f8256ee725b60239ce42750425184cda961924161db62b5890518e7"
+      ],
+      "actual_nodes": [
+        892,
+        892,
+        892
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.5967642600936841,
+      "test_accuracy_population_std": 0.0042909899818557515,
+      "reduction_seconds": [
+        0.25729719270020723,
+        0.26235752925276756,
+        0.2882974101230502
+      ],
+      "median_reduction_seconds": 0.26235752925276756
+    },
+    {
+      "dataset": "reddit",
+      "method": "whole",
+      "training_node_rate": null,
+      "job_ids": [
+        "whole__reddit"
+      ],
+      "result_sha256": [
+        "32f191f51eb1d5746580862048eb197c83303da4cae90b1ea43a2e37baf1d1bf"
+      ],
+      "actual_nodes": [
+        232965
+      ],
+      "n_evaluations": 10,
+      "test_accuracy_mean": 0.9400187949542778,
+      "test_accuracy_population_std": 0.0002673200865594331,
+      "reduction_seconds": [
+        0.0
+      ],
+      "median_reduction_seconds": 0.0
+    },
+    {
+      "dataset": "reddit",
+      "method": "cgc",
+      "training_node_rate": "0.0005",
+      "job_ids": [
+        "reddit__cgc__r0.0005__s1",
+        "reddit__cgc__r0.0005__s2",
+        "reddit__cgc__r0.0005__s3"
+      ],
+      "result_sha256": [
+        "1f6ef7cefa879b075c5ef9a23d64e1760df43b3659244dabbacc18805b1a5b73",
+        "d3c10cbf72eb05b3c134c3c9609082cf30a566dc8c69823c89f4903023be1a83",
+        "3e7d3879a178846e2d9312abe092050fcf96a10b4b222e8a7578cb355615e4b9"
+      ],
+      "actual_nodes": [
+        76,
+        76,
+        76
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.8941030830953844,
+      "test_accuracy_population_std": 0.0009169405263305125,
+      "reduction_seconds": [
+        18.335855420678854,
+        4.987719296477735,
+        5.1158540938049555
+      ],
+      "median_reduction_seconds": 5.1158540938049555
+    },
+    {
+      "dataset": "reddit",
+      "method": "cgc",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "reddit__cgc__r0.001__s1",
+        "reddit__cgc__r0.001__s2",
+        "reddit__cgc__r0.001__s3"
+      ],
+      "result_sha256": [
+        "393401c536aa7d3bb2945a4c0a63df0758f879706513c2673bc46582c571ee7a",
+        "29298ef1b4738ab91d127bcd562bc3ade1ad5e11e354a07e7d34597c24b1f37d",
+        "795e31960d44d9256ad8e94f615f08e6769453daa9384b42a3c38214c945c999"
+      ],
+      "actual_nodes": [
+        153,
+        153,
+        153
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.9026114143203094,
+      "test_accuracy_population_std": 0.001199340780432986,
+      "reduction_seconds": [
+        34.51830474473536,
+        33.70559625606984,
+        34.399324900470674
+      ],
+      "median_reduction_seconds": 34.399324900470674
+    },
+    {
+      "dataset": "reddit",
+      "method": "cgc",
+      "training_node_rate": "0.002",
+      "job_ids": [
+        "reddit__cgc__r0.002__s1",
+        "reddit__cgc__r0.002__s2",
+        "reddit__cgc__r0.002__s3"
+      ],
+      "result_sha256": [
+        "7f13f11e3978b6e6b5f735954473e848a4389b8d768b226d3a9467b4745e2fa3",
+        "d399b574ecffe0ca0e69db3ed23b154b7a3d5a909e9a6fe178a6b9c784255cfe",
+        "4dc71db1a2994add2d0f8c072f5cc0cd9f36c8e5ec9ca78914ca80b3ae80fd8b"
+      ],
+      "actual_nodes": [
+        307,
+        307,
+        307
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.9119890121805763,
+      "test_accuracy_population_std": 0.0019463657276885585,
+      "reduction_seconds": [
+        35.32797309663147,
+        21.068063856102526,
+        24.638648842461407
+      ],
+      "median_reduction_seconds": 24.638648842461407
+    },
+    {
+      "dataset": "reddit",
+      "method": "clustgdd",
+      "training_node_rate": "0.0005",
+      "job_ids": [
+        "reddit__clustgdd__r0.0005__s1",
+        "reddit__clustgdd__r0.0005__s2",
+        "reddit__clustgdd__r0.0005__s3"
+      ],
+      "result_sha256": [
+        "0fd80cde95a12ef3181c957ca8430629aafdb3d5272a85128de2fd03ab82b6db",
+        "1ab993523020907e65f685f49de37a0cbce6172ad049dae32b475d6eb112f80d",
+        "79310ce988bdd24b369166652c9452ba7cd7be203b1e5a9de9f8ea939407f557"
+      ],
+      "actual_nodes": [
+        76,
+        76,
+        76
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.8021108179419526,
+      "test_accuracy_population_std": 0.00908000770710498,
+      "reduction_seconds": [
+        44.62766305170953,
+        24.14470819104463,
+        48.14890249352902
+      ],
+      "median_reduction_seconds": 44.62766305170953
+    },
+    {
+      "dataset": "reddit",
+      "method": "clustgdd",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "reddit__clustgdd__r0.001__s1",
+        "reddit__clustgdd__r0.001__s2",
+        "reddit__clustgdd__r0.001__s3"
+      ],
+      "result_sha256": [
+        "382126034d81a344cc5e1003acc4cb73505ba2884d64fa4203fbd44543405c07",
+        "dadcb255e30284123b69c445737e29dfc1170d3422102568e5f25ed5a892243a",
+        "df620b2c7dd42cbca3b11f6c6ed9866a1d57e0b54e9f4bc5d98e6813c2f5c03a"
+      ],
+      "actual_nodes": [
+        153,
+        153,
+        153
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.8585631498415682,
+      "test_accuracy_population_std": 0.006927217627481073,
+      "reduction_seconds": [
+        38.967719548381865,
+        44.40626783296466,
+        83.66457084473222
+      ],
+      "median_reduction_seconds": 44.40626783296466
+    },
+    {
+      "dataset": "reddit",
+      "method": "clustgdd",
+      "training_node_rate": "0.002",
+      "job_ids": [
+        "reddit__clustgdd__r0.002__s1",
+        "reddit__clustgdd__r0.002__s2",
+        "reddit__clustgdd__r0.002__s3"
+      ],
+      "result_sha256": [
+        "68312ebfd4865709852e005fceb5babfdf2df32ab1385f768fdd3ca0ad455173",
+        "08e8adfa298a0fb3451da440cdb6895a564bab761031d181fa004515afb4b5f2",
+        "49870680d0be94052e8c5217d492028a30088350bd0aa453accab8d5d92dec8d"
+      ],
+      "actual_nodes": [
+        307,
+        307,
+        307
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.8833273093095265,
+      "test_accuracy_population_std": 0.005575727519302145,
+      "reduction_seconds": [
+        91.26135131623596,
+        49.50874932575971,
+        46.32333006989211
+      ],
+      "median_reduction_seconds": 49.50874932575971
+    },
+    {
+      "dataset": "reddit",
+      "method": "gcgp",
+      "training_node_rate": "0.0005",
+      "job_ids": [
+        "reddit__gcgp__r0.0005__s1",
+        "reddit__gcgp__r0.0005__s2",
+        "reddit__gcgp__r0.0005__s3"
+      ],
+      "result_sha256": [
+        "41b5ad1b6f7367c43d0dd2c06a25823ba5898aca86e8f52f4ca05f85e503d5a5",
+        "133edd7edf9d028f0758c489143aed98cf1b683dbd49efffe38c17e1207cf5b1",
+        "fd89cc28c53484b2f110d91e809c937c2c4315750d817dd37ef3fe11ddf01a2d"
+      ],
+      "actual_nodes": [
+        77,
+        77,
+        77
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.19477114733557427,
+      "test_accuracy_population_std": 0.052765260564029096,
+      "reduction_seconds": [
+        6.509933550842106,
+        5.2158918511122465,
+        3.7682206723839045
+      ],
+      "median_reduction_seconds": 5.2158918511122465
+    },
+    {
+      "dataset": "reddit",
+      "method": "gcgp",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "reddit__gcgp__r0.001__s1",
+        "reddit__gcgp__r0.001__s2",
+        "reddit__gcgp__r0.001__s3"
+      ],
+      "result_sha256": [
+        "0e54bc804cba56017fe950543a42e9b07eff8c3f9f4b8f67bea9749291b60f5b",
+        "8c72fa8620475294fdb8f08a0b04a8bcecb2110a00954a3931eb5fcb1d4058a0",
+        "202431198ffa6e6eb5c6c8d85dea97be90ea7ea1174c8c183637ddb3ea2f3739"
+      ],
+      "actual_nodes": [
+        154,
+        154,
+        154
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.27467861832989965,
+      "test_accuracy_population_std": 0.015168638550485001,
+      "reduction_seconds": [
+        6.299244393594563,
+        16.510483536869287,
+        4.706776460632682
+      ],
+      "median_reduction_seconds": 6.299244393594563
+    },
+    {
+      "dataset": "reddit",
+      "method": "gcgp",
+      "training_node_rate": "0.002",
+      "job_ids": [
+        "reddit__gcgp__r0.002__s1",
+        "reddit__gcgp__r0.002__s2",
+        "reddit__gcgp__r0.002__s3"
+      ],
+      "result_sha256": [
+        "7917d7a217588f3708ef242b4851f99844f67b6f08ef8a178141b7f480720b57",
+        "d920cae9e270c48844f69f44d75b635fb6f57804aec19a5238398652dff9e868",
+        "8a0faa9cba822d3d6950c5aa0d19ff25eab0c35339e60f08e59bc8fd6d787126"
+      ],
+      "actual_nodes": [
+        308,
+        308,
+        308
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.19231816484138747,
+      "test_accuracy_population_std": 0.062335764998206276,
+      "reduction_seconds": [
+        6.019652017392218,
+        6.683205935172737,
+        4.082468773238361
+      ],
+      "median_reduction_seconds": 6.019652017392218
+    },
+    {
+      "dataset": "reddit",
+      "method": "random",
+      "training_node_rate": "0.0005",
+      "job_ids": [
+        "reddit__random__r0.0005__s1",
+        "reddit__random__r0.0005__s2",
+        "reddit__random__r0.0005__s3"
+      ],
+      "result_sha256": [
+        "a0ca166f8cccb52c54e623533d3b23239b5b0fc0a680a82ceb2a2c402dc35632",
+        "8384f74ba3e666b31637d47da92a117be7986c07b1086f9c9c3a98c89ba49e26",
+        "a7c798b173f2dd1674830452e80cad1ba0aae6c23a814e198dc0fa933728d4bb"
+      ],
+      "actual_nodes": [
+        69,
+        69,
+        69
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.4680702642136842,
+      "test_accuracy_population_std": 0.07102924351551226,
+      "reduction_seconds": [
+        0.3040822083130479,
+        0.270035763271153,
+        0.23240341059863567
+      ],
+      "median_reduction_seconds": 0.270035763271153
+    },
+    {
+      "dataset": "reddit",
+      "method": "random",
+      "training_node_rate": "0.001",
+      "job_ids": [
+        "reddit__random__r0.001__s1",
+        "reddit__random__r0.001__s2",
+        "reddit__random__r0.001__s3"
+      ],
+      "result_sha256": [
+        "2695ed27d57ce60a09ea737610971709707c1b26371cec0dcc193ca41588485b",
+        "bef072bfde4417fb924c0389966adae8116f3c69bd90f3c94749409ff3f324ef",
+        "fce870abba34f9dfa359aab541d68d3e77d32114a137e93727eac8658f164758"
+      ],
+      "actual_nodes": [
+        138,
+        138,
+        138
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.5732208045686197,
+      "test_accuracy_population_std": 0.060836899511224125,
+      "reduction_seconds": [
+        0.7109589828178287,
+        0.27834422793239355,
+        0.194556069560349
+      ],
+      "median_reduction_seconds": 0.27834422793239355
+    },
+    {
+      "dataset": "reddit",
+      "method": "random",
+      "training_node_rate": "0.002",
+      "job_ids": [
+        "reddit__random__r0.002__s1",
+        "reddit__random__r0.002__s2",
+        "reddit__random__r0.002__s3"
+      ],
+      "result_sha256": [
+        "791b06e259b33f3987d3242d76c0b103c19d927ba40ff915e1e6af40b48d4a0c",
+        "429843d366193ad4886bbeb4df723901d762f2c2ef6faf4fd7ab24383701c881",
+        "3d1fc566ae8cfad9fa793a2f672d220486221308845d282e9abbbf6ec0d651b6"
+      ],
+      "actual_nodes": [
+        288,
+        288,
+        288
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6418525078011109,
+      "test_accuracy_population_std": 0.04955340276259561,
+      "reduction_seconds": [
+        0.18958642333745956,
+        0.16158744227141142,
+        0.14268068596720695
+      ],
+      "median_reduction_seconds": 0.16158744227141142
+    }
+  ]
+}

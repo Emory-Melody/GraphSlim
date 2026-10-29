@@ -17,6 +17,11 @@ from graphslim.condensation.gcond_base import GCondBase
 import skfuzzy as fuzz
 import concurrent.futures
 from sklearn.metrics import pairwise_distances  # Faster than cdist
+from graphslim.reduction.cluster_ops import (
+    nearest_squared,
+    weighted_propagation,
+    sparse_class_assignment,
+)
 
 
 class GECC(GCondBase):
@@ -53,113 +58,21 @@ class GECC(GCondBase):
         # 1) Pre-aggregate features depending on the setting
         ####################################################
 
+        # All transductive datasets use the same normalized full-graph operator.
+        # The former Products-only sampled branch overwrote context nodes across
+        # minibatches; this corrected path is an explicitly new source version.
         if args.setting == "trans":
-            if args.dataset in ["ogbn-products"]:
-                # Move full feature matrix to GPU
-                data.feat_full = data.feat_full.to(device)
-
-                # Initialize aggregated feature tensor
-                num_nodes, feature_dim = data.feat_full.size()
-                final_feat_agg = torch.zeros((num_nodes, feature_dim), device=device)
-
-                # Initialize NeighborSampler with configurable depth
-                train_loader = NeighborSampler(
-                    edge_index=data.edge_index,
-                    sizes=[15] * args.depth,  # Number of neighbors for each hop
-                    batch_size=1024,
-                    shuffle=True,
-                    num_workers=4,
-                )
-
-                # Pre-compute weights for each hop
-                weights = [gamma, alpha, beta]  # For first 3 hops
-                for _ in range(3, args.depth + 1):
-                    weights.append(0.5)  # Use 1.0 for deeper layers
-
-                # Aggregate features using NeighborSampler
-                for batch_size, n_id, adjs in train_loader:
-                    # Move all adjacency matrices to GPU at once
-                    adjs = [adj.to(device) for adj in adjs]
-
-                    # Initialize feature tensors for each hop
-                    feat_hops = [data.feat_full[n_id]]  # 0-hop features
-
-                    # Compute features for each hop
-                    for i, adj in enumerate(adjs):
-                        row, col = adj.edge_index
-                        # Use scatter_add for efficient aggregation
-                        feat_next = scatter_add(
-                            feat_hops[-1][row], col, dim=0, dim_size=feat_hops[0].size(0)
-                        )
-                        feat_hops.append(feat_next)
-
-                    # Combine features with weights efficiently
-                    feat_agg = torch.zeros_like(feat_hops[0])
-                    for i, (weight, feat) in enumerate(zip(weights, feat_hops)):
-                        feat_agg.add_(weight * feat)
-
-                    # Update final features in-place
-                    final_feat_agg[n_id] = feat_agg
-
-            else:
-                # Other transductive datasets
-                data.adj_fully = to_tensor(data.adj_full, device=args.device)
-                data.first_hop = normalize_adj_tensor(data.adj_fully, sparse=True)
-
-                # Pre-compute weights for each hop
-                weights = [gamma, alpha, beta]  # For first 3 hops
-                for _ in range(3, args.depth + 1):
-                    weights.append(0.5)  # Use 1.0 for deeper layers
-
-                # Initialize feature tensors
-                feat_hops = [to_tensor(data.feat_full, device=device)]
-
-                # Compute features for each hop
-                for i in range(1, args.depth + 1):
-                    feat_next = matmul(data.first_hop, feat_hops[-1]).float()
-                    feat_hops.append(feat_next)
-
-                # Combine features with weights efficiently
-                final_feat_agg = torch.zeros_like(feat_hops[0])
-                for weight, feat in zip(weights, feat_hops):
-                    final_feat_agg.add_(weight * feat)
-
-            if verbose:
-                end_agg = timer()
-                args.logger.info(
-                    f"=== Finished trans PreAggregation in {end_agg - start_total:.2f} sec ==="
-                )
-
+            feature_source, adjacency_source = data.feat_full, data.adj_full
         else:
-            # Inductive setting requires local aggregation on the subgraph
-            data.feat_train = data.feat_train.to(device)
-            data.adj_train = to_tensor(data.adj_train, device=device)
-
-            data.first_hop = normalize_adj_tensor(data.adj_train, sparse=True)
-
-            # Pre-compute weights for each hop
-            weights = [gamma, alpha, beta]  # For first 3 hops
-            for _ in range(3, args.depth + 1):
-                weights.append(1.0)  # Use 2.0 for deeper layers
-
-            # Initialize feature tensors
-            feat_hops = [to_tensor(data.feat_train, device=device)]
-
-            # Compute features for each hop
-            for i in range(1, args.depth + 1):
-                feat_next = matmul(data.first_hop, feat_hops[-1]).float()
-                feat_hops.append(feat_next)
-
-            # Combine features with weights efficiently
-            final_feat_agg = torch.zeros_like(feat_hops[0])
-            for weight, feat in zip(weights, feat_hops):
-                final_feat_agg.add_(weight * feat)
-
+            feature_source, adjacency_source = data.feat_train, data.adj_train
+        normalized = normalize_adj_tensor(to_tensor(adjacency_source, device=device), sparse=True)
+        weights = [gamma, alpha, beta]
+        weights.extend([0.5 if args.setting == "trans" else 1.0] * max(args.depth - 2, 0))
+        final_feat_agg = weighted_propagation(
+            normalized, to_tensor(feature_source, device=device), weights[: args.depth + 1]
+        )
         if verbose:
-            end_agg = timer()
-            args.logger.info(
-                f"=== Finished ind PreAggregation in {end_agg - start_total:.2f} sec ==="
-            )
+            args.logger.info(f"Finished sparse preaggregation in {timer() - start_total:.2f} sec")
 
         ###########################
         # 2) Prepare training data
@@ -255,7 +168,7 @@ class GECC(GCondBase):
             n_c = sum(y_syn == c)
 
             # Move to CPU and convert to numpy for clustering
-            x_c_np = x_c.cpu().numpy()
+            x_c_np = x_c if args.fuzziness == 1.0 else x_c.cpu().numpy()
 
             # Perform clustering
             # updated_centroids_c = perform_balance_evolve_clusteringjk(
@@ -318,123 +231,16 @@ class GECC(GCondBase):
             # Create adjacency for synthetic set (identity matrix)
             adj_syn = torch.eye(x_syn.shape[0], device=device)
 
-            # Create assignment matrix (maps synthetic nodes to original training nodes)
-            print(
-                f"Creating assignment matrix with shape ({x_syn.shape[0]}, {data.feat_full.shape[0]})"
+            # Diagnostic mappings stay sparse and use original graph node IDs.
+            assignment = sparse_class_assignment(
+                x_syn,
+                y_syn_incremental,
+                data.feat_train,
+                data.labels_train,
+                data.idx_train,
+                data.feat_full.shape[0],
+                fuzzy=args.fuzziness > 1.0,
             )
-            assignment = torch.zeros((x_syn.shape[0], data.feat_full.shape[0]), device=device)
-
-            # Print class statistics to understand assignments better
-            for i in range(data.nclass):
-                class_indices = torch.where(data.labels_train == i)[0]
-                print(
-                    f"Class {i}: {len(class_indices)} original training nodes, {sum(y_syn_incremental == i).item()} synthetic nodes"
-                )
-
-            # Check if using Fuzzy C-Means (fuzziness > 1.0)
-            if args.fuzziness > 1.0:
-                print(
-                    f"Using top-1 distance for assignment (Fuzzy C-Means with m={args.fuzziness})"
-                )
-
-                # For each class, compute distances and create assignment based on closest nodes
-                for i in range(data.nclass):
-                    # Get indices for this class
-                    class_indices = torch.where(data.labels_train == i)[0]
-                    syn_indices = torch.where(y_syn_incremental == i)[0]
-
-                    if len(syn_indices) == 0 or len(class_indices) == 0:
-                        continue
-
-                    # Get features for synthetic and original nodes
-                    syn_features = x_syn[syn_indices]
-                    orig_features = data.feat_train[data.labels_train == i]
-
-                    # Make sure both tensors are on the same device
-                    if syn_features.device != orig_features.device:
-                        print(
-                            f"Moving orig_features from {orig_features.device} to {syn_features.device}"
-                        )
-                        orig_features = orig_features.to(syn_features.device)
-
-                    # Compute pairwise distances between synthetic and original nodes
-                    # [syn_nodes, orig_nodes]
-                    dist_matrix = torch.cdist(syn_features, orig_features, p=2)
-
-                    # For each synthetic node, find the closest original node
-                    closest_indices = torch.argmin(dist_matrix, dim=1)
-
-                    # Assign each synthetic node to its closest original node
-                    for j, syn_idx in enumerate(syn_indices):
-                        orig_idx = class_indices[closest_indices[j]]
-                        assignment[syn_idx, orig_idx] = 1.0
-
-                    # Print the first few assignments for debugging
-                    for j in range(min(5, len(syn_indices))):
-                        syn_idx = syn_indices[j]
-                        orig_idx = class_indices[closest_indices[j]]
-                        print(
-                            f"Synthetic node {syn_idx} (class {i}) assigned to original node {orig_idx}"
-                        )
-
-                print("Assignment matrix created using top-1 distances")
-            else:
-                # Original method: uniform assignment across all nodes of the same class
-                print("Using uniform assignment across all nodes of the same class")
-                # For each class, assign synthetic nodes to all original nodes of that class
-                for i, (start, end) in enumerate(syn_class_indices.values()):
-                    # Get the original indices for this class
-                    class_indices = torch.where(data.labels_train == i)[0]
-                    print(
-                        f"Creating assignments for class {i}: {end - start} synthetic nodes mapped to {len(class_indices)} original nodes"
-                    )
-
-                    # Assign each synthetic node to its corresponding original nodes
-                    for j in range(start, end):
-                        assignment[j, class_indices] = 1.0 / len(class_indices)
-
-                    # Print the first assignment for debugging
-                    if start < end:
-                        print(
-                            f"Synthetic node {start} (class {i}) uniformly assigned to {len(class_indices)} original nodes"
-                        )
-                        assigned_original = torch.where(assignment[start] > 0)[0]
-                        if isinstance(assigned_original, torch.Tensor):
-                            first_few = assigned_original[:5].cpu().tolist()
-                        else:
-                            first_few = (
-                                assigned_original[:5].tolist()
-                                if hasattr(assigned_original, "tolist")
-                                else list(assigned_original[:5])
-                            )
-                        print(f"  Sample of assigned original nodes: {first_few}...")
-
-            # Print information about the assignment matrix
-            print(f"Assignment matrix created with shape {assignment.shape}")
-            non_zero_counts = (assignment > 0).sum(dim=1)
-            print(
-                f"Each synthetic node is connected to {non_zero_counts.float().mean().item():.2f} original nodes on average"
-            )
-            print(
-                f"Min connections: {non_zero_counts.min().item()}, Max connections: {non_zero_counts.max().item()}"
-            )
-
-            # Verify assignments for the first few synthetic nodes
-            for i in range(min(5, assignment.shape[0])):
-                assigned_original = torch.where(assignment[i] > 0)[0]
-                print(
-                    f"Synthetic node {i} (class {y_syn_incremental[i].item()}) has {len(assigned_original)} connections"
-                )
-                if len(assigned_original) > 0:
-                    if isinstance(assigned_original, torch.Tensor):
-                        first_few = assigned_original[:5].cpu().tolist()
-                    else:
-                        first_few = (
-                            assigned_original[:5].tolist()
-                            if hasattr(assigned_original, "tolist")
-                            else list(assigned_original[:5])
-                        )
-                    print(f"  Connected to original nodes: {first_few}...")
 
             # Assign to data object
             data.feat_syn = x_syn
@@ -558,7 +364,7 @@ class GECC(GCondBase):
 #     device = torch.device(args.device)
 #
 #     # Convert new data to torch
-#     x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
+#     x_c_torch = torch.as_tensor(x_c_current, dtype=torch.float32, device=device)
 #
 #     with torch.random.fork_rng():
 #         # For reproducibility
@@ -730,7 +536,7 @@ def perform_balance_evolve_clusteringjk(
     - returns: Updated centroids (Tensor of shape [n_c, d])
     """
     device = torch.device(args.device)
-    x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
+    x_c_torch = torch.as_tensor(x_c_current, dtype=torch.float32, device=device)
 
     # For reproducibility
     rng_devices = [device.index or torch.cuda.current_device()] if device.type == "cuda" else []
@@ -739,7 +545,7 @@ def perform_balance_evolve_clusteringjk(
         # ----- Initialization -----
         # For K-Means: work with torch tensors; for Fuzzy C-Means: work with numpy arrays.
         if args.fuzziness == 1.0:
-            x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
+            x_c_torch = torch.as_tensor(x_c_current, dtype=torch.float32, device=device)
             if x_syn_c is None:
                 if x_c_torch.size(0) < n_c:
                     raise ValueError(
@@ -823,10 +629,11 @@ def perform_balance_evolve_clusteringjk(
                     # Run K-Means
                     for iteration in range(max_iters):
                         # Compute squared Euclidean distances: [points, n_c]
-                        diff = x_c_torch.unsqueeze(1) - current_centers.unsqueeze(0)
-                        dist = (diff**2).sum(dim=2)
-                        # Hard assignment to the nearest center
-                        current_assignments = dist.argmin(dim=1)
+                        nearest, current_assignments = nearest_squared(
+                            x_c_torch,
+                            current_centers,
+                            getattr(args, "cluster_distance_working_bytes", 64 * 1024**2),
+                        )
                         new_centers = current_centers.clone()
 
                         # Update centers
@@ -848,7 +655,7 @@ def perform_balance_evolve_clusteringjk(
 
                     # Compute balanced SSE objective
                     # 1. Compute base SSE
-                    base_sse = dist.min(dim=1)[0].sum().item()
+                    base_sse = nearest.sum().item()
 
                     # 2. Compute balance penalty
                     cluster_sizes = torch.bincount(current_assignments, minlength=n_c).float()
@@ -868,18 +675,13 @@ def perform_balance_evolve_clusteringjk(
             print(f"Best K-Means objective value: {best_obj}")
             centers = best_centers
 
-            # ----- Compute Partition Matrix -----
-            # Create a one-hot encoded partition matrix from the best assignments
-            partition_matrix = torch.zeros((x_c_torch.size(0), n_c), device=x_c_torch.device)
-            partition_matrix[torch.arange(x_c_torch.size(0)), best_assignments] = 1
-
-            # Convert the partition matrix to a NumPy array
-            partition_matrix_np = partition_matrix.cpu().numpy()
-
-            # Save the partition matrix as a NumPy file if required
+            # This diagnostic was previously allocated even when never saved.
             if save_p:
+                partition_matrix = torch.zeros((len(x_c_torch), n_c), device=device)
+                partition_matrix[torch.arange(len(x_c_torch), device=device), best_assignments] = 1
                 np.save(
-                    f"{args.dataset}_{args.si}_{class_id}_partition_matrix.npy", partition_matrix_np
+                    f"{args.dataset}_{args.si}_{class_id}_partition_matrix.npy",
+                    partition_matrix.cpu().numpy(),
                 )
 
         else:
@@ -1052,10 +854,7 @@ def incremental_kmeanspp_init(
     # ------------------------------------------------------------------------
     if old_centers is not None and old_centers.size(0) > 0:
         # dist_to_old: [N, old_count]
-        diff_old = new_data.unsqueeze(1) - old_centers.unsqueeze(0)
-        dist_to_old = (diff_old**2).sum(dim=2)  # [N, old_count]
-        # nearest_dist: [N]
-        nearest_dist = dist_to_old.min(dim=1).values
+        nearest_dist, _ = nearest_squared(new_data, old_centers)
     else:
         # If no old centers, treat nearest_dist as infinity => pick first centroid random
         nearest_dist = torch.full((new_data.size(0),), float("inf"), device=device)
@@ -1105,7 +904,7 @@ def incremental_kmeanspp_init(
 #     - returns updated x_syn_c (shape: [n_c, d])
 #     """
 #     device = torch.device(args.device)
-#     x_c_torch = torch.tensor(x_c_current, dtype=torch.float32, device=device)
+#     x_c_torch = torch.as_tensor(x_c_current, dtype=torch.float32, device=device)
 #
 #     # For reproducibility
 #     with torch.random.fork_rng():

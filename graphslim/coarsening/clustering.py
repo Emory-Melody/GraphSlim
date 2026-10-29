@@ -6,6 +6,7 @@ from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.coarsening.labels import synthetic_labels, label_tensor
 from graphslim.dataset.utils import save_reduced
 from graphslim.evaluation.utils import verbose_time_memory
+from graphslim.reduction.cluster_ops import fitted_labels
 
 
 class Cluster(Coarsen):
@@ -66,8 +67,7 @@ class Cluster(Coarsen):
             if n_c == 0:
                 continue
             k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
-            k_means.fit(x_c)
-            clusters = torch.from_numpy(k_means.predict(x_c)).long()
+            clusters = torch.from_numpy(fitted_labels(k_means, x_c)).long()
             x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0, dim_size=n_c)
 
         data.feat_syn, data.labels_syn = x_syn.to(x_train.device), y_syn.to(x_train.device)

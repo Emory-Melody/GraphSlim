@@ -1,0 +1,9 @@
+{
+  "lr_feat": 0.0001,
+  "pre_norm": true,
+  "dis_metric": "l1",
+  "outer_loop": 5,
+  "inner_loop": 0,
+  "condense_model": "GCN",
+  "epochs": 2000
+}

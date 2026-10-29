@@ -18,82 +18,98 @@
 GraphSlim 加载 PyG 图，通过统一的方法注册表执行图缩减，再使用统一的下游 GNN 流程评估缩减后的图。
 本仓库包含软件包、可运行示例、回归测试和基准复现命令。
 
-## 实测效率与运行环境互操作性
+加速后端使用 PyTorch 原生算子和 CUDA Graph，面向 A100 及更新的 NVIDIA 显卡，
+覆盖 Ampere、Ada、Hopper 和 Blackwell 架构。通过 `--cuda_graph` 启用。
+[GPU 配置与检查](docs/compatibility.md#gpu-portability)。
 
-可选的 `--cuda_graph` 加速已接入全部 40 个已注册方法和七种下游 GNN 使用的公共训练 API。
-符合条件的一阶优化与核计算阶段会执行严格的数值和状态一致性检查；CPU、动态计算及高阶优化仍采用即时执行（eager）。
-这表示接口已覆盖这些方法，并不表示已验证所有方法都能加速。
-详见[阶段支持、回退机制与复现命令](docs/cuda_graph.md)。
-确定性合成图集成检查中，280 个无噪声和 336 个带噪声的方法/模型组合均通过检查，损失历史、选定权重和得分完全一致。
-六种架构成功捕获为 CUDA Graph；GAT 保持即时执行。
-计入初始化开销后，80 步的短训练大多更慢，因此不能将接口覆盖等同于普遍加速。
-详见[检查记录](benchmark/results/cuda_graph_integration.json)。
+## ogbn-products 实测结果
 
-### 原生 CUDA Graph 耗时结果
+数据集包含 2,449,029 个节点，使用 OGB 官方划分。下图覆盖训练节点数的
+0.05%、0.1% 和 0.2% 三个缩减比例，各缩减方法使用 3 个缩减种子 × 10 个 GCN 种子。
+每次 GCN 训练执行 300 次更新。
 
-以下包内图缩减配对测试使用固定的 48 节点、16 维特征玩具图，缩减随机种子为 1，
-运行环境为 Torch 2.8.0+cu128 和 CUDA 12.8，并启用确定性算法。
-两种后端使用相同的输入、运算方式和训练预算。耗时包含预处理、计算图初始化和数值验证；
-速度比为即时执行耗时除以 CUDA Graph 耗时。每组配对的缩减张量和实际优化损失历史均完全一致。
+![Products 三个缩减比例的 GCN 准确率，以及 0.2% 比例的图缩减耗时](figures/products_results.svg)
 
-| 缩减阶段 | 预算 | 即时执行（s） | CUDA Graph（s） | 速度比 |
-| --- | --- | ---: | ---: | ---: |
-| GCGP SGNK，包内运算方式 | 200 次 GP 更新 | 7.61 | 4.06 | 1.87× |
-| GCGP SGNK，原作者发布的运算方式 | 200 次 GP 更新 | 7.20 | 3.59 | 2.01× |
-| ClustGDD 预训练与细化 | 80 + 200 次更新 | 6.29 | 5.18 | 1.21× |
+准确率误差线为标准差；缩减耗时柱为三次运行的中位数，误差线为最小值至最大值。
+[完整结果与实验设置](docs/products.md) ·
+[逐种子结果与来源记录](benchmark/results/products_20261028.json)。
 
-这些是单种子玩具图集成测量，不是 Cora 准确率结果，也不是与原作者完整仓库的比较。
-部分核计算被捕获为 CUDA Graph，GP 求解和优化器仍即时执行。
-两种 GCGP 运算配置分别进行配对比较，不能作为可互换的科学实验设置。
+### 图缩减耗时与准确率的权衡
 
-下游短训练中速度下降的结果也予以保留。在同一合成图上，使用 40 个方法标签、各训练 80 步时，
-即时执行/CUDA Graph 速度比的中位数如下：
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_ogbn-arxiv_dark.png">
+    <img src="./figures/tradeoff_ogbn-arxiv_light.png" width="49%" alt="ogbn-arxiv 上 CGC、ClustGDD、GCGP 和 Random 在三个预算下的测试准确率与图缩减耗时">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_reddit_dark.png">
+    <img src="./figures/tradeoff_reddit_light.png" width="49%" alt="Reddit 上 CGC、ClustGDD、GCGP 和 Random 在三个预算下的测试准确率与图缩减耗时">
+  </picture>
+</p>
 
-| 下游模型 | 实际后端 | 含初始化开销的速度比中位数 |
-| --- | --- | ---: |
-| GCN | CUDA Graph 捕获 | 0.49× |
-| SGC | CUDA Graph 捕获 | 0.35× |
-| APPNP | CUDA Graph 捕获 | 0.43× |
-| Cheby | CUDA Graph 捕获 | 0.56× |
-| GraphSage | CUDA Graph 捕获 | 0.52× |
-| GAT | 回退到即时执行 | 不适用 |
-| SGFormer | CUDA Graph 捕获 | 0.95× |
+每个标记代表一种方法在一个预算下的结果，标记大小表示预算占有标签训练节点的比例。
+误差线为 3 个缩减种子 × 10 个 GCN 种子的标准差，水平线为原图准确率。
+这些实验与 Products 结果使用相同的 GCN 流程、包内默认配置和 GPU。
+Reddit 使用 PyG 的 Reddit2 图。NOPE 在两个数据集上均未能在一小时任务时限内完成，因此未列出。
+[逐种子结果与来源记录](benchmark/results/tradeoff_20261028.json) ·
+[实验协议](docs/dataset_expansion.md)。
 
-速度比小于 1 表示执行更慢。这里的完整训练耗时包含计算图初始化、严格一致性验证、模型验证和诊断用损失记录，
-并未测量标签所对应的图缩减器耗时。`--cuda_graph` 保持按需启用，请按实际训练预算测量性能。
-详见[固定版本的耗时、张量哈希与损失历史](benchmark/results/cuda_graph_integration.json)；
-[复现命令与各阶段限制](docs/cuda_graph.md)。
+<details>
+<summary>绘图数值</summary>
 
-### 运算基准与兼容性
+<!-- tradeoff-table:start -->
+| 数据集 | 方法 | 预算 | 缩减后节点数 | 测试准确率（%） | 图缩减耗时（s） |
+| --- | --- | ---: | ---: | ---: | ---: |
+| ogbn-arxiv | 原图 | — | 169,343 | 70.61 ± 0.07 | — |
+| ogbn-arxiv | CGC | 0.1% | 90 | 61.24 ± 0.38 | 12.78 |
+| ogbn-arxiv | CGC | 0.5% | 454 | 64.27 ± 0.31 | 27.63 |
+| ogbn-arxiv | CGC | 1% | 909 | 65.19 ± 0.58 | 84.04 |
+| ogbn-arxiv | ClustGDD | 0.1% | 90 | 59.87 ± 0.35 | 14.92 |
+| ogbn-arxiv | ClustGDD | 0.5% | 454 | 63.13 ± 0.23 | 11.52 |
+| ogbn-arxiv | ClustGDD | 1% | 909 | 63.76 ± 0.38 | 19.22 |
+| ogbn-arxiv | GCGP | 0.1% | 91 | 14.75 ± 9.26 | 6.95 |
+| ogbn-arxiv | GCGP | 0.5% | 455 | 8.42 ± 5.69 | 2.15 |
+| ogbn-arxiv | GCGP | 1% | 909 | 10.63 ± 7.83 | 4.42 |
+| ogbn-arxiv | Random | 0.1% | 89 | 44.22 ± 5.22 | 0.20 |
+| ogbn-arxiv | Random | 0.5% | 439 | 57.26 ± 0.93 | 0.29 |
+| ogbn-arxiv | Random | 1% | 892 | 59.68 ± 0.43 | 0.26 |
+| Reddit | 原图 | — | 232,965 | 94.00 ± 0.03 | — |
+| Reddit | CGC | 0.05% | 76 | 89.41 ± 0.09 | 5.12 |
+| Reddit | CGC | 0.1% | 153 | 90.26 ± 0.12 | 34.40 |
+| Reddit | CGC | 0.2% | 307 | 91.20 ± 0.19 | 24.64 |
+| Reddit | ClustGDD | 0.05% | 76 | 80.21 ± 0.91 | 44.63 |
+| Reddit | ClustGDD | 0.1% | 153 | 85.86 ± 0.69 | 44.41 |
+| Reddit | ClustGDD | 0.2% | 307 | 88.33 ± 0.56 | 49.51 |
+| Reddit | GCGP | 0.05% | 77 | 19.48 ± 5.28 | 5.22 |
+| Reddit | GCGP | 0.1% | 154 | 27.47 ± 1.52 | 6.30 |
+| Reddit | GCGP | 0.2% | 308 | 19.23 ± 6.23 | 6.02 |
+| Reddit | Random | 0.05% | 69 | 46.81 ± 7.10 | 0.27 |
+| Reddit | Random | 0.1% | 138 | 57.32 ± 6.08 | 0.28 |
+| Reddit | Random | 0.2% | 288 | 64.19 ± 4.96 | 0.16 |
+<!-- tradeoff-table:end -->
 
-开发版本提供可复现的性能比较和 `graphslim-doctor` 运行环境检查，无需强制安装 GraphSlim 专用 CUDA 扩展。
-此前的运算基准仅针对 GCGP 的 SGNK 数学计算：用逐行范数的平方替代不必要的完整自身 Gram 矩阵。
-计时前会检查相同输入下的输出、梯度和 GP 预测；这些结果不能用于声称整个仓库或原作者仓库获得端到端加速。
+</details>
 
-| Float32 SGNK 形状 N × S × D | CPU 前向加速比 | CUDA 12.8 前向加速比 |
-| --- | ---: | ---: |
-| 140 × 70 × 1433 | 1.98× | 1.41× |
-| 1024 × 256 × 128 | 2.73× | 1.36× |
-| 4096 × 256 × 128 | 5.47× | 1.19× |
-
-在同一 Cora 流程中，执行 200 次 GP 更新和三次各 300 步的 GCN 训练时，
-Float64 CPU 优化使用原作者运算方式耗时 7.83 s，使用 GraphSlim 运算方式耗时 4.82 s（1.62×）；
-GCN 准确率分别为 73.67±0.50% 和 73.83±0.29%。
-这里仅对优化循环计时，不含加载、预处理或完整训练。
-Float32 长时间优化出现准确率漂移，而 Float64 CUDA 更新循环更慢（相对速度为 0.60×），
-因此两者均不能被表述为在保持准确率不变的前提下实现完整方法的 GPU 加速。
-详见[完整的加速与减速测量及准确率检查](docs/efficiency.md)；
-[机器可读原始记录](benchmark/results/efficiency_compatibility.json)。
-
-运行环境检查已在 Python 3.11、Torch 2.6 CPU 以及 Torch 2.8 CPU/CUDA 12.8 上通过，
-包括 Blackwell SM120 上的稀疏运算、scatter、求解及 GCN 前向和反向计算。
-两套本地 CPU 测试各通过 260 项测试。实际 DGL 1.1.3 CPU 图数据互换保留边权重、特征、标签、划分掩码和孤立节点；
-带类型的图转换也保留实际属性张量。
-这些检查不代表已覆盖 DGL GPU/GraphBolt、其他 CUDA 版本或所有方法的 GPU 执行。
-详见[已测试配置与安装说明](docs/compatibility.md)。
+可用以下命令根据固定的结果记录重新绘图：
 
 ```bash
-python -m graphslim.doctor --device cpu --dgl
+python -m benchmark.render_tradeoff
+```
+
+### GCGP 的 CUDA Graph 优化耗时
+
+Products 上的 200 次优化更新，批量大小 1,024，缩减图 393 个节点。
+CUDA Graph 耗时包含初始化，每个种子重复计时 3 次。
+
+![Products 上 GCGP 常规运行与 CUDA Graph 的优化耗时对比，含初始化开销](figures/products_cuda_graph.svg)
+
+两种运行方式在每个种子下得到相同的优化结果和下游得分。
+图中耗时实测于 RTX PRO 6000 Blackwell Server Edition。
+[计时详情](docs/products.md#cuda-graph-timing) · [启用 CUDA Graph](docs/cuda_graph.md)。
+
+`graphslim-doctor` 可检查 PyTorch、稀疏运算和可选的 DGL 安装。
+
+```bash
 python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
@@ -199,15 +215,11 @@ print(list_methods("condensation"))
 | 粗化/聚类 | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron`, `nope` |
 | 图凝聚 | `gcond`, `gcondx`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
 
-方法注册提供查询和实例化能力，并不表示每种方法都已在每个数据集上完成验证。
-GECC 包含演化图工作流，其中部分额外参数未在公共命令行接口中提供。
-请查阅各方法的实现与配置文件，了解所需设置。
+各方法的参数设置见对应配置文件，其中包括 GECC 的演化图工作流。
 
-CGC 和 NOPE 在缩减阶段不训练 GNN。ClustGDD 执行线性预训练与细化；
-GCGP 通过高斯过程（GP）优化合成特征与目标值，不包含 GNN 内层训练循环。
-这些方法有各自的算法实现，并非聚类方法的别名。
-固定版本的来源、与论文设置的对应范围、NOPE 实际节点预算的报告方式及全部下游/噪声测试，
-见[轻量方法说明](docs/lightweight_methods.md)。
+CGC 和 NOPE 在缩减阶段无需训练 GNN。ClustGDD 使用线性预训练和细化；
+GCGP 通过高斯过程优化缩减后的特征和目标值。
+[方法介绍、来源与验证](docs/lightweight_methods.md)。
 
 ```bash
 python -m examples.train_lightweight -D cora -M cgc -G -1 --save_path ./checkpoints
@@ -748,20 +760,11 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 
 ## 轻量方法：下游验证
 
-[按顺序扩展的数据集实验](docs/dataset_expansion.md) 已配置为先运行原有七个数据集，
-再运行 Roman-empire/Amazon-ratings，最后运行 ogbn-products。
-新批次在每个比例下使用三个缩减随机种子和十个 GCN 随机种子，测量时间与内存，
-并单独进行跨数据集的 GCGP 数值一致性检查。
-进度和仅包含完整结果的单元格见
-[`runs/dataset_expansion_20261012_v3/results.md`](runs/dataset_expansion_20261012_v3/results.md)；
-待完成或失败的单元格均视为结果不可用。
+[数据集扩展实验](docs/dataset_expansion.md) 在每个比例下使用 3 个缩减种子和 10 个 GCN 种子。
+[Products 完整结果](docs/products.md) 包含 CGC、ClustGDD、GCGP 和 Random 的全部三个缩减比例。
 
-新方法的测试矩阵覆盖全部七种架构（GCN、SGC、APPNP、Cheby、GraphSage、GAT、SGFormer）、
-直推式与归纳式设置、无噪声输入、六种低开销噪声，以及沿用的 `metattack` 路径（PRBCD）。
-此外还测试固定模型下的推理噪声、已保存图的重新加载、仅基于验证集的 NAS、图属性、
-使用 oracle 阈值的成员推断攻击（MIA）、缺失类别、孤立节点，以及可选的 CGC-X / NOPE* / 学习邻接矩阵的 GCGP 变体。
-这些测试执行真实模型优化，下游得分并非模拟值。
-针对固定版本原作者核心代码的 11 项数值检查，与端到端论文复现分开报告。
+方法测试覆盖七种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
+[方法配置与测试说明](docs/lightweight_methods.md)。
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
@@ -769,75 +772,11 @@ python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --pro
 python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp nope --dry-run
 ```
 
-这四种新增方法尚未建立覆盖完整七数据集、重复运行的基准得分。
-其集成检查准确率与论文表，以及上方使用 3 个缩减种子 × 10 个评估种子的包内结果分开列示。
-
 <!-- lightweight-checks:start -->
 
-### 轻量方法：真实数据集成检查
-
-配置：`smoke`；32/32 次缩减已完成，224 个模型结果单元格，0 次失败。
-
-这些是集成检查，不是论文结果，也不是基于验证集选择的 HPO。
-冒烟测试执行 20 步缩减（ClustGDD 另有 20 步预训练）、20 步下游训练，隐藏维度为 32。
-默认使用一个缩减/评估随机种子。特征预处理随方法而异，因此不能将各行作为受控比较进行排名。
-
-| 数据集 | 方法 | 噪声 | 缩减随机种子 | 实际节点数 | GCN | SGC | APPNP | Cheby | GraphSage | GAT | SGFormer |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cora | cgc | clean | 1 | 70 | 79.70 | 77.80 | 77.00 | 74.50 | 74.20 | 77.70 | 33.90 |
-| cora | cgc | random_adj | 1 | 70 | 77.80 | 75.80 | 75.60 | 73.10 | 74.40 | 71.80 | 20.30 |
-| cora | cgc | edge_drop | 1 | 70 | 79.60 | 76.50 | 76.00 | 75.90 | 75.40 | 75.80 | 60.10 |
-| cora | cgc | random_feat | 1 | 70 | 78.70 | 77.80 | 76.90 | 72.00 | 74.80 | 72.70 | 59.60 |
-| cora | cgc | feature_mask | 1 | 70 | 79.10 | 78.10 | 76.10 | 74.90 | 75.00 | 77.20 | 20.00 |
-| cora | cgc | gaussian | 1 | 70 | 80.50 | 77.90 | 77.50 | 74.70 | 75.30 | 78.80 | 31.30 |
-| cora | cgc | label_noise | 1 | 70 | 70.50 | 68.10 | 67.70 | 67.10 | 66.80 | 66.10 | 20.80 |
-| cora | cgc | metattack | 1 | 70 | 74.80 | 72.90 | 71.50 | 70.30 | 71.90 | 71.70 | 30.30 |
-| cora | clustgdd | clean | 1 | 70 | 21.30 | 25.80 | 25.80 | 25.80 | 29.30 | 28.70 | 13.40 |
-| cora | clustgdd | random_adj | 1 | 70 | 20.70 | 19.80 | 20.10 | 13.40 | 19.10 | 18.70 | 13.00 |
-| cora | clustgdd | edge_drop | 1 | 70 | 19.00 | 25.30 | 25.00 | 21.10 | 27.40 | 29.30 | 13.00 |
-| cora | clustgdd | random_feat | 1 | 70 | 14.80 | 26.10 | 25.80 | 25.80 | 26.00 | 26.70 | 13.00 |
-| cora | clustgdd | feature_mask | 1 | 70 | 20.60 | 19.60 | 19.20 | 13.10 | 16.00 | 21.30 | 13.00 |
-| cora | clustgdd | gaussian | 1 | 70 | 21.90 | 18.30 | 18.70 | 13.50 | 16.90 | 26.00 | 13.00 |
-| cora | clustgdd | label_noise | 1 | 70 | 31.90 | 31.90 | 31.90 | 31.90 | 32.00 | 31.90 | 31.90 |
-| cora | clustgdd | metattack | 1 | 70 | 19.20 | 20.20 | 20.00 | 15.60 | 20.30 | 10.30 | 15.30 |
-| cora | gcgp | clean | 1 | 70 | 48.20 | 21.80 | 21.30 | 33.90 | 31.70 | 23.10 | 31.90 |
-| cora | gcgp | random_adj | 1 | 70 | 31.20 | 25.30 | 25.40 | 32.30 | 31.50 | 21.40 | 29.40 |
-| cora | gcgp | edge_drop | 1 | 70 | 28.00 | 20.70 | 20.60 | 36.10 | 32.40 | 23.20 | 22.60 |
-| cora | gcgp | random_feat | 1 | 70 | 43.20 | 26.50 | 26.10 | 33.70 | 31.90 | 23.50 | 27.30 |
-| cora | gcgp | feature_mask | 1 | 70 | 24.80 | 30.80 | 30.20 | 34.20 | 32.10 | 23.90 | 20.00 |
-| cora | gcgp | gaussian | 1 | 70 | 46.50 | 21.10 | 20.60 | 31.90 | 31.50 | 23.30 | 34.60 |
-| cora | gcgp | label_noise | 1 | 70 | 26.40 | 26.20 | 26.30 | 36.40 | 32.50 | 24.40 | 26.60 |
-| cora | gcgp | metattack | 1 | 70 | 40.30 | 40.30 | 38.00 | 38.10 | 31.90 | 23.60 | 30.10 |
-| cora | nope | clean | 1 | 12 | 16.60 | 7.20 | 7.30 | 11.20 | 15.60 | 14.80 | 18.40 |
-| cora | nope | random_adj | 1 | 36 | 14.60 | 13.00 | 13.00 | 13.30 | 13.30 | 13.50 | 13.00 |
-| cora | nope | edge_drop | 1 | 14 | 16.90 | 7.30 | 7.30 | 7.60 | 13.40 | 11.30 | 18.90 |
-| cora | nope | random_feat | 1 | 12 | 16.10 | 7.30 | 7.30 | 25.80 | 17.70 | 15.50 | 18.70 |
-| cora | nope | feature_mask | 1 | 12 | 16.20 | 7.20 | 7.30 | 17.80 | 14.50 | 14.00 | 17.50 |
-| cora | nope | gaussian | 1 | 12 | 16.40 | 7.90 | 8.20 | 9.60 | 16.00 | 12.00 | 19.10 |
-| cora | nope | label_noise | 1 | 12 | 16.10 | 13.10 | 13.20 | 8.40 | 12.90 | 13.70 | 14.90 |
-| cora | nope | metattack | 1 | 44 | 14.90 | 13.00 | 13.00 | 13.00 | 13.40 | 13.50 | 13.00 |
-
-单元格为测试准确率（%）或相应数据集指标；不确定性和原始随机种子记录见 `scores.csv` 和 `jobs/*/result.json`。
-部分完成的单元格不显示数值。`metattack` 对应本包的 PRBCD 路径，冒烟模式下代理模型/攻击各执行 2 步，并非字面意义上的 MetaAttack。
-无噪声任务还保留固定模型的推理噪声结果、仅基于验证集的双候选 NAS、图属性和 oracle 阈值 MIA 诊断。
-NOPE 保留连通分量并移除无标签超节点；实际节点数可能与请求值不同。
-
-2026-10-10 已验证：**246 项仓库测试**、**112 项已安装 wheel 的方法测试**及
-**11 项固定版本原作者核心代码检查**均通过。严格 Sphinx 构建及 wheel/sdist 内容检查通过。
-
-实验协议：Cora 公开划分；缩减比例为训练节点的 `0.5`；噪声比例 `0.1`；
-缩减随机种子 `1`，评估随机种子 `0`；CPU，四线程。CGC/NOPE 不进行迭代式缩减训练。
-该表使用固定版本源码 `ffc655aea569996bd8511033a5f1c6c8f268053037cdb16a56a2f55b26cd87d0`，
-并已独立核验其源码 ZIP 和全部 96 个检查点文件。
-
-[完整 CSV](benchmark/results/lightweight_integration.csv) ·
-[JSON 来源与验证记录](benchmark/results/lightweight_integration.json) ·
-本地原始产物目录：`runs/lightweight_cora_20261010_v5`。
-
-另一个 300 步的无噪声数据批次已完成 4/4 次缩减和 28 个架构结果单元格，
-目录为 `runs/lightweight_cora_full_20261010_v2`。
-该批次仍仅使用一个缩减和评估随机种子，与冒烟测试矩阵分开列示。
-完整七数据集的重复实验结果正在上方链接的按顺序扩展批次中收集。
+Cora 短流程测试使用 20 步缩减和下游训练、32 维隐藏层，以及一个缩减/评估种子。
+[测试结果 CSV](benchmark/results/lightweight_integration.csv) ·
+[设置与核验记录 JSON](benchmark/results/lightweight_integration.json)。
 
 <!-- lightweight-checks:end -->
 
@@ -850,9 +789,8 @@ ruff format --check graphslim examples benchmark tests interface
 python -m build
 ```
 
-回归测试使用小型内存图、真实的 CPU GNN 优化，以及用于流程编排的模拟对象；无需下载基准数据或执行 GPU 训练。
-科学基准实验则需要原始数据、方法专属超参数、充分训练和重复评估。
-[efficiency.md](efficiency.md) 记录历史冒烟测试及其限制；这些冒烟测试准确率不能作为基准结果。
+回归测试使用小型内存图、CPU GNN 训练和模拟任务调度。
+基准实验使用原始数据集、各方法的参数设置和重复评估。[历史开发测试](efficiency.md)。
 
 ## 仓库结构
 

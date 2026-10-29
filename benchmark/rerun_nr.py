@@ -316,11 +316,17 @@ def gpu_inventory():
     inventory = []
     for line in output.splitlines():
         index, uuid, memory, utilization = [item.strip() for item in line.split(",")]
+        try:
+            idle = uuid not in busy and int(memory) < 200 and int(utilization) < 5
+        except ValueError:
+            # A disabled/unavailable GPU can report [N/A]. Keep it unavailable
+            # without preventing work on other, fully observed devices.
+            idle = False
         inventory.append(
             {
                 "index": int(index),
                 "uuid": uuid,
-                "idle": uuid not in busy and int(memory) < 200 and int(utilization) < 5,
+                "idle": idle,
             }
         )
     return inventory

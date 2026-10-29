@@ -422,8 +422,9 @@ class LargeDataLoader(nn.Module):
         """
         if self.split_method == "kmeans":
             kmeans = KMeans(n_clusters=self.k.item(), n_init=10)
-            kmeans.fit(self.split_feat.numpy())
-            self.batch_labels = kmeans.predict(self.split_feat.numpy())
+            from graphslim.reduction.cluster_ops import fitted_labels
+
+            self.batch_labels = fitted_labels(kmeans, self.split_feat.numpy())
 
     def getitem(self, idx):
         """

@@ -49,6 +49,7 @@ def hierarchical_merge(features, adjacency, target, relaxed=False):
         if u != v:
             neighbors[u].add(int(v))
             neighbors[v].add(int(u))
+    edge_count = sum(map(len, neighbors.values())) // 2
     versions = np.zeros(2 * n, dtype=np.int64)
     active, tree = set(range(n)), {}
 
@@ -80,6 +81,9 @@ def hierarchical_merge(features, adjacency, target, relaxed=False):
         if versions[u] != version_u or versions[v] != version_v:
             continue
         joined = (neighbors[u] | neighbors[v]) - {u, v}
+        # Remove the incident edges (u-v counted once), then add new-to-joined
+        # edges. This avoids scanning every active node after every contraction.
+        edge_count -= len(neighbors[u]) + len(neighbors[v]) - len(joined) - 1
         new = next_id
         next_id += 1
         sizes[new] = sizes[u] + sizes[v]
@@ -100,14 +104,19 @@ def hierarchical_merge(features, adjacency, target, relaxed=False):
         }
         for a, b in sorted(pairs):
             push(a, b)
-        # Bound obsolete heap entries on hubs; rebuild only from active edges.
-        edge_count = sum(len(neighbors[node]) for node in active) // 2
+        # Every current edge already has one entry at its endpoint versions.
+        # Drop stale entries without recomputing all unchanged edge losses.
         if len(heap) > max(1024, 4 * edge_count):
-            heap.clear()
-            for a in sorted(active):
-                for b in sorted(neighbors[a]):
-                    if a < b:
-                        push(a, b)
+            heap[:] = [
+                entry
+                for entry in heap
+                if entry[1] in active
+                and entry[2] in active
+                and entry[3] == versions[entry[1]]
+                and entry[4] == versions[entry[2]]
+                and entry[2] in neighbors[entry[1]]
+            ]
+            heapq.heapify(heap)
     roots = sorted(active)
     mapping = np.empty(n, dtype=np.int64)
     for cluster, root in enumerate(roots):

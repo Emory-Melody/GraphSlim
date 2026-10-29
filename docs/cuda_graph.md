@@ -1,12 +1,14 @@
 # CUDA Graph acceleration
 
-GraphSlim has an optional native Torch CUDA Graph backend for fixed-shape,
-first-order computation. All 40 registered reduction methods share its downstream
-training entry points, covering GCN, SGC, APPNP, Cheby, GraphSage, GAT and SGFormer.
-This is interface coverage, not a claim that all methods or models run faster.
-GAT's dynamic attention structure currently stays eager before capture preflight.
-The default remains eager execution. No GraphSlim CUDA extension or local NVCC
-build is required.
+GraphSlim uses native PyTorch CUDA Graphs to reduce launch overhead in repeated,
+fixed-shape computation. The same implementation targets A100 and newer NVIDIA
+GPUs across Ampere, Ada, Hopper and Blackwell. PyTorch supplies the kernels and
+capture API; GraphSlim requires no architecture-specific extension or NVCC build.
+[GPU setup and checks](compatibility.md#gpu-portability).
+
+The backend connects to the shared training APIs used by 40 reduction methods
+and seven downstream GNNs. GAT's dynamic attention uses eager execution.
+Enable capture with `--cuda_graph`; the default is eager execution.
 
 ```bash
 python -m graphslim.train_all -D cora -M gcond -G 0 --cuda_graph
@@ -17,7 +19,8 @@ python -m examples.train_lightweight -D cora -M clustgdd -G 0 --cuda_graph
 `--no_cuda_graph` explicitly restores the default. Stages with fewer than
 `--cuda_graph_min_steps` updates remain eager; the default is 64. Native capture
 uses `--cuda_graph_warmup` warmups, default 3. Short diagnostics may lower the
-threshold, but their setup-inclusive timings are not an amortized speed claim.
+threshold. [Products measurements](products.md#cuda-graph-timing) include setup
+time for the 200-update optimization loop.
 
 ## Captured stages
 

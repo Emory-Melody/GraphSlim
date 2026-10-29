@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import f1_score
 from sklearn.preprocessing import PolynomialFeatures
+from graphslim.reduction.cluster_ops import softmax_cluster_centers
 
 from graphslim.reduction.lightweight import (
     LightweightReducer,
@@ -119,11 +120,11 @@ class CGC(LightweightReducer):
                 embedding = spectral_embedding(embedding, budget[label], args.seed)
             assignment = cluster(embedding, budget[label], args.seed)
             assignment = torch.as_tensor(assignment, device=self.device)
-            for index in range(budget[label]):
-                members = assignment == index
-                weight = (scores[mask][members] / temperature).softmax(0)
-                centers.append((values[members] * weight[:, None]).sum(0))
-                synthetic_labels.append(label)
+            class_centers = softmax_cluster_centers(
+                values, scores[mask], assignment, budget[label], temperature
+            )
+            centers.extend(class_centers.unbind(0))
+            synthetic_labels.extend([label] * budget[label])
         embeddings = torch.stack(centers)
         if getattr(args, "with_structure", 1):
             cosine = F.normalize(embeddings, dim=1) @ F.normalize(embeddings, dim=1).T

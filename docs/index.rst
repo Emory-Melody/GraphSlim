@@ -19,7 +19,14 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    efficiency.md
    cuda_graph.md
    dataset_expansion.md
+   products.md
    simgc.md
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Software publication
+
+   mloss_extensions.md
 
 .. toctree::
    :hidden:

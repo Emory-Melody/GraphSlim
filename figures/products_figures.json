@@ -1,0 +1,36 @@
+{
+  "input_sha256": "eddb356aa1fa6733457d8a827ab6d316677f0a41b4093be0574074b278487714",
+  "script_sha256": "df5d521e62b2aad1c6fef782d6062219b6e7c397f5e528478706c0f1e5d6efd7",
+  "style_reference": "https://github.com/deepseek-ai/DeepSeek-R1/blob/main/figures/benchmark.jpg",
+  "accuracy_error_bars": "population standard deviation over 30 evaluations; full graph 10",
+  "time_error_bars": "minimum to maximum of three reduction times; bar is the median",
+  "timing_gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+  "paired_timings": [
+    {
+      "seed": 1,
+      "eager_seconds": 1.7584457928314805,
+      "cuda_graph_seconds_including_setup": 1.3213359601795673,
+      "speedup_including_setup": 1.330809003784708
+    },
+    {
+      "seed": 2,
+      "eager_seconds": 1.7201666301116347,
+      "cuda_graph_seconds_including_setup": 1.237020492553711,
+      "speedup_including_setup": 1.390572460574614
+    },
+    {
+      "seed": 3,
+      "eager_seconds": 1.5152036091312766,
+      "cuda_graph_seconds_including_setup": 1.0971164125949144,
+      "speedup_including_setup": 1.3810782445114431
+    }
+  ],
+  "files": {
+    "products_results.svg": "fa376d911f78b4c3140ec470672334dcd9fcfca1aeb35eafac6b87fbb1ba1271",
+    "products_results.png": "b38c9ccbbaa4b94b8ce32acda2469887b74ad9a4fa91d6baefbefb9af9b49084",
+    "products_results.pdf": "ca8dde4aa312eec009da916635dd7c1e5ee5681beb81fffa90826c80113929d6",
+    "products_cuda_graph.svg": "30cafc1622f57bd0eb2adeffbf76798c550b973b0f9c9ce1b8fecac438b98473",
+    "products_cuda_graph.png": "c8b12a09213793696c45ffe2222fa503b5bfcdc26bfa4258251ea02dd1c93f21",
+    "products_cuda_graph.pdf": "ecd37d9650ece020e5f105f91ad469a6ab905d6e434fb26e8c1b7f9c8c2cc052"
+  }
+}

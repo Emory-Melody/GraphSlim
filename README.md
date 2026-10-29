@@ -19,91 +19,102 @@ GraphSlim loads PyG graphs, reduces them with a shared method registry, and eval
 the reduced graph using a common downstream GNN pipeline. The repository includes
 the package, runnable examples, regression tests, and benchmark reproduction commands.
 
-## Measured efficiency and runtime interoperability
+Acceleration uses native PyTorch operations and CUDA Graphs for NVIDIA A100
+and newer GPUs across Ampere, Ada, Hopper and Blackwell. Enable it with
+`--cuda_graph`. [GPU setup and checks](docs/compatibility.md#gpu-portability).
 
-Optional `--cuda_graph` acceleration now reaches the shared training APIs used by
-all 40 registered methods and seven downstream GNNs. Eligible first-order and
-kernel stages use exact numerical/state checks; CPU, dynamic and higher-order
-work stays eager. This is interface coverage, not a verified all-method speedup.
-[Stage support, fallbacks and reproduction commands](docs/cuda_graph.md).
-The integrated deterministic synthetic-graph audit passed 280 clean and 336
-noise method/model pairs with identical loss histories, selected weights and
-scores. Six architectures captured; GAT stayed eager. Short 80-step fits were
-mostly slower after setup, so interface coverage is not advertised as universal
-acceleration. [Audit records](benchmark/results/cuda_graph_integration.json).
+## Results on ogbn-products
 
-### Native CUDA Graph timing results
+The graph has 2,449,029 nodes and uses the official OGB split. The charts cover
+0.05%, 0.1% and 0.2% of training nodes, with 3 reduction seeds × 10 GCN seeds per
+reduced result. Each GCN trains for 300 updates.
 
-The following paired package reductions use a fixed 48-node, 16-feature toy
-graph, reduction seed 1, Torch 2.8.0+cu128 and CUDA 12.8 with deterministic
-algorithms. Both backends use the same inputs, arithmetic and training budget.
-Elapsed time includes preprocessing, graph setup and numerical verification;
-the ratio is eager time divided by CUDA Graph time. Reduced tensors and actual
-optimization loss histories match exactly in each pair.
+![Products GCN accuracy at three reduction budgets and graph reduction time at the 0.2% budget](figures/products_results.svg)
 
-| Reduction stage | Budget | Eager (s) | CUDA Graph (s) | Speed ratio |
-| --- | --- | ---: | ---: | ---: |
-| GCGP SGNK, package arithmetic | 200 GP updates | 7.61 | 4.06 | 1.87× |
-| GCGP SGNK, released arithmetic | 200 GP updates | 7.20 | 3.59 | 2.01× |
-| ClustGDD pretraining and refinement | 80 + 200 updates | 6.29 | 5.18 | 1.21× |
+Accuracy whiskers show standard deviation. Reduction-time bars show the median
+of three runs, with min–max whiskers.
+[Full results and experiment settings](docs/products.md) ·
+[Per-seed results and source records](benchmark/results/products_20261028.json).
 
-These are one-seed toy integration measurements, not Cora accuracy results or
-comparisons against the complete original repositories. Partial kernel capture
-leaves GP solves and optimizers eager. The two GCGP arithmetic profiles are
-separate paired comparisons, not interchangeable scientific settings.
+### Reduction time versus accuracy
 
-Short downstream fits also retain their negative timings. On the same synthetic
-graph, the median eager/CUDA Graph ratio across 40 method tags at 80 updates was:
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_ogbn-arxiv_dark.png">
+    <img src="./figures/tradeoff_ogbn-arxiv_light.png" width="49%" alt="Test accuracy versus graph reduction time on ogbn-arxiv for CGC, ClustGDD, GCGP and Random at three budgets">
+  </picture>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_reddit_dark.png">
+    <img src="./figures/tradeoff_reddit_light.png" width="49%" alt="Test accuracy versus graph reduction time on Reddit for CGC, ClustGDD, GCGP and Random at three budgets">
+  </picture>
+</p>
 
-| Downstream model | Actual backend | Median speed ratio including setup |
-| --- | --- | ---: |
-| GCN | Captured | 0.49× |
-| SGC | Captured | 0.35× |
-| APPNP | Captured | 0.43× |
-| Cheby | Captured | 0.56× |
-| GraphSage | Captured | 0.52× |
-| GAT | Eager fallback | Not applicable |
-| SGFormer | Captured | 0.95× |
+Each marker is one method at one budget. Marker size shows the budget as a share
+of labeled training nodes. Error bars show the standard deviation over 3 reduction
+seeds × 10 GCN seeds, and the horizontal line marks full-graph accuracy.
+These runs use the same GCN protocol, package defaults and GPU as the Products results.
+Reddit is the PyG Reddit2 graph. NOPE did not finish within the one-hour job limit
+on either dataset, so it is not shown.
+[Per-seed results and source records](benchmark/results/tradeoff_20261028.json) ·
+[Experiment protocol](docs/dataset_expansion.md).
 
-Ratios below 1 mean slower execution. These whole-fit timings include graph
-setup, exact verification, validation and diagnostic loss tracing; they do not
-time the tagged reducers. Keep `--cuda_graph` opt-in and profile the actual
-training budget. [Frozen timings, tensor hashes and loss histories](benchmark/results/cuda_graph_integration.json);
-[reproduction commands and stage limitations](docs/cuda_graph.md).
+<details>
+<summary>Plotted values</summary>
 
-### Arithmetic benchmarks and compatibility
+<!-- tradeoff-table:start -->
+| Dataset | Method | Budget | Reduced nodes | Test accuracy (%) | Reduction time (s) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| ogbn-arxiv | Full graph | — | 169,343 | 70.61 ± 0.07 | — |
+| ogbn-arxiv | CGC | 0.1% | 90 | 61.24 ± 0.38 | 12.78 |
+| ogbn-arxiv | CGC | 0.5% | 454 | 64.27 ± 0.31 | 27.63 |
+| ogbn-arxiv | CGC | 1% | 909 | 65.19 ± 0.58 | 84.04 |
+| ogbn-arxiv | ClustGDD | 0.1% | 90 | 59.87 ± 0.35 | 14.92 |
+| ogbn-arxiv | ClustGDD | 0.5% | 454 | 63.13 ± 0.23 | 11.52 |
+| ogbn-arxiv | ClustGDD | 1% | 909 | 63.76 ± 0.38 | 19.22 |
+| ogbn-arxiv | GCGP | 0.1% | 91 | 14.75 ± 9.26 | 6.95 |
+| ogbn-arxiv | GCGP | 0.5% | 455 | 8.42 ± 5.69 | 2.15 |
+| ogbn-arxiv | GCGP | 1% | 909 | 10.63 ± 7.83 | 4.42 |
+| ogbn-arxiv | Random | 0.1% | 89 | 44.22 ± 5.22 | 0.20 |
+| ogbn-arxiv | Random | 0.5% | 439 | 57.26 ± 0.93 | 0.29 |
+| ogbn-arxiv | Random | 1% | 892 | 59.68 ± 0.43 | 0.26 |
+| Reddit | Full graph | — | 232,965 | 94.00 ± 0.03 | — |
+| Reddit | CGC | 0.05% | 76 | 89.41 ± 0.09 | 5.12 |
+| Reddit | CGC | 0.1% | 153 | 90.26 ± 0.12 | 34.40 |
+| Reddit | CGC | 0.2% | 307 | 91.20 ± 0.19 | 24.64 |
+| Reddit | ClustGDD | 0.05% | 76 | 80.21 ± 0.91 | 44.63 |
+| Reddit | ClustGDD | 0.1% | 153 | 85.86 ± 0.69 | 44.41 |
+| Reddit | ClustGDD | 0.2% | 307 | 88.33 ± 0.56 | 49.51 |
+| Reddit | GCGP | 0.05% | 77 | 19.48 ± 5.28 | 5.22 |
+| Reddit | GCGP | 0.1% | 154 | 27.47 ± 1.52 | 6.30 |
+| Reddit | GCGP | 0.2% | 308 | 19.23 ± 6.23 | 6.02 |
+| Reddit | Random | 0.05% | 69 | 46.81 ± 7.10 | 0.27 |
+| Reddit | Random | 0.1% | 138 | 57.32 ± 6.08 | 0.28 |
+| Reddit | Random | 0.2% | 288 | 64.19 ± 4.96 | 0.16 |
+<!-- tradeoff-table:end -->
 
-The development checkout adds reproducible performance comparisons and
-`graphslim-doctor` runtime checks, without a mandatory GraphSlim CUDA extension.
-The earlier arithmetic benchmark is scoped to GCGP's SGNK mathematics: squared row
-norms replace unnecessary full self-Gram matrices. Same-input output, gradient
-and GP prediction checks precede timings; this is not a whole-repository or
-author-repository end-to-end speed claim.
+</details>
 
-| Float32 SGNK shape N × S × D | CPU forward speedup | CUDA 12.8 forward speedup |
-| --- | ---: | ---: |
-| 140 × 70 × 1433 | 1.98× | 1.41× |
-| 1024 × 256 × 128 | 2.73× | 1.36× |
-| 4096 × 256 × 128 | 5.47× | 1.19× |
-
-In a shared Cora workflow with 200 GP updates and three 300-step GCN fits,
-Float64 CPU optimization took 7.83 s with author mathematics and 4.82 s with
-GraphSlim mathematics (1.62×); GCN accuracy was 73.67±0.50% versus 73.83±0.29%.
-This times the optimization loop, not loading/preprocessing or complete training.
-Float32 long optimization showed accuracy drift, and the Float64 CUDA update
-loop was slower (0.60× relative speed), so neither is advertised as an unchanged-
-accuracy complete-method GPU speedup. [Full positive/negative timings and accuracy checks](docs/efficiency.md);
-[raw machine-readable records](benchmark/results/efficiency_compatibility.json).
-
-Runtime probes passed on Python 3.11 with Torch 2.6 CPU and Torch 2.8 CPU/CUDA
-12.8, including Blackwell SM120 sparse/scatter/solve/GCN forward and backward.
-Both local CPU suites passed 260 tests. Actual DGL 1.1.3 CPU interchange preserves
-edge weights, features, labels, split masks and isolated nodes; typed graph
-conversion retains actual attribute tensors. DGL GPU/GraphBolt, other CUDA
-versions and all-method GPU coverage are not implied. [Tested profiles and installation](docs/compatibility.md).
+Redraw the figures from the frozen results with:
 
 ```bash
-python -m graphslim.doctor --device cpu --dgl
+python -m benchmark.render_tradeoff
+```
+
+### GCGP optimization with CUDA Graph
+
+Paired Products runs use 200 optimization updates, a batch size of 1,024 and
+393 reduced nodes. CUDA Graph times include setup; each seed has three repeats.
+
+![Products GCGP eager versus CUDA Graph optimization time including setup](figures/products_cuda_graph.svg)
+
+Both execution modes produce the same optimization results and downstream
+scores for each seed. Timings were measured on an RTX PRO 6000 Blackwell Server
+Edition. [Timing details](docs/products.md#cuda-graph-timing) ·
+[Enable CUDA Graph](docs/cuda_graph.md).
+
+Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
+
+```bash
 python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
@@ -213,16 +224,12 @@ print(list_methods("condensation"))
 | Coarsening / clustering | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron`, `nope` |
 | Graph condensation | `gcond`, `gcondx`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
 
-Registration establishes discovery and construction, not that every method has been
-validated on every dataset. GECC contains an evolving-graph workflow whose additional
-arguments are not all exposed by the common CLI. See each method's implementation
-and configuration files for its required setup.
+See each method's configuration for its settings, including GECC's evolving-graph
+workflow.
 
-CGC and NOPE do not train a GNN during reduction. ClustGDD performs linear
-pretraining/refinement; GCGP optimizes synthetic features/targets through a GP,
-without a GNN inner training loop. These are implemented algorithms, not clustering
-aliases. See [lightweight methods](docs/lightweight_methods.md) for pinned sources,
-paper-profile boundaries, NOPE's actual-budget reporting, and all downstream/noise tests.
+CGC and NOPE reduce graphs without GNN training. ClustGDD uses linear pretraining
+and refinement; GCGP uses a Gaussian process to optimize reduced features and
+targets. [Method descriptions, sources and validation](docs/lightweight_methods.md).
 
 ```bash
 python -m examples.train_lightweight -D cora -M cgc -G -1 --save_path ./checkpoints
@@ -735,22 +742,13 @@ not absent from this local coverage table. Raw artifacts live in the listed run 
 
 ## Lightweight methods: downstream validation
 
-An [ordered dataset expansion](docs/dataset_expansion.md) is configured for the
-original seven datasets, then Roman-empire/Amazon-ratings, then ogbn-products.
-The new batch uses three reduction seeds and ten GCN seeds per rate, with measured
-time/memory and separate cross-dataset GCGP numerical-parity checks. Its progress
-and complete-only result cells are in
-[`runs/dataset_expansion_20261012_v3/results.md`](runs/dataset_expansion_20261012_v3/results.md);
-pending or failed cells are unavailable results.
+The [dataset expansion](docs/dataset_expansion.md) uses three reduction seeds and
+ten GCN seeds per rate. [Completed Products results](docs/products.md) include
+CGC, ClustGDD, GCGP and Random at all three rates.
 
-The new-method test matrix covers all seven architectures (GCN, SGC, APPNP,
-Cheby, GraphSage, GAT, SGFormer), transductive and inductive settings, clean inputs,
-six cheap noise types, and the legacy `metattack` path (PRBCD). It also tests
-fixed-model inference noise, saved graph reloads, validation-only NAS, graph
-properties, oracle-threshold MIA, missing classes, isolated nodes and optional
-CGC-X / NOPE* / learned-adjacency GCGP variants. These use real model optimization,
-not mocked downstream scores. Eleven pinned author-core numerical checks are
-separate from end-to-end paper reproducibility.
+Method checks cover seven downstream architectures, transductive and inductive
+settings, noise, saved-graph reloads and validation-based model selection.
+[Method settings and checks](docs/lightweight_methods.md).
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
@@ -758,65 +756,11 @@ python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --pro
 python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp nope --dry-run
 ```
 
-Full seven-dataset, repeated benchmark scores for these four newly added methods
-are not yet established. Their integration accuracy is kept separate from the
-published table and the 3-reduction × 10-evaluation-seed package results above.
-
 <!-- lightweight-checks:start -->
 
-### Lightweight methods: real-data integration checks
-
-Profile: `smoke`; 32/32 complete reductions, 224 model cells, 0 failures.
-
-These are integration checks, NOT paper results or validation-selected HPO. Smoke: 20 reduction steps (ClustGDD also 20 pretrain steps), 20 downstream steps, hidden 32. One reduction/evaluation seed by default. Feature preprocessing follows each method, so do not rank these rows as a controlled comparison.
-
-| Dataset | Method | Noise | Reduction seed | Actual nodes | GCN | SGC | APPNP | Cheby | GraphSage | GAT | SGFormer |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| cora | cgc | clean | 1 | 70 | 79.70 | 77.80 | 77.00 | 74.50 | 74.20 | 77.70 | 33.90 |
-| cora | cgc | random_adj | 1 | 70 | 77.80 | 75.80 | 75.60 | 73.10 | 74.40 | 71.80 | 20.30 |
-| cora | cgc | edge_drop | 1 | 70 | 79.60 | 76.50 | 76.00 | 75.90 | 75.40 | 75.80 | 60.10 |
-| cora | cgc | random_feat | 1 | 70 | 78.70 | 77.80 | 76.90 | 72.00 | 74.80 | 72.70 | 59.60 |
-| cora | cgc | feature_mask | 1 | 70 | 79.10 | 78.10 | 76.10 | 74.90 | 75.00 | 77.20 | 20.00 |
-| cora | cgc | gaussian | 1 | 70 | 80.50 | 77.90 | 77.50 | 74.70 | 75.30 | 78.80 | 31.30 |
-| cora | cgc | label_noise | 1 | 70 | 70.50 | 68.10 | 67.70 | 67.10 | 66.80 | 66.10 | 20.80 |
-| cora | cgc | metattack | 1 | 70 | 74.80 | 72.90 | 71.50 | 70.30 | 71.90 | 71.70 | 30.30 |
-| cora | clustgdd | clean | 1 | 70 | 21.30 | 25.80 | 25.80 | 25.80 | 29.30 | 28.70 | 13.40 |
-| cora | clustgdd | random_adj | 1 | 70 | 20.70 | 19.80 | 20.10 | 13.40 | 19.10 | 18.70 | 13.00 |
-| cora | clustgdd | edge_drop | 1 | 70 | 19.00 | 25.30 | 25.00 | 21.10 | 27.40 | 29.30 | 13.00 |
-| cora | clustgdd | random_feat | 1 | 70 | 14.80 | 26.10 | 25.80 | 25.80 | 26.00 | 26.70 | 13.00 |
-| cora | clustgdd | feature_mask | 1 | 70 | 20.60 | 19.60 | 19.20 | 13.10 | 16.00 | 21.30 | 13.00 |
-| cora | clustgdd | gaussian | 1 | 70 | 21.90 | 18.30 | 18.70 | 13.50 | 16.90 | 26.00 | 13.00 |
-| cora | clustgdd | label_noise | 1 | 70 | 31.90 | 31.90 | 31.90 | 31.90 | 32.00 | 31.90 | 31.90 |
-| cora | clustgdd | metattack | 1 | 70 | 19.20 | 20.20 | 20.00 | 15.60 | 20.30 | 10.30 | 15.30 |
-| cora | gcgp | clean | 1 | 70 | 48.20 | 21.80 | 21.30 | 33.90 | 31.70 | 23.10 | 31.90 |
-| cora | gcgp | random_adj | 1 | 70 | 31.20 | 25.30 | 25.40 | 32.30 | 31.50 | 21.40 | 29.40 |
-| cora | gcgp | edge_drop | 1 | 70 | 28.00 | 20.70 | 20.60 | 36.10 | 32.40 | 23.20 | 22.60 |
-| cora | gcgp | random_feat | 1 | 70 | 43.20 | 26.50 | 26.10 | 33.70 | 31.90 | 23.50 | 27.30 |
-| cora | gcgp | feature_mask | 1 | 70 | 24.80 | 30.80 | 30.20 | 34.20 | 32.10 | 23.90 | 20.00 |
-| cora | gcgp | gaussian | 1 | 70 | 46.50 | 21.10 | 20.60 | 31.90 | 31.50 | 23.30 | 34.60 |
-| cora | gcgp | label_noise | 1 | 70 | 26.40 | 26.20 | 26.30 | 36.40 | 32.50 | 24.40 | 26.60 |
-| cora | gcgp | metattack | 1 | 70 | 40.30 | 40.30 | 38.00 | 38.10 | 31.90 | 23.60 | 30.10 |
-| cora | nope | clean | 1 | 12 | 16.60 | 7.20 | 7.30 | 11.20 | 15.60 | 14.80 | 18.40 |
-| cora | nope | random_adj | 1 | 36 | 14.60 | 13.00 | 13.00 | 13.30 | 13.30 | 13.50 | 13.00 |
-| cora | nope | edge_drop | 1 | 14 | 16.90 | 7.30 | 7.30 | 7.60 | 13.40 | 11.30 | 18.90 |
-| cora | nope | random_feat | 1 | 12 | 16.10 | 7.30 | 7.30 | 25.80 | 17.70 | 15.50 | 18.70 |
-| cora | nope | feature_mask | 1 | 12 | 16.20 | 7.20 | 7.30 | 17.80 | 14.50 | 14.00 | 17.50 |
-| cora | nope | gaussian | 1 | 12 | 16.40 | 7.90 | 8.20 | 9.60 | 16.00 | 12.00 | 19.10 |
-| cora | nope | label_noise | 1 | 12 | 16.10 | 13.10 | 13.20 | 8.40 | 12.90 | 13.70 | 14.90 |
-| cora | nope | metattack | 1 | 44 | 14.90 | 13.00 | 13.00 | 13.00 | 13.40 | 13.50 | 13.00 |
-
-Cells are test accuracy (%) or the dataset metric; uncertainty/raw seeds are in `scores.csv` and `jobs/*/result.json`. No numeric partial cells. `metattack` is the package's PRBCD path, with 2 surrogate/attack steps in smoke mode, not literal MetaAttack. Clean jobs additionally retain fixed-model inference-noise results, two-candidate validation-only NAS, graph properties and oracle-threshold MIA diagnostics. NOPE preserves components and removes unlabeled supernodes; actual node counts can differ from the request.
-
-Verified on 2026-10-10: **246 repository tests**, **112 installed-wheel method tests**, and **11 pinned author-core checks** passed. Strict Sphinx build and wheel/sdist content checks passed.
-
-Protocol: Cora public split; reduction rate `0.5` of training nodes; noise rate `0.1`; reduction seed `1`, evaluation seed `0`; CPU, four threads. CGC/NOPE have no iterative reduction training. The table uses frozen source `ffc655aea569996bd8511033a5f1c6c8f268053037cdb16a56a2f55b26cd87d0`, independently verified against its source ZIP and all 96 checkpoint files.
-
-[Complete CSV](benchmark/results/lightweight_integration.csv) · [JSON provenance and verification](benchmark/results/lightweight_integration.json) · Local raw artifact directory: `runs/lightweight_cora_20261010_v5`.
-
-A separate 300-step clean-data batch completed 4/4 reductions and 28 architecture
-cells at `runs/lightweight_cora_full_20261010_v2`. It still uses one reduction and
-evaluation seed and is separate from the smoke matrix. Full seven-dataset repeated
-results are being collected in the ordered expansion batch linked above.
+The short Cora checks use 20 reduction and downstream updates, hidden size 32,
+and one reduction/evaluation seed. [Check results (CSV)](benchmark/results/lightweight_integration.csv) ·
+[Settings and verification records (JSON)](benchmark/results/lightweight_integration.json).
 
 <!-- lightweight-checks:end -->
 
@@ -829,11 +773,9 @@ ruff format --check graphslim examples benchmark tests interface
 python -m build
 ```
 
-Regression tests use small in-memory graphs, real CPU GNN optimization, and mocks
-for orchestration; they do not require benchmark downloads or GPU training. The scientific benchmark requires its original data,
-method-specific hyperparameters, sufficient training, and repeated evaluation.
-[efficiency.md](efficiency.md) records historical smoke tests and their limitations;
-those smoke accuracies must not be treated as benchmark results.
+Regression tests use small in-memory graphs, CPU GNN training and mocked job
+orchestration. Benchmark runs use the original datasets, method-specific settings
+and repeated evaluation. [Historical development checks](efficiency.md).
 
 ## Repository layout
 

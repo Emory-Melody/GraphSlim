@@ -9,6 +9,7 @@ from graphslim.evaluation.utils import verbose_time_memory
 
 from torch_sparse import matmul
 from graphslim.utils import normalize_adj_tensor, to_tensor
+from graphslim.reduction.cluster_ops import fitted_labels, weighted_propagation
 
 
 class ClusterAgg(Coarsen):
@@ -58,13 +59,11 @@ class ClusterAgg(Coarsen):
         if args.setting == "trans":
             data.adj_fully = to_tensor(data.adj_full)
             data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
-            data.pre_conv = matmul(data.pre_conv, data.pre_conv)
-            feat_agg = matmul(data.pre_conv, data.feat_full).float()
+            feat_agg = weighted_propagation(data.pre_conv, data.feat_full, (0, 0, 1))
         else:
             data.adj_fully = to_tensor(data.adj_train)
             data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
-            data.pre_conv = matmul(data.pre_conv, data.pre_conv)
-            feat_agg = matmul(data.pre_conv, data.feat_train).float()
+            feat_agg = weighted_propagation(data.pre_conv, data.feat_train, (0, 0, 1))
 
         if hasattr(data, "labels_syn") and data.labels_syn is not None:
             y_syn = data.labels_syn
@@ -83,8 +82,7 @@ class ClusterAgg(Coarsen):
             if n_c == 0:
                 continue
             k_means = BisectingKMeans(n_clusters=n_c, random_state=0)
-            k_means.fit(x_c)
-            clusters = torch.from_numpy(k_means.predict(x_c)).long()
+            clusters = torch.from_numpy(fitted_labels(k_means, x_c)).long()
             x_syn[y_syn == c] = scatter_mean(x_c, clusters, dim=0, dim_size=n_c)
 
         data.feat_syn, data.labels_syn = x_syn.to(x_train.device), y_syn.to(x_train.device)

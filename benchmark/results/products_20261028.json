@@ -1,0 +1,6868 @@
+{
+  "schema_version": 1,
+  "snapshot_date": "2026-10-28",
+  "dataset": {
+    "nodes": 2449029,
+    "classes": 47,
+    "feature_shape": [
+      2449029,
+      100
+    ],
+    "adj_nnz": 123718152,
+    "split_sizes": {
+      "train": 196615,
+      "val": 39323,
+      "test": 2213091
+    },
+    "hashes": {
+      "train": "65489e87f5d04b4c33bb19668c59e9abca9ad6924d8bb936a1de3dc1131d8640",
+      "val": "5658b1578b7c7c0938c6c5772e47702302224550d46f7f753bddea37d6497a78",
+      "test": "6dc6f17cc91b72f6eb3b249ffc312d90f1d0ec3f20e640e63b65c6e061c5c910"
+    },
+    "labels_sha256": "dd259b130bfb0299ef8d975dedd5f4c23c0654ea1bc55d8149092ee04c1f07ff",
+    "features_sha256": "f7f12a63db5cd4ce6142886bc73b39ddd2a9f2d3a2a70b91c2e07177785005cc",
+    "adj_sha256": {
+      "indptr": "0fd0ba56208caa034344b7a1d51bcaabe194a6a68626336c1312903cb077109a",
+      "indices": "d36d748b75010849decc76ff42e53b1997a9f73b0f7572b959d217ef1f654288",
+      "data": "c130606ac40063f6efd29dedd181ad405475a41dbdfe9c77bd5f824cfa856d69"
+    },
+    "split_provenance": {
+      "source": "ogb.get_idx_split"
+    }
+  },
+  "hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "protocol": {
+    "reduction_seeds": [
+      1,
+      2,
+      3
+    ],
+    "evaluation_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "downstream": "GCN",
+    "hidden": 256,
+    "layers": 2,
+    "eval_epochs": 300,
+    "learning_rate": 0.01,
+    "weight_decay": 0.0005,
+    "dropout": 0.0,
+    "activation": "relu",
+    "val_interval": 10,
+    "data_seed": 1,
+    "dataset_split_id": 0,
+    "threads": 4,
+    "selection": "validation only",
+    "reduction": "package method defaults; no HPO; eager backend",
+    "rate_denominator": "labeled training nodes; NOPE reports actual retained nodes",
+    "parity": "author SGNK eager versus native CUDA kernel capture; GP/Adam eager",
+    "failure_policy": "terminal failures retained; no partial numeric cells",
+    "precision": "float32; CGC reconstruction solve float64 as in package",
+    "metric": "accuracy except FraudYelp macro-F1",
+    "settings": "original package trans/ind settings; new datasets transductive",
+    "comparison_scope": "new source/budgets only; no pooling of historical batches"
+  },
+  "statistics": {
+    "accuracy": "mean and population standard deviation across all 30 evaluations per reduced cell; full graph has 10 evaluations",
+    "reduction_time": "median of three timing.reduction_seconds values; includes reduction and reduced-graph saving; data loading and downstream GCN fits are timed separately",
+    "paired_time": "median 200-update loop time, plus median graph setup time for CUDA Graph; includes sampling, GP solve and Adam; graph preprocessing and GCN evaluation are timed outside this loop",
+    "paired_speedup": "median(eager loop) / (median(captured loop) + median(graph setup))"
+  },
+  "sources": {
+    "expansion": {
+      "run_dir": "runs/dataset_expansion_20261028_resume",
+      "source_sha256": "66e175c052a27271d5dbda4adb1d587e02fa9ae69c3171d7c78f3f315481dda0",
+      "source_archive_sha256": "19c726c10aecfca7c20d68216d685bd7d5c41d3492cf0872ace684dfd8f6aeb3",
+      "manifest_sha256": "b1ba584b3de1fbd6b74e30050b5798e499eb16b5a1bfadf3fed32b25c37b91ae",
+      "summary_updated_utc": "2026-10-28T05:52:19.311732+00:00"
+    },
+    "clustgdd": {
+      "run_dir": "runs/products_streaming_20261028",
+      "source_sha256": "1bd0fdfcaf12705f25a2afb5d7d271edcecd95f4b018d302ada65c20127a2d91",
+      "source_archive_sha256": "fc4b29627f7324dfd4e07e83a1b7317b973cc5a57949996fb6997b867e1d945f",
+      "manifest_sha256": "7e433ba5d416238405bab786d74b3f1eceb1a535071fbfa8741fe132796dbf60",
+      "summary_updated_utc": "2026-10-28T09:38:50.799371+00:00"
+    }
+  },
+  "cells": [
+    {
+      "method": "whole",
+      "training_node_rate": null,
+      "source": "expansion",
+      "job_ids": [
+        "whole__ogbn-products"
+      ],
+      "n_evaluations": 10,
+      "test_accuracy_mean": 0.7378302564151226,
+      "test_accuracy_population_std": 0.0010517039671025154,
+      "actual_nodes": [
+        2449029
+      ],
+      "reduction_seconds": [
+        0.0
+      ],
+      "median_reduction_seconds": 0.0
+    },
+    {
+      "method": "random",
+      "training_node_rate": "0.0005",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__random__r0.0005__s1",
+        "ogbn-products__random__r0.0005__s2",
+        "ogbn-products__random__r0.0005__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.4084196266669558,
+      "test_accuracy_population_std": 0.014865615583783454,
+      "actual_nodes": [
+        114,
+        114,
+        114
+      ],
+      "reduction_seconds": [
+        0.2352541582658887,
+        0.21248843614012003,
+        0.22354182694107294
+      ],
+      "median_reduction_seconds": 0.22354182694107294
+    },
+    {
+      "method": "random",
+      "training_node_rate": "0.001",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__random__r0.001__s1",
+        "ogbn-products__random__r0.001__s2",
+        "ogbn-products__random__r0.001__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.4780084054383665,
+      "test_accuracy_population_std": 0.007608658715549399,
+      "actual_nodes": [
+        208,
+        208,
+        208
+      ],
+      "reduction_seconds": [
+        0.17249161377549171,
+        0.1791642401367426,
+        0.15502857882529497
+      ],
+      "median_reduction_seconds": 0.17249161377549171
+    },
+    {
+      "method": "random",
+      "training_node_rate": "0.002",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__random__r0.002__s1",
+        "ogbn-products__random__r0.002__s2",
+        "ogbn-products__random__r0.002__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.5392322020799566,
+      "test_accuracy_population_std": 0.006032613106772882,
+      "actual_nodes": [
+        401,
+        401,
+        401
+      ],
+      "reduction_seconds": [
+        0.18347189761698246,
+        0.17491235304623842,
+        0.22036437038332224
+      ],
+      "median_reduction_seconds": 0.18347189761698246
+    },
+    {
+      "method": "cgc",
+      "training_node_rate": "0.0005",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__cgc__r0.0005__s1",
+        "ogbn-products__cgc__r0.0005__s2",
+        "ogbn-products__cgc__r0.0005__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6182938854901734,
+      "test_accuracy_population_std": 0.0038888684402476298,
+      "actual_nodes": [
+        98,
+        98,
+        98
+      ],
+      "reduction_seconds": [
+        57.187179286032915,
+        39.85682109743357,
+        30.91187211498618
+      ],
+      "median_reduction_seconds": 39.85682109743357
+    },
+    {
+      "method": "cgc",
+      "training_node_rate": "0.001",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__cgc__r0.001__s1",
+        "ogbn-products__cgc__r0.001__s2",
+        "ogbn-products__cgc__r0.001__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.62233839458025,
+      "test_accuracy_population_std": 0.005465256004279714,
+      "actual_nodes": [
+        196,
+        196,
+        196
+      ],
+      "reduction_seconds": [
+        55.41745795402676,
+        35.36858120840043,
+        34.83238673675805
+      ],
+      "median_reduction_seconds": 35.36858120840043
+    },
+    {
+      "method": "cgc",
+      "training_node_rate": "0.002",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__cgc__r0.002__s1",
+        "ogbn-products__cgc__r0.002__s2",
+        "ogbn-products__cgc__r0.002__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6390135034362949,
+      "test_accuracy_population_std": 0.00419934189248766,
+      "actual_nodes": [
+        393,
+        393,
+        393
+      ],
+      "reduction_seconds": [
+        62.63870961777866,
+        78.7337765544653,
+        92.32895616441965
+      ],
+      "median_reduction_seconds": 78.7337765544653
+    },
+    {
+      "method": "clustgdd",
+      "training_node_rate": "0.0005",
+      "source": "clustgdd",
+      "job_ids": [
+        "ogbn-products__clustgdd__r0.0005__s1",
+        "ogbn-products__clustgdd__r0.0005__s2",
+        "ogbn-products__clustgdd__r0.0005__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.5817972841303558,
+      "test_accuracy_population_std": 0.013358808221006947,
+      "actual_nodes": [
+        98,
+        98,
+        98
+      ],
+      "reduction_seconds": [
+        221.92088496200086,
+        219.0735526060016,
+        209.41750192799736
+      ],
+      "median_reduction_seconds": 219.0735526060016
+    },
+    {
+      "method": "clustgdd",
+      "training_node_rate": "0.001",
+      "source": "clustgdd",
+      "job_ids": [
+        "ogbn-products__clustgdd__r0.001__s1",
+        "ogbn-products__clustgdd__r0.001__s2",
+        "ogbn-products__clustgdd__r0.001__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6176876444152846,
+      "test_accuracy_population_std": 0.003402040799671298,
+      "actual_nodes": [
+        196,
+        196,
+        196
+      ],
+      "reduction_seconds": [
+        215.16756516299938,
+        215.12854356499884,
+        216.0081957629991
+      ],
+      "median_reduction_seconds": 215.16756516299938
+    },
+    {
+      "method": "clustgdd",
+      "training_node_rate": "0.002",
+      "source": "clustgdd",
+      "job_ids": [
+        "ogbn-products__clustgdd__r0.002__s1",
+        "ogbn-products__clustgdd__r0.002__s2",
+        "ogbn-products__clustgdd__r0.002__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.6437813146108015,
+      "test_accuracy_population_std": 0.001414306368433445,
+      "actual_nodes": [
+        393,
+        393,
+        393
+      ],
+      "reduction_seconds": [
+        224.913765092002,
+        219.09258005599986,
+        220.03003949399863
+      ],
+      "median_reduction_seconds": 220.03003949399863
+    },
+    {
+      "method": "gcgp",
+      "training_node_rate": "0.0005",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__gcgp__r0.0005__s1",
+        "ogbn-products__gcgp__r0.0005__s2",
+        "ogbn-products__gcgp__r0.0005__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.19992368140306926,
+      "test_accuracy_population_std": 0.09640835257622163,
+      "actual_nodes": [
+        98,
+        98,
+        98
+      ],
+      "reduction_seconds": [
+        52.90552476514131,
+        104.36973401345313,
+        35.747284622862935
+      ],
+      "median_reduction_seconds": 52.90552476514131
+    },
+    {
+      "method": "gcgp",
+      "training_node_rate": "0.001",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__gcgp__r0.001__s1",
+        "ogbn-products__gcgp__r0.001__s2",
+        "ogbn-products__gcgp__r0.001__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.17133299082595338,
+      "test_accuracy_population_std": 0.10214632541157943,
+      "actual_nodes": [
+        197,
+        197,
+        197
+      ],
+      "reduction_seconds": [
+        36.01517480798066,
+        44.63482069596648,
+        28.03218093700707
+      ],
+      "median_reduction_seconds": 36.01517480798066
+    },
+    {
+      "method": "gcgp",
+      "training_node_rate": "0.002",
+      "source": "expansion",
+      "job_ids": [
+        "ogbn-products__gcgp__r0.002__s1",
+        "ogbn-products__gcgp__r0.002__s2",
+        "ogbn-products__gcgp__r0.002__s3"
+      ],
+      "n_evaluations": 30,
+      "test_accuracy_mean": 0.26674178031239265,
+      "test_accuracy_population_std": 0.005644392941659252,
+      "actual_nodes": [
+        393,
+        393,
+        393
+      ],
+      "reduction_seconds": [
+        54.18148145172745,
+        19.897851896472275,
+        79.99444064125419
+      ],
+      "median_reduction_seconds": 54.18148145172745
+    }
+  ],
+  "jobs": [
+    {
+      "job": {
+        "id": "whole__ogbn-products",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "whole",
+        "kind": "whole",
+        "seed": 1,
+        "rate": null
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/whole__ogbn-products/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/whole__ogbn-products/result.json",
+        "sha256": "331a3e7b83715fe3d8e31010786164c1561048e3b3a8b432ae294844c4a9f878",
+        "terminal_sha256": "0a466a42dc4281aaaf2fe17b1e4850bc416500b995685243830d6d571ec2b98e",
+        "completed_utc": "2026-10-28T05:52:16.303746+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.9047122549144266,
+          "test": 0.7374843601099096,
+          "seconds": 554.9695762917399
+        },
+        {
+          "seed": 1,
+          "validation": 0.9049665590112657,
+          "test": 0.7353041515238189,
+          "seconds": 572.2159129455686
+        },
+        {
+          "seed": 2,
+          "validation": 0.9049919894209495,
+          "test": 0.7381287077666485,
+          "seconds": 556.3641300024465
+        },
+        {
+          "seed": 3,
+          "validation": 0.9043816595885359,
+          "test": 0.7375697610265461,
+          "seconds": 487.80322095472366
+        },
+        {
+          "seed": 4,
+          "validation": 0.9048394069628461,
+          "test": 0.7381928714183014,
+          "seconds": 452.6905306838453
+        },
+        {
+          "seed": 5,
+          "validation": 0.9039239122142257,
+          "test": 0.738391236510383,
+          "seconds": 487.12771445699036
+        },
+        {
+          "seed": 6,
+          "validation": 0.9048139765531622,
+          "test": 0.7392244602684661,
+          "seconds": 255.2857174410019
+        },
+        {
+          "seed": 7,
+          "validation": 0.9052971543371563,
+          "test": 0.7377215848783443,
+          "seconds": 261.79694109999764
+        },
+        {
+          "seed": 8,
+          "validation": 0.905373445566208,
+          "test": 0.7371924606805594,
+          "seconds": 257.6547033380011
+        },
+        {
+          "seed": 9,
+          "validation": 0.9049411286015817,
+          "test": 0.739092969968248,
+          "seconds": 253.32467467199967
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 2449029,
+        "uses_test_labels": false
+      },
+      "timing": {
+        "reduction_seconds": 0.0,
+        "loading_and_hash_seconds": 71.6864650369971,
+        "total_compute_seconds": 4139.233121886315,
+        "worker_wall_seconds": 1099.9942985980015
+      },
+      "checkpoint_sha256": {}
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.0005__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.0005__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.0005__s1/result.json",
+        "sha256": "24e9ffb8c4a2b96731208bf79cf1fc4f993a9827ffe2ea9684e28c1e5e42beff",
+        "terminal_sha256": "55696f95637012003dc036c93bb68294ef73fb449d6dfba8afe0335de0a685ff",
+        "completed_utc": "2026-10-13T13:00:59.243806+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.5233578312946622,
+          "test": 0.42262428431546645,
+          "seconds": 306.6879761554301
+        },
+        {
+          "seed": 1,
+          "validation": 0.5256719985758971,
+          "test": 0.42576333282273526,
+          "seconds": 258.5374560728669
+        },
+        {
+          "seed": 2,
+          "validation": 0.5322330442743433,
+          "test": 0.4279092002994906,
+          "seconds": 242.65604255814105
+        },
+        {
+          "seed": 3,
+          "validation": 0.5247819342369605,
+          "test": 0.42087469516617254,
+          "seconds": 267.0159084042534
+        },
+        {
+          "seed": 4,
+          "validation": 0.5254685552984258,
+          "test": 0.4262282933688673,
+          "seconds": 235.65715646278113
+        },
+        {
+          "seed": 5,
+          "validation": 0.5326653612389696,
+          "test": 0.42947759491137055,
+          "seconds": 222.7912298683077
+        },
+        {
+          "seed": 6,
+          "validation": 0.5257991506243165,
+          "test": 0.43119645780494337,
+          "seconds": 311.0952216023579
+        },
+        {
+          "seed": 7,
+          "validation": 0.5273758360247184,
+          "test": 0.4262463676369385,
+          "seconds": 288.8235287517309
+        },
+        {
+          "seed": 8,
+          "validation": 0.5263586196373623,
+          "test": 0.4288151729865604,
+          "seconds": 507.0908702015877
+        },
+        {
+          "seed": 9,
+          "validation": 0.5338860209037968,
+          "test": 0.42682112936160327,
+          "seconds": 246.19754526484758
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 114,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          30,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.2352541582658887,
+        "loading_and_hash_seconds": 80.00672207120806,
+        "total_compute_seconds": 2886.7881895005703,
+        "worker_wall_seconds": 2967.4858884625137
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.0005_1.pt": "66046b1446f33ed97cd04297d23f183b1b7fdb89c76c38f92d09a672c3f1d9a6",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.0005_1.pt": "174a64ae181d9d7d089f4aa4809da9c1b3bd3c38117af04d4598587913d6152d",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.0005_1.pt": "08f93706753a984f672d57971039be800bbeb3ca2150162745a68bec7f909fae"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.0005__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.0005__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.0005__s2/result.json",
+        "sha256": "e8924252974fbc345c16fdfc4d201295fd9d320aa1a2743308904c4855e11c05",
+        "terminal_sha256": "6ea778627f032ba1f14fde32af91c23ddede475d26a3ab67b72285ec7421ba2f",
+        "completed_utc": "2026-10-13T13:05:43.683466+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.5177631411642042,
+          "test": 0.3877513396421566,
+          "seconds": 287.18701667152345
+        },
+        {
+          "seed": 1,
+          "validation": 0.5087099153167357,
+          "test": 0.3904602205693304,
+          "seconds": 266.32961139269173
+        },
+        {
+          "seed": 2,
+          "validation": 0.5224677669557256,
+          "test": 0.3962308825077685,
+          "seconds": 237.45614746771753
+        },
+        {
+          "seed": 3,
+          "validation": 0.5133891106985733,
+          "test": 0.3922712622300664,
+          "seconds": 221.92182382009923
+        },
+        {
+          "seed": 4,
+          "validation": 0.5199755868067034,
+          "test": 0.4053335357651357,
+          "seconds": 312.3236653301865
+        },
+        {
+          "seed": 5,
+          "validation": 0.5187294967321924,
+          "test": 0.40348634556825724,
+          "seconds": 285.90461377147585
+        },
+        {
+          "seed": 6,
+          "validation": 0.5213742593393179,
+          "test": 0.3938206788604716,
+          "seconds": 264.92645884957165
+        },
+        {
+          "seed": 7,
+          "validation": 0.5047682018157312,
+          "test": 0.3826688554605301,
+          "seconds": 258.4562109494582
+        },
+        {
+          "seed": 8,
+          "validation": 0.5183734709966177,
+          "test": 0.3986347601612405,
+          "seconds": 233.55164011009037
+        },
+        {
+          "seed": 9,
+          "validation": 0.5168730768252676,
+          "test": 0.3868354261076476,
+          "seconds": 283.63844931777567
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 114,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          30,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.21248843614012003,
+        "loading_and_hash_seconds": 67.6372164869681,
+        "total_compute_seconds": 2651.9081261167303,
+        "worker_wall_seconds": 2720.211555296555
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.0005_2.pt": "e3f6c6ead2805c27013ef9a34566469a0885d1a9537aecf37bb52f0b0dc3b918",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.0005_2.pt": "60b0c48152798ca8e0142b9e3dc7db1816bfe0a34b07d97c1c106062c209d70a",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.0005_2.pt": "3399ecd9eff842c1ae7e75e9a5a08aa5f2c75ea272bf22d37c00ed0db34e4b1d"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.0005__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.0005__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.0005__s3/result.json",
+        "sha256": "45ac3fd0daab10059b6a1ac70aa0b1dbb7cda119350636f114b7f7503427104b",
+        "terminal_sha256": "8bd950d4816e781d467ff53a61264f120e118f00de103f0bc4a9e9b4854247da",
+        "completed_utc": "2026-10-13T13:34:15.004419+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.5069297866388627,
+          "test": 0.3976587496853948,
+          "seconds": 272.7365133082494
+        },
+        {
+          "seed": 1,
+          "validation": 0.5082521679424256,
+          "test": 0.40405342572899167,
+          "seconds": 278.11263735219836
+        },
+        {
+          "seed": 2,
+          "validation": 0.5014368181471404,
+          "test": 0.3990793871557925,
+          "seconds": 247.47433317638934
+        },
+        {
+          "seed": 3,
+          "validation": 0.5109477913689189,
+          "test": 0.4016581333528535,
+          "seconds": 236.08242383319885
+        },
+        {
+          "seed": 4,
+          "validation": 0.51219388144343,
+          "test": 0.4108113945608201,
+          "seconds": 255.04882541671395
+        },
+        {
+          "seed": 5,
+          "validation": 0.5172291025608422,
+          "test": 0.4197382755611947,
+          "seconds": 300.5572373364121
+        },
+        {
+          "seed": 6,
+          "validation": 0.5121684510337461,
+          "test": 0.4042282942725807,
+          "seconds": 257.1483548535034
+        },
+        {
+          "seed": 7,
+          "validation": 0.5141774533987742,
+          "test": 0.41175125650052347,
+          "seconds": 262.18408422358334
+        },
+        {
+          "seed": 8,
+          "validation": 0.49693563563309,
+          "test": 0.3956018979788901,
+          "seconds": 264.8672857945785
+        },
+        {
+          "seed": 9,
+          "validation": 0.5070569386872822,
+          "test": 0.40455814966488046,
+          "seconds": 275.4852853138
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 114,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          30,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.22354182694107294,
+        "loading_and_hash_seconds": 86.30706685502082,
+        "total_compute_seconds": 2649.9205224355683,
+        "worker_wall_seconds": 2737.219083428383
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.0005_3.pt": "0592772e2fca70658350dc45b322c88568dfb4ff241038a1e600ad6f54a3374c",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.0005_3.pt": "1af7bbb71c1ceaca925f66a673f064e5acda493b041d02292b2c647f04aefcd7",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.0005_3.pt": "6dbc9ac2b604ab8215601d1d670196ba697d9de7933aad35f5f1ab160790b185"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.001__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.001__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.001__s1/result.json",
+        "sha256": "7a63db560d4b3ec0804998d64e554aadb5c0307a90efb320fb140137319ed48a",
+        "terminal_sha256": "1ef345725044c04507ec7d679ff7cdaa6378297063c442693aa058dd1509139a",
+        "completed_utc": "2026-10-13T16:26:18.718447+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.6087022861938306,
+          "test": 0.48862157046411553,
+          "seconds": 233.68290138803422
+        },
+        {
+          "seed": 1,
+          "validation": 0.6035907738473667,
+          "test": 0.48342567025034217,
+          "seconds": 240.58238372765481
+        },
+        {
+          "seed": 2,
+          "validation": 0.6020395188566487,
+          "test": 0.4815956506081313,
+          "seconds": 253.36411856021732
+        },
+        {
+          "seed": 3,
+          "validation": 0.5967754240520815,
+          "test": 0.4818007935507396,
+          "seconds": 293.56326851807535
+        },
+        {
+          "seed": 4,
+          "validation": 0.6017852147598097,
+          "test": 0.47961787382443827,
+          "seconds": 200.6672865403816
+        },
+        {
+          "seed": 5,
+          "validation": 0.5980978053556443,
+          "test": 0.4819101428725705,
+          "seconds": 196.39896312076598
+        },
+        {
+          "seed": 6,
+          "validation": 0.5947664216870534,
+          "test": 0.47311927073943183,
+          "seconds": 220.8475156808272
+        },
+        {
+          "seed": 7,
+          "validation": 0.5994710474785748,
+          "test": 0.47865451533624237,
+          "seconds": 224.1794928824529
+        },
+        {
+          "seed": 8,
+          "validation": 0.600437403046563,
+          "test": 0.48267242512847414,
+          "seconds": 233.39416116662323
+        },
+        {
+          "seed": 9,
+          "validation": 0.5917402029346692,
+          "test": 0.4713696815901379,
+          "seconds": 181.14983119815588
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 208,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          60,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.17249161377549171,
+        "loading_and_hash_seconds": 60.9783923830837,
+        "total_compute_seconds": 2278.002414396964,
+        "worker_wall_seconds": 2339.6134580690414
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.001_1.pt": "bcbd0725c8aefde279ee6d4f23b5d472ec1b21f09ebfb5bce40784c2d45c5102",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.001_1.pt": "e782c0f1bf150f24f75b71c3d5eb802ce3664287d2c764aa96371d02aaebda48",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.001_1.pt": "8d74dd97b7922fc92990746e5d3cedb835a238223b3e3dda6c0f1cd22d39239f"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.001__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.001__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.001__s2/result.json",
+        "sha256": "20c4fdfcf91520b1c83be4ccd17cd24cdd7b2b56de6c272573f21b7e15817f91",
+        "terminal_sha256": "8c02cbc4739e9afd3a0faa0187c6964af194323cde73c4ae96e563b0f70acff6",
+        "completed_utc": "2026-10-13T16:37:48.135355+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.6308521730285075,
+          "test": 0.48339178099770863,
+          "seconds": 291.2598888287321
+        },
+        {
+          "seed": 1,
+          "validation": 0.6322762759708058,
+          "test": 0.4809029542843019,
+          "seconds": 220.2896148255095
+        },
+        {
+          "seed": 2,
+          "validation": 0.6358365333265519,
+          "test": 0.481820675245618,
+          "seconds": 196.08715148922056
+        },
+        {
+          "seed": 3,
+          "validation": 0.6432876433639345,
+          "test": 0.48961068478431297,
+          "seconds": 202.42146691586822
+        },
+        {
+          "seed": 4,
+          "validation": 0.6430079088574117,
+          "test": 0.4926006205799942,
+          "seconds": 227.57284843456
+        },
+        {
+          "seed": 5,
+          "validation": 0.6391424865854589,
+          "test": 0.486974100929424,
+          "seconds": 218.10160992480814
+        },
+        {
+          "seed": 6,
+          "validation": 0.6377183836431605,
+          "test": 0.48761393001914516,
+          "seconds": 208.10036457050592
+        },
+        {
+          "seed": 7,
+          "validation": 0.6320728326933347,
+          "test": 0.480826590501701,
+          "seconds": 193.57136605493724
+        },
+        {
+          "seed": 8,
+          "validation": 0.6286651577956921,
+          "test": 0.4807800492614176,
+          "seconds": 259.1377224465832
+        },
+        {
+          "seed": 9,
+          "validation": 0.6311827683543981,
+          "test": 0.47533336857815606,
+          "seconds": 290.0981490248814
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 208,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          60,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.1791642401367426,
+        "loading_and_hash_seconds": 65.44449908006936,
+        "total_compute_seconds": 2306.819346755743,
+        "worker_wall_seconds": 2372.9287165552378
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.001_2.pt": "3ad80de73e9e0ca5eded2403108a3387bdb72c6cb1e45f73bc430b9cbbf36a17",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.001_2.pt": "82d93140c5e6dea36e309e81b11263cc10f29069f3145287a424efb0c810b074",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.001_2.pt": "19c8951b6bfb0d29fa070d199f22a9e989127641fbd21ddb30217ecb49e2ad96"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.001__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.001__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.001__s3/result.json",
+        "sha256": "ce05db4ab72d9d0e5d3e22ffba2a65737dbaf968ff9d70f0a627d38a182e3153",
+        "terminal_sha256": "087a5ba0837703eff6f95e30b9cf67455d9e0ff5d952998f77d176f61cc120c9",
+        "completed_utc": "2026-10-13T16:52:09.042236+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.6003356814078274,
+          "test": 0.4660242168080752,
+          "seconds": 219.97563706431538
+        },
+        {
+          "seed": 1,
+          "validation": 0.6183149810543448,
+          "test": 0.48053152807543836,
+          "seconds": 224.48401367943734
+        },
+        {
+          "seed": 2,
+          "validation": 0.5997762123947816,
+          "test": 0.4691623616019404,
+          "seconds": 264.6839696057141
+        },
+        {
+          "seed": 3,
+          "validation": 0.6059303715382854,
+          "test": 0.46676706922580224,
+          "seconds": 175.12870372273028
+        },
+        {
+          "seed": 4,
+          "validation": 0.6045062685959871,
+          "test": 0.47304471438363804,
+          "seconds": 238.66173312067986
+        },
+        {
+          "seed": 5,
+          "validation": 0.6003611118175114,
+          "test": 0.46807157952384243,
+          "seconds": 279.09273390006274
+        },
+        {
+          "seed": 6,
+          "validation": 0.5976909188007019,
+          "test": 0.4697655902988173,
+          "seconds": 257.27921815402806
+        },
+        {
+          "seed": 7,
+          "validation": 0.5990133001042647,
+          "test": 0.4670481240943097,
+          "seconds": 256.4736685715616
+        },
+        {
+          "seed": 8,
+          "validation": 0.5965719807746103,
+          "test": 0.4653193203532977,
+          "seconds": 251.65661775227636
+        },
+        {
+          "seed": 9,
+          "validation": 0.603768786715154,
+          "test": 0.4718753092394303,
+          "seconds": 243.5194915626198
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 208,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          60,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.15502857882529497,
+        "loading_and_hash_seconds": 57.16457916330546,
+        "total_compute_seconds": 2411.1108157122508,
+        "worker_wall_seconds": 2468.8889932576567
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.001_3.pt": "3210d402bc1e09d36930c90ce9262f181909f138c5289b691c2f4cb933a225be",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.001_3.pt": "565cb39ce8af1a8c8022c7af05245828f3eae1c66c4782f0597d7b484996b8ad",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.001_3.pt": "441547de4ec33e71a1d95704ae0b4ef9e46bdcce91a930e8278e53405c2e84b8"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.002__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.002__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.002__s1/result.json",
+        "sha256": "f48265947209a099ec8e00efebd8d5d32aa1f54c8b3f635c22aa30c507bda2b7",
+        "terminal_sha256": "af125948eb48179cfe5af63bb7e3201a2aadc4c9641f0af2f808d484ed33a174",
+        "completed_utc": "2026-10-13T20:07:53.927810+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7067873763446328,
+          "test": 0.5486941115390194,
+          "seconds": 270.49491560831666
+        },
+        {
+          "seed": 1,
+          "validation": 0.7043460570149784,
+          "test": 0.5428687749396658,
+          "seconds": 253.7152867158875
+        },
+        {
+          "seed": 2,
+          "validation": 0.7105510769778501,
+          "test": 0.5480018670718917,
+          "seconds": 246.551800920628
+        },
+        {
+          "seed": 3,
+          "validation": 0.7016504335884851,
+          "test": 0.5482969294981543,
+          "seconds": 278.73582173045725
+        },
+        {
+          "seed": 4,
+          "validation": 0.7102967728810111,
+          "test": 0.551753181410073,
+          "seconds": 292.0102777276188
+        },
+        {
+          "seed": 5,
+          "validation": 0.6980138850036873,
+          "test": 0.5449771383101734,
+          "seconds": 276.59095369372517
+        },
+        {
+          "seed": 6,
+          "validation": 0.7041171833278234,
+          "test": 0.5498291755738919,
+          "seconds": 272.4918225426227
+        },
+        {
+          "seed": 7,
+          "validation": 0.7001500394171349,
+          "test": 0.5429984578130768,
+          "seconds": 300.4262348348275
+        },
+        {
+          "seed": 8,
+          "validation": 0.7030745365307834,
+          "test": 0.5407531818619298,
+          "seconds": 340.42808608245105
+        },
+        {
+          "seed": 9,
+          "validation": 0.6962846171451822,
+          "test": 0.5402353540816893,
+          "seconds": 295.50411084573716
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 401,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          121,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.18347189761698246,
+        "loading_and_hash_seconds": 58.27588863763958,
+        "total_compute_seconds": 2827.1327825998887,
+        "worker_wall_seconds": 2886.117115479894
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.002_1.pt": "2e33340c893efc1536b8ad5882dc11a590095bf56b3617b20bb08d0db996ceca",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.002_1.pt": "ec4a65a6c45dee4959e90b19464c6de772fd32263df1ff135736ad9cd43526c6",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.002_1.pt": "ad9a26399b59d92ec49c0c16a7fd82b54494365a5a23b0c3963e1abeb55bf974"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.002__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.002__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.002__s2/result.json",
+        "sha256": "d01e93f0a0d4dbdf8b8d0c19309425095acbbc610ca8906086d79d4721c96a69",
+        "terminal_sha256": "c336c3a51518f6433e9fb5464a8dd92f1cc563fdcb6f078ae79f0cb5f46ccdaf",
+        "completed_utc": "2026-10-13T20:12:40.431043+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7021081809627953,
+          "test": 0.5343557946781221,
+          "seconds": 276.98451634310186
+        },
+        {
+          "seed": 1,
+          "validation": 0.7073214149479948,
+          "test": 0.5369381557287974,
+          "seconds": 232.4365219147876
+        },
+        {
+          "seed": 2,
+          "validation": 0.6989293797523077,
+          "test": 0.5318936275101205,
+          "seconds": 272.24131688661873
+        },
+        {
+          "seed": 3,
+          "validation": 0.7082114792869313,
+          "test": 0.5420730552878305,
+          "seconds": 300.8847109945491
+        },
+        {
+          "seed": 4,
+          "validation": 0.7132212699946596,
+          "test": 0.5432966832362519,
+          "seconds": 326.5112840794027
+        },
+        {
+          "seed": 5,
+          "validation": 0.7093304173130229,
+          "test": 0.5412285351122028,
+          "seconds": 270.6040636841208
+        },
+        {
+          "seed": 6,
+          "validation": 0.6997940136815604,
+          "test": 0.5357814025722394,
+          "seconds": 298.4628830710426
+        },
+        {
+          "seed": 7,
+          "validation": 0.7036340055438293,
+          "test": 0.5403117178642902,
+          "seconds": 336.3751824274659
+        },
+        {
+          "seed": 8,
+          "validation": 0.7097881646873331,
+          "test": 0.539587843428038,
+          "seconds": 294.1613207394257
+        },
+        {
+          "seed": 9,
+          "validation": 0.7070416804414719,
+          "test": 0.5382675181454355,
+          "seconds": 297.311262213625
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 401,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          121,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.17491235304623842,
+        "loading_and_hash_seconds": 69.57544710952789,
+        "total_compute_seconds": 2906.147974707186,
+        "worker_wall_seconds": 2976.4201017981395
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.002_2.pt": "bd604a64d5b616c3806a159b683e013a01ccb41b9bedf16b35f8cc28cc6cb13a",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.002_2.pt": "f3bdb72c3a984d2713807f2ec9433bdce4742ee4ca477486c307f83081277782",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.002_2.pt": "fa23139fd03e2b47273a1dc9f2758f5450c88ca73d10c5f044e20e2042710ea2"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__random__r0.002__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "random",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__random__r0.002__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__random__r0.002__s3/result.json",
+        "sha256": "65b179908bdac141f695bf8141971de0bd8f284bb394b337f9487ddaf1e90de7",
+        "terminal_sha256": "61a65253d079c5b49b9aaf8f1fad6e6100eca49cb01276426d9b096466222fd8",
+        "completed_utc": "2026-10-13T20:28:10.020491+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.698115606642423,
+          "test": 0.5311449009552702,
+          "seconds": 287.65132436715066
+        },
+        {
+          "seed": 1,
+          "validation": 0.6971492510744348,
+          "test": 0.5308918612022732,
+          "seconds": 302.7220220314339
+        },
+        {
+          "seed": 2,
+          "validation": 0.7022861938305826,
+          "test": 0.5331769005431769,
+          "seconds": 277.0062449723482
+        },
+        {
+          "seed": 3,
+          "validation": 0.6986496452457849,
+          "test": 0.5317097218324958,
+          "seconds": 322.4784827437252
+        },
+        {
+          "seed": 4,
+          "validation": 0.7022099026015309,
+          "test": 0.5378161133003568,
+          "seconds": 315.1581605691463
+        },
+        {
+          "seed": 5,
+          "validation": 0.699895735320296,
+          "test": 0.5324417296893801,
+          "seconds": 291.6897852960974
+        },
+        {
+          "seed": 6,
+          "validation": 0.69633547796455,
+          "test": 0.5353290940137572,
+          "seconds": 302.39784043934196
+        },
+        {
+          "seed": 7,
+          "validation": 0.6999211657299799,
+          "test": 0.5332564273226903,
+          "seconds": 281.8569147558883
+        },
+        {
+          "seed": 8,
+          "validation": 0.7016250031788012,
+          "test": 0.5371003722847366,
+          "seconds": 280.84443559031934
+        },
+        {
+          "seed": 9,
+          "validation": 0.6993362663072502,
+          "test": 0.5319564355916679,
+          "seconds": 293.5715341018513
+        }
+      ],
+      "reduction": {
+        "synthetic_nodes": 401,
+        "uses_test_labels": false,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          121,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 0.22036437038332224,
+        "loading_and_hash_seconds": 94.41342677455395,
+        "total_compute_seconds": 2955.597109237686,
+        "worker_wall_seconds": 3050.8211213145405
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/random/adj_ogbn-products_0.002_3.pt": "2fae5c63f7fad9995f29516dca7636cead49c79e63fd9166020430ef610c3fd9",
+        "checkpoints/reduced_graph/random/feat_ogbn-products_0.002_3.pt": "96693c97df4a60a9f358361650947aaf5b376d6aa9fc1b28b33d33befe426890",
+        "checkpoints/reduced_graph/random/label_ogbn-products_0.002_3.pt": "9db645037b2f8b89361ce99ea6a9bb0394fbab31100696d75d2f8ccb18673708"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.0005__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.0005__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.0005__s1/result.json",
+        "sha256": "3641bf73c360d45d6b99d77dc4927c70d49c410ef8af55116a70657f03840823",
+        "terminal_sha256": "abbe6c320937dbd74c1730d20cc2159738e0606f89fa507bbc25bf1fed7c3d3c",
+        "completed_utc": "2026-10-13T10:09:49.809694+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7676169163085217,
+          "test": 0.6194160113614848,
+          "seconds": 272.9468383518979
+        },
+        {
+          "seed": 1,
+          "validation": 0.7685069806474581,
+          "test": 0.6161789099499297,
+          "seconds": 295.937347413972
+        },
+        {
+          "seed": 2,
+          "validation": 0.7681763853215675,
+          "test": 0.6192443058148083,
+          "seconds": 311.2378090778366
+        },
+        {
+          "seed": 3,
+          "validation": 0.763700633217201,
+          "test": 0.6235166109301424,
+          "seconds": 335.6851542200893
+        },
+        {
+          "seed": 4,
+          "validation": 0.7670828777051598,
+          "test": 0.621558263984626,
+          "seconds": 321.0629261508584
+        },
+        {
+          "seed": 5,
+          "validation": 0.7661165221371716,
+          "test": 0.6190816374021674,
+          "seconds": 284.43598185665905
+        },
+        {
+          "seed": 6,
+          "validation": 0.7658113572209648,
+          "test": 0.6193934185263958,
+          "seconds": 272.6821093261242
+        },
+        {
+          "seed": 7,
+          "validation": 0.7669302952470564,
+          "test": 0.6229463677724956,
+          "seconds": 238.01961072627455
+        },
+        {
+          "seed": 8,
+          "validation": 0.7687104239249294,
+          "test": 0.6200544848811006,
+          "seconds": 291.52673995587975
+        },
+        {
+          "seed": 9,
+          "validation": 0.7650484449304478,
+          "test": 0.6178485204630085,
+          "seconds": 253.26177359558642
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 57.16531909070909,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          14,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 57.187179286032915,
+        "loading_and_hash_seconds": 474.32457464654,
+        "total_compute_seconds": 2933.983469961211,
+        "worker_wall_seconds": 3409.0029352605343
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.0005_1.pt": "77319876ad030dfa6093b6a7100d73dc0c1c97b909cc899f391178c91b8bb722",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.0005_1.pt": "dc31bb02a68a82b8a3ea91df92cf22d9f2c2e6e4303d3bfc6db3fb30d95ab97e",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.0005_1.pt": "ff7cb96c8b1ce2bc0b966af9dfad8373d8c20145d8ae4b89cd791a9e17ee195c"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.0005__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.0005__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.0005__s2/result.json",
+        "sha256": "8bc713712b70e8145437ef6c94e323a188c21f186abbbbe7357932e95f3987f2",
+        "terminal_sha256": "25226749b8a9d238bf9955e6c45925be06889cd06ce9f78750eebc863160e7c2",
+        "completed_utc": "2026-10-28T05:43:21.749837+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7687358543346133,
+          "test": 0.6187296410314804,
+          "seconds": 283.77009038906544
+        },
+        {
+          "seed": 1,
+          "validation": 0.7638532156753045,
+          "test": 0.6138369366646016,
+          "seconds": 463.76952355448157
+        },
+        {
+          "seed": 2,
+          "validation": 0.7676677771278895,
+          "test": 0.6181444866026747,
+          "seconds": 548.5522867292166
+        },
+        {
+          "seed": 3,
+          "validation": 0.765506192304758,
+          "test": 0.6214552406566201,
+          "seconds": 520.8809883650392
+        },
+        {
+          "seed": 4,
+          "validation": 0.7643872542786664,
+          "test": 0.618261065631734,
+          "seconds": 515.1987677942961
+        },
+        {
+          "seed": 5,
+          "validation": 0.7654553314853902,
+          "test": 0.6159819004279534,
+          "seconds": 550.9621359966695
+        },
+        {
+          "seed": 6,
+          "validation": 0.767032016885792,
+          "test": 0.6180735451004952,
+          "seconds": 132.43911587600087
+        },
+        {
+          "seed": 7,
+          "validation": 0.768074663682832,
+          "test": 0.619740896330065,
+          "seconds": 131.67410973200094
+        },
+        {
+          "seed": 8,
+          "validation": 0.7620222261780637,
+          "test": 0.6124153954808004,
+          "seconds": 131.33214426199993
+        },
+        {
+          "seed": 9,
+          "validation": 0.7641838110011951,
+          "test": 0.6131257142159993,
+          "seconds": 132.55998623199775
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 39.849645333364606,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          14,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 39.85682109743357,
+        "loading_and_hash_seconds": 37.0077580540019,
+        "total_compute_seconds": 3450.9959700282016,
+        "worker_wall_seconds": 565.4402131819988
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.0005_2.pt": "b501c4b869bd5f480b68484c53b8cbda4766bdf9e207257a78d9fa3e266001e0",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.0005_2.pt": "cd0a415287765cd49a04cee8f61bf13f5822db2ba57f71854a390ca36de6de74",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.0005_2.pt": "485f70910621385541a9ca3474125396102e13d71a734e853130ba8cee0fed86"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.0005__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.0005__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.0005__s3/result.json",
+        "sha256": "d5ebf159fb4d5805509df6874237a848cd2031d622a239aa43c8262900069a85",
+        "terminal_sha256": "7a20378f6b8266b1309809af395bd0ec7a7ed6245920017bcd3ad08bf7a2b6c5",
+        "completed_utc": "2026-10-13T11:00:59.721947+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7670828777051598,
+          "test": 0.6229486270560044,
+          "seconds": 256.00413959193975
+        },
+        {
+          "seed": 1,
+          "validation": 0.7625308343717417,
+          "test": 0.6102031050688833,
+          "seconds": 340.8056465284899
+        },
+        {
+          "seed": 2,
+          "validation": 0.7599623629936678,
+          "test": 0.6111443225786919,
+          "seconds": 302.4987248573452
+        },
+        {
+          "seed": 3,
+          "validation": 0.7615136179843857,
+          "test": 0.6150555941893036,
+          "seconds": 296.437084521167
+        },
+        {
+          "seed": 4,
+          "validation": 0.7639040764946723,
+          "test": 0.6184404527423408,
+          "seconds": 327.5954736173153
+        },
+        {
+          "seed": 5,
+          "validation": 0.7644381150980342,
+          "test": 0.6156172520696166,
+          "seconds": 272.99733917880803
+        },
+        {
+          "seed": 6,
+          "validation": 0.7652010273885512,
+          "test": 0.6169651406110277,
+          "seconds": 320.4768061088398
+        },
+        {
+          "seed": 7,
+          "validation": 0.7669302952470564,
+          "test": 0.623754287555279,
+          "seconds": 263.1979924160987
+        },
+        {
+          "seed": 8,
+          "validation": 0.7661165221371716,
+          "test": 0.6176144586914862,
+          "seconds": 255.6644283607602
+        },
+        {
+          "seed": 9,
+          "validation": 0.7624799735523738,
+          "test": 0.6280699709139841,
+          "seconds": 304.2852867972106
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 30.90360005106777,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          6,
+          5,
+          6,
+          14,
+          1,
+          7,
+          8,
+          5,
+          3,
+          2,
+          1,
+          1,
+          5,
+          1,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 30.91187211498618,
+        "loading_and_hash_seconds": 77.29216190241277,
+        "total_compute_seconds": 2970.8747940929607,
+        "worker_wall_seconds": 3048.779454429634
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.0005_3.pt": "a9c2aff289eb3dd2ed64016163ffaaeab88d923c801258183ad56f5c2a330c1c",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.0005_3.pt": "c33e7ed2f97456933aa1efca08038f9c76844f6a4738ab126daef4fe06d193e8",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.0005_3.pt": "4f8c18453619f8d6b453c137efcf194cd56a0c6eb64de2652d40a06d3e4002d0"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.001__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.001__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.001__s1/result.json",
+        "sha256": "acb6a1f4461884fab0077272c4149ac1a15566c6c423a3634fc040a936e4d4be",
+        "terminal_sha256": "7f362b7d7e4111ded12c8248049cf1a69cb7271b83d2a464fc1c42c7f2d1bc91",
+        "completed_utc": "2026-10-13T13:50:15.111844+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7936067950054675,
+          "test": 0.6264789834670151,
+          "seconds": 231.79531971737742
+        },
+        {
+          "seed": 1,
+          "validation": 0.7905042850240317,
+          "test": 0.6187129223335145,
+          "seconds": 251.61907440889627
+        },
+        {
+          "seed": 2,
+          "validation": 0.7912671973145488,
+          "test": 0.618761271000605,
+          "seconds": 301.18929679878056
+        },
+        {
+          "seed": 3,
+          "validation": 0.7827225796607583,
+          "test": 0.6108357044513759,
+          "seconds": 253.1465824590996
+        },
+        {
+          "seed": 4,
+          "validation": 0.7855453551356713,
+          "test": 0.6191927941508053,
+          "seconds": 263.8174423472956
+        },
+        {
+          "seed": 5,
+          "validation": 0.7892581949495207,
+          "test": 0.6197359259063454,
+          "seconds": 268.45376903936267
+        },
+        {
+          "seed": 6,
+          "validation": 0.7873509142232281,
+          "test": 0.6195886206215651,
+          "seconds": 276.04387642722577
+        },
+        {
+          "seed": 7,
+          "validation": 0.7842484042417923,
+          "test": 0.6122816458970733,
+          "seconds": 270.1372220441699
+        },
+        {
+          "seed": 8,
+          "validation": 0.7925895786181115,
+          "test": 0.6245491034937108,
+          "seconds": 309.72830675635487
+        },
+        {
+          "seed": 9,
+          "validation": 0.7924115657503242,
+          "test": 0.6186270695601762,
+          "seconds": 379.64887035265565
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 55.40300386492163,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          48,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 55.41745795402676,
+        "loading_and_hash_seconds": 73.23036858439445,
+        "total_compute_seconds": 2860.997218305245,
+        "worker_wall_seconds": 2935.0085316915065
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.001_1.pt": "b93a56cb0a943c49ae50bd30b7eca257a7c0fed25a97f7ec1d4b62c4222fe947",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.001_1.pt": "3ce0d7785efa3555e868c6446b6a7d5053c3a6b47026580c5fd3c6a4a1bd3b90",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.001_1.pt": "846c4681b01dc7dfacbdcf6d04ec6d69bb7a7f0502f315e308272c95a7617bbe"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.001__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.001__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.001__s2/result.json",
+        "sha256": "5c9ed78f1afd2708d3388eebf3727db9faf90347c5f1131ac190330d4d0b4f19",
+        "terminal_sha256": "1c08e87e3a39a10b3744d463ca5d65f3504b18484998a9f9fb3937390dec8ba0",
+        "completed_utc": "2026-10-13T13:53:38.959294+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7964550008900643,
+          "test": 0.6283672926237556,
+          "seconds": 249.56201836280525
+        },
+        {
+          "seed": 1,
+          "validation": 0.7992523459552933,
+          "test": 0.630858830477373,
+          "seconds": 299.78581291716546
+        },
+        {
+          "seed": 2,
+          "validation": 0.7982096991582535,
+          "test": 0.6280184592499811,
+          "seconds": 248.50414061080664
+        },
+        {
+          "seed": 3,
+          "validation": 0.7949546067187142,
+          "test": 0.6156208669232308,
+          "seconds": 268.43409630283713
+        },
+        {
+          "seed": 4,
+          "validation": 0.7908348803499224,
+          "test": 0.6220399432287239,
+          "seconds": 266.9838098557666
+        },
+        {
+          "seed": 5,
+          "validation": 0.798820028990667,
+          "test": 0.6267478382045745,
+          "seconds": 275.906873986125
+        },
+        {
+          "seed": 6,
+          "validation": 0.7953614932736566,
+          "test": 0.6279764365767155,
+          "seconds": 263.2046194700524
+        },
+        {
+          "seed": 7,
+          "validation": 0.7930473259924217,
+          "test": 0.6233060457071128,
+          "seconds": 317.0299141118303
+        },
+        {
+          "seed": 8,
+          "validation": 0.8019479693817867,
+          "test": 0.6342152220581982,
+          "seconds": 324.0831601275131
+        },
+        {
+          "seed": 9,
+          "validation": 0.799837245378023,
+          "test": 0.627701707702033,
+          "seconds": 260.0046061454341
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 35.36080007441342,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          48,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 35.36858120840043,
+        "loading_and_hash_seconds": 47.94661610107869,
+        "total_compute_seconds": 2808.8676330987364,
+        "worker_wall_seconds": 2857.4701315741986
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.001_2.pt": "749f93c184ed4d451b657461deda3c6f80924f2f6e7af309146d2ef3d43c67cd",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.001_2.pt": "4e40fa72c5f32e55e2a18110e4cc242d7b56cae0936156a2fb5f661fb94e21fb",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.001_2.pt": "a175c92af38024abc20c6b2ecdd2e6cd221246c6d6db4a2f644e4a2eb4629377"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.001__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.001__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.001__s3/result.json",
+        "sha256": "a9a8893808c0cc2391c012ef1e14e6d06ff0646a5d5a63241632fce9b0a7d9b0",
+        "terminal_sha256": "ae673c21811013e4ad7635f386a0a762e3b960c21eed57eef4052befce57888c",
+        "completed_utc": "2026-10-13T14:27:39.139533+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7889530300333139,
+          "test": 0.623624604681868,
+          "seconds": 297.6195682892576
+        },
+        {
+          "seed": 1,
+          "validation": 0.7857233680034585,
+          "test": 0.618063604253056,
+          "seconds": 364.67083688639104
+        },
+        {
+          "seed": 2,
+          "validation": 0.7888513083945782,
+          "test": 0.6226196753771083,
+          "seconds": 256.0490812296048
+        },
+        {
+          "seed": 3,
+          "validation": 0.7844264171095796,
+          "test": 0.616487076220544,
+          "seconds": 263.7975768689066
+        },
+        {
+          "seed": 4,
+          "validation": 0.7850367469419932,
+          "test": 0.6207607369059835,
+          "seconds": 263.7987595004961
+        },
+        {
+          "seed": 5,
+          "validation": 0.7886732955267909,
+          "test": 0.6230286056922196,
+          "seconds": 329.6711908504367
+        },
+        {
+          "seed": 6,
+          "validation": 0.7836380744093787,
+          "test": 0.6182850140369284,
+          "seconds": 269.9751712465659
+        },
+        {
+          "seed": 7,
+          "validation": 0.7885461434783714,
+          "test": 0.6202564648267965,
+          "seconds": 386.0269241053611
+        },
+        {
+          "seed": 8,
+          "validation": 0.7966838745772195,
+          "test": 0.6318099888346209,
+          "seconds": 353.80535166617483
+        },
+        {
+          "seed": 9,
+          "validation": 0.7916232230501233,
+          "test": 0.621599382944488,
+          "seconds": 303.2931861244142
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 34.82468693237752,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          11,
+          12,
+          10,
+          13,
+          48,
+          3,
+          15,
+          16,
+          10,
+          6,
+          4,
+          3,
+          2,
+          10,
+          1,
+          2,
+          1,
+          4,
+          1,
+          1,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 34.83238673675805,
+        "loading_and_hash_seconds": 59.854294191114604,
+        "total_compute_seconds": 3123.540033504367,
+        "worker_wall_seconds": 3184.194842554629
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.001_3.pt": "6777dae393a242d593ddbb54f9d58da8371376d93975a72793040da7b4c2c493",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.001_3.pt": "ff2020e420855a80d8062f9eb440356c69d001ba921efef4be56c76eb6368cbc",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.001_3.pt": "8442455d8a6336680a3fab6ef60ec052a22efb3bfe9cbea63620098c8c4b9af3"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.002__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.002__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.002__s1/result.json",
+        "sha256": "6d18adc4fa1f5c28d8e71ec581dddeb6a43119b3a9f9226514200fe208b0257c",
+        "terminal_sha256": "63f55c57f9bb06ccfa1e454e426d0ac33c37d905f5085e9a4ad17d69b08b4255",
+        "completed_utc": "2026-10-13T17:12:45.890733+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.8111537776873585,
+          "test": 0.6386623957171214,
+          "seconds": 267.96211786568165
+        },
+        {
+          "seed": 1,
+          "validation": 0.8051267705922742,
+          "test": 0.6328424813981892,
+          "seconds": 296.98614815156907
+        },
+        {
+          "seed": 2,
+          "validation": 0.8123490069425018,
+          "test": 0.6396713917321971,
+          "seconds": 288.99485419597477
+        },
+        {
+          "seed": 3,
+          "validation": 0.8118658291585077,
+          "test": 0.6398141784499598,
+          "seconds": 258.41087819449604
+        },
+        {
+          "seed": 4,
+          "validation": 0.8108486127711517,
+          "test": 0.6365675880476672,
+          "seconds": 246.46657162252814
+        },
+        {
+          "seed": 5,
+          "validation": 0.8076443811509804,
+          "test": 0.638107515687335,
+          "seconds": 248.5961196627468
+        },
+        {
+          "seed": 6,
+          "validation": 0.8090430536835949,
+          "test": 0.6376655998329938,
+          "seconds": 312.42489614803344
+        },
+        {
+          "seed": 7,
+          "validation": 0.8034483635531368,
+          "test": 0.6331407068213643,
+          "seconds": 248.24206593073905
+        },
+        {
+          "seed": 8,
+          "validation": 0.8130356280039671,
+          "test": 0.6466313405097215,
+          "seconds": 226.71918174717575
+        },
+        {
+          "seed": 9,
+          "validation": 0.8104162958065254,
+          "test": 0.6393171360780012,
+          "seconds": 260.5768027920276
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 62.630056724883616,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          113,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 62.63870961777866,
+        "loading_and_hash_seconds": 51.93225099518895,
+        "total_compute_seconds": 2718.018345928751,
+        "worker_wall_seconds": 2770.567385534756
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.002_1.pt": "65bd2d1463a1f6b8d3003c3ef3ac822a35066e9378416ddb3dfa9908209af6e5",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.002_1.pt": "33e72ea04942faff6ace9ff5e0237cd3e27edd161aca914184373c6b196dbd2e",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.002_1.pt": "5a31bb5f20615132a2384086840df19558b5dda198a69806ec83c3231f8eba99"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.002__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.002__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.002__s2/result.json",
+        "sha256": "877585eb4a2829477ac9a76fecaf07eda6b05b6e95f8060eaddf14fef9e750e1",
+        "terminal_sha256": "adfdd6e706f342f1ea27d5d1441a3797ed772acf3596d4e34d13e0abbeda95c8",
+        "completed_utc": "2026-10-13T17:22:49.593555+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.811026625638939,
+          "test": 0.6379809958108364,
+          "seconds": 262.8201631093398
+        },
+        {
+          "seed": 1,
+          "validation": 0.8080258372962388,
+          "test": 0.6335130367436314,
+          "seconds": 256.39583064895123
+        },
+        {
+          "seed": 2,
+          "validation": 0.8150700607786792,
+          "test": 0.6461469501254128,
+          "seconds": 221.37496239785105
+        },
+        {
+          "seed": 3,
+          "validation": 0.8066525951733082,
+          "test": 0.6386551660098929,
+          "seconds": 308.5238093417138
+        },
+        {
+          "seed": 4,
+          "validation": 0.8123744373521857,
+          "test": 0.63970256984462,
+          "seconds": 275.698804076761
+        },
+        {
+          "seed": 5,
+          "validation": 0.8116623858810366,
+          "test": 0.6443607605832746,
+          "seconds": 241.19602593034506
+        },
+        {
+          "seed": 6,
+          "validation": 0.802405716756097,
+          "test": 0.6352834113012072,
+          "seconds": 247.20228691678494
+        },
+        {
+          "seed": 7,
+          "validation": 0.8087887495867558,
+          "test": 0.6395932205227891,
+          "seconds": 237.01651798561215
+        },
+        {
+          "seed": 8,
+          "validation": 0.8118912595681916,
+          "test": 0.6453033336631887,
+          "seconds": 237.84522981382906
+        },
+        {
+          "seed": 9,
+          "validation": 0.8122218548940823,
+          "test": 0.6386384473119271,
+          "seconds": 249.4756150553003
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 78.72411920130253,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          113,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 78.7337765544653,
+        "loading_and_hash_seconds": 64.60474038962275,
+        "total_compute_seconds": 2616.2830218309537,
+        "worker_wall_seconds": 2681.5658657988533
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.002_2.pt": "68ea7c6500b0a330e439fda50a887d4fc989576d50131215230738cc576b131b",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.002_2.pt": "1fcd03b4e432d57d8b7b9da3166210974dee02fb0a834fd80ef15c342d4809e0",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.002_2.pt": "9cad53a0ee21b1ee40ebfd90576f1aaa83208da2a816581513a658ed5584494e"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__cgc__r0.002__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "cgc",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__cgc__r0.002__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__cgc__r0.002__s3/result.json",
+        "sha256": "a7685c70d2967ec9728228ac4c503ef0127c28ef48e8cf28be28e917cde2c8a5",
+        "terminal_sha256": "a6608885afd2be981540b0a138c0c9d3394f227f43b680212dcdf4705c0b5966",
+        "completed_utc": "2026-10-13T17:36:35.140756+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.8096279531063245,
+          "test": 0.639122385839534,
+          "seconds": 327.7478097723797
+        },
+        {
+          "seed": 1,
+          "validation": 0.806194847798998,
+          "test": 0.6315818012002218,
+          "seconds": 254.29712817166
+        },
+        {
+          "seed": 2,
+          "validation": 0.8174350888792818,
+          "test": 0.6440923577024171,
+          "seconds": 223.21925301942974
+        },
+        {
+          "seed": 3,
+          "validation": 0.8084581542608651,
+          "test": 0.6360750642427265,
+          "seconds": 264.573793258518
+        },
+        {
+          "seed": 4,
+          "validation": 0.8118658291585077,
+          "test": 0.63921275717989,
+          "seconds": 236.66757464036345
+        },
+        {
+          "seed": 5,
+          "validation": 0.8098568267934796,
+          "test": 0.6396085836506497,
+          "seconds": 256.1139057232067
+        },
+        {
+          "seed": 6,
+          "validation": 0.8037535284693436,
+          "test": 0.6305696421882335,
+          "seconds": 216.23705084249377
+        },
+        {
+          "seed": 7,
+          "validation": 0.812806754316812,
+          "test": 0.6451135538484409,
+          "seconds": 208.79908613394946
+        },
+        {
+          "seed": 8,
+          "validation": 0.8118403987488239,
+          "test": 0.643950474698058,
+          "seconds": 216.5132106197998
+        },
+        {
+          "seed": 9,
+          "validation": 0.8107468911324162,
+          "test": 0.6394802563473441,
+          "seconds": 293.5150186633691
+        }
+      ],
+      "reduction": {
+        "method": "cgc",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 92.32148068957031,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "clustering_backend": "sklearn",
+        "variant": "CGC",
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          22,
+          24,
+          21,
+          26,
+          113,
+          7,
+          30,
+          33,
+          21,
+          12,
+          8,
+          6,
+          5,
+          21,
+          1,
+          5,
+          1,
+          8,
+          1,
+          2,
+          4,
+          2,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 92.32895616441965,
+        "loading_and_hash_seconds": 57.20347614586353,
+        "total_compute_seconds": 2590.0127870095894,
+        "worker_wall_seconds": 2647.8088299436495
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/cgc/adj_ogbn-products_0.002_3.pt": "7823d330ba8d55931640e14698c07f675cbd06144b00e69565bb82c0a88b135e",
+        "checkpoints/reduced_graph/cgc/feat_ogbn-products_0.002_3.pt": "93d3bc448b352a77dc5c0878319a73815ff463fb693694c739f6846bb6eda8c2",
+        "checkpoints/reduced_graph/cgc/label_ogbn-products_0.002_3.pt": "9f2dfef193a796d843f884516eaa135873fd3d5e251704cd034ca46eb99d37c2"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.0005__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.0005"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s1/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s1/result.json",
+        "sha256": "ca1e3bac704c01b5be82904b41082fdee2cec3b638d220ccaba3db86200bff79",
+        "terminal_sha256": "fc754e89b89657da39002448c309eceeebd483e9f1db8293b49a3eff061bd16f",
+        "completed_utc": "2026-10-28T06:14:32.546300+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.6924700556925972,
+          "test": 0.5672328882996677,
+          "seconds": 127.20652254399829
+        },
+        {
+          "seed": 1,
+          "validation": 0.6865447702362485,
+          "test": 0.5620500919302459,
+          "seconds": 127.52082524700018
+        },
+        {
+          "seed": 2,
+          "validation": 0.6880197339979147,
+          "test": 0.5621504041180412,
+          "seconds": 127.25657780300025
+        },
+        {
+          "seed": 3,
+          "validation": 0.6904610533275691,
+          "test": 0.5662080773000296,
+          "seconds": 127.65181336500245
+        },
+        {
+          "seed": 4,
+          "validation": 0.6898761539048394,
+          "test": 0.564023802003623,
+          "seconds": 127.50051465100114
+        },
+        {
+          "seed": 5,
+          "validation": 0.6924191948732293,
+          "test": 0.5676702855869912,
+          "seconds": 126.21384149399819
+        },
+        {
+          "seed": 6,
+          "validation": 0.6920631691376548,
+          "test": 0.5691221011698118,
+          "seconds": 127.20458594299998
+        },
+        {
+          "seed": 7,
+          "validation": 0.6915037001246089,
+          "test": 0.5661299060906216,
+          "seconds": 125.78857624900047
+        },
+        {
+          "seed": 8,
+          "validation": 0.6868753655621391,
+          "test": 0.5618268747195664,
+          "seconds": 126.34077500800049
+        },
+        {
+          "seed": 9,
+          "validation": 0.6886554942400122,
+          "test": 0.564651430962396,
+          "seconds": 126.2097801380005
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 221.9140283380002,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8219871520996094,
+        "refinement_validation": 0.7166289687156677,
+        "final_train_loss": 11.602188110351562,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          7,
+          2,
+          6,
+          9,
+          32,
+          1,
+          9,
+          5,
+          9,
+          1,
+          2,
+          0,
+          8,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          11,
+          13,
+          14,
+          17,
+          18,
+          19,
+          20,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          33,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 221.92088496200086,
+        "loading_and_hash_seconds": 44.406543295997835,
+        "total_compute_seconds": 1490.8146974040028,
+        "worker_wall_seconds": 1535.608533786999
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.0005_1.pt": "aaf7024e01cd45c620e87139853f2c37ddc6db4517e59e7f7d196908e9d64d7e",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.0005_1.pt": "1aab26a26f6e441dca4fb10eff5cf6eb52d030cb42df452dde1ccafe620ebabf",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.0005_1.pt": "b4b2490e03fa1a733282fb145429dccb132e0e2cb18c66b89da02840049fbb03"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.0005__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.0005"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s2/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s2/result.json",
+        "sha256": "1ede5a879f9b17d7e3fa8218614b0f35186ed7737fa2f910c05b7fa26bf6bfd9",
+        "terminal_sha256": "e0bc9829622fc69e08287d73b5ca6c3317d641e9332083e4813642eeac0bf42b",
+        "completed_utc": "2026-10-28T06:40:16.055884+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7390839966431859,
+          "test": 0.5943497126869162,
+          "seconds": 134.5475295590004
+        },
+        {
+          "seed": 1,
+          "validation": 0.7390077054141342,
+          "test": 0.5967278345083866,
+          "seconds": 126.18977889300004
+        },
+        {
+          "seed": 2,
+          "validation": 0.741092999008214,
+          "test": 0.5990205554132206,
+          "seconds": 126.4473511139986
+        },
+        {
+          "seed": 3,
+          "validation": 0.7404572387661165,
+          "test": 0.598573217278458,
+          "seconds": 127.77667071399992
+        },
+        {
+          "seed": 4,
+          "validation": 0.7410421381888462,
+          "test": 0.5989749178863408,
+          "seconds": 127.26447016300153
+        },
+        {
+          "seed": 5,
+          "validation": 0.7413981639244208,
+          "test": 0.5984155192895366,
+          "seconds": 126.03930611100077
+        },
+        {
+          "seed": 6,
+          "validation": 0.7420593545762022,
+          "test": 0.5986184029486361,
+          "seconds": 125.93326777400216
+        },
+        {
+          "seed": 7,
+          "validation": 0.7387534013172952,
+          "test": 0.5941653551525897,
+          "seconds": 126.01802649299862
+        },
+        {
+          "seed": 8,
+          "validation": 0.7399740609821224,
+          "test": 0.5982058577799105,
+          "seconds": 126.57755077000184
+        },
+        {
+          "seed": 9,
+          "validation": 0.7412710118760013,
+          "test": 0.5966993675361745,
+          "seconds": 126.1855936710017
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 219.06432181099808,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8223431706428528,
+        "refinement_validation": 0.7024133801460266,
+        "final_train_loss": 12.035484313964844,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          6,
+          5,
+          6,
+          8,
+          28,
+          0,
+          7,
+          5,
+          10,
+          3,
+          2,
+          0,
+          5,
+          4,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          5,
+          11,
+          14,
+          16,
+          17,
+          18,
+          19,
+          20,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 219.0735526060016,
+        "loading_and_hash_seconds": 35.8679794339987,
+        "total_compute_seconds": 1492.0530978680072,
+        "worker_wall_seconds": 1528.3451423509978
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.0005_2.pt": "28652a66497bae91825243f0675c6c35cc03e522cfaedf32e4c83b0eadbb4d8c",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.0005_2.pt": "1661c301b7f4406698a0f70fdb4be9f8857ee90483cc4889ac88163ac697ee1e",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.0005_2.pt": "d018fd7a276e14813a395f1461b38ed4124fc84a686286061ffe0702743c2e5f"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.0005__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.0005"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s3/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.0005__s3/result.json",
+        "sha256": "8c311bab427b24e9619b7f2c135b3ca94125786dc64114737550970879326601",
+        "terminal_sha256": "b161d8f3eead574492cb99e6a688a4267a7cda22707f3ed404a3db2e4685319a",
+        "completed_utc": "2026-10-28T07:05:40.144744+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.740813264501691,
+          "test": 0.581416670168556,
+          "seconds": 126.69483825299903
+        },
+        {
+          "seed": 1,
+          "validation": 0.7419830633471505,
+          "test": 0.5819195866776378,
+          "seconds": 126.83103290099825
+        },
+        {
+          "seed": 2,
+          "validation": 0.738015919436462,
+          "test": 0.5816249761080768,
+          "seconds": 127.06637835500078
+        },
+        {
+          "seed": 3,
+          "validation": 0.7441192177605981,
+          "test": 0.5848069510020149,
+          "seconds": 127.32879058599792
+        },
+        {
+          "seed": 4,
+          "validation": 0.7443226610380693,
+          "test": 0.5838408813736082,
+          "seconds": 126.8563983540007
+        },
+        {
+          "seed": 5,
+          "validation": 0.7488747043714874,
+          "test": 0.5862384330332553,
+          "seconds": 126.4139455800032
+        },
+        {
+          "seed": 6,
+          "validation": 0.7460010680772067,
+          "test": 0.585399335138049,
+          "seconds": 126.54329159199915
+        },
+        {
+          "seed": 7,
+          "validation": 0.7429494189151387,
+          "test": 0.5829737683628915,
+          "seconds": 126.96247366700118
+        },
+        {
+          "seed": 8,
+          "validation": 0.7408895557307428,
+          "test": 0.580321821380142,
+          "seconds": 126.37224867700206
+        },
+        {
+          "seed": 9,
+          "validation": 0.7418304808890471,
+          "test": 0.5805594980052785,
+          "seconds": 127.26169632299934
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 209.41045050499815,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8209953904151917,
+        "refinement_validation": 0.7085675001144409,
+        "final_train_loss": 13.15118408203125,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          7,
+          6,
+          12,
+          27,
+          2,
+          8,
+          4,
+          8,
+          4,
+          0,
+          0,
+          6,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          10,
+          11,
+          14,
+          16,
+          18,
+          19,
+          20,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          32,
+          33,
+          34,
+          35,
+          37,
+          38,
+          39,
+          40,
+          41,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 209.41750192799736,
+        "loading_and_hash_seconds": 34.973126085998956,
+        "total_compute_seconds": 1477.748596215999,
+        "worker_wall_seconds": 1513.128988577002
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.0005_3.pt": "5e9a1e01ce84b57971e6f7193f4b8c930d44109f38a8c056089b0cd6f28b8058",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.0005_3.pt": "171bf36fc22c82c951b550f51acf9c8a04419ba8a5506bbc8b72952fd02dc57c",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.0005_3.pt": "799311476e1849794e61da5a7139ed3cf034ff69bcfae34b4c7f3df4d0e1ecf1"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.001__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.001"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s1/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s1/result.json",
+        "sha256": "bbba2545d975ae750266d9ab8af8836aba61dbae28cd709b0614491d73b0a909",
+        "terminal_sha256": "f0c1561805a9b59c91f58e6958e06a52f720aeb0e95022a504924f5b622f5c92",
+        "completed_utc": "2026-10-28T07:31:14.667430+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7609795793810238,
+          "test": 0.6217665699241468,
+          "seconds": 126.39221829000235
+        },
+        {
+          "seed": 1,
+          "validation": 0.7572667395671744,
+          "test": 0.6183433035514581,
+          "seconds": 126.49830819300041
+        },
+        {
+          "seed": 2,
+          "validation": 0.7623528215039544,
+          "test": 0.6229540493364258,
+          "seconds": 126.49712374400042
+        },
+        {
+          "seed": 3,
+          "validation": 0.7613864659359662,
+          "test": 0.6238247772007567,
+          "seconds": 126.72431759599931
+        },
+        {
+          "seed": 4,
+          "validation": 0.7631665946138392,
+          "test": 0.6229725754611988,
+          "seconds": 126.37229043700063
+        },
+        {
+          "seed": 5,
+          "validation": 0.7599623629936678,
+          "test": 0.6206581654346793,
+          "seconds": 126.94283987400195
+        },
+        {
+          "seed": 6,
+          "validation": 0.7642601022302469,
+          "test": 0.6239698232020282,
+          "seconds": 127.01609354700122
+        },
+        {
+          "seed": 7,
+          "validation": 0.7595809068484093,
+          "test": 0.6200843074234181,
+          "seconds": 126.47118591899925
+        },
+        {
+          "seed": 8,
+          "validation": 0.7602420975001907,
+          "test": 0.6198235861064908,
+          "seconds": 127.89667178400123
+        },
+        {
+          "seed": 9,
+          "validation": 0.7588179945578923,
+          "test": 0.6198547642189137,
+          "seconds": 126.98727321499973
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 215.16025686099965,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8219871520996094,
+        "refinement_validation": 0.7262162566184998,
+        "final_train_loss": 14.14929485321045,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          14,
+          10,
+          12,
+          16,
+          60,
+          1,
+          12,
+          9,
+          19,
+          3,
+          5,
+          0,
+          12,
+          7,
+          0,
+          4,
+          0,
+          1,
+          0,
+          0,
+          1,
+          5,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          11,
+          14,
+          16,
+          18,
+          19,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          33,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 215.16756516299938,
+        "loading_and_hash_seconds": 35.545481368000765,
+        "total_compute_seconds": 1482.9658877620059,
+        "worker_wall_seconds": 1518.9207449239984
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.001_1.pt": "8768512683b1b6c693e4503e796347ff8ba05e5a6ad58d26df569ab27e1d38e3",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.001_1.pt": "21799a10c715a793d9b142a9b3200f9045e7a60f6fe96ff3adfab2a2549ccfe1",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.001_1.pt": "61af1cd5c12c1a6368390aaae9323387c89d2325710bacf081d850a3b57fa7b7"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.001__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.001"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s2/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s2/result.json",
+        "sha256": "45ef5bc26be0945d416a9af9d1839637bcdc19fa25cb90ae2c819a2cd5a4da1e",
+        "terminal_sha256": "6434c6cc1e3cc015eebcfa10e65a10c6303b9717aabc6dd0a2b0fcfc49403e2a",
+        "completed_utc": "2026-10-28T07:56:41.871890+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7582839559545304,
+          "test": 0.6124357290323804,
+          "seconds": 126.11696387199845
+        },
+        {
+          "seed": 1,
+          "validation": 0.7551051547440429,
+          "test": 0.611047625244511,
+          "seconds": 125.86060400499991
+        },
+        {
+          "seed": 2,
+          "validation": 0.7556900541667726,
+          "test": 0.6160492270765188,
+          "seconds": 126.33494993799832
+        },
+        {
+          "seed": 3,
+          "validation": 0.7567327009638125,
+          "test": 0.6187065963396896,
+          "seconds": 125.83045055999901
+        },
+        {
+          "seed": 4,
+          "validation": 0.7551814459730946,
+          "test": 0.616135079849857,
+          "seconds": 125.99611426400224
+        },
+        {
+          "seed": 5,
+          "validation": 0.7587925641482084,
+          "test": 0.6148251472713955,
+          "seconds": 126.2935603779988
+        },
+        {
+          "seed": 6,
+          "validation": 0.7589451466063118,
+          "test": 0.6147713763238836,
+          "seconds": 126.64444835299946
+        },
+        {
+          "seed": 7,
+          "validation": 0.7560715103120311,
+          "test": 0.6129467789620942,
+          "seconds": 125.74544642900219
+        },
+        {
+          "seed": 8,
+          "validation": 0.7574701828446456,
+          "test": 0.6177278747236331,
+          "seconds": 126.6399046439983
+        },
+        {
+          "seed": 9,
+          "validation": 0.7552831676118302,
+          "test": 0.6174282937303527,
+          "seconds": 125.98992306500077
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 215.12147955199907,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8223431706428528,
+        "refinement_validation": 0.718002200126648,
+        "final_train_loss": 14.099112510681152,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          9,
+          10,
+          13,
+          18,
+          55,
+          0,
+          19,
+          8,
+          17,
+          5,
+          5,
+          0,
+          16,
+          8,
+          0,
+          3,
+          1,
+          1,
+          0,
+          0,
+          1,
+          3,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          5,
+          11,
+          14,
+          18,
+          19,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 215.12854356499884,
+        "loading_and_hash_seconds": 34.938507170001685,
+        "total_compute_seconds": 1476.5809090729963,
+        "worker_wall_seconds": 1511.9317789839988
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.001_2.pt": "8ba82f1513033c10708b15c6aa38a264073a1e8533efd91f728e4610ce5fdda5",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.001_2.pt": "c9483f6d797c1dbe0de447cef357e05993fef2ebb2484600d84edb8f363027c9",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.001_2.pt": "5df5399f279d0f73bead3a2f9f04c84e8da921ff8de0f3f747c5d958f67fdbfc"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.001__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.001"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s3/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.001__s3/result.json",
+        "sha256": "168ac150dc5b88566884f99a5368e5ac6a1e5ef1c76c434f7f833fd474a0a293",
+        "terminal_sha256": "02c880c4dfda8109df78f9ee76077b0fd4984f623cd6012df5a2bc6c48940746",
+        "completed_utc": "2026-10-28T08:22:12.497734+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.7678966508150445,
+          "test": 0.6163980604502932,
+          "seconds": 126.62522992899903
+        },
+        {
+          "seed": 1,
+          "validation": 0.768303537369987,
+          "test": 0.6166971895868719,
+          "seconds": 126.46628661799696
+        },
+        {
+          "seed": 2,
+          "validation": 0.7689392976120845,
+          "test": 0.617291833006415,
+          "seconds": 127.60616007599674
+        },
+        {
+          "seed": 3,
+          "validation": 0.7685832718765099,
+          "test": 0.6193482328562178,
+          "seconds": 127.48703529299746
+        },
+        {
+          "seed": 4,
+          "validation": 0.7649721537013962,
+          "test": 0.6143850388438613,
+          "seconds": 126.49765882800057
+        },
+        {
+          "seed": 5,
+          "validation": 0.7699819444091244,
+          "test": 0.6174734794005308,
+          "seconds": 125.19346404500175
+        },
+        {
+          "seed": 6,
+          "validation": 0.7718129339063652,
+          "test": 0.6195036715616303,
+          "seconds": 125.88455035299921
+        },
+        {
+          "seed": 7,
+          "validation": 0.7656842051725453,
+          "test": 0.612728984031836,
+          "seconds": 126.8281373509999
+        },
+        {
+          "seed": 8,
+          "validation": 0.7678203595859929,
+          "test": 0.6154441909528348,
+          "seconds": 127.83299100799923
+        },
+        {
+          "seed": 9,
+          "validation": 0.7670828777051598,
+          "test": 0.6150330013542145,
+          "seconds": 127.18875568200019
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 196,
+        "seconds": 216.0007565220003,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8209953904151917,
+        "refinement_validation": 0.7321414947509766,
+        "final_train_loss": 15.346023559570312,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          12,
+          10,
+          11,
+          18,
+          60,
+          3,
+          15,
+          10,
+          15,
+          6,
+          4,
+          0,
+          12,
+          6,
+          0,
+          2,
+          0,
+          2,
+          0,
+          0,
+          0,
+          4,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          11,
+          14,
+          16,
+          18,
+          19,
+          20,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          33,
+          34,
+          35,
+          37,
+          38,
+          39,
+          40,
+          41,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 216.0081957629991,
+        "loading_and_hash_seconds": 34.89970780799922,
+        "total_compute_seconds": 1483.6184649459901,
+        "worker_wall_seconds": 1518.9074178839983
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.001_3.pt": "56cc195fedc7befd282502adfc7436c200d4e4c2c3330ba1b35687ae9dbc200c",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.001_3.pt": "5795bf61a32c5bef108671503b08a086cb8d5837a6b5ec9e4c0de21eb8846468",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.001_3.pt": "7a7e0a3ccf5187553f475958f2ec1a764521ee34972a9ed82699e279a11a8a72"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.002__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.002"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s1/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s1/result.json",
+        "sha256": "c5ab062e41492f9b7dab1ef1280d6035a7b617e01937d44823a5a158efad1e5f",
+        "terminal_sha256": "3cc6899965eb7a88637be06f05d865fe771588e1ae725b0af9e481e568696eb3",
+        "completed_utc": "2026-10-28T08:47:53.699576+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.793479642957048,
+          "test": 0.6425049851090624,
+          "seconds": 127.12926442000025
+        },
+        {
+          "seed": 1,
+          "validation": 0.7897922335528825,
+          "test": 0.6415339450569362,
+          "seconds": 126.7465538159995
+        },
+        {
+          "seed": 2,
+          "validation": 0.79297103476337,
+          "test": 0.6424498585914451,
+          "seconds": 127.1093756850023
+        },
+        {
+          "seed": 3,
+          "validation": 0.7924369961600081,
+          "test": 0.6430576058553399,
+          "seconds": 126.69604981799785
+        },
+        {
+          "seed": 4,
+          "validation": 0.792716730666531,
+          "test": 0.6415709973064821,
+          "seconds": 127.22385752400442
+        },
+        {
+          "seed": 5,
+          "validation": 0.7940645423797777,
+          "test": 0.6441863438963874,
+          "seconds": 126.18718503499986
+        },
+        {
+          "seed": 6,
+          "validation": 0.7945985809831396,
+          "test": 0.6439554451217776,
+          "seconds": 126.30390539499786
+        },
+        {
+          "seed": 7,
+          "validation": 0.791699514279175,
+          "test": 0.6427385950238829,
+          "seconds": 125.86251130000164
+        },
+        {
+          "seed": 8,
+          "validation": 0.7942679856572489,
+          "test": 0.641283164587448,
+          "seconds": 125.78786102199956
+        },
+        {
+          "seed": 9,
+          "validation": 0.7942934160669328,
+          "test": 0.6439929492280254,
+          "seconds": 126.07371359399986
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 224.90639776099852,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8219871520996094,
+        "refinement_validation": 0.7397960424423218,
+        "final_train_loss": 15.654279708862305,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          23,
+          15,
+          25,
+          37,
+          115,
+          4,
+          31,
+          18,
+          30,
+          12,
+          14,
+          0,
+          28,
+          9,
+          0,
+          6,
+          1,
+          6,
+          0,
+          0,
+          2,
+          8,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          5,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          11,
+          14,
+          18,
+          19,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          30,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 224.913765092002,
+        "loading_and_hash_seconds": 35.28901282000152,
+        "total_compute_seconds": 1490.034042701005,
+        "worker_wall_seconds": 1525.7262177270022
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.002_1.pt": "f5e7f2997930ad3569220efb7c028cbac7849289b811f15ab5d75c45c8b582c8",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.002_1.pt": "b423a1de258c45da38eecbdb7433164410fd1bcfe35a9e815fc9781dbd96a291",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.002_1.pt": "4dd3e181edf94df8baae930569162777d6fede609241454483e94b433e3e6b5b"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.002__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.002"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s2/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s2/result.json",
+        "sha256": "cfd4c790223976aff0379cf0ad4952a77789275d4c2635a198c78739ff477783",
+        "terminal_sha256": "f9805cce437ba987fee1308735e0b00abf617589267b725f449c6e634f2a613c",
+        "completed_utc": "2026-10-28T09:13:19.570069+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.8017953869236834,
+          "test": 0.6451686803660581,
+          "seconds": 125.83268978099659
+        },
+        {
+          "seed": 1,
+          "validation": 0.79805711670015,
+          "test": 0.6441764030489483,
+          "seconds": 126.40378367999801
+        },
+        {
+          "seed": 2,
+          "validation": 0.8011341962719019,
+          "test": 0.6463746859031101,
+          "seconds": 125.65405828499934
+        },
+        {
+          "seed": 3,
+          "validation": 0.8002187015232815,
+          "test": 0.6449653448502569,
+          "seconds": 126.5288533990024
+        },
+        {
+          "seed": 4,
+          "validation": 0.7992777763649772,
+          "test": 0.6456666264514201,
+          "seconds": 125.42017392900016
+        },
+        {
+          "seed": 5,
+          "validation": 0.8013122091396893,
+          "test": 0.6450896054432466,
+          "seconds": 125.48153003400512
+        },
+        {
+          "seed": 6,
+          "validation": 0.8015919436462121,
+          "test": 0.6458103168825864,
+          "seconds": 125.51962833200378
+        },
+        {
+          "seed": 7,
+          "validation": 0.8003712839813849,
+          "test": 0.6460177191087035,
+          "seconds": 124.79336930700083
+        },
+        {
+          "seed": 8,
+          "validation": 0.8016936652849477,
+          "test": 0.6440815131415744,
+          "seconds": 125.43875389999448
+        },
+        {
+          "seed": 9,
+          "validation": 0.7984131424357246,
+          "test": 0.646138364848079,
+          "seconds": 126.56020399700355
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 219.08530582400272,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8223431706428528,
+        "refinement_validation": 0.7436360716819763,
+        "final_train_loss": 15.389110565185547,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          18,
+          17,
+          23,
+          43,
+          117,
+          6,
+          32,
+          22,
+          27,
+          10,
+          9,
+          1,
+          20,
+          17,
+          1,
+          6,
+          1,
+          6,
+          0,
+          0,
+          2,
+          9,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          18,
+          19,
+          22,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 219.09258005599986,
+        "loading_and_hash_seconds": 34.80826245799835,
+        "total_compute_seconds": 1476.7256247000041,
+        "worker_wall_seconds": 1511.9344813380012
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.002_2.pt": "577604cf6afd78e12f60a49b0dd4b90e18607f1c6eb8d870c3c86ac71f3fd2ff",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.002_2.pt": "506d756714b8ba1050bb41e69319d2c4d7b9cdbc8c446d11373cbd64f36aac11",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.002_2.pt": "025abbfb6cb25fc21fbb7c8c5fa8f3a9e55532cd8524e052bf48654b1723b41f"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__clustgdd__r0.002__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "clustgdd",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.002"
+      },
+      "source": "clustgdd",
+      "artifact": {
+        "path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s3/result.json",
+        "resolved_path": "runs/products_streaming_20261028/jobs/ogbn-products__clustgdd__r0.002__s3/result.json",
+        "sha256": "e7150461103db37d96f25bf53bcd8b15d15455b144cea5ad1c3a8b6353dee60c",
+        "terminal_sha256": "99718ed96816b7eaceb287ae5400c329f4c4b91425ddb68c82bc81fcdc67ab19",
+        "completed_utc": "2026-10-28T09:38:39.797535+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.800854461765379,
+          "test": 0.6438122065473132,
+          "seconds": 127.05770069299615
+        },
+        {
+          "seed": 1,
+          "validation": 0.7987945985809831,
+          "test": 0.6423563242541765,
+          "seconds": 127.32691376499861
+        },
+        {
+          "seed": 2,
+          "validation": 0.7994812196424484,
+          "test": 0.6420811435227923,
+          "seconds": 125.47361689699756
+        },
+        {
+          "seed": 3,
+          "validation": 0.7999898278361264,
+          "test": 0.6442030625943533,
+          "seconds": 125.77674321600352
+        },
+        {
+          "seed": 4,
+          "validation": 0.799608371690868,
+          "test": 0.6432921194835639,
+          "seconds": 124.92062799999985
+        },
+        {
+          "seed": 5,
+          "validation": 0.8013885003687409,
+          "test": 0.6426893426433887,
+          "seconds": 125.06492753899511
+        },
+        {
+          "seed": 6,
+          "validation": 0.8001932711135976,
+          "test": 0.6443440418853088,
+          "seconds": 124.3279959759966
+        },
+        {
+          "seed": 7,
+          "validation": 0.7978536734226788,
+          "test": 0.6439007704608621,
+          "seconds": 124.34645450599783
+        },
+        {
+          "seed": 8,
+          "validation": 0.8005747272588561,
+          "test": 0.6433540238517078,
+          "seconds": 123.63063887499447
+        },
+        {
+          "seed": 9,
+          "validation": 0.7982096991582535,
+          "test": 0.6426432532598072,
+          "seconds": 124.98469883600046
+        }
+      ],
+      "reduction": {
+        "method": "clustgdd",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 220.02285264200327,
+        "uses_test_labels": false,
+        "pretraining_steps": 80,
+        "refinement_steps": 100,
+        "uses_validation_labels": true,
+        "pretraining_validation": 0.8209953904151917,
+        "refinement_validation": 0.7498664855957031,
+        "final_train_loss": 15.599396705627441,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          24,
+          18,
+          23,
+          44,
+          118,
+          8,
+          35,
+          18,
+          28,
+          7,
+          8,
+          0,
+          21,
+          11,
+          0,
+          5,
+          1,
+          7,
+          0,
+          0,
+          3,
+          8,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          11,
+          14,
+          18,
+          19,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "hard classes"
+      },
+      "timing": {
+        "reduction_seconds": 220.03003949399863,
+        "loading_and_hash_seconds": 35.13820365599531,
+        "total_compute_seconds": 1472.9403577969788,
+        "worker_wall_seconds": 1508.4706265839995
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/clustgdd/adj_ogbn-products_0.002_3.pt": "eb1a68a5352f98f44a8c8a8d9eab9b6fbe4b5666d5f694ae0fcd02f059e5a8d2",
+        "checkpoints/reduced_graph/clustgdd/feat_ogbn-products_0.002_3.pt": "5ad23dd958c75b3d693950e481b611c6a90eadf5578c98420eaaa4f268199697",
+        "checkpoints/reduced_graph/clustgdd/label_ogbn-products_0.002_3.pt": "48d1ef1edcc522974b90ae3f9a50366280f938e693699a140840e741a41ce567"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.0005__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.0005__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__gcgp__r0.0005__s1/result.json",
+        "sha256": "8438628a535eb66fd6f368a0437e90e56f8f796c383a63de11c44c45ca2b6108",
+        "terminal_sha256": "3e25a5343d17265092094a90612ddff1214514fe0b9ff9f5ed778ed42d48af9c",
+        "completed_utc": "2026-10-13T11:11:00.789325+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.30834371741728756,
+          "test": 0.2693938026045924,
+          "seconds": 306.7925411295146
+        },
+        {
+          "seed": 1,
+          "validation": 0.3085980215141266,
+          "test": 0.255728752229348,
+          "seconds": 313.4956170897931
+        },
+        {
+          "seed": 2,
+          "validation": 0.3083691478269715,
+          "test": 0.26451510579546883,
+          "seconds": 312.0721412729472
+        },
+        {
+          "seed": 3,
+          "validation": 0.30834371741728756,
+          "test": 0.26932557224262355,
+          "seconds": 270.9781721457839
+        },
+        {
+          "seed": 4,
+          "validation": 0.30834371741728756,
+          "test": 0.26827907212130003,
+          "seconds": 314.8412544224411
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.26825693114291277,
+          "seconds": 263.6813468337059
+        },
+        {
+          "seed": 6,
+          "validation": 0.30834371741728756,
+          "test": 0.26660765418141413,
+          "seconds": 257.538903767243
+        },
+        {
+          "seed": 7,
+          "validation": 0.30834371741728756,
+          "test": 0.26939425446129417,
+          "seconds": 302.04844950232655
+        },
+        {
+          "seed": 8,
+          "validation": 0.30834371741728756,
+          "test": 0.2687390622437125,
+          "seconds": 315.71794499177486
+        },
+        {
+          "seed": 9,
+          "validation": 0.3164305876967678,
+          "test": 0.26035757228238693,
+          "seconds": 284.05349126737565
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 52.8942030640319,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.004187004175037146,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          2,
+          1,
+          10,
+          37,
+          4,
+          4,
+          0,
+          0,
+          3,
+          0,
+          10,
+          4,
+          2,
+          2,
+          0,
+          1,
+          0,
+          0,
+          0,
+          3,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          2,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          7,
+          8,
+          10,
+          15,
+          17,
+          18,
+          19,
+          22,
+          23,
+          24,
+          25,
+          26,
+          28,
+          29,
+          30,
+          31,
+          32,
+          34,
+          35,
+          38,
+          39,
+          40,
+          44,
+          45,
+          46
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 52.90552476514131,
+        "loading_and_hash_seconds": 96.76336073037237,
+        "total_compute_seconds": 2994.125387188047,
+        "worker_wall_seconds": 3091.562952749431
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.0005_1.pt": "a90a73e17055b6f3a775c909b76d59fc87657c39b76769d283596692e8448ac3",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.0005_1.pt": "c435f964e1ad5cefaee5a497c3a3f76a8907f8baa4febf29a1a86f5eac95c86c",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.0005_1.pt": "5e31fd203862209a24b9f44511b5c13e0d56583a798871d9c04a106152893202"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.0005__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.0005__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.0005__s2/result.json",
+        "sha256": "56e9bf2b2c3f0b7a174d7939e48a2ba12df446cab21e279aaaae426b9fd419b2",
+        "terminal_sha256": "3aba69a0ac646da4e6f85f2d45db1cdea94c5a0d9bf8c03284177db807357fbb",
+        "completed_utc": "2026-10-28T05:46:53.308788+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.10243369020674922,
+          "test": 0.07782644274455953,
+          "seconds": 685.4293283000588
+        },
+        {
+          "seed": 1,
+          "validation": 0.09188007018793072,
+          "test": 0.06979423801371024,
+          "seconds": 635.0863733077422
+        },
+        {
+          "seed": 2,
+          "validation": 0.12272715713450143,
+          "test": 0.08209332557947233,
+          "seconds": 497.41367828659713
+        },
+        {
+          "seed": 3,
+          "validation": 0.058693385550441214,
+          "test": 0.043054713972448484,
+          "seconds": 627.3163132769987
+        },
+        {
+          "seed": 4,
+          "validation": 0.058922259237596315,
+          "test": 0.043183944989157695,
+          "seconds": 505.27775986492634
+        },
+        {
+          "seed": 5,
+          "validation": 0.11970093838211733,
+          "test": 0.07263596481120749,
+          "seconds": 132.7961663390015
+        },
+        {
+          "seed": 6,
+          "validation": 0.09678813925692342,
+          "test": 0.07115703782628008,
+          "seconds": 133.4106308499977
+        },
+        {
+          "seed": 7,
+          "validation": 0.09162576609109173,
+          "test": 0.06982134941581707,
+          "seconds": 135.5076765140002
+        },
+        {
+          "seed": 8,
+          "validation": 0.08653968415431172,
+          "test": 0.06886522063484962,
+          "seconds": 135.03134482899986
+        },
+        {
+          "seed": 9,
+          "validation": 0.05864252473107342,
+          "test": 0.0430266988569381,
+          "seconds": 132.45789044299818
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 104.33371508866549,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.005065161734819412,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          2,
+          0,
+          5,
+          35,
+          8,
+          7,
+          1,
+          0,
+          2,
+          0,
+          8,
+          3,
+          3,
+          2,
+          0,
+          1,
+          2,
+          0,
+          0,
+          4,
+          5,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          2,
+          8,
+          10,
+          15,
+          18,
+          19,
+          22,
+          24,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          35,
+          36,
+          37,
+          39,
+          40,
+          41,
+          42,
+          43,
+          45,
+          46
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 104.36973401345313,
+        "loading_and_hash_seconds": 106.44041578399992,
+        "total_compute_seconds": 3724.0968960247737,
+        "worker_wall_seconds": 776.0753239299993
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.0005_2.pt": "b0515c210090214c23bb57af4b023d5ec0da6a7ee13dbfb37a3b6f6ac1c7b8ca",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.0005_2.pt": "e9983a29e371fa6b52dd4631cc159bef642027168f2b3161a894f708940c0c45",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.0005_2.pt": "88a5c563974f3d2093aeb6160520ac51d669835c4c44bf5068d20d07d2b7dfd6"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.0005__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.0005"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.0005__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__gcgp__r0.0005__s3/result.json",
+        "sha256": "8a904085340e2189fec85e2aa4e9b91bac0f015c30fac1a2d91bc55846f55aac",
+        "terminal_sha256": "03f0ad8eb6ca98de8664ae422e7546a80cf7a35e873c758f9f9aeca72f2da19a",
+        "completed_utc": "2026-10-13T11:48:02.612737+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 299.4636773504317
+        },
+        {
+          "seed": 1,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 257.22845330182463
+        },
+        {
+          "seed": 2,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 290.6241897447035
+        },
+        {
+          "seed": 3,
+          "validation": 0.3085980215141266,
+          "test": 0.2711058876476385,
+          "seconds": 269.6016917768866
+        },
+        {
+          "seed": 4,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 210.7901341477409
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.26939425446129417,
+          "seconds": 270.16525331512094
+        },
+        {
+          "seed": 6,
+          "validation": 0.30834371741728756,
+          "test": 0.26939063960767995,
+          "seconds": 270.3133529284969
+        },
+        {
+          "seed": 7,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 253.16791102383286
+        },
+        {
+          "seed": 8,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 206.11396452318877
+        },
+        {
+          "seed": 9,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 330.6832040036097
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 98,
+        "seconds": 35.727207558229566,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.004578467458486557,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.0005,
+        "argmax_class_histogram": [
+          5,
+          5,
+          0,
+          11,
+          32,
+          3,
+          7,
+          2,
+          1,
+          4,
+          1,
+          4,
+          1,
+          8,
+          1,
+          0,
+          1,
+          1,
+          0,
+          0,
+          7,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0
+        ],
+        "missing_argmax_classes": [
+          2,
+          15,
+          18,
+          19,
+          21,
+          23,
+          24,
+          25,
+          26,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          42,
+          43,
+          44,
+          46
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 35.747284622862935,
+        "loading_and_hash_seconds": 101.44958366639912,
+        "total_compute_seconds": 2693.8991167386994,
+        "worker_wall_seconds": 2796.0485102655366
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.0005_3.pt": "e5b1ded7920c7800091085571d097a52cb23b60fd5f89ae212924dc5425c5dd1",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.0005_3.pt": "14fea725b216fe403e367c2759e3f38774468bb909af34a44c002225989e8260",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.0005_3.pt": "f2a2fc2dabd0877b3af95421b3e32450022611aed327c567e78945bc82208532"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.001__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.001__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__gcgp__r0.001__s1/result.json",
+        "sha256": "b98b41a3e0c7e687555a9e2cb0b2f19f06af2b7d500863c33fa7a513bf1db316",
+        "terminal_sha256": "92cd37b3320c2898059ffdd9190ac85a623ed96f0865ee643d6bb41bc47fef09",
+        "completed_utc": "2026-10-13T14:46:47.392467+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.08910815553238562,
+          "test": 0.06931301062631405,
+          "seconds": 309.24946593493223
+        },
+        {
+          "seed": 1,
+          "validation": 0.13727335147369224,
+          "test": 0.10696577772897725,
+          "seconds": 336.9279021900147
+        },
+        {
+          "seed": 2,
+          "validation": 0.06428807568089921,
+          "test": 0.04658326295665203,
+          "seconds": 218.22473353520036
+        },
+        {
+          "seed": 3,
+          "validation": 0.05574345802710881,
+          "test": 0.04414007377012513,
+          "seconds": 466.4150705020875
+        },
+        {
+          "seed": 4,
+          "validation": 0.06660224296213411,
+          "test": 0.06113575989419323,
+          "seconds": 351.4690059879795
+        },
+        {
+          "seed": 5,
+          "validation": 0.05696411769193602,
+          "test": 0.04440621736747381,
+          "seconds": 229.00693126395345
+        },
+        {
+          "seed": 6,
+          "validation": 0.05571802761742491,
+          "test": 0.04413917005672157,
+          "seconds": 251.06194172333926
+        },
+        {
+          "seed": 7,
+          "validation": 0.05678610482414871,
+          "test": 0.04431268303020526,
+          "seconds": 267.29786106571555
+        },
+        {
+          "seed": 8,
+          "validation": 0.06339801134196271,
+          "test": 0.05052074225596688,
+          "seconds": 259.9681260539219
+        },
+        {
+          "seed": 9,
+          "validation": 0.07250209800879892,
+          "test": 0.048987140610124026,
+          "seconds": 252.30159056186676
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 197,
+        "seconds": 36.00603420473635,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.004124554339796305,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          10,
+          2,
+          1,
+          25,
+          65,
+          10,
+          11,
+          2,
+          1,
+          4,
+          2,
+          14,
+          7,
+          8,
+          6,
+          0,
+          2,
+          0,
+          1,
+          0,
+          5,
+          7,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          0,
+          3,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          2,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "missing_argmax_classes": [
+          15,
+          17,
+          19,
+          22,
+          23,
+          24,
+          25,
+          28,
+          30,
+          31,
+          35,
+          39,
+          40,
+          42,
+          43,
+          44,
+          45,
+          46
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 36.01517480798066,
+        "loading_and_hash_seconds": 129.8370709931478,
+        "total_compute_seconds": 2977.937803626992,
+        "worker_wall_seconds": 3108.3850964764133
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.001_1.pt": "e0fafab38d1af525345fc6477e0f49d5d61444bb73d0fbd6c7a8f603b3b29b94",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.001_1.pt": "59c0dbdb8bca3f1306ecd5cfa449f7745e5d44cf92d5384372ba1bcf639d4f68",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.001_1.pt": "96ddbb79dc9def77586a6d8230ea28f7e2eb85c4190a0a734ba88b938ed1ffa4"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.001__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.001__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.001__s2/result.json",
+        "sha256": "0fcdc93a89bc060e4fb87a94a8c51ef847d25d3209cd34242cecd1445fa43e5a",
+        "terminal_sha256": "a95f96121561de74b01c6d66051aba6d5def71a11e0a52318183e4be4b6965ed",
+        "completed_utc": "2026-10-28T05:51:03.047018+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.3082928565979198,
+          "test": 0.2693314463797467,
+          "seconds": 355.8374478118494
+        },
+        {
+          "seed": 1,
+          "validation": 0.309004908069069,
+          "test": 0.26815029296129256,
+          "seconds": 283.85159726720303
+        },
+        {
+          "seed": 2,
+          "validation": 0.345370393917046,
+          "test": 0.27444194567688357,
+          "seconds": 588.80057990551
+        },
+        {
+          "seed": 3,
+          "validation": 0.27459756376675226,
+          "test": 0.2232163069661392,
+          "seconds": 564.1889672940597
+        },
+        {
+          "seed": 4,
+          "validation": 0.3101238460951606,
+          "test": 0.268301664956389,
+          "seconds": 450.25991050712764
+        },
+        {
+          "seed": 5,
+          "validation": 0.08971848536479922,
+          "test": 0.08819474662361376,
+          "seconds": 496.7564578047022
+        },
+        {
+          "seed": 6,
+          "validation": 0.23673168374742515,
+          "test": 0.16353868864859147,
+          "seconds": 454.6756729744375
+        },
+        {
+          "seed": 7,
+          "validation": 0.09556747959209623,
+          "test": 0.057073116288485194,
+          "seconds": 132.11794729399844
+        },
+        {
+          "seed": 8,
+          "validation": 0.31452330697047526,
+          "test": 0.26360777753829373,
+          "seconds": 130.35761981000178
+        },
+        {
+          "seed": 9,
+          "validation": 0.05963431070874552,
+          "test": 0.04382919635930018,
+          "seconds": 145.81945872199867
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 197,
+        "seconds": 44.62446602340788,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.005125254858285189,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          9,
+          5,
+          0,
+          18,
+          66,
+          10,
+          11,
+          1,
+          0,
+          3,
+          4,
+          16,
+          4,
+          11,
+          7,
+          2,
+          2,
+          2,
+          0,
+          0,
+          5,
+          7,
+          0,
+          2,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          1
+        ],
+        "missing_argmax_classes": [
+          2,
+          8,
+          18,
+          19,
+          22,
+          26,
+          27,
+          30,
+          34,
+          35,
+          36,
+          40,
+          41,
+          42,
+          43,
+          45
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 44.63482069596648,
+        "loading_and_hash_seconds": 40.7869364750004,
+        "total_compute_seconds": 3647.300480086855,
+        "worker_wall_seconds": 449.42828509600076
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.001_2.pt": "4a0e2a9f83a64c2e574f41a26d20c6e5af2cf6cdfbe316e21485781178a75194",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.001_2.pt": "d93308e3f69a4b1a9a7ccf1a0a25e584d13b11ec36d92eb789b3bec2dc76c08c",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.001_2.pt": "7ea5664837b53449ceeaa23bf18ca21d5c5bc2619e5545a0640ed2b909b3329a"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.001__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.001"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.001__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__gcgp__r0.001__s3/result.json",
+        "sha256": "a5c6477c19faa1a2fd88ba531900c59d1bd374b6e491a1305d613496a0e2dfd4",
+        "terminal_sha256": "f25bfaf5d62d7d439479d1221f8c3dcde1687f6aa07be4116fceb452185f1ff9",
+        "completed_utc": "2026-10-13T15:10:31.686220+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.3085725911044427,
+          "test": 0.2694141361561725,
+          "seconds": 254.43959618918598
+        },
+        {
+          "seed": 1,
+          "validation": 0.31093761920504537,
+          "test": 0.24644219329435615,
+          "seconds": 268.5746437376365
+        },
+        {
+          "seed": 2,
+          "validation": 0.30834371741728756,
+          "test": 0.26889676023263387,
+          "seconds": 258.7282085651532
+        },
+        {
+          "seed": 3,
+          "validation": 0.30834371741728756,
+          "test": 0.2693910914643817,
+          "seconds": 254.16461712960154
+        },
+        {
+          "seed": 4,
+          "validation": 0.30834371741728756,
+          "test": 0.26936714305918735,
+          "seconds": 276.74443334620446
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.2691091328824707,
+          "seconds": 252.49528708308935
+        },
+        {
+          "seed": 6,
+          "validation": 0.30834371741728756,
+          "test": 0.2693919951777853,
+          "seconds": 208.98500570002943
+        },
+        {
+          "seed": 7,
+          "validation": 0.30849629987539096,
+          "test": 0.2594330734705441,
+          "seconds": 213.80944523401558
+        },
+        {
+          "seed": 8,
+          "validation": 0.30834371741728756,
+          "test": 0.2692871644229722,
+          "seconds": 223.0558647979051
+        },
+        {
+          "seed": 9,
+          "validation": 0.30834371741728756,
+          "test": 0.2690680139226087,
+          "seconds": 245.86241033952683
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 197,
+        "seconds": 28.021826554089785,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.0045957318507134914,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.001,
+        "argmax_class_histogram": [
+          7,
+          5,
+          0,
+          19,
+          66,
+          13,
+          14,
+          3,
+          1,
+          2,
+          2,
+          11,
+          4,
+          17,
+          5,
+          1,
+          1,
+          2,
+          0,
+          0,
+          7,
+          8,
+          1,
+          1,
+          1,
+          1,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          2,
+          0
+        ],
+        "missing_argmax_classes": [
+          2,
+          18,
+          19,
+          26,
+          28,
+          29,
+          30,
+          31,
+          32,
+          34,
+          35,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          46
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 28.03218093700707,
+        "loading_and_hash_seconds": 66.50944991502911,
+        "total_compute_seconds": 2484.891693059355,
+        "worker_wall_seconds": 2552.060703234747
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.001_3.pt": "f49c88ae067d3c4d9f0b3d8d12e6e0a16458e01fa64757263aefaaa95da3c7c6",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.001_3.pt": "4d3021be92ebabe33d1ec3e92be1945a279d189c55b162e570ee7548b27afb03",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.001_3.pt": "f26a07f6c65a3980a2da156a007aae90a0086fbe27505451af3061a3f2465743"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.002__s1",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 1,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.002__s1/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.002__s1/result.json",
+        "sha256": "27d4824efaeb8ffdaed525e062e8b687193f3fd31172b5c165151b1765a05279",
+        "terminal_sha256": "f77c7b1bcc9ee3ca424008e700a710fb19192031cab45541b0ae80ea66b1807f",
+        "completed_utc": "2026-10-28T05:50:39.503093+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.30834371741728756,
+          "test": 0.26939425446129417,
+          "seconds": 198.88431557640433
+        },
+        {
+          "seed": 1,
+          "validation": 0.30834371741728756,
+          "test": 0.2692754161487259,
+          "seconds": 239.7487204214558
+        },
+        {
+          "seed": 2,
+          "validation": 0.30834371741728756,
+          "test": 0.2692108006403713,
+          "seconds": 236.90666572470218
+        },
+        {
+          "seed": 3,
+          "validation": 0.30834371741728756,
+          "test": 0.26939063960767995,
+          "seconds": 491.2723752884194
+        },
+        {
+          "seed": 4,
+          "validation": 0.3083691478269715,
+          "test": 0.2692939422734989,
+          "seconds": 447.9794942867011
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.2693450020808001,
+          "seconds": 383.8369270032272
+        },
+        {
+          "seed": 6,
+          "validation": 0.30834371741728756,
+          "test": 0.2682072269057169,
+          "seconds": 408.0009271232411
+        },
+        {
+          "seed": 7,
+          "validation": 0.30834371741728756,
+          "test": 0.2693341575199574,
+          "seconds": 352.63460963685066
+        },
+        {
+          "seed": 8,
+          "validation": 0.30834371741728756,
+          "test": 0.2693404835137823,
+          "seconds": 409.215651887469
+        },
+        {
+          "seed": 9,
+          "validation": 0.30834371741728756,
+          "test": 0.269365787489082,
+          "seconds": 129.77808668299986
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 54.17200097814202,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.004192899446934462,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          13,
+          14,
+          0,
+          48,
+          144,
+          20,
+          25,
+          1,
+          2,
+          8,
+          3,
+          21,
+          14,
+          20,
+          11,
+          2,
+          2,
+          2,
+          1,
+          0,
+          14,
+          10,
+          0,
+          2,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          2,
+          0,
+          0,
+          1,
+          2,
+          1,
+          2,
+          0,
+          0,
+          0,
+          2,
+          1,
+          0,
+          1,
+          1
+        ],
+        "missing_argmax_classes": [
+          2,
+          19,
+          22,
+          25,
+          26,
+          27,
+          29,
+          31,
+          33,
+          34,
+          39,
+          40,
+          41,
+          44
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 54.18148145172745,
+        "loading_and_hash_seconds": 35.79870318900066,
+        "total_compute_seconds": 3352.439255083198,
+        "worker_wall_seconds": 165.83061750200068
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.002_1.pt": "c17fd18147fc4caf8d4ca29775b8868eb919544de25e1236b7672829caff57fd",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.002_1.pt": "a08c5e160b103c01dbb28f7ff3d5d0411650d02bcf07fa76660dd49520d1ce2a",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.002_1.pt": "f25f8b25d538c4b8f4a01c7495d64c5bf208c774097cc00ed6760d357e6abb4c"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.002__s2",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 2,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.002__s2/result.json",
+        "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/ogbn-products__gcgp__r0.002__s2/result.json",
+        "sha256": "829ade0c9e4dfa48963e83d5d0edb1e0de8e5c35d4220ad4f36f41160204a6f4",
+        "terminal_sha256": "a419cbff5f941bc3e64c55d15c5c6b010f58633e95480c853dd2638a704874ff",
+        "completed_utc": "2026-10-13T18:22:34.740165+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.3198636930040943,
+          "test": 0.25526469539661945,
+          "seconds": 223.20315614063293
+        },
+        {
+          "seed": 1,
+          "validation": 0.314599598199527,
+          "test": 0.2691466369887185,
+          "seconds": 219.9368082312867
+        },
+        {
+          "seed": 2,
+          "validation": 0.3204994532461918,
+          "test": 0.2633077446883115,
+          "seconds": 300.4039886696264
+        },
+        {
+          "seed": 3,
+          "validation": 0.3083691478269715,
+          "test": 0.2688710044006324,
+          "seconds": 399.6558148879558
+        },
+        {
+          "seed": 4,
+          "validation": 0.3099458332273733,
+          "test": 0.2559641695709756,
+          "seconds": 369.8315466167405
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.2693933507478906,
+          "seconds": 424.22244971990585
+        },
+        {
+          "seed": 6,
+          "validation": 0.3083691478269715,
+          "test": 0.26885609312947367,
+          "seconds": 387.7107916455716
+        },
+        {
+          "seed": 7,
+          "validation": 0.31495562393510157,
+          "test": 0.24670336646798527,
+          "seconds": 366.3401413531974
+        },
+        {
+          "seed": 8,
+          "validation": 0.3143961549220558,
+          "test": 0.2680237730847941,
+          "seconds": 403.4912808127701
+        },
+        {
+          "seed": 9,
+          "validation": 0.32021971873966887,
+          "test": 0.2542837144970541,
+          "seconds": 402.6815751940012
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 19.89080665074289,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.005029131658375263,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          18,
+          12,
+          3,
+          34,
+          133,
+          23,
+          22,
+          1,
+          2,
+          7,
+          10,
+          28,
+          7,
+          25,
+          10,
+          5,
+          2,
+          3,
+          0,
+          0,
+          12,
+          18,
+          1,
+          0,
+          2,
+          1,
+          1,
+          0,
+          0,
+          1,
+          0,
+          2,
+          1,
+          2,
+          1,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          0,
+          2
+        ],
+        "missing_argmax_classes": [
+          18,
+          19,
+          23,
+          27,
+          28,
+          30,
+          35,
+          38,
+          39,
+          40,
+          43,
+          44,
+          45
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 19.897851896472275,
+        "loading_and_hash_seconds": 51.63717912044376,
+        "total_compute_seconds": 3517.375405168161,
+        "worker_wall_seconds": 3569.8360442128032
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.002_2.pt": "c7b76c703ce4cde07c4d1e05841688fa0c0a9db2274e34b348089d8596db5367",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.002_2.pt": "772f5fc91b0c57fb7a1bece86210b23670aff6c1759614b6ada309988c22f19e",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.002_2.pt": "ef63981b4d5c67d6fffc1c5896105dbefab51dbf09bfd2db94d481e87943d4d4"
+      }
+    },
+    {
+      "job": {
+        "id": "ogbn-products__gcgp__r0.002__s3",
+        "stage": 3,
+        "dataset": "ogbn-products",
+        "method": "gcgp",
+        "kind": "reduction",
+        "seed": 3,
+        "rate": "0.002"
+      },
+      "source": "expansion",
+      "artifact": {
+        "path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.002__s3/result.json",
+        "resolved_path": "runs/dataset_expansion_20261028_resume/jobs/ogbn-products__gcgp__r0.002__s3/result.json",
+        "sha256": "4e9d0c833166189d376a25add0caa895b3f555cc9600c3b93a400719c556ba31",
+        "terminal_sha256": "e055750dd1827155f5a76a022dd165c18fb858fcb2127a72618e8324c1145789",
+        "completed_utc": "2026-10-28T05:51:26.628544+00:00"
+      },
+      "gpu_name": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation": 0.30834371741728756,
+          "test": 0.26939470631799595,
+          "seconds": 374.63625850435346
+        },
+        {
+          "seed": 1,
+          "validation": 0.30941179462401136,
+          "test": 0.2687652699324158,
+          "seconds": 367.1279565989971
+        },
+        {
+          "seed": 2,
+          "validation": 0.30834371741728756,
+          "test": 0.26913940728149,
+          "seconds": 401.43088029511273
+        },
+        {
+          "seed": 3,
+          "validation": 0.30834371741728756,
+          "test": 0.26937301719631046,
+          "seconds": 381.77539603970945
+        },
+        {
+          "seed": 4,
+          "validation": 0.30834371741728756,
+          "test": 0.2693725653396087,
+          "seconds": 386.8884400045499
+        },
+        {
+          "seed": 5,
+          "validation": 0.30834371741728756,
+          "test": 0.26894917561004045,
+          "seconds": 410.7414351180196
+        },
+        {
+          "seed": 6,
+          "validation": 0.30834371741728756,
+          "test": 0.2685727789774573,
+          "seconds": 401.12311114463955
+        },
+        {
+          "seed": 7,
+          "validation": 0.30834371741728756,
+          "test": 0.2683351023523208,
+          "seconds": 311.9777651419863
+        },
+        {
+          "seed": 8,
+          "validation": 0.30834371741728756,
+          "test": 0.269365787489082,
+          "seconds": 311.564455431886
+        },
+        {
+          "seed": 9,
+          "validation": 0.3084200086463393,
+          "test": 0.26901333926169324,
+          "seconds": 141.72397301099772
+        }
+      ],
+      "reduction": {
+        "method": "gcgp",
+        "setting": "trans",
+        "synthetic_nodes": 393,
+        "seconds": 79.97969937231392,
+        "uses_test_labels": false,
+        "gnn_training_steps": 0,
+        "optimization_steps": 200,
+        "kernel": "SGNK",
+        "arithmetic": "package",
+        "training_batch_size": 1024,
+        "final_train_loss": 0.004692495334893465,
+        "training_nodes": 196615,
+        "requested_training_rate": 0.002,
+        "argmax_class_histogram": [
+          13,
+          14,
+          3,
+          43,
+          125,
+          24,
+          27,
+          1,
+          3,
+          8,
+          5,
+          25,
+          10,
+          23,
+          13,
+          1,
+          1,
+          3,
+          0,
+          2,
+          20,
+          8,
+          1,
+          1,
+          1,
+          1,
+          0,
+          2,
+          2,
+          1,
+          1,
+          0,
+          0,
+          0,
+          2,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          2,
+          2,
+          2
+        ],
+        "missing_argmax_classes": [
+          18,
+          26,
+          31,
+          32,
+          33,
+          35,
+          36,
+          38,
+          39,
+          41,
+          43
+        ],
+        "label_type": "continuous optimized targets"
+      },
+      "timing": {
+        "reduction_seconds": 79.99444064125419,
+        "loading_and_hash_seconds": 70.02248598400183,
+        "total_compute_seconds": 3568.984111931506,
+        "worker_wall_seconds": 211.97675913299827
+      },
+      "checkpoint_sha256": {
+        "checkpoints/reduced_graph/gcgp/adj_ogbn-products_0.002_3.pt": "d609a2f2a43cde8689be9670097130411282cd12ef0381d30a22f9404ed76103",
+        "checkpoints/reduced_graph/gcgp/feat_ogbn-products_0.002_3.pt": "beb5cb6f90a95c9cba907ccf70f3ae43b248adfde4c04f8d659c74e5a6248b85",
+        "checkpoints/reduced_graph/gcgp/label_ogbn-products_0.002_3.pt": "283d46a1c3340947e6c8635f358b14d8a5c75ba7de7eb5e422f21e3543300538"
+      }
+    }
+  ],
+  "cuda_graph": {
+    "source": "expansion",
+    "artifact": {
+      "path": "runs/dataset_expansion_20261028_resume/jobs/parity__ogbn-products/result.json",
+      "resolved_path": "runs/dataset_expansion_20261012_v3/jobs/parity__ogbn-products/result.json",
+      "sha256": "de7b35b4d27c5cdcbbaac46feb84ac6a46d298b9270a9a969a8f6fe7f2df5269",
+      "terminal_sha256": "69c188e5479c93715b7d304d80da318a8c0e2334eeb0a5136020e7ab44adb24e",
+      "completed_utc": "2026-10-13T20:36:18.007735+00:00"
+    },
+    "passed": true,
+    "rows": [
+      {
+        "seed": 1,
+        "warm_seconds": {
+          "eager": [
+            2.2051814682781696,
+            1.7584457928314805,
+            1.0735145509243011
+          ],
+          "capture": [
+            0.7911196453496814,
+            0.4647946022450924,
+            0.782502462156117
+          ]
+        },
+        "graph_setup_seconds": [
+          0.6570763327181339,
+          0.5360762504860759,
+          0.5388334980234504
+        ],
+        "warm_speedup": 2.247207999814131,
+        "speedup_including_setup": 1.330809003784708,
+        "loss_histories_exact": true,
+        "parameter_hashes_exact": true,
+        "downstream_exact": true,
+        "downstream": {
+          "eager": [
+            0.30834371741728756,
+            0.26939425446129417
+          ],
+          "capture": [
+            0.30834371741728756,
+            0.26939425446129417
+          ]
+        },
+        "parameter_hashes": {
+          "eager": [
+            "ec8b93f78c082d19bc238493689483ef5bae38ae0ca3e611b5f546f67dc114f6",
+            "8fc04c8befca18c154b875e74031929d74a40560e7e6c4c14b47d1f3752afc47"
+          ],
+          "capture": [
+            "ec8b93f78c082d19bc238493689483ef5bae38ae0ca3e611b5f546f67dc114f6",
+            "8fc04c8befca18c154b875e74031929d74a40560e7e6c4c14b47d1f3752afc47"
+          ]
+        },
+        "loss_history_sha256": {
+          "eager": [
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553",
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553",
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553"
+          ],
+          "capture": [
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553",
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553",
+            "e3beef7133bf7754bd62b5e2349240b1adb5771643071289583fd708730bf553"
+          ]
+        },
+        "median_eager_loop_seconds": 1.7584457928314805,
+        "median_capture_loop_plus_median_setup_seconds": 1.3213359601795673
+      },
+      {
+        "seed": 2,
+        "warm_seconds": {
+          "eager": [
+            1.765157738700509,
+            1.7201666301116347,
+            1.2867558551952243
+          ],
+          "capture": [
+            0.6545594949275255,
+            0.5237816497683525,
+            0.6489139990881085
+          ]
+        },
+        "graph_setup_seconds": [
+          0.6760648479685187,
+          0.5881064934656024,
+          0.5619091223925352
+        ],
+        "warm_speedup": 2.6508391443687644,
+        "speedup_including_setup": 1.390572460574614,
+        "loss_histories_exact": true,
+        "parameter_hashes_exact": true,
+        "downstream_exact": true,
+        "downstream": {
+          "eager": [
+            0.11026625638939043,
+            0.08338292460635373
+          ],
+          "capture": [
+            0.11026625638939043,
+            0.08338292460635373
+          ]
+        },
+        "parameter_hashes": {
+          "eager": [
+            "9a72cada2b943acc5fb186f0f1a754dee195613d37ffcd3935bef8bd0914186c",
+            "3a53204c0fa7940bb6d259d9631afcd7ec4ea8b23825c64a98eac3d4bb49e093"
+          ],
+          "capture": [
+            "9a72cada2b943acc5fb186f0f1a754dee195613d37ffcd3935bef8bd0914186c",
+            "3a53204c0fa7940bb6d259d9631afcd7ec4ea8b23825c64a98eac3d4bb49e093"
+          ]
+        },
+        "loss_history_sha256": {
+          "eager": [
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed",
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed",
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed"
+          ],
+          "capture": [
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed",
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed",
+            "9e14b38bb48706d80f681f8d87ac897df20590fcf85e168342695a22a09dc4ed"
+          ]
+        },
+        "median_eager_loop_seconds": 1.7201666301116347,
+        "median_capture_loop_plus_median_setup_seconds": 1.237020492553711
+      },
+      {
+        "seed": 3,
+        "warm_seconds": {
+          "eager": [
+            1.235913903452456,
+            1.5152036091312766,
+            1.612168688327074
+          ],
+          "capture": [
+            0.4996041674166918,
+            0.5209567816928029,
+            0.6354116480797529
+          ]
+        },
+        "graph_setup_seconds": [
+          0.6053074495866895,
+          0.5761596309021115,
+          0.5343250017613173
+        ],
+        "warm_speedup": 2.9085015540209627,
+        "speedup_including_setup": 1.3810782445114431,
+        "loss_histories_exact": true,
+        "parameter_hashes_exact": true,
+        "downstream_exact": true,
+        "downstream": {
+          "eager": [
+            0.30834371741728756,
+            0.26939470631799595
+          ],
+          "capture": [
+            0.30834371741728756,
+            0.26939470631799595
+          ]
+        },
+        "parameter_hashes": {
+          "eager": [
+            "ecf009ed22a1f188025c576b25e24b5d707fc2570eeb31cc8ff330b0be9ddd9c",
+            "8982ef39b6a2792e8824fca20aa21a90956cceb5abb8b4ae0cebe2cb416c650c"
+          ],
+          "capture": [
+            "ecf009ed22a1f188025c576b25e24b5d707fc2570eeb31cc8ff330b0be9ddd9c",
+            "8982ef39b6a2792e8824fca20aa21a90956cceb5abb8b4ae0cebe2cb416c650c"
+          ]
+        },
+        "loss_history_sha256": {
+          "eager": [
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab",
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab",
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab"
+          ],
+          "capture": [
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab",
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab",
+            "26a9a679adfcf79c15cc8ac83ebb1f30f687c99e45fe23714e61ae527b0e83ab"
+          ]
+        },
+        "median_eager_loop_seconds": 1.5152036091312766,
+        "median_capture_loop_plus_median_setup_seconds": 1.0971164125949144
+      }
+    ],
+    "author_commit": "d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb",
+    "steps": 200,
+    "repeats": 3,
+    "batch_size": 1024,
+    "synthetic_nodes": 393,
+    "precision": "float32",
+    "default_changed": false,
+    "scope": "paired author SGNK/GP arithmetic in shared package preprocessing and GCN evaluation; not author-repository end-to-end or package-default speedup"
+  },
+  "validation": {
+    "complete_result_files": 38,
+    "accuracy_cells": 13,
+    "accuracy_evaluations": 370,
+    "dataset_hashes_match": true,
+    "gpu_family_runtime_and_protocol_match": true,
+    "summary_statistics_recomputed": true,
+    "source_archives_verified": true,
+    "paired_setup_inclusive_speedups_recomputed": true
+  }
+}

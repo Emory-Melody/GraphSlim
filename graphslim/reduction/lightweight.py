@@ -7,6 +7,7 @@ import numpy as np
 import scipy.sparse as sp
 import torch
 from sklearn.cluster import KMeans, MiniBatchKMeans
+from graphslim.reduction.cluster_ops import fitted_labels
 
 
 def as_csr(adj):
@@ -93,7 +94,7 @@ def cluster(features, size, seed, *, minibatch=False):
         if minibatch
         else KMeans(n_clusters=size, random_state=seed, n_init=10, max_iter=300, tol=1e-4)
     )
-    labels = estimator.fit_predict(features)
+    labels = fitted_labels(estimator, features)
     counts = np.bincount(labels, minlength=size)
     for empty in np.flatnonzero(counts == 0):
         donor = int(np.argmax(counts))

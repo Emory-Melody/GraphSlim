@@ -28,6 +28,7 @@ from benchmark.reproduce import RATES
 
 ROOT = Path(__file__).resolve().parents[1]
 METHODS = ("cgc", "clustgdd", "gcgp", "nope", "random")
+OPTIONAL_METHODS = ("gecc", "clustering", "vng")
 STAGES = (
     ("cora", "citeseer", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp"),
     ("roman-empire", "amazon-ratings"),
@@ -108,6 +109,8 @@ def initialize(options):
     folder = options.run_dir
     folder.mkdir(parents=True, exist_ok=True)
     jobs = plan(options.datasets, options.methods, options.seeds)
+    if getattr(options, "reductions_only", False):
+        jobs = [job for job in jobs if job["kind"] == "reduction"]
     protocol = dict(
         reduction_seeds=options.seeds,
         evaluation_seeds=options.eval_seeds,
@@ -135,6 +138,11 @@ def initialize(options):
         settings="original package trans/ind settings; new datasets transductive",
         comparison_scope="new source/budgets only; no pooling of historical batches",
     )
+    if "gecc" in options.methods:
+        protocol["implementation_notes"] = {
+            "gecc": "Full normalized sparse propagation on Products replaces the legacy sampled overwrite branch; bounded exact squared-distance arithmetic; sparse diagnostic assignments use original node IDs.",
+            "cluster_ops": "Native sklearn algorithms/restarts retained; segmented and sparse aggregation can change floating-point summation order. See operator validation; no historical source pooling.",
+        }
     if (folder / "manifest.json").exists():
         manifest = nr.read_json(folder / "manifest.json")
         if manifest["jobs"] != jobs or manifest["protocol"] != protocol:
@@ -394,6 +402,12 @@ def export(folder, manifest):
             "",
             f"Complete cells inherited from `{manifest['inheritance']['run_dir']}` retain their original source hash. Only whole complete seed groups are reused; incomplete groups are not spliced. The archived package mathematics outside the OGB loader are identical. See manifest inheritance audit.",
         ]
+    if manifest.get("continuation"):
+        continuation = manifest["continuation"]
+        lines += [
+            "",
+            f"Evaluation-only continuation of `{continuation['parent']}`: {len(continuation['jobs'])} timed-out jobs reuse hash-verified reductions and completed fits. The original terminal records remain archived. Frozen computation, data and seeds are unchanged; the new per-attempt wall limit is {manifest['protocol']['timeout_seconds']} seconds. Runtime totals retain saved successful work but exclude interrupted attempts; see the continuation manifest for original outcomes and limits.",
+        ]
     lines += [
         "",
         "NOPE is the existing training-budget condensation adapter, not the original-node classifier from its paper. Unreachable targets, unlabeled-supernode filtering and class loss remain disclosed in per-job metadata. Timeout/resource failures are unavailable, never zero. GPU peaks are allocator peaks; per-job RSS is process peak, including data and training. Three stages execute in order after all prior-stage jobs are terminal, including retained failures.",
@@ -428,6 +442,12 @@ def worker(options, manifest, job):
     wall_started = time.monotonic()
     if nr.source_digest(science_files()) != manifest["source_sha256"]:
         raise RuntimeError("Frozen source digest mismatch")
+    gpu_uuid = str(torch.cuda.get_device_properties(0).uuid)
+    requested_gpu = os.environ.get("CUDA_VISIBLE_DEVICES", "")
+    if requested_gpu.startswith("GPU-") and (
+        gpu_uuid.removeprefix("GPU-") != requested_gpu.removeprefix("GPU-")
+    ):
+        raise RuntimeError("Visible CUDA device differs from the locked GPU UUID")
     protocol = manifest["protocol"]
     torch.set_num_threads(protocol["threads"])
     args = get_args(
@@ -496,6 +516,7 @@ def worker(options, manifest, job):
         data=data,
         protocol=protocol,
         gpu_name=torch.cuda.get_device_name(0),
+        gpu_uuid=gpu_uuid,
         evaluations=[],
         runtime=dict(torch=torch.__version__, cuda=torch.version.cuda),
         reduction=dict(synthetic_nodes=graph.num_nodes, uses_test_labels=False),
@@ -697,7 +718,8 @@ def manage(options, manifest):
                 log = (job_folder / "worker.log").open("a")
                 env = os.environ.copy()
                 env.update(
-                    CUDA_VISIBLE_DEVICES=str(gpu),
+                    CUDA_VISIBLE_DEVICES=inventory[gpu]["uuid"],
+                    CUDA_DEVICE_ORDER="PCI_BUS_ID",
                     PYTHONPATH=str(frozen),
                     PYTHONDONTWRITEBYTECODE="1",
                     OMP_NUM_THREADS=str(options.threads),
@@ -722,6 +744,16 @@ def manage(options, manifest):
                     stdout=log,
                     stderr=subprocess.STDOUT,
                     start_new_session=True,
+                )
+                nr.write_json(
+                    job_folder / "launch.json",
+                    dict(
+                        pid=process.pid,
+                        physical_gpu=gpu,
+                        gpu_uuid=inventory[gpu]["uuid"],
+                        utc=nr.utcnow(),
+                        command=command,
+                    ),
                 )
                 active[gpu] = dict(
                     process=process, job=job, started=time.monotonic(), log=log, handles=handles
@@ -837,7 +869,9 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--datasets", nargs="+")
-    parser.add_argument("--methods", nargs="+", choices=METHODS, default=list(METHODS))
+    parser.add_argument(
+        "--methods", nargs="+", choices=METHODS + OPTIONAL_METHODS, default=list(METHODS)
+    )
     parser.add_argument("--seeds", type=int, nargs="+", default=[1, 2, 3])
     parser.add_argument("--eval-seeds", type=int, nargs="+", default=list(range(10)))
     parser.add_argument("--gpus", type=int, nargs="+", default=[3, 4, 5])
@@ -847,6 +881,11 @@ def main(argv=None):
     parser.add_argument("--timeout", type=int, default=14400)
     parser.add_argument("--max-rss-gib", type=float, default=160)
     parser.add_argument("--inherit-run", type=Path)
+    parser.add_argument(
+        "--reductions-only",
+        action="store_true",
+        help="Run only selected reductions; omit whole-graph and parity jobs",
+    )
     parser.add_argument("--worker")
     parser.add_argument("--initialize-only", action="store_true")
     parser.add_argument("--export", action="store_true")
