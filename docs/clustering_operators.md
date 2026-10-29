@@ -68,24 +68,8 @@ observed CPU check, and ClusteringAgg's maximum feature difference was 1.79e-7.
 This does not establish identical large-graph final scores, which require the
 new complete seed grid.
 
-Paired operator checks use three timed repeats after warmup. The following are
-isolated measurements from `runs/cluster_ops_20261028/gpu/validation.json` on
-fixed synthetic inputs; CPU-native operators run on four CPU threads even in
-that GPU validation process. They are not end-to-end Products speedups.
-
-| Operator | Backend | Measured speed ratio | Additional GPU allocation before → after |
-| --- | --- | ---: | ---: |
-| GECC squared distances | CUDA | 1.33× | 256.0 → 64.6 MiB |
-| CGC weighted centers | CUDA | 117.82× | 0.19 → 8.28 MiB |
-| ClusteringAgg propagation | CUDA | 15.44× | 18.57 → 1.50 MiB |
-| GECC weighted hops | CUDA | 1.02× | 3.00 → 1.50 MiB |
-| Clustering fit/label reuse | CPU | 1.22× | — |
-| VNG weighted membership | CPU | 6.92× | — |
-
-CPU operator measurements are separately retained in
-`runs/cluster_ops_20261028/cpu/validation.json`; GECC weighted-hop accumulation
-was slightly slower there (0.96×), while reducing retained hop storage. Speed
-and memory tradeoffs depend on shape and device; no universal speedup is claimed.
+The verifier records numerical differences, per-repeat timings and peak CUDA
+allocations in its output directory.
 
 ```bash
 .venv-gpu/bin/python -m benchmark.verify_cluster_ops \
