@@ -4,7 +4,7 @@ GraphSlim uses native PyTorch CUDA Graphs to reduce launch overhead in repeated,
 fixed-shape computation. The same implementation targets A100 and newer NVIDIA
 GPUs across Ampere, Ada, Hopper and Blackwell. PyTorch supplies the kernels and
 capture API; GraphSlim requires no architecture-specific extension or NVCC build.
-[GPU setup and checks](compatibility.md#gpu-portability).
+[GPU setup and checks](compatibility.md).
 
 The backend connects to the shared training APIs used by 40 reduction methods
 and seven downstream GNNs. GAT's dynamic attention uses eager execution.
@@ -19,8 +19,7 @@ python -m examples.train_lightweight -D cora -M clustgdd -G 0 --cuda_graph
 `--no_cuda_graph` explicitly restores the default. Stages with fewer than
 `--cuda_graph_min_steps` updates remain eager; the default is 64. Native capture
 uses `--cuda_graph_warmup` warmups, default 3. Short diagnostics may lower the
-threshold. [Products measurements](products.md#cuda-graph-timing) include setup
-time for the 200-update optimization loop.
+threshold.
 
 ## Captured stages
 
@@ -96,7 +95,7 @@ graph metadata. Only detached original statistics from a fixed full training
 batch are cached. Random minibatches do not reuse a full-graph diagonal cache.
 Historical accuracy tables remain tied to their original source and arithmetic.
 
-## Validation and timing scope
+## Validation
 
 The integrated CUDA audit completed all 280 clean method/model pairs and 336
 noise pairs (six corruptions, four lightweight method tags, seven models,
@@ -105,28 +104,6 @@ and validation/test scores matched exactly under the declared deterministic
 Torch/CuBLAS setting. Six model architectures captured in every clean method tag;
 GAT remained eager. The [machine-readable audit](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/cuda_graph_integration.json)
 retains source hashes, complete coverage and timing scope.
-
-Capturing is not sufficient to make a short fit faster. In this 80-step,
-48-node, 16-feature synthetic diagnostic, median setup-inclusive ratios were
-0.49× for GCN, 0.35× SGC, 0.43× APPNP, 0.56× Cheby, 0.52× GraphSage and 0.95×
-SGFormer. These are mostly slowdowns caused by setup/verification overhead in
-small runs, not acceleration claims. Keep the backend opt-in and profile the
-actual dataset, fitting budget and validation interval before enabling it.
-
-Actual 200-step toy reduction pairs also retained reduced features, adjacency,
-labels and real optimization loss histories. Including setup and preprocessing,
-GCGP measured 1.87× for the historical arithmetic and 2.01× for released arithmetic;
-ClustGDD measured 1.21× across pretraining and refinement. These are one-seed
-integration measurements, not a Cora or whole-repository speed claim. The
-[published audit record](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/cuda_graph_integration.json) retains
-these paired timings, tensor hashes and complete optimization loss histories.
-
-The earlier Cora SGNK feasibility experiment retained exact 200-step trajectories
-and downstream GCN scores. Its three Float32 reduction seeds measured 3.10–3.21×
-warm-loop speedups, or 1.64–1.81× including graph/cache setup. Its one Float64
-reduction seed measured 3.48× warm and 1.72× including setup. These are kernel
-replacement experiments, not measurements of the new general training backend
-or the complete original repository. See the [efficiency protocol](efficiency.md).
 
 The integration verifier executes actual package fitting with explicit synthetic
 graphs under every method tag and all seven downstream architectures. It compares

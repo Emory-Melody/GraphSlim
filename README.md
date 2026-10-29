@@ -23,94 +23,21 @@ Acceleration uses native PyTorch operations and CUDA Graphs for NVIDIA A100
 and newer GPUs across Ampere, Ada, Hopper and Blackwell. Enable it with
 `--cuda_graph`. [GPU setup and checks](docs/compatibility.md#gpu-portability).
 
-## Results on ogbn-products
+## ogbn-arxiv accuracy–time tradeoff
 
-The graph has 2,449,029 nodes and uses the official OGB split. The charts cover
-0.05%, 0.1% and 0.2% of training nodes, with 3 reduction seeds × 10 GCN seeds per
-reduced result. Each GCN trains for 300 updates.
+Gray points show 17 methods reported in the
+[CGC paper](https://arxiv.org/html/2405.13707). Arrows show three methods
+moving from their author-reported results (open circles) to measured
+GraphSlim package results (filled circles) at matching reduced-node counts.
+The plot has no error bars. GraphSlim's full [40-method roster](#methods) is below.
 
-![Products GCN accuracy at three reduction budgets and graph reduction time at the 0.2% budget](figures/products_results.svg)
+![ogbn-arxiv tradeoff with arrows from author papers to GraphSlim results for CGC, ClustGDD and GCGP](figures/arxiv_author_vs_graphslim.svg)
 
-Accuracy whiskers show standard deviation. Reduction-time bars show the median
-of three runs, with min–max whiskers.
-[Full results and experiment settings](docs/products.md) ·
-[Per-seed results and source records](benchmark/results/products_20261028.json).
-
-### Reduction time versus accuracy
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_ogbn-arxiv_dark.png">
-    <img src="./figures/tradeoff_ogbn-arxiv_light.png" width="49%" alt="Test accuracy versus graph reduction time on ogbn-arxiv for CGC, ClustGDD, GCGP and Random at three budgets">
-  </picture>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_reddit_dark.png">
-    <img src="./figures/tradeoff_reddit_light.png" width="49%" alt="Test accuracy versus graph reduction time on Reddit for CGC, ClustGDD, GCGP and Random at three budgets">
-  </picture>
-</p>
-
-Each marker is one method at one budget. Marker size shows the budget as a share
-of labeled training nodes. Error bars show the standard deviation over 3 reduction
-seeds × 10 GCN seeds, and the horizontal line marks full-graph accuracy.
-These runs use the same GCN protocol, package defaults and GPU as the Products results.
-Reddit is the PyG Reddit2 graph. NOPE did not finish within the one-hour job limit
-on either dataset, so it is not shown.
-[Per-seed results and source records](benchmark/results/tradeoff_20261028.json) ·
-[Experiment protocol](docs/dataset_expansion.md).
-
-<details>
-<summary>Plotted values</summary>
-
-<!-- tradeoff-table:start -->
-| Dataset | Method | Budget | Reduced nodes | Test accuracy (%) | Reduction time (s) |
-| --- | --- | ---: | ---: | ---: | ---: |
-| ogbn-arxiv | Full graph | — | 169,343 | 70.61 ± 0.07 | — |
-| ogbn-arxiv | CGC | 0.1% | 90 | 61.24 ± 0.38 | 12.78 |
-| ogbn-arxiv | CGC | 0.5% | 454 | 64.27 ± 0.31 | 27.63 |
-| ogbn-arxiv | CGC | 1% | 909 | 65.19 ± 0.58 | 84.04 |
-| ogbn-arxiv | ClustGDD | 0.1% | 90 | 59.87 ± 0.35 | 14.92 |
-| ogbn-arxiv | ClustGDD | 0.5% | 454 | 63.13 ± 0.23 | 11.52 |
-| ogbn-arxiv | ClustGDD | 1% | 909 | 63.76 ± 0.38 | 19.22 |
-| ogbn-arxiv | GCGP | 0.1% | 91 | 14.75 ± 9.26 | 6.95 |
-| ogbn-arxiv | GCGP | 0.5% | 455 | 8.42 ± 5.69 | 2.15 |
-| ogbn-arxiv | GCGP | 1% | 909 | 10.63 ± 7.83 | 4.42 |
-| ogbn-arxiv | Random | 0.1% | 89 | 44.22 ± 5.22 | 0.20 |
-| ogbn-arxiv | Random | 0.5% | 439 | 57.26 ± 0.93 | 0.29 |
-| ogbn-arxiv | Random | 1% | 892 | 59.68 ± 0.43 | 0.26 |
-| Reddit | Full graph | — | 232,965 | 94.00 ± 0.03 | — |
-| Reddit | CGC | 0.05% | 76 | 89.41 ± 0.09 | 5.12 |
-| Reddit | CGC | 0.1% | 153 | 90.26 ± 0.12 | 34.40 |
-| Reddit | CGC | 0.2% | 307 | 91.20 ± 0.19 | 24.64 |
-| Reddit | ClustGDD | 0.05% | 76 | 80.21 ± 0.91 | 44.63 |
-| Reddit | ClustGDD | 0.1% | 153 | 85.86 ± 0.69 | 44.41 |
-| Reddit | ClustGDD | 0.2% | 307 | 88.33 ± 0.56 | 49.51 |
-| Reddit | GCGP | 0.05% | 77 | 19.48 ± 5.28 | 5.22 |
-| Reddit | GCGP | 0.1% | 154 | 27.47 ± 1.52 | 6.30 |
-| Reddit | GCGP | 0.2% | 308 | 19.23 ± 6.23 | 6.02 |
-| Reddit | Random | 0.05% | 69 | 46.81 ± 7.10 | 0.27 |
-| Reddit | Random | 0.1% | 138 | 57.32 ± 6.08 | 0.28 |
-| Reddit | Random | 0.2% | 288 | 64.19 ± 4.96 | 0.16 |
-<!-- tradeoff-table:end -->
-
-</details>
-
-Redraw the figures from the frozen results with:
-
-```bash
-python -m benchmark.render_tradeoff
-```
-
-### GCGP optimization with CUDA Graph
-
-Paired Products runs use 200 optimization updates, a batch size of 1,024 and
-393 reduced nodes. CUDA Graph times include setup; each seed has three repeats.
-
-![Products GCGP eager versus CUDA Graph optimization time including setup](figures/products_cuda_graph.svg)
-
-Both execution modes produce the same optimization results and downstream
-scores for each seed. Timings were measured on an RTX PRO 6000 Blackwell Server
-Edition. [Timing details](docs/products.md#cuda-graph-timing) ·
-[Enable CUDA Graph](docs/cuda_graph.md).
+GCGP moves to a much shorter reduction time and a much lower test accuracy in
+these records. The papers and GraphSlim runs used different hardware and GCN
+settings. [Exact values, sources and protocol](docs/arxiv_tradeoff.md) ·
+[Plot data](benchmark/results/arxiv_author_vs_graphslim_20261029.json) ·
+[Products results](docs/products.md).
 
 Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
 

@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "scope": "Published author reports to frozen GraphSlim package measurements on ogbn-arxiv",
+  "comparison_type": "descriptive cross-study arrows; different hardware and evaluation settings",
+  "x_axis": "graph condensation/reduction time in seconds, log scale",
+  "y_axis": "test accuracy percentage",
+  "uncertainty_displayed": false,
+  "paper_landscape": [
+    {
+      "method": "VN",
+      "seconds": 412.6,
+      "accuracy_percent": 43.5
+    },
+    {
+      "method": "A-CM",
+      "seconds": 179.9,
+      "accuracy_percent": 60.0
+    },
+    {
+      "method": "GCond",
+      "seconds": 14876.0,
+      "accuracy_percent": 63.2
+    },
+    {
+      "method": "GCond-X",
+      "seconds": 13516.7,
+      "accuracy_percent": 64.2
+    },
+    {
+      "method": "GCDM",
+      "seconds": 690.0,
+      "accuracy_percent": 59.6
+    },
+    {
+      "method": "GCDM-X",
+      "seconds": 469.0,
+      "accuracy_percent": 61.2
+    },
+    {
+      "method": "DosCond",
+      "seconds": 12483.0,
+      "accuracy_percent": 63.5
+    },
+    {
+      "method": "SGDD",
+      "seconds": 22155.8,
+      "accuracy_percent": 65.8
+    },
+    {
+      "method": "MSGC",
+      "seconds": 14723.1,
+      "accuracy_percent": 65.8
+    },
+    {
+      "method": "SNTK",
+      "seconds": 9353.6,
+      "accuracy_percent": 65.1
+    },
+    {
+      "method": "SNTK-X",
+      "seconds": 9079.9,
+      "accuracy_percent": 65.5
+    },
+    {
+      "method": "SimGC",
+      "seconds": 252.4,
+      "accuracy_percent": 66.4
+    },
+    {
+      "method": "SFGC",
+      "seconds": 86288.5,
+      "accuracy_percent": 66.1
+    },
+    {
+      "method": "GEOM",
+      "seconds": 108962.5,
+      "accuracy_percent": 67.5
+    },
+    {
+      "method": "GCSR",
+      "seconds": 5283.5,
+      "accuracy_percent": 65.4
+    },
+    {
+      "method": "CGC",
+      "seconds": 8.8,
+      "accuracy_percent": 66.4
+    },
+    {
+      "method": "CGC-X",
+      "seconds": 7.9,
+      "accuracy_percent": 66.3
+    }
+  ],
+  "paper_landscape_source": "https://arxiv.org/html/2405.13707",
+  "paper_landscape_location": "Tables 3 and 4, Arxiv r=0.25%",
+  "graphslim_snapshot": "benchmark/results/tradeoff_20261028.json",
+  "graphslim_snapshot_sha256": "445761474cbe452d80959172e4f45effbba8d9c88dc0abf69de6eabe6de0d340",
+  "graphslim_source": {
+    "run_dir": "runs/dataset_expansion_20261012_v3",
+    "source_sha256": "66e175c052a27271d5dbda4adb1d587e02fa9ae69c3171d7c78f3f315481dda0",
+    "archive_sha256": "19c726c10aecfca7c20d68216d685bd7d5c41d3492cf0872ace684dfd8f6aeb3",
+    "manifest_sha256": "90a65c7f6ac2e84acd9c1733f80154b0553457a1da6daceb8cb09d34ac5b65e5"
+  },
+  "graphslim_hardware": {
+    "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+    "torch": "2.8.0+cu128",
+    "cuda": "12.8"
+  },
+  "graphslim_protocol": {
+    "reduction_seeds": [
+      1,
+      2,
+      3
+    ],
+    "evaluation_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "downstream": "GCN",
+    "hidden": 256,
+    "layers": 2,
+    "eval_epochs": 300,
+    "learning_rate": 0.01,
+    "weight_decay": 0.0005,
+    "dropout": 0.0,
+    "activation": "relu",
+    "val_interval": 10,
+    "data_seed": 1,
+    "dataset_split_id": 0,
+    "threads": 4,
+    "selection": "validation only",
+    "reduction": "package method defaults; no HPO; eager backend",
+    "rate_denominator": "labeled training nodes; NOPE reports actual retained nodes",
+    "parity": "author SGNK eager versus native CUDA kernel capture; GP/Adam eager",
+    "timeout_seconds": 3600,
+    "max_rss_gib": 100.0,
+    "failure_policy": "terminal failures retained; no partial numeric cells",
+    "precision": "float32; CGC reconstruction solve float64 as in package",
+    "metric": "accuracy except FraudYelp macro-F1",
+    "settings": "original package trans/ind settings; new datasets transductive",
+    "comparison_scope": "new source/budgets only; no pooling of historical batches"
+  },
+  "pairs": [
+    {
+      "method": "CGC",
+      "nodes": 454,
+      "paper_seconds": 8.8,
+      "paper_accuracy_percent": 66.4,
+      "paper_time_approximate": false,
+      "paper": "https://arxiv.org/html/2405.13707",
+      "paper_location": "Tables 3 and 4, Arxiv r=0.25%",
+      "graphslim_training_node_rate": "0.005",
+      "graphslim_seconds": 27.634181663393974,
+      "graphslim_accuracy_percent": 64.27099836086934,
+      "graphslim_evaluations": 30,
+      "graphslim_job_ids": [
+        "ogbn-arxiv__cgc__r0.005__s1",
+        "ogbn-arxiv__cgc__r0.005__s2",
+        "ogbn-arxiv__cgc__r0.005__s3"
+      ],
+      "graphslim_result_sha256": [
+        "efee3851dedd0cf1ecb0f958a5e176795012dc11f4e618fc6249ba7ed7e49dce",
+        "b5ba5b9a3716a34fed245d2cb2d469f58fa5762ed6b0f6d98e1c2995eb05d451",
+        "064f745ad48526ae91ca06da5b3615d39fae13565144edc935a38d99d3b52433"
+      ]
+    },
+    {
+      "method": "ClustGDD",
+      "nodes": 90,
+      "paper_seconds": 79.0,
+      "paper_accuracy_percent": 63.7,
+      "paper_time_approximate": true,
+      "paper": "https://arxiv.org/html/2505.20807",
+      "paper_location": "Table 3, arXiv r=0.05%; Appendix D.1 says around 79 s",
+      "graphslim_training_node_rate": "0.001",
+      "graphslim_seconds": 14.91753832437098,
+      "graphslim_accuracy_percent": 59.86982970872854,
+      "graphslim_evaluations": 30,
+      "graphslim_job_ids": [
+        "ogbn-arxiv__clustgdd__r0.001__s1",
+        "ogbn-arxiv__clustgdd__r0.001__s2",
+        "ogbn-arxiv__clustgdd__r0.001__s3"
+      ],
+      "graphslim_result_sha256": [
+        "7c16b553f632d5b954f23eb415233893037a96cfb6d021536958aedbb460938e",
+        "25e362cec16fcd818f65e8a7877bf8f7b51c56722441f8214f686e71a2fec0f9",
+        "c2fbbb515f39aa8a8bead149bb1bbb28b2b83bf3fe52d330e7c75e27a71ea426"
+      ]
+    },
+    {
+      "method": "GCGP",
+      "nodes": 909,
+      "paper_seconds": 298.4082,
+      "paper_accuracy_percent": 65.7,
+      "paper_time_approximate": false,
+      "paper": "https://arxiv.org/html/2501.02565",
+      "paper_location": "Tables III and IV, Ogbn-arxiv size 909, X-only variant",
+      "graphslim_training_node_rate": "0.01",
+      "graphslim_seconds": 4.42209638748318,
+      "graphslim_accuracy_percent": 10.629316434513642,
+      "graphslim_evaluations": 30,
+      "graphslim_job_ids": [
+        "ogbn-arxiv__gcgp__r0.01__s1",
+        "ogbn-arxiv__gcgp__r0.01__s2",
+        "ogbn-arxiv__gcgp__r0.01__s3"
+      ],
+      "graphslim_result_sha256": [
+        "cb428db28db229c60c149db1679c31337a9ba0b752dfd09f9740e75a274b58ba",
+        "ba2ea42e882d4c74237dd5c674cb2649e66e5a271c73c7bf9c9bd3baa23c35c0",
+        "2209ee03cd96282a10e6e87a8d94647c51ce381bb35be528285e2d12e7a79b63"
+      ]
+    }
+  ],
+  "figure_sha256": {
+    "arxiv_author_vs_graphslim.svg": "e17077b532f8b8cdd4db3e4f0ccd6ec2734f2093e7ac98745b8510cf1d2386cc",
+    "arxiv_author_vs_graphslim.png": "bd96665b2e393f6902275db1aaf29072d1e97b0683e014f16e38e1c4d38368ea",
+    "arxiv_author_vs_graphslim.pdf": "c0b6f91a3859430bdd6c8d8373558b0f167a5bb2c3cba193559f6ffa32293c74"
+  },
+  "plot_script_sha256": "b9ba7b1f26f5d1c61433795398ad50bc05c737f7e2441433c88bbd221f8e769a"
+}

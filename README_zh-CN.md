@@ -22,90 +22,19 @@ GraphSlim 加载 PyG 图，通过统一的方法注册表执行图缩减，再�
 覆盖 Ampere、Ada、Hopper 和 Blackwell 架构。通过 `--cuda_graph` 启用。
 [GPU 配置与检查](docs/compatibility.md#gpu-portability)。
 
-## ogbn-products 实测结果
+## ogbn-arxiv 准确率与缩减耗时
 
-数据集包含 2,449,029 个节点，使用 OGB 官方划分。下图覆盖训练节点数的
-0.05%、0.1% 和 0.2% 三个缩减比例，各缩减方法使用 3 个缩减种子 × 10 个 GCN 种子。
-每次 GCN 训练执行 300 次更新。
+灰点是 [CGC 论文](https://arxiv.org/html/2405.13707)报告的 17 种方法。
+箭头从作者论文结果（空心点）指向
+GraphSlim 实测结果（实心点），展示 CGC、ClustGDD 和 GCGP 在相同缩减节点数下的位置变化。
+图中不画误差线。GraphSlim 的完整[40 种方法列表](#支持的方法)见下文。
 
-![Products 三个缩减比例的 GCN 准确率，以及 0.2% 比例的图缩减耗时](figures/products_results.svg)
+![ogbn-arxiv 上 CGC、ClustGDD 和 GCGP 从作者论文到 GraphSlim 结果的 tradeoff 箭头图](figures/arxiv_author_vs_graphslim.svg)
 
-准确率误差线为标准差；缩减耗时柱为三次运行的中位数，误差线为最小值至最大值。
-[完整结果与实验设置](docs/products.md) ·
-[逐种子结果与来源记录](benchmark/results/products_20261028.json)。
-
-### 图缩减耗时与准确率的权衡
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_ogbn-arxiv_dark.png">
-    <img src="./figures/tradeoff_ogbn-arxiv_light.png" width="49%" alt="ogbn-arxiv 上 CGC、ClustGDD、GCGP 和 Random 在三个预算下的测试准确率与图缩减耗时">
-  </picture>
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="./figures/tradeoff_reddit_dark.png">
-    <img src="./figures/tradeoff_reddit_light.png" width="49%" alt="Reddit 上 CGC、ClustGDD、GCGP 和 Random 在三个预算下的测试准确率与图缩减耗时">
-  </picture>
-</p>
-
-每个标记代表一种方法在一个预算下的结果，标记大小表示预算占有标签训练节点的比例。
-误差线为 3 个缩减种子 × 10 个 GCN 种子的标准差，水平线为原图准确率。
-这些实验与 Products 结果使用相同的 GCN 流程、包内默认配置和 GPU。
-Reddit 使用 PyG 的 Reddit2 图。NOPE 在两个数据集上均未能在一小时任务时限内完成，因此未列出。
-[逐种子结果与来源记录](benchmark/results/tradeoff_20261028.json) ·
-[实验协议](docs/dataset_expansion.md)。
-
-<details>
-<summary>绘图数值</summary>
-
-<!-- tradeoff-table:start -->
-| 数据集 | 方法 | 预算 | 缩减后节点数 | 测试准确率（%） | 图缩减耗时（s） |
-| --- | --- | ---: | ---: | ---: | ---: |
-| ogbn-arxiv | 原图 | — | 169,343 | 70.61 ± 0.07 | — |
-| ogbn-arxiv | CGC | 0.1% | 90 | 61.24 ± 0.38 | 12.78 |
-| ogbn-arxiv | CGC | 0.5% | 454 | 64.27 ± 0.31 | 27.63 |
-| ogbn-arxiv | CGC | 1% | 909 | 65.19 ± 0.58 | 84.04 |
-| ogbn-arxiv | ClustGDD | 0.1% | 90 | 59.87 ± 0.35 | 14.92 |
-| ogbn-arxiv | ClustGDD | 0.5% | 454 | 63.13 ± 0.23 | 11.52 |
-| ogbn-arxiv | ClustGDD | 1% | 909 | 63.76 ± 0.38 | 19.22 |
-| ogbn-arxiv | GCGP | 0.1% | 91 | 14.75 ± 9.26 | 6.95 |
-| ogbn-arxiv | GCGP | 0.5% | 455 | 8.42 ± 5.69 | 2.15 |
-| ogbn-arxiv | GCGP | 1% | 909 | 10.63 ± 7.83 | 4.42 |
-| ogbn-arxiv | Random | 0.1% | 89 | 44.22 ± 5.22 | 0.20 |
-| ogbn-arxiv | Random | 0.5% | 439 | 57.26 ± 0.93 | 0.29 |
-| ogbn-arxiv | Random | 1% | 892 | 59.68 ± 0.43 | 0.26 |
-| Reddit | 原图 | — | 232,965 | 94.00 ± 0.03 | — |
-| Reddit | CGC | 0.05% | 76 | 89.41 ± 0.09 | 5.12 |
-| Reddit | CGC | 0.1% | 153 | 90.26 ± 0.12 | 34.40 |
-| Reddit | CGC | 0.2% | 307 | 91.20 ± 0.19 | 24.64 |
-| Reddit | ClustGDD | 0.05% | 76 | 80.21 ± 0.91 | 44.63 |
-| Reddit | ClustGDD | 0.1% | 153 | 85.86 ± 0.69 | 44.41 |
-| Reddit | ClustGDD | 0.2% | 307 | 88.33 ± 0.56 | 49.51 |
-| Reddit | GCGP | 0.05% | 77 | 19.48 ± 5.28 | 5.22 |
-| Reddit | GCGP | 0.1% | 154 | 27.47 ± 1.52 | 6.30 |
-| Reddit | GCGP | 0.2% | 308 | 19.23 ± 6.23 | 6.02 |
-| Reddit | Random | 0.05% | 69 | 46.81 ± 7.10 | 0.27 |
-| Reddit | Random | 0.1% | 138 | 57.32 ± 6.08 | 0.28 |
-| Reddit | Random | 0.2% | 288 | 64.19 ± 4.96 | 0.16 |
-<!-- tradeoff-table:end -->
-
-</details>
-
-可用以下命令根据固定的结果记录重新绘图：
-
-```bash
-python -m benchmark.render_tradeoff
-```
-
-### GCGP 的 CUDA Graph 优化耗时
-
-Products 上的 200 次优化更新，批量大小 1,024，缩减图 393 个节点。
-CUDA Graph 耗时包含初始化，每个种子重复计时 3 次。
-
-![Products 上 GCGP 常规运行与 CUDA Graph 的优化耗时对比，含初始化开销](figures/products_cuda_graph.svg)
-
-两种运行方式在每个种子下得到相同的优化结果和下游得分。
-图中耗时实测于 RTX PRO 6000 Blackwell Server Edition。
-[计时详情](docs/products.md#cuda-graph-timing) · [启用 CUDA Graph](docs/cuda_graph.md)。
+这组记录中，GCGP 的耗时明显缩短，测试准确率也明显下降。作者论文与 GraphSlim
+实验使用了不同硬件和 GCN 设置。[数值、来源和实验口径](docs/arxiv_tradeoff.md) ·
+[绘图数据](benchmark/results/arxiv_author_vs_graphslim_20261029.json) ·
+[Products 结果](docs/products.md)。
 
 `graphslim-doctor` 可检查 PyTorch、稀疏运算和可选的 DGL 安装。
 

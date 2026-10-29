@@ -15,11 +15,13 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
 
    quickstart.md
    lightweight_methods.md
+   clustering_operators.md
    compatibility.md
    efficiency.md
    cuda_graph.md
    dataset_expansion.md
    products.md
+   arxiv_tradeoff.md
    simgc.md
 
 .. toctree::
