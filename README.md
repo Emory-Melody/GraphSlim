@@ -2,6 +2,8 @@
 
 # GraphSlim
 
+[English](README.md) | [简体中文](README_zh-CN.md)
+
 A PyTorch library for graph sparsification, coarsening, and condensation.
 
 [Documentation](https://graphslim.readthedocs.io/en/latest/) ·
