@@ -1,6 +1,20 @@
 name: Checks
 on: [push, pull_request]
 jobs:
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.10', '3.11']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r docs/requirements.txt
+      - run: sphinx-build -E -W --keep-going -b html -d docs/_build/doctrees docs docs/_build/html
+      - run: sphinx-build -E -W --keep-going -b epub -d docs/_build/doctrees docs docs/_build/epub
+      - run: sphinx-build -E -W --keep-going -b latex -d docs/_build/doctrees docs docs/_build/latex
   cpu:
     runs-on: ubuntu-latest
     strategy:

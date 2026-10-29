@@ -100,7 +100,7 @@ noise pairs (six corruptions, four lightweight method tags, seven models,
 transductive and inductive). Loss histories, validation-selected parameter hashes
 and validation/test scores matched exactly under the declared deterministic
 Torch/CuBLAS setting. Six model architectures captured in every clean method tag;
-GAT remained eager. The [machine-readable audit](../benchmark/results/cuda_graph_integration.json)
+GAT remained eager. The [machine-readable audit](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/cuda_graph_integration.json)
 retains source hashes, complete coverage and timing scope.
 
 Capturing is not sufficient to make a short fit faster. In this 80-step,
@@ -115,7 +115,7 @@ labels and real optimization loss histories. Including setup and preprocessing,
 GCGP measured 1.87× for the historical arithmetic and 2.01× for released arithmetic;
 ClustGDD measured 1.21× across pretraining and refinement. These are one-seed
 integration measurements, not a Cora or whole-repository speed claim. The
-[published audit record](../benchmark/results/cuda_graph_integration.json) retains
+[published audit record](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/cuda_graph_integration.json) retains
 these paired timings, tensor hashes and complete optimization loss histories.
 
 The earlier Cora SGNK feasibility experiment retained exact 200-step trajectories

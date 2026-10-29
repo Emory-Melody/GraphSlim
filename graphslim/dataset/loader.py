@@ -427,7 +427,7 @@ class LargeDataLoader(nn.Module):
 
     def getitem(self, idx):
         """
-        对于给定的 idx 输出对应的 node_features, labels, sub Ajacency matrix
+        Return node features, labels and the adjacency submatrix for the given indices.
         """
         # idx   = [idx]
         n_idx = len(idx)

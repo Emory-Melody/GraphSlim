@@ -108,7 +108,7 @@ Use distinct output paths for each device, precision or source revision. The
 benchmark snapshots scientific source and author definitions, records hashes,
 checks that source remains unchanged and retains raw timing/score records.
 
-[Machine-readable results and compatibility probes](../benchmark/results/efficiency_compatibility.json)
+[Machine-readable results and compatibility probes](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/efficiency_compatibility.json)
 include all four replay groups and the selected timing records. The original
 local JSON files, source ZIPs and logs are in `runs/efficiency_compat_20261011`.
 The baseline is pinned [GCGP author mathematics](https://github.com/WANGLin0126/GCGP/blob/d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb/gcgp/sgnk.py),

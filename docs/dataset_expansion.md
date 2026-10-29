@@ -11,7 +11,7 @@ terminal status. Complete, failed, timeout and resource-limit outcomes are
 retained separately. Reaching a terminal status does not imply successful or
 complete numeric benchmark coverage.
 
-The implementation is [benchmark.expand_datasets](../benchmark/expand_datasets.py).
+The implementation is [benchmark.expand_datasets](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/expand_datasets.py).
 It freezes a source ZIP and source digest before dispatch, honors the host's
 physical-GPU and UUID locks, and checks that each selected GPU is idle. Workers
 load data with fixed seed 1 and then reset the independent reduction seed.
@@ -68,7 +68,7 @@ reduction is performed. CUDA timings synchronize at phase boundaries.
 Per-job limits and the failure policy are fixed in the manifest; failures retain
 their actual logs and never become zero-valued scores.
 
-[benchmark.gcgp_parity](../benchmark/gcgp_parity.py) separately compares the pinned
+[benchmark.gcgp_parity](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/gcgp_parity.py) separately compares the pinned
 author SGNK arithmetic in eager mode and native CUDA kernel capture at each
 dataset's largest declared rate. GP solves, Adam and changing minibatch sampling
 remain eager. Three seeds, three timing repeats and 200 GP updates are checked.

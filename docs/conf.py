@@ -6,7 +6,6 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 import sys
-import os
 from pathlib import Path
 
 # sys.path.insert(0, os.path.abspath('../../GraphSlim'))
@@ -17,6 +16,7 @@ html_theme = "sphinx_rtd_theme"
 
 source_suffix = [".rst", ".md"]
 project = "GraphSlim"
+version = release = "1.2.1"
 copyright = "2024, Emory Melody Group"
 author = "Shengbo Gong, Juntong Ni, Wei Jin"
 
@@ -40,11 +40,21 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autosummary",
     "sphinx.ext.mathjax",
-    "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
 ]
 
+# Autodoc imports the real GraphSlim source, but does not run training. Mock
+# optional/runtime libraries so Read the Docs needs only docs/requirements.txt.
 autodoc_mock_imports = [
+    "click",
+    "gdown",
+    "matplotlib",
+    "networkx",
+    "numpy",
+    "skfuzzy",
+    "sortedcontainers",
+    "tqdm",
+    "wandb",
     "torch",
     "torchvision",
     "texttable",
@@ -72,6 +82,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_static_path = ["_static"] if (Path(__file__).parent / "_static").is_dir() else []
+epub_exclude_files = [".nojekyll"]
 #
 # add_module_names = False
 #
