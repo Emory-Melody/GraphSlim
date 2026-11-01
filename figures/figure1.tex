@@ -1,0 +1,12 @@
+% Build from the repository root:
+% tectonic figures/figure1.tex --outdir figures
+% pdftoppm -singlefile -scale-to 2400 -png figures/figure1.pdf figures/figure1
+\documentclass[border=3pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usepackage{fontawesome5}
+\definecolor{edgegray}{HTML}{666666}
+\newcommand{\edgegray}[1]{\textcolor{edgegray}{#1}}
+\begin{document}
+\input{figure1_architecture.tex}
+\end{document}

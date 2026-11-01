@@ -15,13 +15,311 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
-GraphSlim loads PyG graphs, reduces them with a shared method registry, and evaluates
-the reduced graph using a common downstream GNN pipeline. The repository includes
-the package, runnable examples, regression tests, and benchmark reproduction commands.
+GraphSlim brings sparsification, coarsening, condensation, **7 downstream GNN backbones**,
+and **validation-only hyperparameter optimization (HPO)** into a shared workflow.
+Load a graph, choose a reducer, and evaluate its output through the same interfaces.
+The repository includes runnable examples, regression tests, and benchmark
+reproduction commands.
 
-Acceleration uses native PyTorch operations and CUDA Graphs for NVIDIA A100
-and newer GPUs across Ampere, Ada, Hopper and Blackwell. Enable it with
-`--cuda_graph`. [GPU setup and checks](docs/compatibility.md#gpu-portability).
+GPU execution uses native PyTorch operations. Install matching Torch and PyG
+extension wheels for your GPU and CUDA runtime.
+[GPU setup and checks](docs/compatibility.md#gpu-portability).
+
+[Quick start](#quick-start) · [Architecture](#architecture) ·
+[Acceleration](#acceleration) · [Reproduction coverage](#reproduction-coverage) ·
+[HPO](#hyperparameter-optimization-hpo) · [Methods](#methods)
+
+## Architecture
+
+[![Figure 1. GraphSlim architecture: data, reduction with validation-only HPO, and evaluation layers](figures/figure1.png)](figures/figure1.pdf)
+
+Figure 1 depicts the package paper's 38-method development roster. The data, reduction, and evaluation layers are
+independently callable. The reduction layer covers sparsification, coarsening,
+condensation, and optional HPO. Solid arrows show graph flow; dashed arrows show
+node selection or coarsening used to initialize condensation.
+[Vector PDF](figures/figure1.pdf) · [Editable source](figures/figure1_architecture.tex).
+
+## Acceleration
+
+**CGC achieves observed author/GraphSlim reduction-time ratios of 1.87–2.69×;
+ClustGDD achieves 1.06–1.22×** in the controlled comparison below.
+All six method–dataset pairs are shown with their downstream quality.
+
+<!-- implementation-comparison:start -->
+
+| Method | Dataset | Author (s) | GraphSlim (s) | Time ratio | Author GCN (%) | GraphSlim GCN (%) |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| CGC | Cora | 0.261 | 0.097 | 2.69× | 75.92 ± 2.15 | 74.48 ± 3.01 |
+| CGC | Citeseer | 0.246 | 0.131 | 1.87× | 72.28 ± 0.64 | 72.48 ± 0.48 |
+| ClustGDD | Cora | 1.207 | 1.139 | 1.06× | 78.04 ± 0.82 | 79.16 ± 0.90 |
+| ClustGDD | Citeseer | 1.463 | 1.196 | 1.22× | 72.54 ± 0.48 | 71.91 ± 0.33 |
+| GCGP | Cora | 0.946 | 0.946 | 1.00× | 42.67 ± 5.44 | 36.19 ± 4.84 |
+| GCGP | Citeseer | 0.789 | 0.798 | 0.99× | 64.99 ± 0.45 | 66.02 ± 1.81 |
+
+<!-- implementation-comparison:end -->
+
+Time ratio is author time divided by GraphSlim time; values above 1 favor
+GraphSlim. Times are medians of **three reductions** at 50% of labeled training
+nodes (Cora: 70; Citeseer: 60). GCN scores are mean ± population standard
+deviation over **30 fits**: ten per reduced graph, nested within three reductions.
+CGC uses four CPU threads on an AMD EPYC 9115; ClustGDD and GCGP use one NVIDIA
+RTX PRO 6000 Blackwell, with the same device for both implementations.
+
+Timing covers the complete in-memory reduction, including preprocessing and
+device transfers. Imports, data loading, serialization, and downstream GCN
+training are outside the timing boundary. Author code is pinned and adapted to
+shared inputs and evaluation. Outputs and accuracy differ, so these ratios
+describe measured implementation tradeoffs. GCGP shows essentially unchanged
+runtime, and its Cora GCN accuracy drops by 6.48 points; its paper uses a GP predictor.
+[Frozen measurements, author commits, and adapter protocol](benchmark/results/implementation_comparison_20261031.json) ·
+[Comparison runner](benchmark/compare_implementations.py).
+
+## Reproduction coverage
+
+**123/123 declared method–dataset pairs completed all their reduction rates.**
+Under the primary criterion, **121/123 (98.37%)** meet a mean relative shortfall
+below 5%; **111/123 (90.24%)** meet an absolute relative gap below 5%.
+This fixed roster covers **20 methods and seven datasets**, with equal weight
+per pair. Both rates include seven policy-credited Clustering pairs, explained below.
+
+<!-- reproduction-coverage:start -->
+
+| Criterion | <1% | <2% | <5% |
+| --- | ---: | ---: | ---: |
+| Relative shortfall (primary) | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |
+| Absolute relative gap | 42/123 (34.15%) | 69/123 (56.10%) | 111/123 (90.24%) |
+
+<!-- reproduction-coverage:end -->
+
+Shortfall is `100 * max(0, reference - reproduced) / reference`; a score above
+the reference contributes zero shortfall. Absolute relative gap uses
+`100 * abs(reproduced - reference) / reference`. Compute each quantity per
+declared matched rate, average within a method–dataset pair, then apply the
+strict `<` threshold. These are relative percentages, not percentage-point gaps.
+
+The seven completed Clustering pairs have no numerical paper reference and
+receive threshold credit under the declared reporting rule; their measured
+gaps remain missing. For the **116 pairs with numerical references alone**,
+the <5% rates are **114/116 (98.28%)** for shortfall and **104/116 (89.66%)**
+for absolute relative gap.
+
+<details>
+<summary>Coverage scope, reference corrections, and frozen evidence</summary>
+
+- Snapshot: **2026-11-01 22:52 UTC**. It combines frozen historical runs,
+  provenance-aligned replays, and validation-selected HPO. Each pair retains its
+  adopted evaluation profile. GEOM/SFGC published-only values, whole-graph
+  baselines, and extra cells without references are outside this roster.
+- References combine GC4NC and the GECC, CGC, and ClustGDD papers. The declared
+  Pubmed corrections use main-text Table 1 for K-Center and Averaging; TSpanner
+  uses an explicitly inferred Table 9 cell swap. Original and corrected values
+  are retained in the snapshot.
+- The summary covers the declared subset of method–dataset combinations.
+  Figure 1 describes package interfaces; each application has its own validation
+  scope. The cumulative coverage snapshot and the result tables below retain
+  separate source versions and display criteria.
+- [Frozen summary, per-pair metrics, reporting policy, corrections, and source hashes](benchmark/results/reproduction_coverage_20261101.json).
+  Recheck the README tables with `python -m benchmark.render_readme_highlights --check`.
+
+</details>
+
+## Reproduced results
+
+These tables rerun the [GC4NC benchmark](https://arxiv.org/html/2406.16715v3#A1.T9)
+with this package. A two-layer GCN with 256 hidden units trains on each reduced
+graph for 300 epochs, ten times, and reduced graphs are selected on validation
+accuracy. Random, K-Center and Herding use three reduction seeds and the other
+methods use one, as in the paper. Cells show mean ± standard deviation of test
+accuracy in percent; Yelp shows macro-F1. Rates follow Table 9: percentages of the
+whole graph for Citeseer, Cora, Pubmed and Arxiv, and of the training graph for
+Flickr, Reddit and Yelp.
+
+A row is listed when it is on average within 3 points of the published values.
+GECC, CGC and ClustGDD are compared with their own papers at the rates those
+papers report.
+[Frozen results and sources](benchmark/results/table9_reproduction.json).
+
+<details>
+<summary>Show the seven-dataset result tables and omitted-row notes</summary>
+
+<!-- reproduction-results:start -->
+
+#### Citeseer — test accuracy (%)
+
+| Family | Method | 0.36% | 0.90% | 1.80% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 44.56 ± 2.30 | 59.32 ± 0.24 | 62.91 ± 0.47 |
+| Node sparsification | Cent-P | 41.04 ± 1.55 | 52.01 ± 0.78 | 65.42 ± 0.36 |
+| Node sparsification | Random | 36.94 ± 4.89 | 51.01 ± 4.46 | 63.13 ± 2.72 |
+| Node sparsification | Herding | 46.11 ± 2.80 | 61.67 ± 1.43 | 67.37 ± 1.37 |
+| Node sparsification | K-Center | 44.92 ± 4.69 | 53.58 ± 2.70 | 60.16 ± 1.28 |
+| Edge sparsification | TSpanner | 71.19 ± 0.44 | 71.57 ± 0.43 | 71.92 ± 0.26 |
+| Coarsening | Averaging | 69.68 ± 0.43 | 69.70 ± 0.45 | 69.63 ± 0.41 |
+| Coarsening | VNG | 68.83 ± 0.27 | 63.75 ± 0.46 | 67.55 ± 0.55 |
+| Condensation | GEOM² | 67.61 ± 0.7 | 70.70 ± 0.5 | 73.03 ± 0.3 |
+| Condensation | SFGC² | 66.27 ± 0.8 | 70.27 ± 0.7 | 72.36 ± 0.5 |
+| Condensation | GCDMX | 69.91 ± 0.64 | 70.89 ± 0.38 | 71.82 ± 0.63 |
+| Condensation | DosCondX¹ | 68.64 ± 0.47 | 69.24 ± 0.79 | 70.64 ± 0.82 |
+| Condensation | GCond | 73.42 ± 0.32 | 70.80 ± 0.38 | 72.44 ± 0.42 |
+| Condensation | DosCond | 70.29 ± 0.71 | 71.27 ± 0.42 | 71.64 ± 1.01 |
+| Condensation | SGDD | 72.39 ± 0.83 | 71.21 ± 0.38 | 71.59 ± 0.50 |
+| Condensation | GECC | 73.07 ± 0.33 | 72.82 ± 0.30 | 72.97 ± 0.22 |
+| Condensation | CGC | 70.90 ± 0.24 | 71.89 ± 0.25 | 70.96 ± 0.11 |
+| Condensation | ClustGDD | 71.92 ± 0.16 | 73.09 ± 0.27 | 72.54 ± 0.30 |
+
+Whole graph: 71.84 ± 0.21.
+
+#### Cora — test accuracy (%)
+
+| Family | Method | 0.50% | 1.30% | 2.60% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 57.27 ± 1.15 | 66.86 ± 0.65 | 75.60 ± 0.42 |
+| Node sparsification | K-Center | 48.58 ± 5.61 | 64.46 ± 1.47 | 73.17 ± 0.72 |
+| Edge sparsification | TSpanner | 81.54 ± 0.21 | 80.62 ± 0.37 | 80.70 ± 0.25 |
+| Coarsening | Averaging | 75.83 ± 0.70 | 75.83 ± 0.70 | 75.83 ± 0.70 |
+| Coarsening | VNG | 64.59 ± 0.56 | 74.29 ± 0.45 | 75.32 ± 0.21 |
+| Condensation | GEOM² | 78.14 ± 0.5 | 82.29 ± 0.6 | 82.82 ± 0.2 |
+| Condensation | SFGC² | 75.11 ± 2.2 | 79.55 ± 0.3 | 80.54 ± 0.5 |
+| Condensation | GCSNTK | 70.81 ± 1.62 | 68.33 ± 4.01 | 68.83 ± 1.65 |
+| Condensation | GCDMX | 80.47 ± 0.46 | 80.59 ± 0.46 | 81.18 ± 0.24 |
+| Condensation | DosCondX¹ | 80.51 ± 0.33 | 80.22 ± 0.43 | 78.51 ± 0.45 |
+| Condensation | GCond | 80.34 ± 0.34 | 80.93 ± 0.58 | 81.15 ± 0.52 |
+| Condensation | DosCond | 79.12 ± 0.70 | 79.96 ± 0.84 | 78.99 ± 0.96 |
+| Condensation | MSGC | 79.78 ± 0.45 | 80.39 ± 0.58 | 80.89 ± 0.48 |
+| Condensation | SGDD | 80.41 ± 0.49 | 81.00 ± 0.52 | 79.64 ± 0.60 |
+| Condensation | GDEM | 53.60 ± 5.81 | 72.23 ± 2.19 | 75.94 ± 0.74 |
+| Condensation | GECC | 81.94 ± 0.59 | 82.86 ± 0.35 | 82.61 ± 0.34 |
+| Condensation | CGC | 79.75 ± 0.56 | 81.32 ± 0.37 | 80.75 ± 0.60 |
+
+Whole graph: 80.81 ± 0.51.
+
+#### Pubmed — test accuracy (%)
+
+| Family | Method | 0.02% | 0.03% | 0.15% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 56.17 ± 2.57 | 55.61 ± 1.55 | 71.75 ± 0.82 |
+| Node sparsification | Cent-P | 56.17 ± 2.57 | 62.50 ± 0.99 | 72.48 ± 0.75 |
+| Node sparsification | Random | 51.17 ± 3.25 | 57.72 ± 2.02 | 74.08 ± 1.81 |
+| Node sparsification | Herding | 63.03 ± 1.61 | 68.99 ± 1.67 | 75.69 ± 0.63 |
+| Coarsening | Averaging | 75.60 ± 0.42 | 75.60 ± 0.42 | 75.60 ± 0.42 |
+| Coarsening | VNG | 72.85 ± 0.55 | 75.52 ± 0.38 | 76.25 ± 0.42 |
+| Condensation | GEOM² | 69.64 ± 1.4 | 76.21 ± 0.7 | 78.49 ± 0.2 |
+| Condensation | SFGC² | 67.61 ± 2.0 | 66.89 ± 3.3 | 67.61 ± 4.1 |
+| Condensation | GCDMX | 77.60 ± 0.30 | 75.74 ± 1.37 | 77.44 ± 0.36 |
+| Condensation | DosCondX¹ | 72.03 ± 1.58 | 72.25 ± 0.97 | 72.56 ± 0.29 |
+| Condensation | GCond | 77.70 ± 0.64 | 78.09 ± 0.47 | 77.32 ± 0.43 |
+| Condensation | DosCond | 58.03 ± 1.97 | 52.97 ± 0.17 | 76.87 ± 0.20 |
+| Condensation | MSGC | 75.36 ± 0.58 | 77.99 ± 0.44 | 78.32 ± 0.25 |
+| Condensation | SGDD | 78.16 ± 0.31 | 77.98 ± 0.32 | 76.25 ± 0.21 |
+| Condensation | GECC | 75.14 ± 0.22 | 77.75 ± 0.23 | 80.54 ± 0.29 |
+
+Whole graph: 78.60 ± 0.57.
+
+#### Arxiv — test accuracy (%)
+
+| Family | Method | 0.05% | 0.25% | 0.50% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 40.07 ± 1.51 | 49.09 ± 1.03 | 52.10 ± 0.49 |
+| Node sparsification | Cent-P | 34.45 ± 1.34 | 48.52 ± 0.88 | 57.40 ± 0.63 |
+| Node sparsification | Random | 44.91 ± 5.23 | 57.63 ± 1.14 | 59.74 ± 0.39 |
+| Node sparsification | Herding | 49.25 ± 1.86 | 57.26 ± 0.92 | 57.54 ± 0.72 |
+| Node sparsification | K-Center | 48.66 ± 1.70 | 55.40 ± 1.63 | 59.00 ± 0.55 |
+| Edge sparsification | TSpanner³ | 69.35 ± 0.39 | 69.44 ± 0.41 | 69.30 ± 0.28 |
+| Coarsening | Averaging | 59.62 ± 0.42 | 59.96 ± 0.33 | 59.94 ± 0.30 |
+| Condensation | GEOM² | 64.91 ± 0.4 | 68.78 ± 0.1 | 69.59 ± 0.2 |
+| Condensation | SFGC² | 64.91 ± 0.5 | 66.58 ± 0.3 | 67.03 ± 0.5 |
+| Condensation | GCDMX | 60.02 ± 0.44 | 60.59 ± 0.44 | 60.72 ± 0.64 |
+| Condensation | DosCondX¹ | 59.58 ± 0.48 | 62.28 ± 0.39 | 59.73 ± 0.30 |
+| Condensation | DosCond | 56.03 ± 0.60 | 57.41 ± 0.48 | 54.00 ± 0.58 |
+| Condensation | MSGC | 61.09 ± 0.32 | 65.68 ± 0.23 | 64.85 ± 0.21 |
+| Condensation | GDEM³ | 56.25 ± 1.21 | 61.41 ± 0.48 | 63.68 ± 0.40 |
+| Condensation | GECC | 61.52 ± 0.22 | 64.95 ± 0.19 | 66.44 ± 0.19 |
+| Condensation | CGC | 60.71 ± 0.61 | 63.52 ± 0.28 | 64.65 ± 0.28 |
+| Condensation | ClustGDD | 62.11 ± 0.09 | 65.32 ± 0.08 | 66.38 ± 0.12 |
+
+Whole graph: 70.70 ± 0.14.
+
+#### Flickr — test accuracy (%)
+
+| Family | Method | 0.10% | 0.50% | 1.00% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 40.69 ± 0.39 | 42.88 ± 0.29 | 42.63 ± 0.23 |
+| Node sparsification | Cent-P | 39.82 ± 1.34 | 41.77 ± 0.53 | 42.14 ± 0.35 |
+| Node sparsification | Random | 41.22 ± 1.91 | 43.89 ± 0.45 | 44.04 ± 0.68 |
+| Node sparsification | Herding | 40.05 ± 1.49 | 42.63 ± 0.95 | 44.44 ± 0.45 |
+| Node sparsification | K-Center | 39.88 ± 2.36 | 42.35 ± 1.10 | 43.02 ± 0.69 |
+| Edge sparsification | TSpanner³ | 47.18 ± 0.13 | 47.19 ± 0.16 | 47.18 ± 0.14 |
+| Coarsening | Averaging | 37.93 ± 0.31 | 37.76 ± 0.35 | 37.66 ± 0.34 |
+| Coarsening | VNG | 42.73 ± 0.76 | 41.86 ± 0.82 | 42.37 ± 1.03 |
+| Condensation | GEOM² | 47.15 ± 0.1 | 46.71 ± 0.2 | 46.13 ± 0.2 |
+| Condensation | SFGC² | 46.38 ± 0.2 | 46.38 ± 0.2 | 46.61 ± 0.1 |
+| Condensation | GCDMX | 43.25 ± 0.26 | 45.25 ± 0.21 | 45.82 ± 0.30 |
+| Condensation | DosCondX¹ | 46.68 ± 0.08 | 46.80 ± 0.11 | 46.83 ± 0.09 |
+| Condensation | GCond | 46.64 ± 0.19 | 47.02 ± 0.23 | 46.91 ± 0.13 |
+| Condensation | DosCond | 45.73 ± 0.34 | 46.07 ± 0.26 | 46.30 ± 0.20 |
+| Condensation | MSGC | 45.71 ± 0.26 | 46.35 ± 0.31 | 46.43 ± 0.22 |
+| Condensation | SGDD | 42.21 ± 0.31 | 44.32 ± 0.20 | 43.97 ± 0.21 |
+| Condensation | GDEM³ | 44.61 ± 1.04 | 43.88 ± 1.45 | 45.30 ± 0.67 |
+| Condensation | GECC | 46.34 ± 0.10 | 45.92 ± 0.20 | 45.83 ± 0.13 |
+| Condensation | CGC | 46.01 ± 0.14 | 45.93 ± 0.18 | 45.38 ± 0.31 |
+| Condensation | ClustGDD | 46.32 ± 0.05 | 46.63 ± 0.04 | 46.62 ± 0.08 |
+
+Whole graph: 46.95 ± 0.19.
+
+#### Reddit — test accuracy (%)
+
+| Family | Method | 0.05% | 0.10% | 0.20% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 39.87 ± 0.78 | 51.49 ± 1.15 | 56.83 ± 1.99 |
+| Node sparsification | Cent-P | 46.18 ± 1.55 | 52.37 ± 0.82 | 62.00 ± 0.41 |
+| Node sparsification | Herding | 49.88 ± 4.41 | 58.71 ± 4.57 | 69.33 ± 1.92 |
+| Edge sparsification | TSpanner³ | 94.01 ± 0.04 | 93.99 ± 0.03 | 94.00 ± 0.05 |
+| Coarsening | Averaging | 88.29 ± 0.06 | 88.43 ± 0.09 | 88.41 ± 0.07 |
+| Condensation | GEOM² | 90.63 ± 0.2 | 91.33 ± 0.1 | 91.03 ± 0.3 |
+| Condensation | SFGC² | 90.18 ± 0.2 | 89.84 ± 0.3 | 90.71 ± 0.1 |
+| Condensation | GCDMX | 87.31 ± 0.17 | 89.09 ± 0.06 | 89.96 ± 0.04 |
+| Condensation | DosCondX¹ | 87.31 ± 0.23 | 88.04 ± 0.24 | 88.67 ± 0.23 |
+| Condensation | GCond | 84.48 ± 0.76 | 86.98 ± 0.13 | 90.18 ± 0.07 |
+| Condensation | DosCond | 82.72 ± 0.10 | 86.67 ± 0.10 | 88.07 ± 0.26 |
+| Condensation | GDEM³ | 87.95 ± 0.09 | 88.48 ± 0.62 | 90.76 ± 0.25 |
+| Condensation | GECC | 89.95 ± 0.10 | 91.00 ± 0.03 | 91.58 ± 0.05 |
+| Condensation | CGC | 89.39 ± 0.14 | 90.29 ± 0.06 | 90.92 ± 0.06 |
+| Condensation | ClustGDD | 86.89 ± 0.14 | 90.39 ± 0.04 | 91.33 ± 0.07 |
+
+Whole graph: 93.99 ± 0.05.
+
+#### Yelp — F1-macro (%)
+
+| Family | Method | 0.05% | 0.10% | 0.20% |
+| --- | --- | ---: | ---: | ---: |
+| Node sparsification | Cent-D | 50.23 ± 0.53 | 46.08 ± 0.00 | 46.08 ± 0.00 |
+| Node sparsification | Cent-P | 47.40 ± 0.09 | 48.62 ± 0.54 | 46.11 ± 0.06 |
+| Node sparsification | Random | 46.10 ± 0.05 | 47.74 ± 1.05 | 49.21 ± 2.60 |
+| Node sparsification | Herding | 46.13 ± 0.07 | 46.43 ± 0.39 | 47.00 ± 0.35 |
+| Node sparsification | K-Center | 46.45 ± 0.26 | 48.30 ± 0.30 | 48.42 ± 0.64 |
+| Edge sparsification | TSpanner³ | 47.50 ± 0.26 | 47.50 ± 0.23 | 47.54 ± 0.13 |
+| Coarsening | Averaging | 53.42 ± 0.86 | 53.79 ± 0.35 | 53.83 ± 0.35 |
+| Coarsening | VNG | 46.08 ± 0.00 | 46.08 ± 0.00 | 46.08 ± 0.00 |
+| Condensation | GEOM² | 52.80 ± 2.2 | 47.56 ± 0.2 | 49.48 ± 0.7 |
+| Condensation | SFGC² | 46.20 ± 0.1 | 47.96 ± 0.0 | 46.70 ± 0.1 |
+| Condensation | GCDMX | 52.15 ± 1.20 | 55.12 ± 0.78 | 53.63 ± 0.46 |
+| Condensation | DosCondX¹ | 52.43 ± 0.13 | 52.34 ± 0.62 | 50.30 ± 0.26 |
+| Condensation | GCond | 52.09 ± 0.13 | 51.74 ± 0.14 | 49.83 ± 0.16 |
+| Condensation | DosCond | 46.74 ± 1.48 | 51.72 ± 0.58 | 53.41 ± 0.17 |
+| Condensation | SGDD | 53.66 ± 0.25 | 51.81 ± 0.30 | 51.89 ± 0.12 |
+| Condensation | GDEM³ | 46.08 ± 0.00 | 46.08 ± 0.00 | 46.08 ± 0.00 |
+
+Whole graph: 47.43 ± 0.22.
+
+¹ Archived DosCondX measurements use the historical GCondX settings and reference row. The Reddit configuration differs from current DosCondX defaults; raw archived names and configurations are preserved.
+² Published GC4NC values (mean ± standard error). The paper obtained GEOM and SFGC scores from the authors' implementations; their expert-trajectory training is too slow to rerun for the full matrix.
+³ GC4NC Table 9 reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
+
+Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); GDEM (Citeseer, Pubmed); Cent-P (Cora); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
+
+<!-- reproduction-results:end -->
+
+</details>
 
 ## ogbn-arxiv accuracy–time tradeoff
 
@@ -94,6 +392,32 @@ controls downstream evaluation repetitions. `--run_reduction 0` evaluates a save
 graph, and `-W` evaluates the whole graph. Method JSON defaults load before explicit
 CLI overrides. `--agg` (also `--aggpreprocess`) selects an aggregated variant where
 available.
+
+### Hyperparameter optimization (HPO)
+
+Search reduction-method settings using **mean validation accuracy only**.
+For example, GDEM ships a search space:
+
+```bash
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 --hpo --save_path ./checkpoints
+```
+
+Use `--hpo_space path/to/space.json` for a custom grid. Each key is a method
+setting and each list contains its candidate values. For a method without a
+shipped grid, the first invocation writes a one-point template to widen.
+The command previews the grid and requests confirmation; `--hpo_yes` starts it
+directly. Rerunning the same command resumes from `trials.jsonl`.
+
+The winning settings are saved to `checkpoints/hpo/gdem/cora_r0.5/best.json`:
+
+```bash
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 \
+  --config ./checkpoints/hpo/gdem/cora_r0.5/best.json --save_path ./checkpoints
+```
+
+HPO computes validation scores during search; the replay command evaluates the
+selected configuration. `--hpo_eval_runs` controls validation fits per trial
+(default: 3). [Search-space format](graphslim/configs/hpo/README.md).
 
 ### Examples
 

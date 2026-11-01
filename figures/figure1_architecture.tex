@@ -1,0 +1,111 @@
+% Native vector artwork; icons come from Font Awesome 5 (fontawesome5 package).
+% Keep the diagram within the JMLR text width (15.24 cm).
+% Color does one job: layer identity. The three hues are slots 1-3 of a categorical
+% palette validated for colorblind and normal-vision separation. All text uses neutral
+% ink; the hue appears only on marks (accent strip, icons, connectors, panel wash).
+\begingroup%
+\definecolor{gsData}{HTML}{2A78D6}%
+\definecolor{gsReduce}{HTML}{EB6834}%
+\definecolor{gsEval}{HTML}{1BAF7A}%
+\definecolor{gsInk}{HTML}{0B0B0B}%
+\definecolor{gsInkTwo}{HTML}{52514E}%
+\definecolor{edgegray}{HTML}{666666}%
+\providecommand{\edgegray}[1]{\textcolor{edgegray}{#1}}%
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  font=\sffamily\fontsize{8}{9.4}\selectfont,
+  text=gsInk,
+  >={Stealth[length=1.5mm,width=1.1mm]},
+  line cap=round, line join=round,
+  rowtext/.style={anchor=west,inner sep=0pt},
+  title/.style={anchor=base west,inner sep=0pt,
+    font=\sffamily\bfseries\fontsize{9.5}{11}\selectfont},
+  api/.style={anchor=base west,inner sep=0pt,text=gsInkTwo,
+    font=\ttfamily\fontsize{7.5}{9}\selectfont},
+  flowlabel/.style={inner sep=0pt,align=center,text=gsInkTwo,
+    font=\sffamily\fontsize{6.8}{7.8}\selectfont},
+  ico/.style={inner sep=0pt,font=\fontsize{8.5}{8.5}\selectfont},
+  pics/merge/.style={code={
+    % Coarsening: a cluster of nodes collapses into one supernode.
+    \draw[line width=.65pt] (-.2,.09) -- (-.11,-.09) -- (-.02,.08) -- cycle;
+    \foreach \p in {(-.2,.09),(-.11,-.09),(-.02,.08)} \fill \p circle[radius=.036];
+    \draw[line width=.7pt,->,>={Stealth[length=.8mm,width=.6mm]}] (.03,0) -- (.12,0);
+    \fill (.19,0) circle[radius=.065];
+  }},
+]
+% Panels: a light wash of the layer hue with a 2 pt accent strip on top; no outlines.
+\foreach \xl/\xr/\c in {0/4.02/gsData,4.82/9.57/gsReduce,10.47/15.22/gsEval} {
+  \begin{scope}
+    \clip[rounded corners=3pt] (\xl,0) rectangle (\xr,3.5);
+    \fill[\c!7] (\xl,0) rectangle (\xr,3.5);
+    \fill[\c] (\xl,3.43) rectangle (\xr,3.5);
+  \end{scope}
+  \draw[\c!22,line width=.4pt] (\xl+.2,2.6) -- (\xr-.2,2.6);
+}
+\node[title] at (.2,3.07) {Data layer};
+\node[api] at (.2,2.76) {get\_dataset(name)};
+\node[title] at (5.02,3.07) {Reduction layer};
+\node[api] at (5.02,2.76) {create\_reducer(method)};
+\node[title] at (10.67,3.07) {Evaluation layer};
+\node[api] at (10.67,2.76) {Evaluator};
+
+% Data services: one pictogram per row on a shared grid.
+\foreach \yy in {1.875,1.3,.725} {
+  \draw[gsData!20,line width=.4pt] (.2,\yy) -- (3.82,\yy);
+}
+\node[ico,text=gsData] at (.38,2.1625) {\faIcon{database}};
+\node[rowtext] at (.72,2.1625) {PyG, OGB, DGL sources};
+\node[ico,text=gsData] at (.38,1.5875) {\faIcon{file-import}};
+\node[rowtext] at (.72,1.5875) {Custom graph input};
+\node[ico,text=gsData] at (.38,1.0125) {\faIcon{toggle-on}};
+\node[rowtext] at (.72,1.0125) {Transductive / inductive};
+\node[ico,text=gsData] at (.38,.4375) {\faIcon{exchange-alt}};
+\node[rowtext] at (.72,.4375) {\texttt{compat}: PyG $\leftrightarrow$ DGL};
+
+% Reduction families share one interface; node-level reducers can seed condensation.
+\foreach \yy/\label/\count in {2.15/Sparsification/12,1.55/Coarsening/10,.95/Condensation/16} {
+  \fill[white,rounded corners=2pt] (5.02,\yy-.25) rectangle (8.9,\yy+.25);
+  \ifdim\yy pt>2pt
+    \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy+.075) {\label};
+    \node[rowtext,text=gsInkTwo,font=\sffamily\fontsize{6.4}{7.4}\selectfont]
+      at (5.60,\yy-.15) {5 node / \edgegray{7 edge}};
+  \else
+    \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy) {\label};
+  \fi
+  \node[anchor=east,inner sep=0pt,text=gsInkTwo,font=\sffamily\fontsize{7}{8}\selectfont]
+    at (8.76,\yy) {\count\ methods};
+}
+\node[ico,text=gsReduce] at (5.30,2.15) {\faIcon{filter}};
+\pic[draw=gsReduce,fill=gsReduce] at (5.31,1.55) {merge};
+\node[ico,text=gsReduce] at (5.30,.95) {\faIcon{flask}};
+\draw[gsReduce,dashed,line width=.65pt,->] (8.9,2.15) -- (9.06,2.15) -- (9.06,.95) -- (8.9,.95);
+\draw[gsReduce,dashed,line width=.65pt] (8.9,1.55) -- (9.06,1.55);
+\node[flowlabel,anchor=west] at (9.12,1.13) {init};
+
+% Optional method-hyperparameter search; trial selection uses validation only.
+\draw[gsReduce!20,line width=.4pt] (5.02,.60) -- (9.37,.60);
+\node[ico,text=gsReduce] at (5.30,.30) {\faIcon{sliders-h}};
+\node[rowtext] at (5.60,.30) {\textbf{HPO} / validation-only};
+
+% Evaluation tasks: one pictogram per row on a shared grid.
+\foreach \yy in {1.99,1.53,1.07,.61} {
+  \draw[gsEval!20,line width=.4pt] (10.67,\yy) -- (15.02,\yy);
+}
+\node[ico,text=gsEval] at (10.85,2.22) {\faIcon{project-diagram}};
+\node[rowtext] at (11.19,2.22) {7 GNN backbones / transfer};
+\node[ico,text=gsEval] at (10.85,1.76) {\faIcon{list-ol}};
+\node[rowtext] at (11.19,1.76) {Architecture search / rankings};
+\node[ico,text=gsEval] at (10.85,1.30) {\faIcon{stethoscope}};
+\node[rowtext] at (11.19,1.30) {Graph properties};
+\node[ico,text=gsEval] at (10.85,.84) {\faIcon{shield-alt}};
+\node[rowtext] at (11.19,.84) {Privacy / robustness};
+\node[ico,text=gsEval] at (10.85,.38) {\faIcon{stopwatch}};
+\node[rowtext] at (11.19,.38) {Runtime / memory};
+
+% One possible composition of the independently accessible layers.
+\draw[gsInkTwo,line width=.75pt,->] (4.02,1.3) -- (4.82,1.3);
+\node[flowlabel] at (4.42,1.48) {graph};
+\draw[gsInkTwo,line width=.75pt,->] (9.57,1.3) -- (10.47,1.3);
+\node[flowlabel] at (10.02,1.6) {reduced\\graph};
+\end{tikzpicture}%
+\endgroup

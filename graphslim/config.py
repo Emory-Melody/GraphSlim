@@ -89,6 +89,7 @@ PARAMETER_CATEGORIES = {
     },
     "GEOM, SFGC": {"no_buff"},
     "KCenter, Herding, Random, Clustering": {"agg"},
+    "HPO": {"hpo", "hpo_space", "hpo_eval_runs", "hpo_yes"},
     "Downstream Evaluation": {
         "eval_epochs",
         "eval_model",
@@ -116,6 +117,7 @@ PARAMETER_CATEGORIES = {
 CATEGORY_ORDER = [
     "Common",
     "Downstream Evaluation",
+    "HPO",
     "Attack",
     "Coarsening",
     "KCenter, Herding, Random, Clustering",
@@ -572,6 +574,23 @@ def method_config(args):
 )
 # ==================tspanner=====#
 @click.option("--ts", default=4, help="for tspanner", show_default=True)
+# ==================hpo=====#
+@click.option(
+    "--hpo",
+    is_flag=True,
+    show_default=True,
+    help="grid-search the reduction method's settings with validation-only selection (resumable)",
+)
+@click.option(
+    "--hpo_space",
+    default=None,
+    show_default=True,
+    help="JSON search space; default graphslim/configs/hpo/<method>.json or a template under save_path/hpo",
+)
+@click.option("--hpo_eval_runs", default=3, show_default=True, help="validation GCN fits per trial")
+@click.option(
+    "--hpo_yes", is_flag=True, show_default=True, help="start the search without the Y/N prompt"
+)
 # ======================================simgc====================================== #
 @click.option("--feat_alpha", default=10, show_default=True, help="feature loss weight")
 @click.option("--smoothness_alpha", default=0.1, show_default=True, help="smoothness loss weight")

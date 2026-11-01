@@ -28,6 +28,10 @@ def run(args, *, load_dataset=None, on_result=None):
     graph = loader(args.dataset, args, args.load_path)
     if args.attack is not None:
         graph = attack(graph, args)
+    if getattr(args, "hpo", False):
+        from graphslim import hpo
+
+        return hpo.run_search(args, graph)
     tracker = build_tracker(args)
     results = []
     try:
