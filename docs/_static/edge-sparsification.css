@@ -1,0 +1,18 @@
+/* Match the manuscript's edgegray (#666666); keep edge text legible on white. */
+.edge-sparsification,
+.edge-sparsification * {
+  color: #666666 !important;
+}
+
+/* Table of contents links live outside the styled API sections. */
+a[href$="#edge-sparsification"],
+a[href*="#graphslim-sparsification-edge-sparsification-base-module"],
+a[href*="#graphslim-sparsification-random-edge-module"],
+a[href*="#graphslim-sparsification-g-spar-module"],
+a[href*="#graphslim-sparsification-local-degree-module"],
+a[href*="#graphslim-sparsification-rank-degree-module"],
+a[href*="#graphslim-sparsification-scan-module"],
+a[href*="#graphslim-sparsification-spanning-forest-module"],
+a[href*="#graphslim-sparsification-t-spanner-module"] {
+  color: #666666 !important;
+}

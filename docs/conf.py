@@ -82,6 +82,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_static_path = ["_static"] if (Path(__file__).parent / "_static").is_dir() else []
+html_css_files = ["edge-sparsification.css"]
 epub_exclude_files = [".nojekyll"]
 #
 # add_module_names = False

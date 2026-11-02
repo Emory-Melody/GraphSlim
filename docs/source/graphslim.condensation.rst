@@ -29,14 +29,6 @@ graphslim.condensation.gcond module
    :undoc-members:
    :show-inheritance:
 
-graphslim.condensation.gcondx module
-------------------------------------
-
-.. automodule:: graphslim.condensation.gcondx
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 graphslim.condensation.doscond module
 -------------------------------------
 

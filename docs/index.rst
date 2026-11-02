@@ -1,7 +1,9 @@
 Welcome to GraphSlim's documentation!
 =====================================
 
-A comprehensive package for graph sparsification, coarsening and condensation based on PyG.
+.. role:: edge-sparsification
+
+A comprehensive package for node sparsification, :edge-sparsification:`edge sparsification`, coarsening and condensation based on PyG.
 
 .. toctree::
    :maxdepth: 1
@@ -14,21 +16,6 @@ A comprehensive package for graph sparsification, coarsening and condensation ba
    :caption: Quickstart
 
    quickstart.md
-   lightweight_methods.md
-   clustering_operators.md
-   compatibility.md
-   efficiency.md
-   cuda_graph.md
-   dataset_expansion.md
-   products.md
-   arxiv_tradeoff.md
-   simgc.md
-
-.. toctree::
-   :maxdepth: 1
-   :caption: Software publication
-
-   mloss_extensions.md
 
 .. toctree::
    :hidden:

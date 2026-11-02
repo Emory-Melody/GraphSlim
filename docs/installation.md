@@ -14,12 +14,14 @@ for the full CPU setup and optional dependency groups. For a published version,
 use `pip install graphslim`. The `uv.lock` environment is consumed by
 `uv sync --locked`; PyG extension wheels must match its Torch version.
 
-See [runtime compatibility](compatibility.md) for tested CPU/CUDA combinations,
-optional DGL graph interchange and the real-operator self-check:
+Check the installed CPU environment and optional DGL support:
 
 ```bash
 python -m graphslim.doctor --device cpu --dgl
 ```
+
+For GPU execution, install Torch and PyG extension wheels matching your CUDA
+runtime, then check the selected device with `python -m graphslim.doctor --device cuda:0`.
 
 ## Build the documentation
 
