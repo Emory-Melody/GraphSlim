@@ -49,6 +49,12 @@ explained below.
 
 <!-- reproduction-coverage:start -->
 
+[![Cumulative reproduction coverage at 1%, 2% and 5% one-sided relative-shortfall thresholds, with policy credits separately hatched](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
+
+Each column is cumulative for the same fixed roster; blue segments show disjoint measured-shortfall ranges. The hatched segment contains the same **seven policy-credited Clustering pairs** at every cutoff; their numerical gaps remain unknown.
+
+[Vector PDF](figures/reproduction_coverage.pdf) · [High-resolution PNG](figures/reproduction_coverage.png) · [Reviewed chart data](benchmark/results/reproduction_coverage_figure.json) · [Figure renderer](benchmark/plot_reproduction_coverage.py)
+
 | Criterion | <1% | <2% | <5% |
 | --- | ---: | ---: | ---: |
 | Relative shortfall | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |

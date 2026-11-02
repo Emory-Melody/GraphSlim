@@ -46,6 +46,12 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
 
 <!-- reproduction-coverage:start -->
 
+[![单边相对短缺阈值为 1%、2%、5% 时的累计复现覆盖率，规则计入组合单独用纹理标出](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
+
+各柱按阈值累计同一固定范围内的组合，蓝色区间对应互斥的实测短缺范围。纹理部分为每档均按规则计入的同样 **7 个 Clustering 组合**，其数值差距仍未知。
+
+[矢量 PDF](figures/reproduction_coverage.pdf) · [高清 PNG](figures/reproduction_coverage.png) · [经核对的绘图数据](benchmark/results/reproduction_coverage_figure.json) · [绘图脚本](benchmark/plot_reproduction_coverage.py)
+
 | 判定口径 | <1% | <2% | <5% |
 | --- | ---: | ---: | ---: |
 | 单边相对短缺 | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |

@@ -6,6 +6,7 @@ roster, formulas, policy credits, reference corrections, and source hashes.
 """
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -14,6 +15,7 @@ from benchmark.render_arxiv_efficiency import speed_figure
 
 ROOT = Path(__file__).resolve().parents[1]
 COVERAGE = ROOT / "benchmark/results/reproduction_coverage_20261101.json"
+COVERAGE_FIGURE = ROOT / "benchmark/results/reproduction_coverage_figure.json"
 
 
 def load_coverage():
@@ -53,6 +55,26 @@ def coverage_table(data, language):
         cells.append(f"{row['count']}/{row['denominator']} ({row['percent']:.2f}%)")
     lines.append("| " + " | ".join([label, *cells]) + " |")
     return "\n".join(lines)
+
+
+def coverage_content(data, language):
+    figure = json.loads(COVERAGE_FIGURE.read_text())
+    assert figure["source_sha256"] == hashlib.sha256(COVERAGE.read_bytes()).hexdigest()
+    assert figure["metric"] == "mean_shortfall_percent"
+    assert figure["total_pairs"] == data["total_pairs"]
+    for suffix, digest in figure["assets_sha256"].items():
+        path = ROOT / f"figures/reproduction_coverage{suffix}"
+        assert hashlib.sha256(path.read_bytes()).hexdigest() == digest
+    if language == "en":
+        alt = "Cumulative reproduction coverage at 1%, 2% and 5% one-sided relative-shortfall thresholds, with policy credits separately hatched"
+        caption = "Each column is cumulative for the same fixed roster; blue segments show disjoint measured-shortfall ranges. The hatched segment contains the same **seven policy-credited Clustering pairs** at every cutoff; their numerical gaps remain unknown."
+        links = "[Vector PDF](figures/reproduction_coverage.pdf) · [High-resolution PNG](figures/reproduction_coverage.png) · [Reviewed chart data](benchmark/results/reproduction_coverage_figure.json) · [Figure renderer](benchmark/plot_reproduction_coverage.py)"
+    else:
+        alt = "单边相对短缺阈值为 1%、2%、5% 时的累计复现覆盖率，规则计入组合单独用纹理标出"
+        caption = "各柱按阈值累计同一固定范围内的组合，蓝色区间对应互斥的实测短缺范围。纹理部分为每档均按规则计入的同样 **7 个 Clustering 组合**，其数值差距仍未知。"
+        links = "[矢量 PDF](figures/reproduction_coverage.pdf) · [高清 PNG](figures/reproduction_coverage.png) · [经核对的绘图数据](benchmark/results/reproduction_coverage_figure.json) · [绘图脚本](benchmark/plot_reproduction_coverage.py)"
+    image = f"[![{alt}](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)"
+    return "\n\n".join([image, caption, links, coverage_table(data, language)])
 
 
 def replace(text, name, table):
@@ -101,7 +123,7 @@ def main():
         path = ROOT / filename
         old = path.read_text(encoding="utf-8")
         new = replace(old, "implementation-comparison", speed_figure(language))
-        new = replace(new, "reproduction-coverage", coverage_table(coverage, language))
+        new = replace(new, "reproduction-coverage", coverage_content(coverage, language))
         new = order_highlights(new, language)
         if args.check:
             if old != new:
