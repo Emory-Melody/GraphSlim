@@ -54,6 +54,20 @@ def gcn_norm(
     dtype=None,
 ):
 
+    """Apply symmetric GCN degree normalization to edge indices or torch_sparse adjacency.
+
+    The edge-index path returns endpoints and weights. The SparseTensor path
+    returns a normalized SparseTensor.
+
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :param edge_weight: One scalar weight per edge; ``None`` uses unit weights. Defaults to ``None``.
+    :param num_nodes: Number of nodes in the graph. Defaults to ``None``.
+    :param improved: Whether self-loop weights use two instead of one in GCN normalization. Defaults to ``False``.
+    :param add_self_loops: Whether to add diagonal edges during adjacency preparation. Defaults to ``True``.
+    :param flow: Message direction used to select source or target degree normalization. Defaults to ``'source_to_target'``.
+    :param dtype: Desired numeric dtype. Defaults to ``None``.
+    :returns: Normalized adjacency representation matching the input format.
+    """
     fill_value = 2.0 if improved else 1.0
 
     if isinstance(edge_index, SparseTensor):
@@ -94,6 +108,12 @@ def gcn_norm(
 
 # from deeprobust.graph.utils import *
 def is_identity(mx, device):
+    """Test whether a supported dense or sparse tensor equals an identity matrix within tolerance.
+
+    :param mx: Input matrix to transform.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+    :returns: Boolean result of ``torch.allclose``.
+    """
     identity = torch.eye(mx.size(0), device=device)
     if isinstance(mx, torch.Tensor):
         if is_sparse_tensor(mx):
@@ -110,6 +130,10 @@ def is_identity(mx, device):
 
 
 def seed_everything(seed):
+    """Seed Python, NumPy, PyTorch, CUDA, and the hash-seed environment variable.
+
+    :param seed: Random seed.
+    """
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -119,6 +143,13 @@ def seed_everything(seed):
 
 def regularization(adj, x, eig_real=None):
     # fLf
+    """Compute feature-smoothing regularization on the synthetic graph.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param x: Node feature matrix with one row per node.
+    :param eig_real: Optional reference eigenvalues retained for interface compatibility. Defaults to ``None``.
+    :returns: Scalar smoothing loss; ``eig_real`` is currently unused.
+    """
     loss = 0
     # loss += torch.norm(adj, p=1)
     loss += feature_smoothing(adj, x)
@@ -126,11 +157,21 @@ def regularization(adj, x, eig_real=None):
 
 
 def maxdegree(adj):
+    """Penalize a maximum weighted degree above half the graph node count.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: Scalar ``relu(max_degree / num_nodes - 0.5)`` tensor.
+    """
     n = adj.shape[0]
     return F.relu(max(adj.sum(1)) / n - 0.5)
 
 
 def sparsity2(adj):
+    """Compute the normalized Frobenius adjacency penalty.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: Scalar Frobenius norm divided by node count; the degree term has zero weight.
+    """
     n = adj.shape[0]
     loss_degree = -torch.log(adj.sum(1)).sum() / n
     loss_fro = torch.norm(adj) / n
@@ -138,6 +179,11 @@ def sparsity2(adj):
 
 
 def sparsity(adj):
+    """Penalize adjacency mass above one percent of all possible node pairs.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: Scalar nonnegative excess adjacency mass.
+    """
     n = adj.shape[0]
     thresh = n * n * 0.01
     return F.relu(adj.sum() - thresh)
@@ -145,6 +191,12 @@ def sparsity(adj):
 
 
 def feature_smoothing(adj, X):
+    """Measure feature variation with the symmetrized normalized graph Laplacian.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param X: Node feature matrix with one row per node.
+    :returns: Scalar trace ``X.T @ L @ X``.
+    """
     adj = (adj.t() + adj) / 2
     rowsum = adj.sum(1)
     r_inv = rowsum.flatten()
@@ -165,6 +217,13 @@ def feature_smoothing(adj, X):
 
 
 def row_normalize_tensor(mx):
+    """Subtract the global minimum and normalize nonzero matrix rows to unit sum.
+
+    The minimum subtraction mutates the supplied tensor.
+
+    :param mx: Input matrix to transform.
+    :returns: Row-normalized tensor with zero rows preserved.
+    """
     mx -= mx.min()
     rowsum = mx.sum(1)
     r_inv = rowsum.pow(-1).flatten()
@@ -178,6 +237,14 @@ def row_normalize_tensor(mx):
 
 
 def one_hot_sfgc(x, num_classes, center=True, dtype=np.float32):
+    """Encode class IDs as NumPy one-hot rows, optionally centered by the uniform class prior.
+
+    :param x: Node feature matrix with one row per node.
+    :param num_classes: Number of output classes.
+    :param center: Whether to subtract the uniform class probability from each encoded row. Defaults to ``True``.
+    :param dtype: Desired numeric dtype. Defaults to ``np.float32``.
+    :returns: Array of shape ``(num_samples, num_classes)``.
+    """
     assert len(x.shape) == 1
     one_hot_vectors = np.array(x[:, None] == np.arange(num_classes), dtype)
     if center:
@@ -186,6 +253,17 @@ def one_hot_sfgc(x, num_classes, center=True, dtype=np.float32):
 
 
 def calc(gntk, feat1, feat2, diag1, diag2, A1, A2):
+    """Delegate a graph-pair kernel calculation to a GNTK implementation.
+
+    :param gntk: Kernel object exposing a ``gntk`` method.
+    :param feat1: Node features of the first and second graph, respectively.
+    :param feat2: Node features of the first and second graph, respectively.
+    :param diag1: Standard-deviation vectors for the left and right node sets.
+    :param diag2: Standard-deviation vectors for the left and right node sets.
+    :param A1: Adjacency of the first and second graph, respectively.
+    :param A2: Adjacency of the first and second graph, respectively.
+    :returns: Kernel value returned by ``gntk.gntk``.
+    """
     return gntk.gntk(feat1, feat2, diag1, diag2, A1, A2)
 
 
@@ -203,6 +281,16 @@ def calc(gntk, feat1, feat2, diag1, diag2, A1, A2):
 
 
 def loss_acc_fn_eval(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
+    """Evaluate trace-regularized kernel ridge predictions against target class rows.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param k_ss: Support-to-support kernel matrix.
+    :param k_ts: Target-to-support kernel matrix.
+    :param y_support: Support or target class indicator rows, respectively.
+    :param y_target: Support or target class indicator rows, respectively.
+    :param reg: Nonnegative trace-scaled kernel ridge regularization magnitude. Defaults to ``0.05``.
+    :returns: Tuple ``(half_mean_squared_error, accuracy_fraction)``; ``data`` is unused.
+    """
     k_ss_reg = k_ss + np.abs(reg) * np.trace(k_ss) * np.eye(k_ss.shape[0]) / k_ss.shape[0]
     pred = np.dot(k_ts, np.linalg.inv(k_ss_reg).dot(y_support))
     mse_loss = 0.5 * np.mean((pred - y_target) ** 2)
@@ -214,21 +302,44 @@ def loss_acc_fn_eval(data, k_ss, k_ts, y_support, y_target, reg=5e-2):
 
 
 def one_hot(x, class_count):
+    """Index a CPU identity matrix to encode integer class labels.
+
+    :param x: Node feature matrix with one row per node.
+    :param class_count: Number of output classes.
+    :returns: PyTorch one-hot tensor with one column per class.
+    """
     return torch.eye(class_count)[x, :]
 
 
 def mask_to_index(index, size):
+    """Convert a mask or index selection into NumPy node IDs.
+
+    :param index: Index or indices to access.
+    :param size: Size of the output or requested budget.
+    :returns: NumPy array of selected indices from ``arange(size)``.
+    """
     all_idx = np.arange(size)
     return all_idx[index]
 
 
 def index_to_mask(index, size):
+    """Create a CPU boolean mask from selected integer indices.
+
+    :param index: Index or indices to access.
+    :param size: Size of the output or requested budget.
+    :returns: Boolean tensor of length ``size``.
+    """
     mask = torch.zeros((size,), dtype=torch.bool)
     mask[index] = 1
     return mask
 
 
 def to_camel_case(snake_str):
+    """Convert underscore-separated tokens to a concatenated title-case name.
+
+    :param snake_str: Underscore-separated input string.
+    :returns: Camel-case string.
+    """
     components = snake_str.split("_")
     return "".join(x.title() for x in components)
 
@@ -243,6 +354,16 @@ def to_camel_case(snake_str):
 
 
 def to_tensor(*vars, **kwargs):
+    """Convert positional arrays and keyword values to device tensors.
+
+    One-dimensional keyword values whose names contain ``label`` become integer
+    tensors; other values become floating point. Keyword values follow positional
+    values in the returned order, excluding the ``device`` option.
+
+    :param vars: Positional arrays, sparse matrices, or tensors to convert.
+    :param kwargs: Additional keyword options passed to the underlying implementation.
+    :returns: A single tensor for one input, otherwise a list of tensors.
+    """
     device = kwargs.get("device", "cpu")
     tensor_list = []
     for var in vars:
@@ -263,6 +384,12 @@ def to_tensor(*vars, **kwargs):
 
 
 def check_type(var, device):
+    """Convert a SciPy matrix, NumPy array, or tensor to a float tensor on the target device.
+
+    :param var: Single NumPy array, SciPy sparse matrix, or PyTorch tensor to convert.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+    :returns: PyTorch tensor; SciPy inputs become coalesced sparse COO tensors.
+    """
     if sp.issparse(var):
         var = sparse_mx_to_torch_sparse_tensor(var).coalesce()
     elif isinstance(var, np.ndarray):
@@ -277,17 +404,10 @@ import scipy.sparse as sp
 
 
 def encode_onehot(labels):
-    """Convert label to onehot format.
+    """Encode nonnegative integer labels by indexing a NumPy identity matrix.
 
-    Parameters
-    ----------
-    labels : numpy.array
-        node labels
-
-    Returns
-    -------
-    numpy.array
-        onehot labels
+    :param labels: Node labels in the same node ordering as the corresponding features.
+    :returns: NumPy array with ``max(labels) + 1`` class columns.
     """
     eye = np.eye(labels.max() + 1)
     onehot_mx = eye[labels]
@@ -341,7 +461,12 @@ def normalize_feature(mx):
 
 
 def normalize_sparse_tensor(adj, fill_value=1):
-    """Normalize sparse tensor. Need to import torch_scatter"""
+    """Append self-loops and apply symmetric degree normalization to sparse COO adjacency.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param fill_value: Weight assigned to newly appended self-loop edges. Defaults to ``1``.
+    :returns: Normalized PyTorch sparse tensor.
+    """
     edge_index = adj._indices()
     edge_weight = adj._values()
     num_nodes = adj.size(0)
@@ -363,6 +488,14 @@ def normalize_sparse_tensor(adj, fill_value=1):
 def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
     # num_nodes = maybe_num_nodes(edge_index, num_nodes)
 
+    """Append one diagonal edge per declared node without removing existing loops.
+
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :param edge_weight: One scalar weight per edge; ``None`` uses unit weights. Defaults to ``None``.
+    :param fill_value: Weight assigned to newly appended self-loop edges. Defaults to ``1``.
+    :param num_nodes: Number of nodes in the graph. Defaults to ``None``.
+    :returns: Tuple ``(edge_index_with_loops, optional_edge_weights)``.
+    """
     loop_index = torch.arange(0, num_nodes, dtype=torch.long, device=edge_index.device)
     loop_index = loop_index.unsqueeze(0).repeat(2, 1)
 
@@ -377,15 +510,12 @@ def add_self_loops(edge_index, edge_weight=None, fill_value=1, num_nodes=None):
 
 
 def normalize_adj_sgformer(adj):
-    """
-    Normalize the adjacency matrix. Works for both dense and sparse matrices.
+    """Normalize dense adjacency by weighted degree or sparse adjacency by edge counts.
 
-    Args:
-    adj (torch.Tensor): The adjacency matrix (either dense or sparse COO).
-    device (torch.device): The device to run the normalization on.
-
-    Returns:
-    torch.Tensor or SparseTensor: The normalized adjacency matrix.
+    :param adj: Dense Torch matrix or ``torch_sparse.SparseTensor`` with stored
+        edge values. The sparse path uses column edge counts for its degree factors.
+    :returns: Normalized adjacency in the input representation, with non-finite
+        normalized entries replaced by zero. No self-loops are added.
     """
     # if is_sparse_tensor(adj):
     #     # Sparse matrix normalization
@@ -426,7 +556,12 @@ def normalize_adj_sgformer(adj):
 
 
 def normalize_adj_tensor(adj, sparse=False):
-    """Normalize adjacency tensor matrix, return sparse or not"""
+    """Apply GCN normalization to a dense graph, dense graph batch, or sparse graph.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param sparse: Whether to use the sparse adjacency normalization path. Defaults to ``False``.
+    :returns: Dense tensor for dense inputs, or transposed torch_sparse SparseTensor when sparse=True.
+    """
     device = adj.device
     if sparse:
         adj = to_scipy(adj)
@@ -452,6 +587,12 @@ def normalize_adj_tensor(adj, sparse=False):
 
 
 def dense_gcn_norm(adj, device):
+    """Add identity and apply symmetric inverse-square-root degree normalization to dense adjacency.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+    :returns: Normalized dense PyTorch tensor.
+    """
     if type(adj) is not torch.Tensor:
         adj = torch.from_numpy(adj)
     mx = adj + torch.eye(adj.shape[0]).to(device)
@@ -465,6 +606,12 @@ def dense_gcn_norm(adj, device):
 
 
 def gcn_normalize_adj(adj, device="cpu"):
+    """Apply GCN normalization while preserving SciPy, NumPy, or dense tensor output conventions.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cpu'``.
+    :returns: Normalized adjacency in the corresponding input representation.
+    """
     if sp.issparse(adj):
         return sparse_gcn_norm(adj)
     elif type(adj) is torch.Tensor:
@@ -474,6 +621,11 @@ def gcn_normalize_adj(adj, device="cpu"):
 
 
 def sparse_gcn_norm(adj):
+    """Add identity and symmetrically normalize a SciPy sparse adjacency.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: SciPy sparse normalized adjacency.
+    """
     adj = adj + sp.eye(adj.shape[0])
     rowsum = np.array(adj.sum(1))
     r_inv = np.power(rowsum, -0.5).flatten()
@@ -484,7 +636,13 @@ def sparse_gcn_norm(adj):
 
 
 def degree_normalize_adj(mx):
-    """Row-normalize sparse matrix"""
+    """Apply row-degree normalization to SciPy sparse adjacency.
+
+    Identity is added only when the first diagonal entry is zero.
+
+    :param mx: Input matrix to transform.
+    :returns: Row-normalized SciPy sparse matrix.
+    """
     mx = mx.tolil()
     if mx[0, 0] == 0:
         mx = mx + sp.eye(mx.shape[0])
@@ -498,7 +656,12 @@ def degree_normalize_adj(mx):
 
 
 def degree_normalize_sparse_tensor(adj, fill_value=1):
-    """degree_normalize_sparse_tensor."""
+    """Append self-loops and row-normalize sparse COO adjacency.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param fill_value: Weight assigned to newly appended self-loop edges. Defaults to ``1``.
+    :returns: PyTorch sparse tensor with inverse-row-degree edge weights.
+    """
     edge_index = adj._indices()
     edge_weight = adj._values()
     num_nodes = adj.size(0)
@@ -518,7 +681,12 @@ def degree_normalize_sparse_tensor(adj, fill_value=1):
 
 
 def degree_normalize_adj_tensor(adj, sparse=True):
-    """degree_normalize_adj_tensor."""
+    """Apply row-degree normalization using a dense or sparse preparation path.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param sparse: Whether to use the sparse adjacency normalization path. Defaults to ``True``.
+    :returns: Normalized PyTorch tensor with the selected representation.
+    """
 
     device = adj.device
     if sparse:
@@ -562,21 +730,14 @@ def accuracy(output, labels):
 
 
 def roc_auc(output, labels, is_sigmoid=False):
-    """Return ROC-AUC score of output compared to labels.
+    """Compute binary ROC-AUC from the model's selected output column.
 
-    Parameters
-    ----------
-    output : torch.Tensor
-        output from model
-    labels : torch.Tensor or numpy.array
-        true labels (0 or 1)
-    is_sigmoid : bool, optional
-        If True, apply sigmoid thresholding on the output, by default False.
-
-    Returns
-    -------
-    float
-        ROC-AUC score
+    :param output: Two-dimensional Torch model output. Multiple-column outputs use
+        column one; a single-column output with ``is_sigmoid=False`` uses its argmax.
+    :param labels: Binary ground-truth labels as a Torch tensor or array-like object.
+    :param is_sigmoid: Whether to directly select column one, requiring at least two
+        output columns. This flag does not apply a sigmoid. Defaults to ``False``.
+    :returns: Binary ROC-AUC score computed by scikit-learn.
     """
     if not hasattr(labels, "__len__"):
         labels = [labels]
@@ -611,6 +772,9 @@ def f1_macro(output, labels, is_sigmoid=False):
         output from model
     labels : torch.Tensor or numpy.array
         true labels (0 or 1)
+    is_sigmoid : bool, optional
+        Threshold the second output column at 0.5 for binary predictions;
+        otherwise take the class argmax. Defaults to False.
 
     Returns
     -------
@@ -686,7 +850,11 @@ def classification_margin(output, true_label):
 
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
-    """Convert a scipy sparse matrix to a torch sparse tensor."""
+    """Convert a SciPy sparse matrix to a float32 PyTorch sparse COO tensor.
+
+    :param sparse_mx: SciPy sparse matrix to convert.
+    :returns: Sparse COO tensor retaining matrix shape and stored values.
+    """
     sparse_mx = sparse_mx.tocoo().astype(np.float32)
     sparserow = torch.LongTensor(sparse_mx.row).unsqueeze(1)
     sparsecol = torch.LongTensor(sparse_mx.col).unsqueeze(1)
@@ -705,7 +873,11 @@ def sparse_mx_to_torch_sparse_tensor(sparse_mx):
 
 
 def to_scipy(tensor):
-    """Convert a dense/sparse tensor to scipy matrix"""
+    """Convert supported dense or sparse PyTorch tensor values to SciPy CSR.
+
+    :param tensor: PyTorch tensor to convert to SciPy.
+    :returns: CPU SciPy CSR matrix; the source tensor must permit NumPy conversion.
+    """
     if is_sparse_tensor(tensor):
         values = tensor._values()
         indices = tensor._indices()
@@ -870,7 +1042,12 @@ def get_train_val_test_gcn(labels, seed=None):
 
 
 def get_train_test_labelrate(labels, label_rate):
-    """Get train test according to given label rate."""
+    """Choose equal per-class training counts from a requested overall label fraction.
+
+    :param labels: Node labels in the same node ordering as the corresponding features.
+    :param label_rate: Requested overall fraction of labeled training examples.
+    :returns: Tuple ``(train_indices, test_indices)``; a validation split is formed internally and omitted.
+    """
     nclass = labels.max() + 1
     train_size = int(round(len(labels) * label_rate / nclass))
     print("=== train_size = %s ===" % train_size)
@@ -879,7 +1056,12 @@ def get_train_test_labelrate(labels, label_rate):
 
 
 def get_splits_each_class(labels, train_size):
-    """We randomly sample n instances for class, where n = train_size."""
+    """Randomly allocate equal training and validation counts within every class.
+
+    :param labels: Node labels in the same node ordering as the corresponding features.
+    :param train_size: Number of training examples and validation examples selected per class.
+    :returns: Tuple of shuffled NumPy ``(train_indices, val_indices, test_indices)`` arrays.
+    """
     idx = np.arange(len(labels))
     nclass = labels.max() + 1
     idx_train = []
@@ -900,12 +1082,23 @@ def get_splits_each_class(labels, train_size):
 
 
 def unravel_index(index, array_shape):
+    """Convert flattened two-dimensional tensor indices to row and column coordinates.
+
+    :param index: Index or indices to access.
+    :param array_shape: Requested two-dimensional matrix shape.
+    :returns: Tuple ``(rows, columns)``.
+    """
     rows = torch.div(index, array_shape[1], rounding_mode="trunc")
     cols = index % array_shape[1]
     return rows, cols
 
 
 def get_degree_squence(adj):
+    """Compute graph degrees from a supported adjacency representation.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: Degree vector obtained from the adjacency sum.
+    """
     try:
         return adj.sum(0)
     except:
@@ -913,8 +1106,11 @@ def get_degree_squence(adj):
 
 
 def degree_sequence_log_likelihood(degree_sequence, d_min):
-    """
-    Compute the (maximum) log likelihood of the Powerlaw distribution fit on a degree distribution.
+    """Fit power-law degree statistics above the supplied cutoff.
+
+    :param degree_sequence: Observed node degrees used by the power-law fit.
+    :param d_min: Minimum degree included in the power-law fit.
+    :returns: Tuple ``(log_likelihood, exponent, observation_count, sum_log_degrees)``.
     """
 
     # Determine which degrees are to be considered, i.e. >= d_min.
@@ -931,7 +1127,13 @@ def degree_sequence_log_likelihood(degree_sequence, d_min):
 
 
 def updated_log_likelihood_for_edge_changes(node_pairs, adjacency_matrix, d_min):
-    """Adopted from https://github.com/danielzuegner/nettack"""
+    """Update power-law likelihood statistics for candidate edge flips.
+
+    :param node_pairs: Candidate edge endpoint pairs, one pair per row.
+    :param adjacency_matrix: Adjacency matrix whose candidate entries will be flipped.
+    :param d_min: Minimum degree included in the power-law fit.
+    :returns: Tuple ``(new_log_likelihood, new_exponent, new_count, new_sum_log_degrees)`` per candidate.
+    """
     # For each node pair find out whether there is an edge or not in the input adjacency matrix.
 
     edge_entries_before = adjacency_matrix[node_pairs.T]
@@ -957,6 +1159,15 @@ def updated_log_likelihood_for_edge_changes(node_pairs, adjacency_matrix, d_min)
 
 def update_sum_log_degrees(sum_log_degrees_before, n_old, d_old, d_new, d_min):
     # Find out whether the degrees before and after the change are above the threshold d_min.
+    """Update power-law sufficient statistics after candidate node degrees change.
+
+    :param sum_log_degrees_before: Sum of log degrees for observations above the power-law cutoff.
+    :param n_old: Previous number of degree observations above the cutoff.
+    :param d_old: Old or proposed degrees for the affected nodes, respectively.
+    :param d_new: Old or proposed degrees for the affected nodes, respectively.
+    :param d_min: Minimum degree included in the power-law fit.
+    :returns: Tuple ``(updated_sum_log_degrees, updated_observation_count)``.
+    """
     old_in_range = d_old >= d_min
     new_in_range = d_new >= d_min
     d_old_in_range = d_old * old_in_range.float()
@@ -977,6 +1188,13 @@ def update_sum_log_degrees(sum_log_degrees_before, n_old, d_old, d_new, d_min):
 
 
 def compute_alpha(n, sum_log_degrees, d_min):
+    """Estimate the power-law exponent from degree sufficient statistics.
+
+    :param n: Number of graph nodes or degree observations, as required by the operation.
+    :param sum_log_degrees: Sum of log degrees for observations above the power-law cutoff.
+    :param d_min: Minimum degree included in the power-law fit.
+    :returns: Exponent computed as ``1 + n / (sum_log_degrees - n * log(d_min - 0.5))``.
+    """
     try:
         alpha = 1 + n / (sum_log_degrees - n * torch.log(d_min - 0.5))
     except:
@@ -986,6 +1204,14 @@ def compute_alpha(n, sum_log_degrees, d_min):
 
 def compute_log_likelihood(n, alpha, sum_log_degrees, d_min):
     # Log likelihood under alpha
+    """Evaluate the degree-statistic likelihood expression used by the attack constraint.
+
+    :param n: Number of graph nodes or degree observations, as required by the operation.
+    :param alpha: Power-law exponent used by the likelihood calculation.
+    :param sum_log_degrees: Sum of log degrees for observations above the power-law cutoff.
+    :param d_min: Minimum degree included in the power-law fit.
+    :returns: Likelihood statistic with the same batch shape as the input counts.
+    """
     try:
         ll = n * torch.log(alpha) + n * alpha * torch.log(d_min) + (alpha + 1) * sum_log_degrees
     except:
@@ -995,22 +1221,13 @@ def compute_log_likelihood(n, alpha, sum_log_degrees, d_min):
 
 
 def ravel_multiple_indices(ixs, shape, reverse=False):
-    """
-    "Flattens" multiple 2D input indices into indices on the flattened matrix, similar to np.ravel_multi_index.
-    Does the same as ravel_index but for multiple indices at once.
-    Parameters
-    ----------
-    ixs: array of ints shape (n, 2)
-        The array of n indices that will be flattened.
+    """Flatten a batch of two-dimensional coordinates with stride ``shape[1]``.
 
-    shape: list or tuple of ints of length 2
-        The shape of the corresponding matrix.
-
-    Returns
-    -------
-    array of n ints between 0 and shape[0]*shape[1]-1
-        The indices on the flattened matrix corresponding to the 2D input indices.
-
+    :param ixs: Integer coordinate array or tensor with shape ``(num_indices, 2)``.
+    :param shape: Two-dimensional matrix shape; the second dimension sets the stride.
+    :param reverse: Swap coordinate columns before flattening. This does not
+        perform inverse unraveling. Defaults to ``False``.
+    :returns: One-dimensional flat indices in the input's array or tensor representation.
     """
     if reverse:
         return ixs[:, 1] * shape[1] + ixs[:, 0]
@@ -1026,12 +1243,22 @@ def ravel_multiple_indices(ixs, shape, reverse=False):
 
 
 def reshape_mx(mx, shape):
+    """Rebuild a SciPy sparse matrix with the requested shape using existing nonzero coordinates.
+
+    :param mx: Input matrix to transform.
+    :param shape: Requested two-dimensional matrix shape.
+    :returns: SciPy CSR matrix with unchanged stored values and coordinates.
+    """
     indices = mx.nonzero()
     return sp.csr_matrix((mx.data, (indices[0], indices[1])), shape=shape)
 
 
 def add_mask(data, dataset):
-    """data: ogb-arxiv pyg data format"""
+    """Attach official OGB split masks and squeeze the node label dimension in place.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    """
     # for arxiv
     split_idx = dataset.get_idx_split()
     train_idx, valid_idx, test_idx = split_idx["train"], split_idx["valid"], split_idx["test"]
@@ -1044,12 +1271,25 @@ def add_mask(data, dataset):
 
 
 def index_to_mask(index, size):
+    """Create a CPU boolean mask from selected integer indices.
+
+    :param index: Index or indices to access.
+    :param size: Size of the output or requested budget.
+    :returns: Boolean tensor of length ``size``.
+    """
     mask = torch.zeros((size,), dtype=torch.bool)
     mask[index] = 1
     return mask
 
 
 def add_feature_noise(data, noise_ratio, seed):
+    """Replace a seeded fraction of all node features with independent standard Gaussian samples.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param noise_ratio: Fraction of eligible nodes whose features are replaced by Gaussian noise.
+    :param seed: Random seed.
+    :returns: Tuple ``(feature_delta, changed_node_mask)``; ``data.x`` is modified in place.
+    """
     np.random.seed(seed)
     n, d = data.x.shape
     # noise = torch.normal(mean=torch.zeros(int(noise_ratio*n), d), std=1)
@@ -1068,6 +1308,13 @@ def add_feature_noise(data, noise_ratio, seed):
 
 
 def add_feature_noise_test(data, noise_ratio, seed):
+    """Replace a seeded fraction of test-node features with standard Gaussian samples.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param noise_ratio: Fraction of eligible nodes whose features are replaced by Gaussian noise.
+    :param seed: Random seed.
+    :returns: Tuple ``(feature_delta, changed_node_mask)`` over all nodes; ``data.x`` is modified in place.
+    """
     np.random.seed(seed)
     n, d = data.x.shape
     indices = np.arange(n)

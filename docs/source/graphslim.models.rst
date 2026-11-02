@@ -1,8 +1,13 @@
 graphslim.models package
-========================
+============================
+
+Model selection
+-------------------
+
+.. autofunction:: graphslim.models.get_model_class
 
 graphslim.models.base module
-----------------------------
+--------------------------------
 
 .. automodule:: graphslim.models.base
    :members:
@@ -10,15 +15,16 @@ graphslim.models.base module
    :show-inheritance:
 
 graphslim.models.gcn module
----------------------------
+-------------------------------
 
 .. automodule:: graphslim.models.gcn
    :members:
    :undoc-members:
    :show-inheritance:
 
+
 graphslim.models.appnp module
------------------------------
+---------------------------------
 
 .. automodule:: graphslim.models.appnp
    :members:
@@ -26,7 +32,7 @@ graphslim.models.appnp module
    :show-inheritance:
 
 graphslim.models.cheby module
------------------------------
+---------------------------------
 
 .. automodule:: graphslim.models.cheby
    :members:
@@ -34,7 +40,7 @@ graphslim.models.cheby module
    :show-inheritance:
 
 graphslim.models.gat module
----------------------------
+-------------------------------
 
 .. automodule:: graphslim.models.gat
    :members:
@@ -42,7 +48,7 @@ graphslim.models.gat module
    :show-inheritance:
 
 graphslim.models.gntk module
-----------------------------
+--------------------------------
 
 .. automodule:: graphslim.models.gntk
    :members:
@@ -50,7 +56,7 @@ graphslim.models.gntk module
    :show-inheritance:
 
 graphslim.models.graphsage module
----------------------------------
+-------------------------------------
 
 .. automodule:: graphslim.models.graphsage
    :members:
@@ -58,7 +64,7 @@ graphslim.models.graphsage module
    :show-inheritance:
 
 graphslim.models.sgc module
----------------------------
+-------------------------------
 
 .. automodule:: graphslim.models.sgc
    :members:
@@ -66,7 +72,7 @@ graphslim.models.sgc module
    :show-inheritance:
 
 graphslim.models.layers module
-------------------------------
+----------------------------------
 
 .. automodule:: graphslim.models.layers
    :members:
@@ -74,7 +80,7 @@ graphslim.models.layers module
    :show-inheritance:
 
 graphslim.models.sgformer module
---------------------------------
+------------------------------------
 
 .. automodule:: graphslim.models.sgformer
    :members:
@@ -82,7 +88,7 @@ graphslim.models.sgformer module
    :show-inheritance:
 
 graphslim.models.ignr module
-----------------------------
+--------------------------------
 
 .. automodule:: graphslim.models.ignr
    :members:
@@ -90,7 +96,7 @@ graphslim.models.ignr module
    :show-inheritance:
 
 graphslim.models.krr module
----------------------------
+-------------------------------
 
 .. automodule:: graphslim.models.krr
    :members:
@@ -98,7 +104,7 @@ graphslim.models.krr module
    :show-inheritance:
 
 graphslim.models.prbcd module
------------------------------
+---------------------------------
 
 .. automodule:: graphslim.models.prbcd
    :members:
@@ -106,7 +112,7 @@ graphslim.models.prbcd module
    :show-inheritance:
 
 graphslim.models.reparam\_module module
----------------------------------------
+-------------------------------------------
 
 .. automodule:: graphslim.models.reparam_module
    :members:
@@ -114,7 +120,7 @@ graphslim.models.reparam\_module module
    :show-inheritance:
 
 graphslim.models.sntk module
-----------------------------
+--------------------------------
 
 .. automodule:: graphslim.models.sntk
    :members:
@@ -122,7 +128,7 @@ graphslim.models.sntk module
    :show-inheritance:
 
 graphslim.models.random\_attack module
---------------------------------------
+------------------------------------------
 
 .. automodule:: graphslim.models.random_attack
    :members:
@@ -130,7 +136,7 @@ graphslim.models.random\_attack module
    :show-inheritance:
 
 graphslim.models.parametrized\_adj module
------------------------------------------
+---------------------------------------------
 
 .. automodule:: graphslim.models.parametrized_adj
    :members:

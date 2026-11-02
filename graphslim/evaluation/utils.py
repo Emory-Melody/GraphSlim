@@ -13,6 +13,12 @@ from graphslim.dataset.utils import csr2ei
 
 def calculate_homophily(y, adj):
     # Convert dense numpy array to sparse matrix if necessary
+    """Measure the fraction of nonzero adjacency entries connecting equal-label nodes.
+
+    :param y: Node labels in the same node ordering as the corresponding features.
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: Edge homophily fraction; the result follows the input adjacency representation.
+    """
     if isinstance(adj, np.ndarray):
         adj = sp.csr_matrix(adj)
 
@@ -81,6 +87,14 @@ def getsize_mb(elements):
 def inference_via_confidence(confidence_mtx1, confidence_mtx2, label_vec1, label_vec2):
 
     # ----------------First step: obtain confidence lists for both training dataset and test dataset--------------
+    """Scan true-label prediction confidence thresholds for membership inference.
+
+    :param confidence_mtx1: Member and nonmember prediction matrices, respectively.
+    :param confidence_mtx2: Member and nonmember prediction matrices, respectively.
+    :param label_vec1: Ground-truth class labels for the corresponding prediction matrix.
+    :param label_vec2: Ground-truth class labels for the corresponding prediction matrix.
+    :returns: Best balanced member/nonmember classification accuracy, with a minimum baseline of 0.5.
+    """
     confidence1 = []
     confidence2 = []
     acc1 = 0
@@ -133,6 +147,12 @@ def verbose_time_memory(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
+        """Call the wrapped operation and optionally report elapsed time and graph memory.
+
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        :returns: Return value of the wrapped function.
+        """
         verbose = kwargs.get("verbose", False)
         if verbose:
             start = time.perf_counter()

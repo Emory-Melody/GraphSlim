@@ -21,7 +21,13 @@ from graphslim.reduction.lightweight import (
 
 
 def spectral_embedding(features, size, seed):
-    """Low-rank degree-two polynomial affinity, without the N x N affinity."""
+    """Build a low-rank degree-two polynomial spectral embedding without a dense sample affinity.
+
+    :param features: Node feature matrix with one row per node.
+    :param size: Size of the output or requested budget.
+    :param seed: Random seed.
+    :returns: NumPy spectral embedding with one row per input sample.
+    """
     centered = features - features.mean(0, keepdims=True)
     rank = min(size, centered.shape[0], centered.shape[1])
     if centered.shape[1] < 2 or not np.any(centered):
@@ -46,7 +52,14 @@ def spectral_embedding(features, size, seed):
 
 
 def reconstruct_features(adjacency, embeddings, alpha=3.0, ridge=1e-8):
-    """Released CGC solve: (A_conv A_conv.T + L) X = alpha A_conv.T H."""
+    """Recover synthetic features from embeddings with the CGC regularized graph solve.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param embeddings: Node or cluster embedding matrix.
+    :param alpha: Multiplier applied to the reconstruction right-hand side. Defaults to ``3.0``.
+    :param ridge: Diagonal stabilization coefficient for the reconstruction solve. Defaults to ``1e-08``.
+    :returns: Synthetic feature tensor in the embedding dtype.
+    """
     degree = adjacency.sum(1)
     inverse = (degree + 1e-10).rsqrt()
     laplacian = inverse[:, None] * (torch.diag(degree) - adjacency) * inverse[None, :]
@@ -64,7 +77,17 @@ def reconstruct_features(adjacency, embeddings, alpha=3.0, ridge=1e-8):
 
 
 class CGC(LightweightReducer):
+    """Construct classwise clusters from propagated features and optionally reconstruct their graph.
+
+    """
     def reduce(self, data, verbose=True, save=True):
+        """Construct classwise clusters from propagated features and optionally reconstruct their graph.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :param save: Whether to write the reduced graph checkpoint to ``args.save_path``. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         features, adjacency, train, labels = self.inputs(data)
         budget = class_budget(labels, args.reduction_rate)
@@ -100,6 +123,12 @@ class CGC(LightweightReducer):
             embeddings, all_labels = hop2[train], labels
 
         def confidence(embedded, target):
+            """Score true-label probabilities and floor misclassified samples to the minimum confidence.
+
+            :param embedded: Training sample embeddings used to estimate class confidence.
+            :param target: Integer class ID for each embedded training sample.
+            :returns: Per-sample confidence vector.
+            """
             probability = (embedded @ weights).softmax(1)
             score = probability.gather(1, target[:, None]).flatten()
             return torch.where(probability.argmax(1) == target, score, score.min())

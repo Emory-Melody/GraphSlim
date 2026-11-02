@@ -18,6 +18,13 @@ class SGDD(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize SGDD and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(SGDD, self).__init__(setting, data, args, **kwargs)
 
         self.pge = IGNR(
@@ -30,6 +37,12 @@ class SGDD(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Learn synthetic features and adjacency with gradient matching and graphon-based structural guidance.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
 
         if data.adj_full.shape[0] < args.mx_size:

@@ -26,12 +26,25 @@ class LinearClassifier(nn.Module):
     """The author's no-ReLU, no-BN multi-layer linear classifier with dropout."""
 
     def __init__(self, input_size, hidden, classes, layers=2, dropout=0.6):
+        """Initialize LinearClassifier and its configuration.
+
+        :param input_size: Number of input features per node.
+        :param hidden: Hidden representation width.
+        :param classes: Number of output classes.
+        :param layers: Number of layers. Defaults to ``2``.
+        :param dropout: Dropout probability. Defaults to ``0.6``.
+        """
         super().__init__()
         dimensions = [input_size] + [hidden] * (layers - 1) + [classes]
         self.layers = nn.ModuleList(nn.Linear(a, b) for a, b in zip(dimensions, dimensions[1:]))
         self.dropout = dropout
 
     def forward(self, features):
+        """Apply linear classifier layers and dropout between hidden layers.
+
+        :param features: Node feature matrix with one row per node.
+        :returns: Unnormalized class logits for each feature row.
+        """
         for pos, layer in enumerate(self.layers):
             features = layer(features)
             if pos < len(self.layers) - 1:
@@ -40,6 +53,12 @@ class LinearClassifier(nn.Module):
 
 
 def consistency_loss(outputs, temperature=0.5):
+    """Penalize disagreement of classifier predictions with a detached sharpened ensemble target.
+
+    :param outputs: Sequence of class logit matrices from stochastic classifier passes.
+    :param temperature: Temperature used to sharpen the averaged class probabilities. Defaults to ``0.5``.
+    :returns: Scalar tensor containing the temperature-scaled mean squared consistency loss.
+    """
     probabilities = torch.stack([output.softmax(1) for output in outputs])
     average = probabilities.mean(0)
     sharpened = average.clamp_min(1e-12).pow(1 / temperature)
@@ -48,7 +67,13 @@ def consistency_loss(outputs, temperature=0.5):
 
 
 def compress_graph(adjacency, assignments, size):
-    """Column-normalized membership: C.T A C; no N x size dense membership."""
+    """Compute column-normalized cluster membership compression ``C.T @ A @ C``.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param assignments: Integer cluster assignment for each original node.
+    :param size: Size of the output or requested budget.
+    :returns: SciPy CSR cluster adjacency with diagonal entries removed.
+    """
     counts = np.bincount(assignments, minlength=size)
     membership = sp.csr_matrix(
         (1 / counts[assignments], (np.arange(len(assignments)), assignments)),
@@ -66,6 +91,16 @@ def iter_class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_0
     Chunk only independent cosine calculations; degrees, resistance and global
     top-k retain their original arithmetic. Consume each view before requesting
     the next one so large original-node graphs need not all remain in memory.
+
+    :param adjacency: Torch sparse COO adjacency on the embedding device.
+    :param embeddings: Node classifier logits with shape ``(num_nodes, num_classes)``.
+    :param ratio: Fraction of stored adjacency entries retained by each class's
+        global top-k selection, in ``[0, 1]``.
+    :param edge_chunk_size: Positive maximum number of edges processed in each
+        cosine-similarity chunk. Defaults to ``1000000``.
+    :yields: One symmetric SciPy CSR adjacency per class, weighted by
+        non-negative feature similarity.
+    :raises ValueError: If the ratio or chunk size is outside its valid range.
     """
     if not 0 <= ratio <= 1:
         raise ValueError("clustgdd_sampling_ratio must be in [0, 1]")
@@ -94,12 +129,29 @@ def iter_class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_0
 
 
 def class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_000):
-    """Compatibility list interface; reducers stream the iterator directly."""
+    """Materialize the graph-aware feature-view iterator as a compatibility list.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param embeddings: Node or cluster embedding matrix.
+    :param ratio: Fraction controlling the feature-view perturbation sampling.
+    :param edge_chunk_size: Maximum number of edges processed in one feature-view chunk. Defaults to ``1000000``.
+    :returns: List of feature views; the reducer itself uses the streaming iterator.
+    """
     return list(iter_class_aware_views(adjacency, embeddings, ratio, edge_chunk_size))
 
 
 class ClustGDD(LightweightReducer):
+    """Denoise features, cluster training nodes, and refine cluster centers with a pretrained classifier.
+
+    """
     def reduce(self, data, verbose=True, save=True):
+        """Denoise features, cluster training nodes, and refine cluster centers with a pretrained classifier.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :param save: Whether to write the reduced graph checkpoint to ``args.save_path``. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         features, adjacency, train, labels = self.inputs(data)
         size = max(1, int(len(train) * args.reduction_rate))
@@ -120,6 +172,10 @@ class ClustGDD(LightweightReducer):
         validation_labels = torch.as_tensor(data.labels_val, dtype=torch.long, device=self.device)
 
         def classifier():
+            """Build the classifier used for cluster-center pretraining and refinement.
+
+            :returns: LinearClassifier on the reducer device.
+            """
             return LinearClassifier(
                 features.shape[1],
                 getattr(args, "clustgdd_hidden", 256),
@@ -224,6 +280,10 @@ class ClustGDD(LightweightReducer):
         history = []
 
         def refinement_loss():
+            """Evaluate the supervised and consistency losses for the current synthetic offsets.
+
+            :returns: Scalar refinement loss tensor.
+            """
             refined = centers + refinement * offset
             predictions = [
                 model(denoise(view, refined, getattr(args, "clustgdd_post_steps", 2), alpha))

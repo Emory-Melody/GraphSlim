@@ -6,7 +6,13 @@ DOWNSTREAM_MODELS = ("GCN", "SGC", "APPNP", "Cheby", "GraphSage", "GAT", "SGForm
 
 
 def get_model_class(name):
-    """Resolve supported GNN architectures without evaluating Python code."""
+    """Resolve a supported downstream GNN architecture by name.
+
+    :param name: Case-sensitive architecture name from ``DOWNSTREAM_MODELS``, such
+        as ``'GCN'`` or ``'SGFormer'``.
+    :returns: The requested model class, imported on demand.
+    :raises ValueError: If the architecture name is unsupported.
+    """
     supported = DOWNSTREAM_MODELS
     if name not in supported:
         raise ValueError(f"Unknown GNN model {name!r}; choose from {supported}")

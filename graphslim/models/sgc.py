@@ -15,7 +15,17 @@ class SGC(BaseGNN):
     """
 
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
-        """nlayers indicates the number of propagations"""
+        """Initialize feature transformations and the configured number of propagation hops.
+
+        ``args.nlayers`` controls propagation depth; evaluation uses one feature
+        transformation.
+
+        :param nfeat: Number of input features per node.
+        :param nhid: Hidden representation width.
+        :param nclass: Number of output classes.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings. Defaults to ``'train'``.
+        """
         super(SGC, self).__init__(nfeat, nhid, nclass, args, mode)
 
         if mode in ["eval"]:
@@ -34,6 +44,13 @@ class SGC(BaseGNN):
             self.layers.append(MyLinear(nhid, nclass))
 
     def forward(self, x, adj, output_layer_features=False):
+        """Propagate node features through the configured hops and linear transformations.
+
+        :param x: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Class log probabilities, or intermediate features and predictions when requested.
+        """
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:

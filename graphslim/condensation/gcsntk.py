@@ -22,6 +22,13 @@ class GCSNTK(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize GCSNTK and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(GCSNTK, self).__init__(setting, data, args, **kwargs)
         self.k = args.k
         self.K = args.K
@@ -44,6 +51,25 @@ class GCSNTK(GCondBase):
         i=None,
         TRAIN_K=None,
     ):
+        """Backpropagate a kernel-ridge training loss and update synthetic support tensors.
+
+        When accumulation is enabled, optimizer updates occur at accumulation
+        boundaries and at the final training batch.
+
+        :param KRR: Kernel ridge regression model used to predict target labels from the support graph.
+        :param G_t: Target or synthetic support node features, respectively.
+        :param G_s: Target or synthetic support node features, respectively.
+        :param y_t: Target or synthetic support class targets, respectively, with one row per node.
+        :param y_s: Target or synthetic support class targets, respectively, with one row per node.
+        :param E_t: Target or synthetic support sparse adjacency, respectively.
+        :param E_s: Target or synthetic support sparse adjacency, respectively.
+        :param loss_fn: Callable used to compare predictions and targets.
+        :param optimizer: Optimizer that updates the synthetic features and targets.
+        :param accumulate_steps: Number of batches per optimizer step; ``None`` updates every batch. Defaults to ``None``.
+        :param i: Zero-based current batch index for gradient accumulation. Defaults to ``None``.
+        :param TRAIN_K: Total batch count, used to flush the final accumulated gradients. Defaults to ``None``.
+        :returns: Tuple ``(synthetic_features, synthetic_targets, loss, accuracy_percent)``.
+        """
         pred, acc = KRR.forward(G_t, G_s, y_t, y_s, E_t, E_s)
 
         pred = pred.to(torch.float32)
@@ -73,6 +99,18 @@ class GCSNTK(GCondBase):
         return G_s, y_s, loss, acc * 100
 
     def test(self, KRR, G_t, G_s, y_t, y_s, E_t, E_s, loss_fn):
+        """Evaluate target predictions from synthetic support data without gradients.
+
+        :param KRR: Kernel ridge regression model used to predict target labels from the support graph.
+        :param G_t: Target or synthetic support node features, respectively.
+        :param G_s: Target or synthetic support node features, respectively.
+        :param y_t: Target or synthetic support class targets, respectively, with one row per node.
+        :param y_s: Target or synthetic support class targets, respectively, with one row per node.
+        :param E_t: Target or synthetic support sparse adjacency, respectively.
+        :param E_s: Target or synthetic support sparse adjacency, respectively.
+        :param loss_fn: Callable used to compare predictions and targets.
+        :returns: Tuple ``(loss, accuracy_percent)``.
+        """
         size = len(y_t)
         test_loss, correct = 0, 0
         with torch.no_grad():
@@ -85,6 +123,12 @@ class GCSNTK(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Condense a graph by optimizing support features and targets through a structure-based NTK.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         if args.dataset in ["flickr", "reddit", "ogbn-arxiv"]:
             train_loader = LargeDataLoader(

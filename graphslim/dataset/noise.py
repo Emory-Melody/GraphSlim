@@ -23,7 +23,12 @@ NOISE_TYPES = (
 
 
 def graph_fingerprint(data, setting):
-    """Cache identity includes graph contents and split, not only dataset name."""
+    """Hash graph feature and adjacency contents together with split node IDs.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+    :returns: SHA-256 content fingerprint.
+    """
     digest = hashlib.sha256()
     prefix = "full" if setting == "trans" else "train"
     features = torch.as_tensor(getattr(data, f"feat_{prefix}")).detach().cpu().numpy()
@@ -44,6 +49,14 @@ def graph_fingerprint(data, setting):
 
 
 def _structural_noise(adjacency, kind, rate, rng):
+    """Perturb adjacency entries while preserving the input sparse or dense representation.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param kind: Structural perturbation type supported by the noise routine.
+    :param rate: Fraction or magnitude of the requested perturbation.
+    :param rng: NumPy random number generator used to draw perturbations.
+    :returns: Adjacency with the requested structural perturbations applied.
+    """
     adjacency = as_csr(adjacency)
     n = len(adjacency.indptr) - 1
     adjacency = adjacency.maximum(adjacency.T)
@@ -84,6 +97,21 @@ def perturb_graph(data, kind, rate=0.1, seed=0, *, setting="trans", stage="train
     Inductive training noise affects only the training graph; inference noise
     affects only the test graph. Gaussian sigma is rate * training-feature std.
     random_feat masks columns, feature_mask masks individual entries.
+
+    :param data: Graph data to copy, including feature, adjacency, label and
+        split attributes required by the chosen perturbation.
+    :param kind: Noise name from ``NOISE_TYPES``: ``clean``, ``random_adj``,
+        ``edge_drop``, ``random_feat``, ``feature_mask``, ``gaussian`` or ``label_noise``.
+    :param rate: Perturbation fraction, or Gaussian scale multiplier, in
+        ``[0, 1]``. Defaults to ``0.1``.
+    :param seed: NumPy random seed for this perturbation. Defaults to ``0``.
+    :param setting: ``'trans'`` for full-graph perturbations or ``'ind'`` for
+        split-specific perturbations. Defaults to ``'trans'``.
+    :param stage: ``'training'`` or ``'inference'``; selects the affected split
+        in the inductive setting. Defaults to ``'training'``.
+    :returns: Independent graph copy with perturbed attributes and ``noise_metadata``.
+    :raises ValueError: If an option is invalid, inference label noise is
+        requested, or label noise is requested for fewer than two classes.
     """
     if kind not in NOISE_TYPES or not 0 <= rate <= 1:
         raise ValueError(f"Unknown noise or rate outside [0,1]: {kind}, {rate}")
@@ -164,7 +192,12 @@ def perturb_graph(data, kind, rate=0.1, seed=0, *, setting="trans", stage="train
 
 
 def cached_noise(data, args):
-    """Validated tensor/CSR cache for the CLI's inexpensive training noise."""
+    """Load a validated training-noise cache or generate and save a new perturbed graph.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Graph with the configured training perturbation and noise metadata.
+    """
     signature = {
         "kind": args.attack,
         "rate": args.ptb_r,

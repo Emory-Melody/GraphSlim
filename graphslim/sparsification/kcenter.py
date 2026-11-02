@@ -4,7 +4,15 @@ import numpy as np
 
 
 class KCenter(MBCoreSet):
+    """Choose classwise representatives by greedy farthest-first coverage of embeddings.
+
+    """
     def select(self, embeds):
+        """Choose classwise representatives by greedy farthest-first coverage of embeddings.
+
+        :param embeds: Node embeddings indexed in the current graph node ordering.
+        :returns: One-dimensional NumPy array of selected node IDs; IDs are local to the training subgraph in the inductive setting.
+        """
         idx_selected = []
         for class_id, cnt in self.num_class_dict.items():
             idx = self.idx_train[self.labels_train == class_id]

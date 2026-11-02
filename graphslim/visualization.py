@@ -15,6 +15,11 @@ from graphslim.compat import to_pyg_data
 
 
 def to_networkx_graph(graph: Any) -> nx.Graph:
+    """Convert a supported graph or adjacency into a NetworkX graph.
+
+    :param graph: Input graph object.
+    :returns: NetworkX graph suitable for visualization.
+    """
     data = to_pyg_data(graph)
     if data.edge_index is not None:
         return to_networkx(data, to_undirected=True)
@@ -35,6 +40,15 @@ def draw_graph_pair(
 
     This intentionally targets small graph inspection; large benchmark graphs
     should be sampled before plotting.
+
+    :param original: Original graph or adjacency accepted by ``to_networkx_graph``.
+    :param reduced: Reduced graph or adjacency in a supported representation.
+    :param title: Figure title. Defaults to ``'GraphSlim reduction'``.
+    :param output_path: Optional image destination; parent directories are
+        created when saving. ``None`` leaves the figure unsaved.
+    :param max_nodes: Maximum displayed nodes per graph. Larger graphs show the
+        induced subgraph on the first nodes in iteration order. Defaults to ``300``.
+    :returns: Tuple ``(figure, axes)`` for the original and reduced graph panels.
     """
 
     graphs = [to_networkx_graph(original), to_networkx_graph(reduced)]
@@ -59,6 +73,13 @@ def draw_graph_pair(
 def load_reduced_graph(
     adj_path: str, feat_path: Optional[str] = None, label_path: Optional[str] = None
 ):
+    """Load saved adjacency and optional feature and label checkpoints.
+
+    :param adj_path: Path to the saved adjacency tensor.
+    :param feat_path: Optional path to the saved node feature tensor. Defaults to ``None``.
+    :param label_path: Optional path to the saved node label tensor. Defaults to ``None``.
+    :returns: PyG Data containing the loaded graph and available node attributes.
+    """
     from torch_geometric.data import Data
 
     adj = torch.load(adj_path, map_location="cpu")
@@ -79,6 +100,10 @@ def load_reduced_graph(
 
 
 def main(argv=None) -> None:
+    """Load a reduced graph and save a static graph-pair image.
+
+    :param argv: Command line arguments; ``None`` reads the process arguments. Defaults to ``None``.
+    """
     parser = argparse.ArgumentParser(description="Visualize a small GraphSlim reduced graph.")
     parser.add_argument("--adj", required=True, help="path to saved reduced adjacency tensor")
     parser.add_argument("--feat", default=None, help="optional path to saved reduced features")

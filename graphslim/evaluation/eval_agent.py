@@ -54,8 +54,8 @@ class Evaluator:
         self.metric = args.metric
 
     def reset_parameters(self):
-        """
-        Initializes or resets model parameters.
+        """Compatibility hook; the evaluator itself has no trainable parameters to reset.
+
         """
         pass
 
@@ -228,8 +228,7 @@ class Evaluator:
         MIA=False,
         validation_only=False,
     ):
-        """
-        Tests a model and returns accuracy and loss.
+        """Train a model with validation selection and return validation/test scores.
 
         Parameters
         ----------
@@ -243,13 +242,17 @@ class Evaluator:
             Whether to use synthetic data.
         mode : str, optional, default='eval'
             The mode for the model (e.g., 'eval' or 'cross').
+        MIA : bool, optional, default=False
+            Also compute and return confidence-based membership inference accuracy.
+        validation_only : bool, optional, default=False
+            Return the validation score before evaluating test labels or MIA.
 
         Returns
         -------
-        best_acc_val : float
-            Best accuracy on validation set.
-        acc_test : float
-            Accuracy on test set.
+        float or tuple
+            Validation score when ``validation_only=True``; otherwise
+            ``(validation_score, test_score)``, with a third membership inference
+            accuracy value when ``MIA=True``. Scores use the configured metric.
         """
         args = self.args
 

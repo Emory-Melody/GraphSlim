@@ -466,6 +466,13 @@ def training_scheduler(lam, t, T, scheduler="geom"):
 
 
 def get_largest_cc(adj, num_nodes, data_name):
+    """Extract the largest undirected connected component and its normalized adjacency.
+
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param num_nodes: Number of nodes in the graph.
+    :param data_name: Dataset name retained for compatibility with the component helper interface.
+    :returns: Tuple ``(original_node_ids, normalized_adjacency, raw_adjacency)``.
+    """
     mx = (adj).tocoo()
     edge_index = torch.LongTensor(np.vstack([mx.row, mx.col]))
     data = Data(edge_index=edge_index, num_nodes=num_nodes)
@@ -486,6 +493,15 @@ def get_largest_cc(adj, num_nodes, data_name):
 
 
 def get_syn_eigen(real_eigenvals, real_eigenvecs, eigen_k, ratio, step=1):
+    """Select low- and high-frequency eigenpairs with the requested ratio and stride.
+
+    :param real_eigenvals: Eigenvalues ordered consistently with the eigenvector columns.
+    :param real_eigenvecs: Eigenvector matrix; columns correspond to eigenvalues unless stated otherwise.
+    :param eigen_k: Number of spectral components or propagation steps to use.
+    :param ratio: Fraction of selected eigenpairs taken from the low end of the spectrum.
+    :param step: Stride between selected eigenpairs. Defaults to ``1``.
+    :returns: Tuple ``(selected_eigenvalues, selected_eigenvectors)``.
+    """
     k1 = math.ceil(eigen_k * ratio)
     k2 = eigen_k - k1
     print("k1:", k1, ",", "k2:", k2)
@@ -504,6 +520,12 @@ def get_syn_eigen(real_eigenvals, real_eigenvecs, eigen_k, ratio, step=1):
 
 
 def get_subspace_embed(eigenvecs, x):
+    """Project node features onto the selected eigenbasis and each individual eigenspace.
+
+    :param eigenvecs: Eigenvector matrix; columns correspond to eigenvalues unless stated otherwise.
+    :param x: Node feature matrix with one row per node.
+    :returns: Tuple ``(spectral_features, per_eigenvector_node_embeddings)``.
+    """
     x_trans = eigenvecs.T @ x  # kd
     u_unsqueeze = (eigenvecs.T).unsqueeze(2)  # kn1
     x_trans_unsqueeze = x_trans.unsqueeze(1)  # k1d
@@ -512,6 +534,12 @@ def get_subspace_embed(eigenvecs, x):
 
 
 def get_subspace_covariance_matrix(eigenvecs, x):
+    """Form a feature outer product for each normalized spectral feature row.
+
+    :param eigenvecs: Eigenvector matrix; columns correspond to eigenvalues unless stated otherwise.
+    :param x: Node feature matrix with one row per node.
+    :returns: Tensor of shape ``(num_eigenvectors, feature_dim, feature_dim)``.
+    """
     x_trans = eigenvecs.T @ x  # kd
     x_trans = F.normalize(input=x_trans, p=2, dim=1)
     x_trans_unsqueeze = x_trans.unsqueeze(1)  # k1d
@@ -520,6 +548,13 @@ def get_subspace_covariance_matrix(eigenvecs, x):
 
 
 def get_embed_sum(eigenvals, eigenvecs, x):
+    """Filter features with spectral weights ``1 - eigenvalue`` and reconstruct node embeddings.
+
+    :param eigenvals: Eigenvalues ordered consistently with the eigenvector columns.
+    :param eigenvecs: Eigenvector matrix; columns correspond to eigenvalues unless stated otherwise.
+    :param x: Node feature matrix with one row per node.
+    :returns: Node embedding matrix with the same shape as the input features.
+    """
     x_trans = eigenvecs.T @ x  # kd
     x_trans = torch.diag(1 - eigenvals) @ x_trans  # kd
     embed_sum = eigenvecs @ x_trans  # nk @ kd = nd
@@ -527,6 +562,13 @@ def get_embed_sum(eigenvals, eigenvecs, x):
 
 
 def get_embed_mean(embed_sum, label, class_matrix=None):
+    """Compute normalized class means of node embeddings while keeping empty classes zero.
+
+    :param embed_sum: Filtered node embedding matrix.
+    :param label: Node labels in the same node ordering as the corresponding features.
+    :param class_matrix: Optional class-by-node membership matrix; otherwise built from the labels. Defaults to ``None``.
+    :returns: Class-by-feature tensor of L2-normalized mean embeddings.
+    """
     if class_matrix is None:
         class_matrix = F.one_hot(label).float().T  # cn
     embed_sum = class_matrix @ embed_sum  # cd
@@ -537,6 +579,16 @@ def get_embed_mean(embed_sum, label, class_matrix=None):
 
 
 def get_eigh(laplacian_matrix, data_name, save=True):
+    """Load or compute Laplacian eigenpairs under ``./data/data_name``.
+
+    Large datasets use low and high partial spectral ranges; other datasets use a
+    complete eigendecomposition. Existing cache files are read even when saving is disabled.
+
+    :param laplacian_matrix: Dense NumPy or SciPy sparse symmetric Laplacian.
+    :param data_name: Dataset name selecting the cache directory and spectral ranges.
+    :param save: Whether to write newly computed eigenpairs. Defaults to ``True``.
+    :returns: NumPy ``(eigenvalues, eigenvectors)`` sorted by ascending eigenvalue.
+    """
     dir = os.path.join("./data", data_name)
     if not os.path.isdir(dir):
         os.makedirs(dir)
@@ -590,6 +642,12 @@ def get_eigh(laplacian_matrix, data_name, save=True):
 
 
 def load_eigen(dataset, load_path):
+    """Load cached eigenpairs, merge large-dataset spectral ranges, and sort by eigenvalue.
+
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :param load_path: Filesystem location used by this operation.
+    :returns: Tuple of NumPy arrays ``(eigenvalues, eigenvectors)``.
+    """
     dir = os.path.join(load_path, dataset)
     val_file_name = "eigenvalues.npy"
     vec_file_name = "eigenvectors.npy"
@@ -618,6 +676,17 @@ def load_eigen(dataset, load_path):
 
 
 def get_train_lcc(idx_lcc, idx_train, y_full, num_nodes, num_classes):
+    """Map only observed training nodes into the largest connected component.
+
+    Validation and test labels are never used to fill missing training classes.
+
+    :param idx_lcc: Original node IDs belonging to the largest connected component.
+    :param idx_train: Original node IDs belonging to the training split.
+    :param y_full: Full-graph labels; retained for compatibility and not used to infer missing training labels.
+    :param num_nodes: Number of nodes in the graph.
+    :param num_classes: Number of output classes.
+    :returns: Tuple ``(original_training_node_ids, component_local_node_ids)``.
+    """
     idx_train_lcc = list(set(idx_train).intersection(set(idx_lcc)))
     y_full = y_full.cpu().numpy()
     if len(idx_lcc) == num_nodes:

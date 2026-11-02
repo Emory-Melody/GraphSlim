@@ -7,6 +7,11 @@ from typing import Any, Dict, Mapping, Optional
 
 
 def _compact_config(args: Any) -> Dict[str, Any]:
+    """Keep public scalar configuration attributes for experiment tracking.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Dictionary excluding loggers, private attributes, and non-scalar values.
+    """
     if args is None:
         return {}
     values = getattr(args, "__dict__", {})
@@ -26,12 +31,26 @@ class NullTracker:
     enabled: bool = False
 
     def log(self, metrics: Mapping[str, Any], step: Optional[int] = None) -> None:
+        """Accept metric logging calls when experiment tracking is disabled.
+
+        :param metrics: Mapping from metric names to scalar values.
+        :param step: Optional training step attached to these logged values. Defaults to ``None``.
+        """
         return None
 
     def log_graph(self, name: str, graph: Any, step: Optional[int] = None) -> None:
+        """Accept graph logging calls when experiment tracking is disabled.
+
+        :param name: Prefix used to group the graph summary metrics.
+        :param graph: Input graph object.
+        :param step: Optional training step attached to these logged values. Defaults to ``None``.
+        """
         return None
 
     def finish(self) -> None:
+        """Close a disabled tracker without external side effects.
+
+        """
         return None
 
 
@@ -43,6 +62,12 @@ class WandbTracker:
     def __init__(
         self, args: Any = None, project: Optional[str] = None, run_name: Optional[str] = None
     ):
+        """Initialize WandbTracker and its configuration.
+
+        :param args: Configuration namespace containing the options used by this operation. Defaults to ``None``.
+        :param project: Weights & Biases project name; ``None`` uses configuration or defaults. Defaults to ``None``.
+        :param run_name: Optional display name for the tracking run. Defaults to ``None``.
+        """
         try:
             import wandb
         except ImportError as exc:
@@ -58,18 +83,36 @@ class WandbTracker:
         )
 
     def log(self, metrics: Mapping[str, Any], step: Optional[int] = None) -> None:
+        """Send scalar metrics to the active Weights & Biases run.
+
+        :param metrics: Mapping from metric names to scalar values.
+        :param step: Optional training step attached to these logged values. Defaults to ``None``.
+        """
         self._wandb.log(dict(metrics), step=step)
 
     def log_graph(self, name: str, graph: Any, step: Optional[int] = None) -> None:
+        """Summarize a graph and log its size and attribute statistics under a name prefix.
+
+        :param name: Prefix used to group the graph summary metrics.
+        :param graph: Input graph object.
+        :param step: Optional training step attached to these logged values. Defaults to ``None``.
+        """
         summary = graph_summary(graph)
         self.log({f"{name}/{key}": value for key, value in summary.items()}, step=step)
 
     def finish(self) -> None:
+        """Finish the active Weights & Biases run.
+
+        """
         self._wandb.finish()
 
 
 def build_tracker(args: Any = None):
-    """Create a WandB tracker only when explicitly requested."""
+    """Create experiment tracking only when explicitly enabled in the configuration.
+
+    :param args: Configuration namespace containing the options used by this operation. Defaults to ``None``.
+    :returns: WandbTracker when enabled, otherwise NullTracker; optional initialization failures follow the required-tracking setting.
+    """
 
     if not bool(getattr(args, "wandb", False)):
         return NullTracker()
@@ -82,7 +125,11 @@ def build_tracker(args: Any = None):
 
 
 def graph_summary(graph: Any) -> Dict[str, Any]:
-    """Return cheap graph evolution metrics for PyG-like or reduced graph objects."""
+    """Summarize node, edge, feature, and class counts without expensive graph diagnostics.
+
+    :param graph: Input graph object.
+    :returns: Mapping of available graph size and attribute statistics.
+    """
 
     num_nodes = getattr(graph, "num_nodes", None)
     if num_nodes is None and hasattr(graph, "x"):

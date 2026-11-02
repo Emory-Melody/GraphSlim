@@ -11,6 +11,11 @@ from graphslim.train_all import run
 
 
 def main(argv=None):
+    """Run evaluation with reduction disabled unless explicitly requested.
+
+    :param argv: Command line arguments; ``None`` reads the process arguments. Defaults to ``None``.
+    :returns: Return value of the shared training pipeline.
+    """
     args = get_args(argv)
     if not hasattr(args, "method"):
         return None
@@ -19,6 +24,10 @@ def main(argv=None):
 
 
 def entrypoint():
+    """Invoke the evaluation CLI from the installed console command.
+
+    :returns: Return value of ``main``.
+    """
     main()
 
 

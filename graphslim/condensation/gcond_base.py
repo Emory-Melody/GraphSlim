@@ -73,8 +73,8 @@ class GCondBase:
             print("adj_syn:", (n, n), "feat_syn:", self.feat_syn.shape)
 
     def reset_parameters(self):
-        """
-        Resets the parameters of the model.
+        """Reinitialize synthetic features from Gaussian noise and reset the adjacency estimator.
+
         """
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
         self.pge.reset_parameters()
@@ -118,18 +118,21 @@ class GCondBase:
         return np.array(labels_syn)
 
     def init(self, with_adj=False, reuse_init=False):
-        """
-        Initializes synthetic features and (optionally) adjacency matrix.
+        """Initializes synthetic features and (optionally) adjacency matrix.
 
         Parameters
         ----------
         with_adj : bool, optional
             Whether to initialize the adjacency matrix (default is False).
+        reuse_init : bool, optional
+            Load matching feature and, when requested, adjacency checkpoints
+            from ``args.save_path/reduced_graph/args.init`` if available.
+            Otherwise run the configured initializer. Defaults to False.
 
         Returns
         -------
-        tuple
-            A tuple containing the synthetic features and (optionally) the adjacency matrix.
+        torch.Tensor or tuple
+            Synthetic features, or ``(features, adjacency)`` when ``with_adj=True``.
         """
         args = self.args
         if reuse_init:
@@ -153,8 +156,7 @@ class GCondBase:
             # return reduced_data.feat_syn_0, reduced_data.feat_syn_1,reduced_data.feat_syn_2
 
     def train_class(self, model, adj, features, labels, labels_syn, args, soft=False):
-        """
-        Trains the model and computes the loss.
+        """Trains the model and computes the loss.
 
         Parameters
         ----------
@@ -170,6 +172,9 @@ class GCondBase:
             The synthetic labels.
         args : Namespace
             Arguments object containing hyperparameters for training and model.
+        soft : bool, optional
+            Use KL divergence with log targets instead of negative log
+            likelihood for classwise gradient matching. Defaults to False.
 
         Returns
         -------
@@ -287,17 +292,19 @@ class GCondBase:
         return model
 
     def intermediate_evaluation(self, best_val, loss_avg=None, save=True, save_valid_acc=False):
-        """
-        Performs intermediate evaluation and saves the best model.
+        """Evaluate the synthetic graph and save it when mean validation performance improves.
 
         Parameters
         ----------
         best_val : float
             The best validation accuracy observed so far.
-        loss_avg : float
-            The average loss.
+        loss_avg : float or None, optional
+            Average loss printed when ``args.verbose`` is enabled. Defaults to None.
         save : bool, optional
-            Whether to save the model (default is True).
+            Whether to save an improved synthetic graph and update ``best_val``.
+            Defaults to True.
+        save_valid_acc : bool, optional
+            Compatibility argument; currently unused. Defaults to False.
 
         Returns
         -------
@@ -334,26 +341,33 @@ class GCondBase:
         return best_val
 
     def validation_model_args(self):
-        """Separate method-specific graph selection from downstream model tuning."""
+        """Return the downstream validation configuration used for synthetic graph selection.
+
+        :returns: The existing configuration namespace; subclasses may override this hook.
+        """
         return self.args
 
     def test_with_val(self, verbose=False, setting="trans", iters=200, best_val=None):
-        """
-        Conducts validation testing and returns results.
+        """Conducts validation testing and returns results.
 
         Parameters
         ----------
         verbose : bool, optional
-            Whether to print verbose output (default is False).
+            Compatibility argument; the downstream training and testing calls
+            currently use ``verbose=False`` regardless of this value.
         setting : str, optional
             The setting type (default is 'trans').
         iters : int, optional
             Number of iterations for validation testing (default is 200).
+        best_val : float or None, optional
+            Initial validation threshold forwarded to ``fit_with_val``.
+            Defaults to None.
 
         Returns
         -------
         list
-            A list containing validation results.
+            ``[validation_score]`` when ``args.validation_only`` is enabled;
+            otherwise ``[validation_score, test_score]``.
         """
 
         args = self.validation_model_args()

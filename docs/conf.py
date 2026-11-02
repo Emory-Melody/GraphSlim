@@ -43,6 +43,14 @@ extensions = [
     "sphinx.ext.githubpages",
 ]
 
+# Include constructor arguments and local helper methods in the API reference.
+autoclass_content = "both"
+autodoc_member_order = "bysource"
+autodoc_default_options = {
+    "private-members": True,
+    "special-members": "__getitem__, __repr__",
+}
+
 # Autodoc imports the real GraphSlim source, but does not run training. Mock
 # optional/runtime libraries so Read the Docs needs only docs/requirements.txt.
 autodoc_mock_imports = [

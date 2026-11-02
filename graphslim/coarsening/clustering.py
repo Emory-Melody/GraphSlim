@@ -27,6 +27,12 @@ class Cluster(Coarsen):
     """
 
     def __init__(self, setting, data, args):
+        """Initialize Cluster and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         super(Cluster, self).__init__(setting, data, args)
         args.method = "clustering"
 

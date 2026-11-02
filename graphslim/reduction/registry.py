@@ -23,6 +23,11 @@ class MethodSpec:
     agg_class_name: Optional[str] = None
 
     def load_class(self, use_agg: bool = False) -> Type:
+        """Import and return the registered reducer class lazily.
+
+        :param use_agg: Whether to prefer the registered feature aggregation variant. Defaults to ``False``.
+        :returns: Reducer class, using the aggregation variant when requested and registered.
+        """
         module_name = self.module
         class_name = self.class_name
         if use_agg and self.agg_module and self.agg_class_name:
@@ -33,7 +38,11 @@ class MethodSpec:
 
 
 def normalize_method_name(method: str) -> str:
-    """Normalize method names while preserving public CLI aliases."""
+    """Strip whitespace, replace hyphens with underscores, and lowercase a method name.
+
+    :param method: Reduction method name.
+    :returns: Normalized method name string.
+    """
 
     return method.strip().replace("-", "_").lower()
 
@@ -153,6 +162,13 @@ _ALIASES = {
 
 
 def get_method_spec(method: str) -> MethodSpec:
+    """Resolve a method name or supported alias to its registry entry.
+
+    Raises ``ValueError`` for an unknown method.
+
+    :param method: Reduction method name.
+    :returns: Immutable ``MethodSpec`` describing the canonical method.
+    """
     key = _ALIASES.get(method, normalize_method_name(method))
     try:
         return _METHODS[key]
@@ -164,13 +180,29 @@ def get_method_spec(method: str) -> MethodSpec:
 
 
 def list_methods(family: Optional[str] = None) -> Iterable[str]:
+    """List canonical reducer names in alphabetical order.
+
+    :param family: Optional family filter: ``sparsification``, ``coarsening``, or ``condensation``. Defaults to ``None``.
+    :returns: Tuple of registered names, optionally restricted to one family.
+    """
     if family is None:
         return tuple(sorted(_METHODS))
     return tuple(sorted(name for name, spec in _METHODS.items() if spec.family == family))
 
 
 def create_reducer(method: str, setting, data, args, **kwargs):
-    """Instantiate a graph reduction method from the shared registry."""
+    """Resolve a registered method and instantiate its reducer.
+
+    When ``args.agg`` is enabled, a registered aggregation variant is used
+    if available. Unknown names raise ``ValueError``.
+
+    :param method: Reduction method name.
+    :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param args: Configuration namespace containing the options used by this operation.
+    :param kwargs: Additional keyword options passed to the underlying implementation.
+    :returns: Reducer instance constructed with ``setting``, ``data``, ``args``, and additional options.
+    """
 
     spec = get_method_spec(method)
     use_agg = bool(getattr(args, "agg", False))

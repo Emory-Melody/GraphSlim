@@ -1,5 +1,5 @@
 GraphSlim
-=========
+=============
 
 .. toctree::
    :maxdepth: 4

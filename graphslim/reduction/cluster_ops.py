@@ -16,6 +16,16 @@ def nearest_squared(points, centers, max_working_bytes=64 * 1024**2):
     Never construct N x K x D for the whole input. The budget covers the two
     largest subtraction/square temporaries; inputs and returned N-vectors are
     additional storage. No GEMM distance approximation or neighbor sampling.
+
+    :param points: Torch feature matrix with shape ``(num_points, feature_dim)``.
+    :param centers: Nonempty center matrix with the same feature width, dtype
+        and device as ``points``.
+    :param max_working_bytes: Positive working-memory target in bytes used to
+        choose row and center blocks. At least one point-center comparison is
+        always processed. Defaults to ``64 * 1024**2``.
+    :returns: Tuple ``(squared_distances, center_indices)`` with one entry per
+        point; ties select the first center index.
+    :raises ValueError: If shapes, dtypes, devices or the memory budget are invalid.
     """
     if points.ndim != 2 or centers.ndim != 2 or points.shape[1] != centers.shape[1]:
         raise ValueError("Expected matching two-dimensional feature matrices")
@@ -42,13 +52,25 @@ def nearest_squared(points, centers, max_working_bytes=64 * 1024**2):
 
 
 def fitted_labels(estimator, features, **fit_kwargs):
-    """Reuse labels from sklearn's final assignment instead of predicting twice."""
+    """Fit a clustering estimator and reuse its final assignments without a second prediction pass.
+
+    :param estimator: Clustering estimator exposing ``fit`` and ``labels_``.
+    :param features: Node feature matrix with one row per node.
+    :param fit_kwargs: Keyword arguments passed to the estimator fit call.
+    :returns: NumPy int64 array from the fitted estimator labels.
+    """
     estimator.fit(features, **fit_kwargs)
     return np.asarray(estimator.labels_, dtype=np.int64)
 
 
 def weighted_propagation(adjacency, features, weights):
-    """Accumulate weighted sparse hops while retaining only the current hop."""
+    """Accumulate a weighted sum of feature propagation hops while storing only the current hop.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param features: Node feature matrix with one row per node.
+    :param weights: Propagation weights or sample weights, in the order consumed by this operation.
+    :returns: Tensor ``sum(weights[h] * adjacency**h @ features)``.
+    """
     result = torch.zeros_like(features)
     current = features
     for hop, weight in enumerate(weights):
@@ -63,7 +85,15 @@ def weighted_propagation(adjacency, features, weights):
 
 
 def softmax_cluster_centers(features, scores, labels, size, temperature=1.0):
-    """Segmented stable softmax and weighted sums, without K full-input masks."""
+    """Compute clusterwise softmax-weighted feature centers with stable segmented reductions.
+
+    :param features: Node feature matrix with one row per node.
+    :param scores: Per-sample confidence logits used for within-cluster softmax weighting.
+    :param labels: Integer cluster assignment for each input feature row.
+    :param size: Number of output clusters.
+    :param temperature: Positive softmax temperature applied to the sample scores. Defaults to ``1.0``.
+    :returns: Tensor with one feature row per cluster.
+    """
     if temperature <= 0:
         raise ValueError("temperature must be positive")
     logits = scores / temperature
@@ -78,7 +108,14 @@ def softmax_cluster_centers(features, scores, labels, size, temperature=1.0):
 
 
 def sparse_membership(labels, size, weights=None, normalize=False):
-    """K x N CSR membership with one entry per sample, replacing dense E/M."""
+    """Build a cluster-by-sample sparse membership matrix with one stored value per sample.
+
+    :param labels: Integer cluster assignment for each sample.
+    :param size: Number of clusters.
+    :param weights: Propagation weights or sample weights, in the order consumed by this operation. Defaults to ``None``.
+    :param normalize: Whether to normalize each cluster row to unit total weight. Defaults to ``False``.
+    :returns: SciPy CSR membership matrix; normalization rejects empty clusters.
+    """
     labels = np.asarray(labels, dtype=np.int64)
     values = (
         np.ones(len(labels), dtype=np.float64)
@@ -103,7 +140,17 @@ def sparse_class_assignment(
     original_nodes,
     fuzzy=False,
 ):
-    """Sparse GECC diagnostic assignment, indexed by original graph node IDs."""
+    """Construct sparse classwise assignments from synthetic nodes to original training node IDs.
+
+    :param features: Node feature matrix with one row per node.
+    :param synthetic_labels: Class labels of the synthetic feature rows.
+    :param train_features: Training feature rows.
+    :param train_labels: Class label for each training row.
+    :param train_indices: Original graph node ID for each training row.
+    :param original_nodes: Number of nodes in the original graph, defining the assignment matrix width.
+    :param fuzzy: Whether to use distance-based soft assignments instead of uniform class memberships. Defaults to ``False``.
+    :returns: Coalesced sparse COO tensor of shape ``(num_synthetic_nodes, original_nodes)``.
+    """
     device = features.device
     train_labels = torch.as_tensor(train_labels, device=device)
     train_indices = torch.as_tensor(train_indices, device=device, dtype=torch.long)

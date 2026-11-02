@@ -12,11 +12,25 @@ from graphslim.reduction.lightweight import as_csr
 
 
 def _numpy(value):
+    """Convert a tensor or array to a CPU NumPy representation.
+
+    :param value: Value to convert or identify.
+    :returns: NumPy array; tensors are detached first.
+    """
     return value.detach().cpu().numpy() if isinstance(value, torch.Tensor) else np.asarray(value)
 
 
 def graph_statistics(adjacency, features, labels, structure=True):
-    """Undefined quantities are None, never fabricated zeros or NaNs."""
+    """Measure graph, feature, and label properties with explicit undefined values.
+
+    Undefined quantities are None instead of fabricated zeros or NaNs.
+
+    :param adjacency: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param features: Node feature matrix with one row per node.
+    :param labels: Node labels in the same node ordering as the corresponding features.
+    :param structure: Whether to include adjacency-based graph diagnostics. Defaults to ``True``.
+    :returns: Dictionary of graph diagnostics; structural calculations are optional.
+    """
     features, labels = _numpy(features), _numpy(labels)
     if labels.ndim == 2:
         labels = labels.argmax(1)
@@ -71,10 +85,24 @@ def graph_statistics(adjacency, features, labels, structure=True):
 
 
 class PropertyEvaluator:
+    """Reporter for original and reduced graph structure, features, and labels.
+
+    """
     def __init__(self, args):
+        """Initialize PropertyEvaluator and its configuration.
+
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         self.args = args
 
     def evaluate(self, data, reduced=True, model_type="GCN"):
+        """Select original or reduced graph inputs and report their structural and feature statistics.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param reduced: Whether to use the synthetic graph instead of the original training graph. Defaults to ``True``.
+        :param model_type: Downstream model name used when preparing reduced graph inputs. Defaults to ``'GCN'``.
+        :returns: Statistics dictionary, or a list of dictionaries for batched synthetic adjacencies.
+        """
         if reduced:
             self.feat, self.adj, self.label = get_syn_data(data, self.args, model_type=model_type)
         else:
@@ -89,6 +117,11 @@ class PropertyEvaluator:
         )
 
     def _report(self, structure):
+        """Compute graph statistics for the current graph and write them to the run logger.
+
+        :param structure: Whether to include adjacency-based graph diagnostics.
+        :returns: Statistics dictionary or one dictionary per batched graph.
+        """
         adjacency = self.adj
         if isinstance(adjacency, torch.Tensor) and adjacency.ndim == 3:
             reports = [
@@ -100,7 +133,15 @@ class PropertyEvaluator:
         return reports
 
     def graph_property(self):
+        """Report structural diagnostics together with node feature and label statistics.
+
+        :returns: Graph statistics dictionary or list of dictionaries.
+        """
         return self._report(True)
 
     def graph_property_no_structure(self):
+        """Report feature and label diagnostics without structural graph calculations.
+
+        :returns: Graph statistics dictionary or list of dictionaries.
+        """
         return self._report(False)

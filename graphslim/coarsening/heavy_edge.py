@@ -25,11 +25,26 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class HeavyEdge(Coarsen):
+    """Multilevel graph coarsening using heavy-edge matching.
+
+    """
     def __init__(self, setting, data, args):
+        """Initialize HeavyEdge and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         super(HeavyEdge, self).__init__(setting, data, args)
         args.method = "heavy_edge"
 
     def coarsen(self, G, method):
+        """Coarsen a PyGSP graph using heavy-edge matching.
+
+        :param G: Input PyGSP graph.
+        :param method: Compatibility argument; this implementation always uses heavy-edge proximity.
+        :returns: Tuple ``(coarsening_matrix, coarse_graph, level_matrices, level_graphs)``.
+        """
         K = 10
         r = 0.5
         max_levels = 10

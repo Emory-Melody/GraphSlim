@@ -14,10 +14,23 @@ class GCond(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize GCond and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(GCond, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Optimize synthetic features and adjacency by classwise gradient matching.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         pge = self.pge
         self.feat_syn, labels_syn = to_tensor(

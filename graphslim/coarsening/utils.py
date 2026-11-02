@@ -44,7 +44,15 @@ def maxWeightMatching(edges, maxcardinality=False):
     Return a list "mate", such that mate[i] == j if vertex i is
     matched to vertex j, and mate[i] == -1 if vertex i is not matched.
 
-    This function takes time O(n ** 3)."""
+    This function takes time O(n ** 3).
+
+    :param edges: Sequence of ``(i, j, weight)`` tuples for an undirected graph
+        without self-loops or parallel edges. Vertex IDs are consecutive
+        non-negative integers.
+    :param maxcardinality: Whether to maximize cardinality before maximizing
+        weight among equal-cardinality matchings. Defaults to ``False``.
+    :returns: Partner vertex IDs, with ``-1`` for unmatched vertices.
+    """
 
     #
     # Vertices are numbered 0 .. (nvertex-1).
@@ -184,11 +192,21 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Return 2 * slack of edge k (does not work inside blossoms).
     def slack(k):
+        """Compute twice the dual slack of a candidate matching edge.
+
+        :param k: Index of the candidate edge in the matching edge list.
+        :returns: Edge dual slack.
+        """
         (i, j, wt) = edges[k]
         return dualvar[i] + dualvar[j] - 2 * wt
 
     # Generate the leaf vertices of a blossom.
     def blossomLeaves(b):
+        """Enumerate original vertices inside a possibly nested blossom.
+
+        :param b: Blossom ID in the matching hierarchy.
+        :returns: Iterator over blossom leaf vertex IDs.
+        """
         if b < nvertex:
             yield b
         else:
@@ -203,6 +221,12 @@ def maxWeightMatching(edges, maxcardinality=False):
     # and record the fact that w was reached through the edge with
     # remote endpoint p.
     def assignLabel(w, t, p):
+        """Assign a search-tree label to a vertex and its containing blossom.
+
+        :param w: Vertex ID used by the blossom search.
+        :param t: Alternating-tree label: one for S and two for T.
+        :param p: Remote endpoint through which the search label was assigned.
+        """
         if DEBUG:
             DEBUG("assignLabel(%d,%d,%d)" % (w, t, p))
         b = inblossom[w]
@@ -226,6 +250,12 @@ def maxWeightMatching(edges, maxcardinality=False):
     # Trace back from vertices v and w to discover either a new blossom
     # or an augmenting path. Return the base vertex of the new blossom or -1.
     def scanBlossom(v, w):
+        """Trace two alternating paths to find a blossom base or an augmenting path.
+
+        :param v: Vertex ID used by the blossom search.
+        :param w: Vertex ID used by the blossom search.
+        :returns: Base vertex ID, or -1 when an augmenting path is found.
+        """
         if DEBUG:
             DEBUG("scanBlossom(%d,%d)" % (v, w))
         # Trace back from v and w, placing breadcrumbs as we go.
@@ -265,6 +295,11 @@ def maxWeightMatching(edges, maxcardinality=False):
     # connects a pair of S vertices. Label the new blossom as S; set its dual
     # variable to zero; relabel its T-vertices to S and add them to the queue.
     def addBlossom(base, k):
+        """Contract an odd cycle into a new blossom and update search labels.
+
+        :param base: Vertex ID used by the blossom search.
+        :param k: Index of the candidate edge in the matching edge list.
+        """
         (v, w, wt) = edges[k]
         bb = inblossom[base]
         bv = inblossom[v]
@@ -355,6 +390,11 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Expand the given top-level blossom.
     def expandBlossom(b, endstage):
+        """Expand a blossom and restore its children and alternating-tree labels.
+
+        :param b: Blossom ID in the matching hierarchy.
+        :param endstage: Whether the current augmentation stage has finished.
+        """
         if DEBUG:
             DEBUG("expandBlossom(%d,%d) %s" % (b, endstage, repr(blossomchilds[b])))
         # Convert sub-blossoms into top-level blossoms.
@@ -444,6 +484,11 @@ def maxWeightMatching(edges, maxcardinality=False):
     # Swap matched/unmatched edges over an alternating path through blossom b
     # between vertex v and the base vertex. Keep blossom bookkeeping consistent.
     def augmentBlossom(b, v):
+        """Flip matched edges along the path from a vertex to a blossom base.
+
+        :param b: Blossom ID in the matching hierarchy.
+        :param v: Vertex ID used by the blossom search.
+        """
         if DEBUG:
             DEBUG("augmentBlossom(%d,%d)" % (b, v))
         # Bubble up through the blossom tree from vertex v to an immediate
@@ -493,6 +538,10 @@ def maxWeightMatching(edges, maxcardinality=False):
     # single vertices. The augmenting path runs through edge k, which
     # connects a pair of S vertices.
     def augmentMatching(k):
+        """Augment the current matching along the discovered alternating path.
+
+        :param k: Index of the candidate edge in the matching edge list.
+        """
         (v, w, wt) = edges[k]
         if DEBUG:
             DEBUG("augmentMatching(%d) (v=%d w=%d)" % (k, v, w))
@@ -536,6 +585,9 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Verify that the optimum solution has been reached.
     def verifyOptimum():
+        """Assert primal and dual conditions for the completed weighted matching.
+
+        """
         if maxcardinality:
             # Vertices may have negative dual;
             # find a constant non-negative number to add to all vertex duals.
@@ -580,6 +632,9 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Check optimized delta2 against a trivial computation.
     def checkDelta2():
+        """Recompute the delta-2 slack minimum to check cached matching state.
+
+        """
         for v in range(nvertex):
             if label[inblossom[v]] == 0:
                 bd = None
@@ -615,6 +670,9 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Check optimized delta3 against a trivial computation.
     def checkDelta3():
+        """Recompute the delta-3 slack minimum to check cached matching state.
+
+        """
         bk = -1
         bd = None
         tbk = -1
@@ -1488,10 +1546,19 @@ def contract_variation_linear(G, A=None, K=10, r=0.5, mode="neighborhood"):
         """
 
         def __init__(self, candidate_list):
+            """Store a contraction candidate and its precomputed variation cost.
+
+            :param candidate_list: Node IDs forming one proposed contraction candidate.
+            """
             self.set = candidate_list
             self.cost = subgraph_cost(candidate_list)
 
         def __lt__(self, other):
+            """Order contraction candidates by variation cost.
+
+            :param other: Other contraction candidate used for cost comparison.
+            :returns: Whether this candidate has a lower cost than the other candidate.
+            """
             return self.cost < other.cost
 
     family = []

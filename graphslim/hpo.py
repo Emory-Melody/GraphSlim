@@ -55,10 +55,19 @@ FORBIDDEN = {
 
 
 def utcnow():
+    """Get the current UTC timestamp for search provenance.
+
+    :returns: ISO 8601 timestamp string including the UTC offset.
+    """
     return datetime.now(timezone.utc).isoformat()
 
 
 def search_dir(args):
+    """Resolve the output directory for a method/dataset/reduction-rate search.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Absolute ``Path`` beneath ``args.save_path/hpo``.
+    """
     return (
         Path(args.save_path).expanduser().resolve()
         / "hpo"
@@ -68,7 +77,11 @@ def search_dir(args):
 
 
 def template_space(args):
-    """A one-point space holding the method's current settings, for the user to widen."""
+    """Build an editable one-point search grid from the current method settings.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Parameter-to-candidate-list mapping using eligible scalar configuration values.
+    """
     keys = sorted(k for k in getattr(args, "_method_config_keys", set()) if not k.startswith("_"))
     space = {}
     for key in keys:
@@ -83,6 +96,14 @@ def template_space(args):
 
 
 def load_space(path):
+    """Read and validate a JSON grid search space.
+
+    Comment keys beginning with an underscore are ignored. Forbidden parameters,
+    empty candidate lists, and non-object JSON values raise ``click.BadParameter``.
+
+    :param path: Filesystem location used by this operation.
+    :returns: Mapping from parameter names to nonempty candidate lists.
+    """
     space = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(space, dict):
         raise click.BadParameter("search space must be a JSON object", param_hint="--hpo_space")
@@ -103,7 +124,11 @@ def load_space(path):
 
 
 def resolve_space(args):
-    """Return (path, space, created) where created means a template was just written."""
+    """Select an explicit, shipped, or saved search grid, creating a template when needed.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Tuple ``(space_path, candidate_mapping, template_created)``.
+    """
     folder = search_dir(args)
     folder.mkdir(parents=True, exist_ok=True)
     if getattr(args, "hpo_space", None):
@@ -128,11 +153,22 @@ def resolve_space(args):
 
 
 def grid(space):
+    """Enumerate the Cartesian product of parameter candidates in sorted key order.
+
+    :param space: Mapping from searchable parameter names to candidate lists.
+    :returns: List of parameter dictionaries, one per trial.
+    """
     keys = sorted(space)
     return [dict(zip(keys, values)) for values in itertools.product(*(space[k] for k in keys))]
 
 
 def box_table(rows, header):
+    """Render search parameters as a bordered plain text table.
+
+    :param rows: Table body rows.
+    :param header: Column headings for the rendered table.
+    :returns: Formatted table string.
+    """
     widths = [max(len(str(r[i])) for r in [header, *rows]) for i in range(len(header))]
     line = "+" + "+".join("-" * (w + 2) for w in widths) + "+"
     render = lambda r: "|" + "|".join(f" {str(v).ljust(w)} " for v, w in zip(r, widths)) + "|"
@@ -140,6 +176,11 @@ def box_table(rows, header):
 
 
 def format_seconds(seconds):
+    """Format an estimated duration in seconds, minutes, or hours.
+
+    :param seconds: Duration in seconds, or ``None`` when no estimate is available.
+    :returns: Duration text, or an unknown-duration message for missing or non-finite values.
+    """
     if seconds is None or not math.isfinite(seconds):
         return "unknown until the first trial finishes"
     if seconds < 90:
@@ -153,6 +194,10 @@ class TrialLog:
     """Append-only record of finished trials; resuming skips every trial already recorded."""
 
     def __init__(self, folder):
+        """Initialize TrialLog and its configuration.
+
+        :param folder: Filesystem location used by this operation.
+        """
         self.path = folder / "trials.jsonl"
         self.records = {}
         if self.path.is_file():
@@ -162,16 +207,34 @@ class TrialLog:
                     self.records[record["trial"]] = record
 
     def append(self, record):
+        """Append a trial record to JSONL and update the in-memory trial index.
+
+        :param record: JSON-serializable trial record including its unique ``trial`` key.
+        """
         with self.path.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(record) + "\n")
         self.records[record["trial"]] = record
 
     def mean_seconds(self):
+        """Average durations of completed trials only.
+
+        :returns: Mean elapsed seconds, or ``None`` if no trial has completed.
+        """
         done = [r["seconds"] for r in self.records.values() if r.get("status") == "complete"]
         return statistics.mean(done) if done else None
 
 
 def describe(args, path, space, trials, log, created):
+    """Describe a search grid, completed trials, validation selection rule, and estimated remaining time.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param path: Filesystem location used by this operation.
+    :param space: Mapping from searchable parameter names to candidate lists.
+    :param trials: Enumerated trial parameter dictionaries.
+    :param log: TrialLog containing previously recorded trial results.
+    :param created: Whether the search space template was just created.
+    :returns: Multiline search summary.
+    """
     rows = [[key, ", ".join(str(v) for v in values), len(values)] for key, values in space.items()]
     remaining = len(trials) - len(log.records)
     per_trial = log.mean_seconds()
@@ -190,6 +253,12 @@ def describe(args, path, space, trials, log, created):
 
 
 def apply(args, params):
+    """Copy a configuration and apply trial parameters for validation-only evaluation.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param params: Mapping of parameter names to replacement values.
+    :returns: Trial configuration with HPO and experiment tracking disabled.
+    """
     run_args = copy(args)
     for key, value in params.items():
         setattr(run_args, key, value)
@@ -202,7 +271,10 @@ def apply(args, params):
 
 
 def reset_graph(graph):
-    """Drop the previous trial's synthetic graph and cached samplers."""
+    """Clear synthetic graph attributes and cached samplers before another trial.
+
+    :param graph: Input graph object.
+    """
     if hasattr(graph, "reset"):
         graph.reset()
     else:
@@ -211,6 +283,13 @@ def reset_graph(graph):
 
 
 def validation_score(graph, run_args, runs):
+    """Fit repeated downstream models and collect validation-only scores on a reduced graph.
+
+    :param graph: Input graph object.
+    :param run_args: Configuration namespace containing the options used by this operation.
+    :param runs: Number of independently seeded downstream evaluations.
+    :returns: List of validation scores; seeds increment from ``run_args.seed``.
+    """
     from graphslim.dataset.utils import get_syn_data
     from graphslim.evaluation import Evaluator
     from graphslim.utils import seed_everything
@@ -230,7 +309,15 @@ def validation_score(graph, run_args, runs):
 
 
 def run_search(args, graph):
-    """Run or resume the grid search; return the best record or None if the user declined."""
+    """Run or resume a grid search selected only by mean validation accuracy.
+
+    Trial records are appended to JSONL. The selected parameters and summary
+    are saved beneath the search directory; no test metric selects the winner.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param graph: Input graph object.
+    :returns: Best completed trial record, or None if the search is declined or no trial completes.
+    """
     from graphslim.reduction import create_reducer
     from graphslim.utils import seed_everything
 

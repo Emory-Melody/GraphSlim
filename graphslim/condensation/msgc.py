@@ -18,6 +18,13 @@ class MSGC(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize MSGC and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(MSGC, self).__init__(setting, data, args, **kwargs)
         x_channels = data.feat_train.shape[1]
         edge_hidden_channels = 256
@@ -43,6 +50,11 @@ class MSGC(GCondBase):
         ).to(args.device)
 
     def generate_labels_syn(self, data):
+        """Allocate synthetic nodes by training class proportions with at least one per class.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :returns: Integer per-class node counts; synthetic labels are also stored in ``self.y_syn``.
+        """
         labels_train = data.labels_train.to(self.device)
         n = labels_train.shape[0]
         n_syn = self.nnodes_syn
@@ -69,6 +81,12 @@ class MSGC(GCondBase):
 
     def reduce(self, data, verbose=True):
 
+        """Match real gradients with batches of synthetic graphs sharing trainable node features.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         if args.setting == "trans":
             features, adj, labels = to_tensor(
@@ -192,6 +210,9 @@ class MSGC(GCondBase):
     #         return x_syn
 
     def reset_adj_batch(self):
+        """Resample class-aware candidate edge indices for all synthetic graph batches.
+
+        """
         rows = []
         cols = []
         batch = []
@@ -234,6 +255,10 @@ class MSGC(GCondBase):
             print(f"n_edge:{n_edge}")
 
     def get_adj_t_syn(self):
+        """Generate symmetric synthetic adjacency batches with self-loops and GCN normalization.
+
+        :returns: Dense tensor of shape ``(batch_size, num_synthetic_nodes, num_synthetic_nodes)``.
+        """
         adj = torch.zeros(size=(self.batch_size, self.n_syn, self.n_syn), device=self.device)
         adj[self.batch, self.rows, self.cols] = torch.sigmoid(
             self.pge(
@@ -252,11 +277,22 @@ class MSGC(GCondBase):
 
 
 class FixLenList:
+    """Fixed-capacity history that discards the oldest element on overflow.
+
+    """
     def __init__(self, lenth):
+        """Initialize FixLenList and its configuration.
+
+        :param lenth: Maximum number of entries retained in the history.
+        """
         self.lenth = lenth
         self.data = []
 
     def append(self, element):
+        """Append a value and discard the oldest entry if the capacity is exceeded.
+
+        :param element: New value to append to the fixed-capacity history.
+        """
         self.data.append(element)
         if len(self.data) > self.lenth:
             del self.data[0]

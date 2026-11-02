@@ -25,6 +25,13 @@ class GEOM(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize GEOM and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(GEOM, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = "GCN"
@@ -39,6 +46,12 @@ class GEOM(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Learn synthetic features by matching curriculum-trained expert parameter trajectories.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         args.num_experts = 20  # 200
 
@@ -334,6 +347,10 @@ class GEOM(GCondBase):
         return data
 
     def buffer_cl(self, data):
+        """Train curriculum experts and save parameter trajectories in replay buffers.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        """
         args = self.args
 
         if args.setting == "trans":
@@ -420,6 +437,10 @@ class GEOM(GCondBase):
                 trajectories = []
 
     def expert_load(self):
+        """Discover replay buffers, shuffle expert order, and load the first buffer.
+
+        :returns: Tuple ``(file_index, expert_index, expert_files)``; raises if no buffers exist.
+        """
         expert_files = []
         n = 0
         while os.path.exists(os.path.join(self.buf_dir, "replay_buffer_{}.pt".format(n))):
@@ -437,6 +458,10 @@ class GEOM(GCondBase):
         return file_idx, expert_idx, expert_files
 
     def synset_save(self):
+        """Copy the current synthetic features and labels and construct identity adjacency.
+
+        :returns: Tuple ``(features, identity_adjacency, labels)`` detached for evaluation.
+        """
         args = self.args
 
         with torch.no_grad():
@@ -453,6 +478,11 @@ class GEOM(GCondBase):
         return feat_syn_eval, adj_syn_eval, label_syn_eval
 
     def init_coreset_select(self, data):
+        """Train a coreset embedding model and save k-center initialization indices.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :returns: NumPy array of selected training node IDs.
+        """
         args = self.args
 
         # random.seed(15)
@@ -511,6 +541,13 @@ class GEOM(GCondBase):
         return idx_selected
 
     def get_coreset_init(self, features, adj, labels):
+        """Load saved k-center indices and extract the corresponding induced subgraph.
+
+        :param features: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param labels: Node labels in the same node ordering as the corresponding features.
+        :returns: Tuple ``(features, adjacency, labels)`` restricted to the saved indices.
+        """
         args = self.args
         print(
             "Loading from: {}".format(
