@@ -13,10 +13,7 @@
 \definecolor{gsData}{HTML}{2A78D6}%
 \definecolor{gsReduce}{HTML}{EB6834}%
 \definecolor{gsEval}{HTML}{1BAF7A}%
-\definecolor{gsInk}{HTML}{0B0B0B}%
-\definecolor{gsInkTwo}{HTML}{52514E}%
-\definecolor{edgegray}{HTML}{666666}%
-\providecommand{\edgegray}[1]{\textcolor{edgegray}{#1}}%
+\definecolor{gsInk}{HTML}{000000}%
 \begin{tikzpicture}[
   x=1cm, y=1cm,
   font=\sffamily\fontsize{8}{9.4}\selectfont,
@@ -26,9 +23,9 @@
   rowtext/.style={anchor=west,inner sep=0pt},
   title/.style={anchor=base west,inner sep=0pt,
     font=\sffamily\bfseries\fontsize{9.5}{11}\selectfont},
-  api/.style={anchor=base west,inner sep=0pt,text=gsInkTwo,
+  api/.style={anchor=base west,inner sep=0pt,text=gsInk,
     font=\ttfamily\fontsize{7.5}{9}\selectfont},
-  flowlabel/.style={inner sep=0pt,align=center,text=gsInkTwo,
+  flowlabel/.style={inner sep=0pt,align=center,text=gsInk,
     font=\sffamily\fontsize{6.8}{7.8}\selectfont},
   ico/.style={inner sep=0pt,font=\fontsize{8.5}{8.5}\selectfont},
   pics/merge/.style={code={
@@ -80,12 +77,12 @@
   \fill[white,rounded corners=2pt] (5.02,\yy-.25) rectangle (8.9,\yy+.25);
   \ifdim\yy pt>2pt
     \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy+.075) {\label};
-    \node[rowtext,text=gsInkTwo,font=\sffamily\fontsize{6.4}{7.4}\selectfont]
-      at (5.60,\yy-.15) {5 node / \edgegray{7 edge}};
+    \node[rowtext,text=gsInk,font=\sffamily\fontsize{6.4}{7.4}\selectfont]
+      at (5.60,\yy-.15) {5 node / 7 edge};
   \else
     \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy) {\label};
   \fi
-  \node[anchor=east,inner sep=0pt,text=gsInkTwo,font=\sffamily\fontsize{7}{8}\selectfont]
+  \node[anchor=east,inner sep=0pt,text=gsInk,font=\sffamily\fontsize{7}{8}\selectfont]
     at (8.76,\yy) {\count\ methods};
 }
 \node[ico,text=gsReduce] at (5.30,2.15) {\faIcon{filter}};
@@ -116,9 +113,9 @@
 \node[rowtext] at (11.19,.38) {Runtime / memory};
 
 % One possible composition of the independently accessible layers.
-\draw[gsInkTwo,line width=.75pt,->] (4.02,1.3) -- (4.82,1.3);
+\draw[gsInk,line width=.75pt,->] (4.02,1.3) -- (4.82,1.3);
 \node[flowlabel] at (4.42,1.48) {graph};
-\draw[gsInkTwo,line width=.75pt,->] (9.57,1.3) -- (10.47,1.3);
+\draw[gsInk,line width=.75pt,->] (9.57,1.3) -- (10.47,1.3);
 \node[flowlabel] at (10.02,1.6) {reduced\\graph};
 \end{tikzpicture}%
 \endgroup
