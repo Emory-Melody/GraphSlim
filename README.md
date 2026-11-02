@@ -31,7 +31,7 @@ extension wheels for your GPU and CUDA runtime.
 
 ## Architecture
 
-[![Figure 1. GraphSlim architecture: data, reduction with validation-only HPO, and evaluation layers](figures/figure1.png)](figures/figure1.pdf)
+[![Figure 1. GraphSlim architecture: data, reduction with HPO, and evaluation layers](figures/figure1.png)](figures/figure1.pdf)
 
 Figure 1 depicts the package paper's 38-method development roster. The data, reduction, and evaluation layers are
 independently callable. The reduction layer covers sparsification, coarsening,

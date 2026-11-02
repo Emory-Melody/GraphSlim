@@ -30,7 +30,7 @@ Torch 与 PyG 扩展 wheel。
 
 ## 软件框架
 
-[![Figure 1：GraphSlim 的数据层、含验证集选参 HPO 的缩减层和评估层](figures/figure1.png)](figures/figure1.pdf)
+[![Figure 1：GraphSlim 的数据层、含 HPO 的缩减层和评估层](figures/figure1.png)](figures/figure1.pdf)
 
 Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据、缩减和评估三层均可独立调用。
 中间的缩减层包含稀疏化、粗化、凝聚及可选 HPO；
