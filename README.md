@@ -23,7 +23,7 @@ reproduction commands.
 
 GPU execution uses native PyTorch operations. Install matching Torch and PyG
 extension wheels for your GPU and CUDA runtime.
-[GPU setup and checks](#install).
+[GPU setup and checks](README.md#gpu-setup-and-checks).
 
 [Quick start](#quick-start) · [Architecture](#architecture) ·
 [Reproduction coverage](#reproduction-coverage) · [Clustering acceleration](#clustering-acceleration) ·
@@ -330,12 +330,6 @@ Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cor
 
 </details>
 
-Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
-
-```bash
-python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
-```
-
 ## Install
 
 Use Python 3.10 or 3.11. Install PyTorch first for your CPU/CUDA environment, then
@@ -351,6 +345,8 @@ uv pip install torch-scatter torch-sparse --no-deps --no-index -f https://data.p
 uv pip install -e ".[dev]" --constraint <(printf 'torch==2.6.0\ntorchvision==0.21.0\n')
 ```
 
+### GPU setup and checks
+
 For CUDA, choose matching PyTorch and extension wheels from
 [PyTorch](https://pytorch.org/get-started/previous-versions/) and
 [PyG](https://data.pyg.org/whl/). Keep the installed Torch version constrained while
@@ -362,6 +358,12 @@ not contain SciPy; the subsequent GraphSlim installation supplies dependencies.
 The checked-in `uv.lock` records dependency resolution. `uv sync --locked` reads it;
 `uv pip sync` requires a requirements file and does not consume `uv.lock`.
 Compiled PyG extensions must still match the Torch/CUDA environment.
+
+Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
+
+```bash
+python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
+```
 
 To use a published package instead of this checkout: `pip install graphslim`.
 

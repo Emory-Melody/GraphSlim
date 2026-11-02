@@ -22,7 +22,7 @@ GraphSlim 将 稀疏化、粗化、凝聚、**7 种下游 GNN 骨干网络**和
 
 GPU 运算使用 PyTorch 原生算子。请安装与显卡和 CUDA 运行时匹配的
 Torch 与 PyG 扩展 wheel。
-[GPU 配置与检查](#安装)。
+[GPU 配置与检查](README_zh-CN.md#gpu-setup-and-checks)。
 
 [快速开始](#快速开始) · [软件框架](#软件框架) ·
 [复现覆盖率](#复现覆盖率) · [聚类加速](#聚类加速) ·
@@ -315,12 +315,6 @@ GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
 
 </details>
 
-`graphslim-doctor` 可检查 PyTorch、稀疏运算和可选的 DGL 安装。
-
-```bash
-python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
-```
-
 ## 安装
 
 请使用 Python 3.10 或 3.11。先安装适合 CPU/CUDA 环境的 PyTorch，再安装匹配的 PyG 扩展 wheel。
@@ -336,6 +330,10 @@ uv pip install torch-scatter torch-sparse --no-deps --no-index -f https://data.p
 uv pip install -e ".[dev]" --constraint <(printf 'torch==2.6.0\ntorchvision==0.21.0\n')
 ```
 
+<a id="gpu-setup-and-checks"></a>
+
+### GPU 配置与检查
+
 使用 CUDA 时，请从 [PyTorch](https://pytorch.org/get-started/previous-versions/) 和
 [PyG](https://data.pyg.org/whl/) 选择匹配的 PyTorch 与扩展 wheel。
 安装其余依赖时，应继续约束已安装的 Torch 版本。
@@ -345,6 +343,12 @@ Yelp/Amazon 欺诈检测数据集需要安装 `.[dgl]`，GECC 的模糊聚类需
 仓库中的 `uv.lock` 记录依赖解析结果，可由 `uv sync --locked` 读取；
 `uv pip sync` 需要 requirements 文件，不能读取 `uv.lock`。
 编译后的 PyG 扩展仍须与 Torch/CUDA 环境匹配。
+
+`graphslim-doctor` 可检查 PyTorch、稀疏运算和可选的 DGL 安装。
+
+```bash
+python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
+```
 
 如需使用已发布的软件包，可运行：`pip install graphslim`。
 
