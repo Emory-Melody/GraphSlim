@@ -39,34 +39,40 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
 
 ## 加速表现
 
-在下列受控对比中，**CGC 的实测作者实现 / GraphSlim 缩减耗时比为 1.87–2.69×，
-ClustGDD 为 1.06–1.22×**。表中完整展示六个方法与数据集组合及其下游效果。
+用完整的六组对比展示缩减耗时、峰值进程内存和峰值 GPU 显存。
+**CGC 的实测作者实现 / GraphSlim 耗时比最高为 2.69×**；耗时持平和内存增加的组合也完整保留。
 
 <!-- implementation-comparison:start -->
 
-| 方法 | 数据集 | 作者实现（秒） | GraphSlim（秒） | 耗时比 | 作者实现 GCN（%） | GraphSlim GCN（%） |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| CGC | Cora | 0.261 | 0.097 | 2.69× | 75.92 ± 2.15 | 74.48 ± 3.01 |
-| CGC | Citeseer | 0.246 | 0.131 | 1.87× | 72.28 ± 0.64 | 72.48 ± 0.48 |
-| ClustGDD | Cora | 1.207 | 1.139 | 1.06× | 78.04 ± 0.82 | 79.16 ± 0.90 |
-| ClustGDD | Citeseer | 1.463 | 1.196 | 1.22× | 72.54 ± 0.48 | 71.91 ± 0.33 |
-| GCGP | Cora | 0.946 | 0.946 | 1.00× | 42.67 ± 5.44 | 36.19 ± 4.84 |
-| GCGP | Citeseer | 0.789 | 0.798 | 0.99× | 64.99 ± 0.45 | 66.02 ± 1.81 |
+[![缩减耗时、峰值进程内存、峰值 GPU 显存和准确率相对短缺的大图对比](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)
+
+**复现标准：准确率单边相对短缺低于 5%。** 统一 GCN 评估下 **5/6** 组达标；GCGP/Cora 的短缺为 **15.19%**。采用 GCGP 原生 GP 预测器时，**2/2** 组达标（橙色菱形）。该阈值针对预测效果。
+
+[矢量 PDF](figures/implementation_comparison.pdf) · [高清 PNG](figures/implementation_comparison.png) · [经核对的绘图数据](benchmark/results/implementation_comparison_figure.json)
 
 <!-- implementation-comparison:end -->
 
-耗时比为作者实现耗时除以 GraphSlim 耗时，大于 1 表示 GraphSlim 更快。
-耗时取 **3 次缩减的中位数**，缩减规模为有标签训练节点的 50%（Cora：70；Citeseer：60）。
-GCN 得分为 **30 次训练**的均值 ± 总体标准差：每个缩减图评估 10 次，共 3 个缩减图。
-CGC 在 AMD EPYC 9115 上使用 4 个 CPU 线程；ClustGDD 和 GCGP 使用一张
-NVIDIA RTX PRO 6000 Blackwell，每组对比的两种实现使用相同设备。
+耗时与内存柱取 **3 次缩减的中位数**，误差线为实测最小值至最大值，并非置信区间。
+GCN 准确率取 **3 个缩减图上共 30 次训练的均值**；原生 GP 评估使用 3 个缩减图。
+所有对比均保留有标签训练节点的 50%（Cora：70；Citeseer：60）。
 
-计时覆盖完整的内存内缩减，包括预处理和设备间传输；导入、数据加载、序列化及下游 GCN 训练不在计时范围内。
-作者代码固定到具体提交，并通过适配器使用相同输入和评估流程。
-两种实现的输出与准确率有差异，因此耗时比反映实测的实现取舍。
-GCGP 的耗时基本持平，Cora 上的 GCN 准确率下降 6.48 个百分点；其原论文使用 GP 预测器。
-[冻结测量、作者代码提交与适配协议](benchmark/results/implementation_comparison_20261031.json) ·
-[对比运行器](benchmark/compare_implementations.py)。
+<details>
+<summary>耗时、内存及复现误差口径</summary>
+
+- 每组使用相同的冻结输入与设备：CGC 在 AMD EPYC 9115 上使用 4 个 CPU 线程；
+  ClustGDD 和 GCGP 使用一张 RTX PRO 6000 Blackwell。
+- 缩减计时包括预处理和设备间传输；导入、加载、序列化、下游 GCN 训练及诊断性 GP 推理不在计时范围内。
+- **进程内存**为每 5 ms 采样的峰值 RSS，包含常驻输入和导入库；更短的峰值可能漏采。
+  **GPU 显存**为上下文预热后的 PyTorch 峰值已分配显存；仅用 CPU 的组合标为 N/A。
+  缓存保留显存和设备总占用各有不同口径。
+- 5% 标准按匹配评估的准确率均值计算 `100 * max(0, 作者实现 - GraphSlim) / 作者实现`，
+  沿用复现覆盖率的单边短缺公式，此处参照为固定版本的作者实现。统一 GCN 与原生 GP 结果各自保留评估范围。
+- [冻结测量及适配协议](benchmark/results/implementation_comparison_20261031.json) ·
+  [对比运行器](benchmark/compare_implementations.py) ·
+  [绘图脚本](benchmark/plot_implementation_comparison.py)。
+  执行 `python -m benchmark.plot_implementation_comparison` 重新生成，加 `--check` 核验。
+
+</details>
 
 ## 复现覆盖率
 

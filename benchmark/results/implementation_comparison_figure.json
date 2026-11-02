@@ -1,0 +1,355 @@
+{
+  "source": "benchmark/results/implementation_comparison_20261031.json",
+  "source_sha256": "76c50b6708446a47159dc3ba38454d087ae49f773d122871e98dfc9c6317302f",
+  "renderer_sha256": "d71759b1f89e7f18f67fc9704497d70e5fb9452ce1c3b09d5041e07a275d761c",
+  "scope": "new controlled reduction comparison, not paper-score reproduction or an unmodified author CLI benchmark; no all-method claim",
+  "reduction_seeds_per_implementation": 3,
+  "uncertainty": "Bars are medians; whiskers show observed min-max across three reductions, not confidence intervals.",
+  "memory": "Process RSS sampled every 5 ms includes resident inputs/imports. CUDA is PyTorch peak allocated memory after context warmup; CPU-only cells are not applicable.",
+  "fidelity": {
+    "criterion": "100 * max(0, author_mean - graphslim_mean) / author_mean < 5",
+    "threshold_percent": 5,
+    "reference": "Matched pinned author implementation; this is separate from the paper-reference coverage roster.",
+    "shared_gcn_passes": 5,
+    "shared_gcn_pairs": 6,
+    "native_gp_passes": 2,
+    "native_gp_pairs": 2
+  },
+  "pairs": [
+    {
+      "method": "cgc",
+      "dataset": "cora",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 0.26082620199304074,
+            "minimum": 0.24971052398905158,
+            "maximum": 0.26226742699509487
+          },
+          "peak_process_rss_mib": {
+            "median": 988.8828125,
+            "minimum": 988.55859375,
+            "maximum": 1007.08984375
+          },
+          "peak_cuda_allocated_mib": null,
+          "device": "cpu",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 75.91666678587596,
+          "common_gcn_accuracy_std_percent": 2.1492765085513956
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 0.0968269890290685,
+            "minimum": 0.09550790500361472,
+            "maximum": 0.09804599499329925
+          },
+          "peak_process_rss_mib": {
+            "median": 991.46484375,
+            "minimum": 987.6796875,
+            "maximum": 1002.91015625
+          },
+          "peak_cuda_allocated_mib": null,
+          "device": "cpu",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 74.48000013828278,
+          "common_gcn_accuracy_std_percent": 3.00803341115668
+        }
+      },
+      "author_over_graphslim_time": 2.693734511508335,
+      "common_gcn": {
+        "author_percent": 75.91666678587596,
+        "graphslim_percent": 74.48000013828278,
+        "relative_shortfall_percent": 1.8924258775023985,
+        "absolute_relative_gap_percent": 1.8924258775023985
+      },
+      "native_gp": null
+    },
+    {
+      "method": "cgc",
+      "dataset": "citeseer",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 0.2458345500053838,
+            "minimum": 0.2338694750214927,
+            "maximum": 0.24645112705184147
+          },
+          "peak_process_rss_mib": {
+            "median": 1152.4453125,
+            "minimum": 1117.69921875,
+            "maximum": 1157.15625
+          },
+          "peak_cuda_allocated_mib": null,
+          "device": "cpu",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 72.27666636308034,
+          "common_gcn_accuracy_std_percent": 0.6401466810277283
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 0.13132550800219178,
+            "minimum": 0.12179994402686134,
+            "maximum": 0.13487582397647202
+          },
+          "peak_process_rss_mib": {
+            "median": 1087.109375,
+            "minimum": 1062.3671875,
+            "maximum": 1109.4296875
+          },
+          "peak_cuda_allocated_mib": null,
+          "device": "cpu",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 72.48000005880992,
+          "common_gcn_accuracy_std_percent": 0.48055530699537713
+        }
+      },
+      "author_over_graphslim_time": 1.8719482128428613,
+      "common_gcn": {
+        "author_percent": 72.27666636308034,
+        "graphslim_percent": 72.48000005880992,
+        "relative_shortfall_percent": 0.0,
+        "absolute_relative_gap_percent": 0.2813268873084716
+      },
+      "native_gp": null
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "cora",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 1.2073610209627077,
+            "minimum": 1.18321918300353,
+            "maximum": 1.2845284040085971
+          },
+          "peak_process_rss_mib": {
+            "median": 2093.875,
+            "minimum": 2088.9609375,
+            "maximum": 2114.45703125
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 139.609375,
+            "minimum": 139.609375,
+            "maximum": 139.609375
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 78.036670088768,
+          "common_gcn_accuracy_std_percent": 0.8223883696756462
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 1.1391431220108643,
+            "minimum": 1.1081283609964885,
+            "maximum": 1.1735062709776685
+          },
+          "peak_process_rss_mib": {
+            "median": 2071.96484375,
+            "minimum": 2071.6640625,
+            "maximum": 2072.65625
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 121.1376953125,
+            "minimum": 121.1376953125,
+            "maximum": 121.1376953125
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 79.15666997432709,
+          "common_gcn_accuracy_std_percent": 0.8965431651566015
+        }
+      },
+      "author_over_graphslim_time": 1.0598852748471344,
+      "common_gcn": {
+        "author_percent": 78.036670088768,
+        "graphslim_percent": 79.15666997432709,
+        "relative_shortfall_percent": 0.0,
+        "absolute_relative_gap_percent": 1.4352225489440587
+      },
+      "native_gp": null
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "citeseer",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 1.4629241529619321,
+            "minimum": 1.4258212050190195,
+            "maximum": 1.5151865330408327
+          },
+          "peak_process_rss_mib": {
+            "median": 2182.1953125,
+            "minimum": 2145.8125,
+            "maximum": 2206.83203125
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 281.46923828125,
+            "minimum": 281.46923828125,
+            "maximum": 281.4697265625
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 72.5400032599767,
+          "common_gcn_accuracy_std_percent": 0.47930485901906955
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 1.1962964329868555,
+            "minimum": 1.1677390430122614,
+            "maximum": 1.244042291014921
+          },
+          "peak_process_rss_mib": {
+            "median": 2131.58984375,
+            "minimum": 2131.4921875,
+            "maximum": 2133.1015625
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 267.2861328125,
+            "minimum": 267.2861328125,
+            "maximum": 267.2861328125
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 71.91000362237294,
+          "common_gcn_accuracy_std_percent": 0.3340162594372206
+        }
+      },
+      "author_over_graphslim_time": 1.2228776351939572,
+      "common_gcn": {
+        "author_percent": 72.5400032599767,
+        "graphslim_percent": 71.91000362237294,
+        "relative_shortfall_percent": 0.8684858137459672,
+        "absolute_relative_gap_percent": 0.8684858137459672
+      },
+      "native_gp": null
+    },
+    {
+      "method": "gcgp",
+      "dataset": "cora",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 0.945742012001574,
+            "minimum": 0.9432939409743994,
+            "maximum": 1.00338039197959
+          },
+          "peak_process_rss_mib": {
+            "median": 1857.3359375,
+            "minimum": 1856.90625,
+            "maximum": 1857.49609375
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 158.80322265625,
+            "minimum": 158.80322265625,
+            "maximum": 158.80322265625
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 42.673335472742714,
+          "common_gcn_accuracy_std_percent": 5.441687088182809
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 0.945909931033384,
+            "minimum": 0.8521834599669091,
+            "maximum": 0.9500488759949803
+          },
+          "peak_process_rss_mib": {
+            "median": 1878.0703125,
+            "minimum": 1876.27734375,
+            "maximum": 1878.1328125
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 106.33447265625,
+            "minimum": 106.33447265625,
+            "maximum": 106.33447265625
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 70,
+          "common_gcn_accuracy_mean_percent": 36.19000176588694,
+          "common_gcn_accuracy_std_percent": 4.837654654466313
+        }
+      },
+      "author_over_graphslim_time": 0.9998224788361968,
+      "common_gcn": {
+        "author_percent": 42.673335472742714,
+        "graphslim_percent": 36.19000176588694,
+        "relative_shortfall_percent": 15.192938716958173,
+        "absolute_relative_gap_percent": 15.192938716958173
+      },
+      "native_gp": {
+        "author_percent": 80.43333333333334,
+        "graphslim_percent": 80.23333333333333,
+        "relative_shortfall_percent": 0.24865312888520866,
+        "absolute_relative_gap_percent": 0.24865312888520866
+      }
+    },
+    {
+      "method": "gcgp",
+      "dataset": "citeseer",
+      "implementations": {
+        "author": {
+          "time_seconds": {
+            "median": 0.7888562819571234,
+            "minimum": 0.7882548450143076,
+            "maximum": 0.8952351249754429
+          },
+          "peak_process_rss_mib": {
+            "median": 1851.203125,
+            "minimum": 1850.8828125,
+            "maximum": 1851.421875
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 252.66943359375,
+            "minimum": 252.66943359375,
+            "maximum": 252.66943359375
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 64.98666902383168,
+          "common_gcn_accuracy_std_percent": 0.4514669650205712
+        },
+        "graphslim": {
+          "time_seconds": {
+            "median": 0.7981535759754479,
+            "minimum": 0.7863751210388727,
+            "maximum": 0.9899051319807768
+          },
+          "peak_process_rss_mib": {
+            "median": 1889.41015625,
+            "minimum": 1889.39453125,
+            "maximum": 1891.515625
+          },
+          "peak_cuda_allocated_mib": {
+            "median": 267.2861328125,
+            "minimum": 267.2861328125,
+            "maximum": 267.2861328125
+          },
+          "device": "cuda:0",
+          "reduced_nodes": 60,
+          "common_gcn_accuracy_mean_percent": 66.02333625157674,
+          "common_gcn_accuracy_std_percent": 1.8097300294136138
+        }
+      },
+      "author_over_graphslim_time": 0.9883514973832424,
+      "common_gcn": {
+        "author_percent": 64.98666902383168,
+        "graphslim_percent": 66.02333625157674,
+        "relative_shortfall_percent": 0.0,
+        "absolute_relative_gap_percent": 1.5951998206969082
+      },
+      "native_gp": {
+        "author_percent": 68.06666666666668,
+        "graphslim_percent": 68.5,
+        "relative_shortfall_percent": 0.0,
+        "absolute_relative_gap_percent": 0.6366307541625703
+      }
+    }
+  ],
+  "assets_sha256": {
+    ".svg": "a32e6788d43e28f848aa36ac8441c17d799be8e11bcb08d0b7f68fc526c149bb",
+    ".png": "63d3b2df5fb418d52f6a872d33e7cd457d9da555fe0e1308cc5d9895ee506576",
+    ".pdf": "00ff76a27e873663eb860d560a75b156b6bf7376e7a3de8fb9bf708c0927192b"
+  }
+}

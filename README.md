@@ -41,38 +41,48 @@ node selection or coarsening used to initialize condensation.
 
 ## Acceleration
 
-**CGC achieves observed author/GraphSlim reduction-time ratios of 1.87–2.69×;
-ClustGDD achieves 1.06–1.22×** in the controlled comparison below.
-All six method–dataset pairs are shown with their downstream quality.
+Compare reduction time, peak process memory, and peak GPU memory on the complete
+six-pair roster. **CGC's measured time ratio reaches 2.69×**; the chart also
+shows unchanged runtime and memory increases where they occur.
 
 <!-- implementation-comparison:start -->
 
-| Method | Dataset | Author (s) | GraphSlim (s) | Time ratio | Author GCN (%) | GraphSlim GCN (%) |
-| --- | --- | ---: | ---: | ---: | ---: | ---: |
-| CGC | Cora | 0.261 | 0.097 | 2.69× | 75.92 ± 2.15 | 74.48 ± 3.01 |
-| CGC | Citeseer | 0.246 | 0.131 | 1.87× | 72.28 ± 0.64 | 72.48 ± 0.48 |
-| ClustGDD | Cora | 1.207 | 1.139 | 1.06× | 78.04 ± 0.82 | 79.16 ± 0.90 |
-| ClustGDD | Citeseer | 1.463 | 1.196 | 1.22× | 72.54 ± 0.48 | 71.91 ± 0.33 |
-| GCGP | Cora | 0.946 | 0.946 | 1.00× | 42.67 ± 5.44 | 36.19 ± 4.84 |
-| GCGP | Citeseer | 0.789 | 0.798 | 0.99× | 64.99 ± 0.45 | 66.02 ± 1.81 |
+[![Large comparison of reduction time, peak process RSS, peak GPU allocation, and accuracy shortfall](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)
+
+**Reproduction criterion: relative accuracy shortfall <5%.** **5/6** pairs meet it with shared GCN evaluation; GCGP/Cora has **15.19%** shortfall. With GCGP's native GP predictor, **2/2** pairs meet the criterion (orange diamonds). The threshold concerns predictive quality.
+
+[Vector PDF](figures/implementation_comparison.pdf) · [High-resolution PNG](figures/implementation_comparison.png) · [Reviewed chart data](benchmark/results/implementation_comparison_figure.json)
 
 <!-- implementation-comparison:end -->
 
-Time ratio is author time divided by GraphSlim time; values above 1 favor
-GraphSlim. Times are medians of **three reductions** at 50% of labeled training
-nodes (Cora: 70; Citeseer: 60). GCN scores are mean ± population standard
-deviation over **30 fits**: ten per reduced graph, nested within three reductions.
-CGC uses four CPU threads on an AMD EPYC 9115; ClustGDD and GCGP use one NVIDIA
-RTX PRO 6000 Blackwell, with the same device for both implementations.
+Time and memory bars are medians of **three reductions**; whiskers show the
+observed minimum–maximum, rather than confidence intervals. GCN accuracy averages
+**30 fits nested within three reduced graphs**; the native GP evaluation uses
+three reduced graphs. All pairs use 50% of labeled training nodes
+(Cora: 70; Citeseer: 60).
 
-Timing covers the complete in-memory reduction, including preprocessing and
-device transfers. Imports, data loading, serialization, and downstream GCN
-training are outside the timing boundary. Author code is pinned and adapted to
-shared inputs and evaluation. Outputs and accuracy differ, so these ratios
-describe measured implementation tradeoffs. GCGP shows essentially unchanged
-runtime, and its Cora GCN accuracy drops by 6.48 points; its paper uses a GP predictor.
-[Frozen measurements, author commits, and adapter protocol](benchmark/results/implementation_comparison_20261031.json) ·
-[Comparison runner](benchmark/compare_implementations.py).
+<details>
+<summary>Timing, memory, and quality definitions</summary>
+
+- Each pair uses common saved inputs and the same device: CGC uses four CPU
+  threads on an AMD EPYC 9115; ClustGDD and GCGP use one RTX PRO 6000 Blackwell.
+- Timing includes preprocessing and device transfers. Imports, loading,
+  serialization, downstream GCN fitting, and diagnostic GP inference are excluded.
+- **Process memory** is peak process RSS sampled every 5 ms, including resident
+  inputs and imported libraries. Shorter peaks may be missed. **GPU memory** is
+  PyTorch peak allocated memory after context warmup; CPU-only cells are marked
+  N/A. Allocator-reserved and total device memory are separate quantities.
+- The 5% criterion uses `100 * max(0, author - GraphSlim) / author`, comparing
+  matched mean accuracies. It follows the shortfall formula in the coverage
+  section; the reference here is the pinned author implementation. Shared GCN
+  and native GP results retain their own evaluation scope.
+- [Frozen measurements and adapters](benchmark/results/implementation_comparison_20261031.json) ·
+  [Comparison runner](benchmark/compare_implementations.py) ·
+  [Figure renderer](benchmark/plot_implementation_comparison.py).
+  Regenerate with `python -m benchmark.plot_implementation_comparison` and verify
+  with the same command plus `--check`.
+
+</details>
 
 ## Reproduction coverage
 

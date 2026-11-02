@@ -1,4 +1,4 @@
-"""Render README comparison tables from frozen evidence, without running benchmarks.
+"""Render the README comparison figure and coverage table from frozen evidence.
 
 Run ``python -m benchmark.render_readme_highlights`` to update both languages,
 or append ``--check`` to verify them. The coverage snapshot includes its fixed
@@ -6,6 +6,7 @@ roster, formulas, policy credits, reference corrections, and source hashes.
 """
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -13,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 COVERAGE = ROOT / "benchmark/results/reproduction_coverage_20261101.json"
 COMPARISON = ROOT / "benchmark/results/implementation_comparison_20261031.json"
+FIGURE = ROOT / "benchmark/results/implementation_comparison_figure.json"
 
 
 def load_coverage():
@@ -55,46 +57,39 @@ def coverage_table(data, language):
     return "\n".join(lines)
 
 
-def speed_table(language):
-    data = json.loads(COMPARISON.read_text(encoding="utf-8"))
-    rows = data["rows"]
-    expected = {
-        (m, d, b)
-        for m in ("cgc", "clustgdd", "gcgp")
-        for d in ("cora", "citeseer")
-        for b in ("author", "graphslim")
-    }
-    assert len(rows) == len(expected)
-    assert {(r["method"], r["dataset"], r["backend"]) for r in rows} == expected
-    indexed = {(r["method"], r["dataset"], r["backend"]): r for r in rows}
+def speed_figure(language):
+    data = json.loads(FIGURE.read_text(encoding="utf-8"))
+    assert data["source_sha256"] == hashlib.sha256(COMPARISON.read_bytes()).hexdigest()
+    for suffix, expected in data["assets_sha256"].items():
+        asset = ROOT / f"figures/implementation_comparison{suffix}"
+        assert hashlib.sha256(asset.read_bytes()).hexdigest() == expected
+    fidelity = data["fidelity"]
+    exception = next(p for p in data["pairs"] if (p["method"], p["dataset"]) == ("gcgp", "cora"))
+    gap = exception["common_gcn"]["relative_shortfall_percent"]
     if language == "en":
-        header = "| Method | Dataset | Author (s) | GraphSlim (s) | Time ratio | Author GCN (%) | GraphSlim GCN (%) |"
+        alt = "Large comparison of reduction time, peak process RSS, peak GPU allocation, and accuracy shortfall"
+        note = (
+            "**Reproduction criterion: relative accuracy shortfall <5%.** "
+            f"**{fidelity['shared_gcn_passes']}/{fidelity['shared_gcn_pairs']}** pairs meet it with shared GCN evaluation; "
+            f"GCGP/Cora has **{gap:.2f}%** shortfall. With GCGP's native GP predictor, "
+            f"**{fidelity['native_gp_passes']}/{fidelity['native_gp_pairs']}** pairs meet the criterion "
+            "(orange diamonds). The threshold concerns predictive quality."
+        )
+        links = "[Vector PDF](figures/implementation_comparison.pdf) · [High-resolution PNG](figures/implementation_comparison.png) · [Reviewed chart data](benchmark/results/implementation_comparison_figure.json)"
     else:
-        header = "| 方法 | 数据集 | 作者实现（秒） | GraphSlim（秒） | 耗时比 | 作者实现 GCN（%） | GraphSlim GCN（%） |"
-    lines = [header, "| --- | --- | ---: | ---: | ---: | ---: | ---: |"]
-    for method, name in (("cgc", "CGC"), ("clustgdd", "ClustGDD"), ("gcgp", "GCGP")):
-        for dataset in ("cora", "citeseer"):
-            author = indexed[method, dataset, "author"]
-            package = indexed[method, dataset, "graphslim"]
-            for row in (author, package):
-                assert row["status"] == "complete"
-                assert row["completed_seeds"] == row["expected_seeds"] == 3
-                assert row["evaluations"] == 30
-            assert author["synthetic_nodes"] == package["synthetic_nodes"]
-            assert author["device"] == package["device"]
-            ratio = author["reduction_seconds_median"] / package["reduction_seconds_median"]
-            assert math.isclose(ratio, package["author_over_graphslim_time"])
-            values = [
-                name,
-                dataset.title(),
-                f"{author['reduction_seconds_median']:.3f}",
-                f"{package['reduction_seconds_median']:.3f}",
-                f"{ratio:.2f}×",
-                f"{author['accuracy_mean']:.2f} ± {author['accuracy_std']:.2f}",
-                f"{package['accuracy_mean']:.2f} ± {package['accuracy_std']:.2f}",
-            ]
-            lines.append("| " + " | ".join(values) + " |")
-    return "\n".join(lines)
+        alt = "缩减耗时、峰值进程内存、峰值 GPU 显存和准确率相对短缺的大图对比"
+        note = (
+            "**复现标准：准确率单边相对短缺低于 5%。** "
+            f"统一 GCN 评估下 **{fidelity['shared_gcn_passes']}/{fidelity['shared_gcn_pairs']}** 组达标；"
+            f"GCGP/Cora 的短缺为 **{gap:.2f}%**。采用 GCGP 原生 GP 预测器时，"
+            f"**{fidelity['native_gp_passes']}/{fidelity['native_gp_pairs']}** 组达标（橙色菱形）。"
+            "该阈值针对预测效果。"
+        )
+        links = "[矢量 PDF](figures/implementation_comparison.pdf) · [高清 PNG](figures/implementation_comparison.png) · [经核对的绘图数据](benchmark/results/implementation_comparison_figure.json)"
+    image = (
+        f"[![{alt}](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)"
+    )
+    return "\n\n".join([image, note, links])
 
 
 def replace(text, name, table):
@@ -114,7 +109,7 @@ def main():
     for filename, language in (("README.md", "en"), ("README_zh-CN.md", "zh")):
         path = ROOT / filename
         old = path.read_text(encoding="utf-8")
-        new = replace(old, "implementation-comparison", speed_table(language))
+        new = replace(old, "implementation-comparison", speed_figure(language))
         new = replace(new, "reproduction-coverage", coverage_table(coverage, language))
         if args.check:
             if old != new:
