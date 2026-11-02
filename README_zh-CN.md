@@ -25,7 +25,7 @@ Torch 与 PyG 扩展 wheel。
 [GPU 配置与检查](#安装)。
 
 [快速开始](#快速开始) · [软件框架](#软件框架) ·
-[聚类加速](#聚类加速) · [复现覆盖率](#复现覆盖率) ·
+[复现覆盖率](#复现覆盖率) · [聚类加速](#聚类加速) ·
 [HPO](#超参数优化hpo) · [支持的方法](#支持的方法)
 
 ## 软件框架
@@ -36,38 +36,6 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
 中间的缩减层包含稀疏化、粗化、凝聚及可选 HPO；
 实线表示图数据流，虚线表示使用节点选取或粗化结果初始化凝聚。
 [矢量 PDF](figures/figure1.pdf) · [可编辑源文件](figures/figure1_architecture.tex)。
-
-## 聚类加速
-
-[共享聚类算子](graphslim/reduction/cluster_ops.py)复用已拟合的聚类分配，
-并优化稀疏聚合与分组聚合。
-
-<!-- implementation-comparison:start -->
-
-在**完整 ogbn-arxiv（169,343 个节点，对称化后存储 2,315,598 条边）**上实测。作者实现与 GraphSlim 共用同一份冻结输入、一张 RTX PRO 6000 Blackwell GPU 和 4 个 CPU 线程。实测作者实现 / GraphSlim 缩减耗时比：**CGC 4.59–5.16×**，**ClustGDD 1.65–2.31×**。
-
-[![完整 ogbn-arxiv 上 CGC 和 ClustGDD 在三档缩减预算下的耗时与峰值 GPU 显存实测](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
-
-[矢量 PDF](figures/arxiv_clustering_comparison.pdf) · [高清 PNG](figures/arxiv_clustering_comparison.png) · [原始实测记录](benchmark/results/arxiv_clustering_comparison_20261101.json)
-
-每根柱汇总 **3 个独立进程缩减**，误差线为实测最小值至最大值。左图以同组作者实现的耗时中位数为 1×，柱顶标注实测秒数；右图为峰值 GPU 显存（GiB）。0.1%、0.5%、1% 均以 **90,941 个有标签训练节点**为分母，分别保留 90、454、909 个节点。显存为缩减阶段的 PyTorch 峰值已分配显存。
-
-<details>
-<summary>实测口径与冻结源码</summary>
-
-- 从已完成对称化、训练集拟合标准化的共同 CPU 图开始计时，覆盖缩减内部的预处理和设备间传输，起止均同步 CUDA；不含导入、共同输入准备、保存与下游评估。
-- GPU 峰值在上下文预热后、输入传入 GPU 前重置。原始记录同时保留进程 RSS 和缓存保留显存峰值。
-- 使用 ogbn-arxiv 官方划分，特征标准化仅在训练节点上拟合。种子 1–3 交替执行两种实现，保留全部 3 档预算和 36 次缩减记录。
-- CGC 沿用分档参数，双方聚类上限均为 10 次初始化、300 轮（作者 FAISS 与 GraphSlim sklearn 各自保留收敛规则）。ClustGDD 双方均使用 600 轮预训练、100 轮优化，以及初始化 3 次的 MiniBatchKMeans。CGC 双方重构求解均使用 float64，关闭 TF32。
-- 另行使用共享 GCN 检查效果：每个缩减图训练 1 次、每次 300 轮（每种实现 3 个图），按验证集选检查点。**6/6** 组的准确率均值单边相对短缺低于 5%。此处参照为固定版本的作者实现，与下方采用论文数值参照的覆盖率各有独立统计范围。
-- [实测 GraphSlim 源码与运行器](benchmark/results/arxiv_clustering_source_20261101.zip) · [作者固定版本、适配说明及逐种子结果](benchmark/results/arxiv_clustering_comparison_20261101.json)。
-- 运行前需安装 `faiss-cpu==1.8.0.post1`（NumPy 1.x），并在 `runs/reference` 准备固定版本的 CGC / ClustGDD；版本与提交均记录于快照中。
-- 先执行 `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`，再用实测开发版本建任务：`python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`，随后执行 `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`；GPU 可显式指定。
-- 执行 `python -m benchmark.plot_arxiv_efficiency` 重新生成图，加 `--check` 核验原始记录与图文件哈希。
-
-</details>
-
-<!-- implementation-comparison:end -->
 
 ## 复现覆盖率
 
@@ -104,6 +72,38 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
   执行 `python -m benchmark.render_readme_highlights --check` 可核对 README 表格。
 
 </details>
+
+## 聚类加速
+
+[共享聚类算子](graphslim/reduction/cluster_ops.py)复用已拟合的聚类分配，
+并优化稀疏聚合与分组聚合。
+
+<!-- implementation-comparison:start -->
+
+在**完整 ogbn-arxiv（169,343 个节点，对称化后存储 2,315,598 条边）**上实测。作者实现与 GraphSlim 共用同一份冻结输入、一张 RTX PRO 6000 Blackwell GPU 和 4 个 CPU 线程。实测 GraphSlim / 作者实现缩减耗时比：**CGC 0.19–0.22×**，**ClustGDD 0.43–0.61×**，**越低越好**。
+
+[![完整 ogbn-arxiv 上 CGC 和 ClustGDD 在三档缩减预算下的耗时与峰值 GPU 显存实测](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
+
+[矢量 PDF](figures/arxiv_clustering_comparison.pdf) · [高清 PNG](figures/arxiv_clustering_comparison.png) · [原始实测记录](benchmark/results/arxiv_clustering_comparison_20261101.json)
+
+每根柱汇总 **3 个独立进程缩减**，误差线为实测最小值至最大值。左图为耗时除以同组作者实现的耗时中位数（作者为 1），柱顶标注实测秒数；右图为峰值 GPU 显存（GiB）。**两项均越低越好。**0.1%、0.5%、1% 均以 **90,941 个有标签训练节点**为分母，分别保留 90、454、909 个节点。显存为缩减阶段的 PyTorch 峰值已分配显存。
+
+<details>
+<summary>实测口径与冻结源码</summary>
+
+- 从已完成对称化、训练集拟合标准化的共同 CPU 图开始计时，覆盖缩减内部的预处理和设备间传输，起止均同步 CUDA；不含导入、共同输入准备、保存与下游评估。
+- GPU 峰值在上下文预热后、输入传入 GPU 前重置。原始记录同时保留进程 RSS 和缓存保留显存峰值。
+- 使用 ogbn-arxiv 官方划分，特征标准化仅在训练节点上拟合。种子 1–3 交替执行两种实现，保留全部 3 档预算和 36 次缩减记录。
+- CGC 沿用分档参数，双方聚类上限均为 10 次初始化、300 轮（作者 FAISS 与 GraphSlim sklearn 各自保留收敛规则）。ClustGDD 双方均使用 600 轮预训练、100 轮优化，以及初始化 3 次的 MiniBatchKMeans。CGC 双方重构求解均使用 float64，关闭 TF32。
+- 另行使用共享 GCN 检查效果：每个缩减图训练 1 次、每次 300 轮（每种实现 3 个图），按验证集选检查点。**6/6** 组的准确率均值单边相对短缺低于 5%。此处参照为固定版本的作者实现，与上方采用论文数值参照的覆盖率各有独立统计范围。
+- [实测 GraphSlim 源码与运行器](benchmark/results/arxiv_clustering_source_20261101.zip) · [作者固定版本、适配说明及逐种子结果](benchmark/results/arxiv_clustering_comparison_20261101.json)。
+- 运行前需安装 `faiss-cpu==1.8.0.post1`（NumPy 1.x），并在 `runs/reference` 准备固定版本的 CGC / ClustGDD；版本与提交均记录于快照中。
+- 先执行 `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`，再用实测开发版本建任务：`python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`，随后执行 `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`；GPU 可显式指定。
+- 执行 `python -m benchmark.plot_arxiv_efficiency` 重新生成图，加 `--check` 核验原始记录与图文件哈希。
+
+</details>
+
+<!-- implementation-comparison:end -->
 
 ## 复现结果
 

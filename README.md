@@ -26,7 +26,7 @@ extension wheels for your GPU and CUDA runtime.
 [GPU setup and checks](#install).
 
 [Quick start](#quick-start) · [Architecture](#architecture) ·
-[Clustering acceleration](#clustering-acceleration) · [Reproduction coverage](#reproduction-coverage) ·
+[Reproduction coverage](#reproduction-coverage) · [Clustering acceleration](#clustering-acceleration) ·
 [HPO](#hyperparameter-optimization-hpo) · [Methods](#methods)
 
 ## Architecture
@@ -38,38 +38,6 @@ independently callable. The reduction layer covers sparsification, coarsening,
 condensation, and optional HPO. Solid arrows show graph flow; dashed arrows show
 node selection or coarsening used to initialize condensation.
 [Vector PDF](figures/figure1.pdf) · [Editable source](figures/figure1_architecture.tex).
-
-## Clustering acceleration
-
-[Shared clustering operators](graphslim/reduction/cluster_ops.py) reuse fitted
-assignments and streamline sparse and segmented aggregation.
-
-<!-- implementation-comparison:start -->
-
-Measured on **full ogbn-arxiv: 169,343 nodes and 2,315,598 stored edges after symmetrization**. Both implementations use the same saved inputs, one RTX PRO 6000 Blackwell GPU and four CPU threads. Observed author/GraphSlim reduction-time ratios: **CGC 4.59–5.16×**, **ClustGDD 1.65–2.31×**.
-
-[![Measured ogbn-arxiv reduction time and peak GPU memory for CGC and ClustGDD at three reduction rates](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
-
-[Vector PDF](figures/arxiv_clustering_comparison.pdf) · [High-resolution PNG](figures/arxiv_clustering_comparison.png) · [Raw measurements](benchmark/results/arxiv_clustering_comparison_20261101.json)
-
-Each bar summarizes **three fresh-process reductions**; whiskers show their observed minimum–maximum. Left: speed relative to the matched author's median (1×), with measured seconds above the bars. Right: peak GPU memory in GiB. The 0.1%, 0.5% and 1% budgets refer to the **90,941 labeled training nodes**, retaining 90, 454 and 909 nodes. GPU memory is PyTorch peak allocated memory during reduction.
-
-<details>
-<summary>Measurement protocol and frozen source</summary>
-
-- Timing starts from the common CPU graph after symmetrization and training-fitted standardization. It includes reducer-internal preprocessing and device transfers, with CUDA synchronization; imports, shared input preparation, saving and downstream evaluation are excluded.
-- GPU peaks are reset after context warmup, before input transfers. Process RSS and allocator-reserved peaks are also retained in the raw records.
-- Inputs use the official ogbn-arxiv splits and feature standardization fitted on training nodes. Seeds 1–3 alternate implementation order. All three declared rates and all 36 reduction records are included.
-- CGC retains its rate-specific settings and matched caps of 10 initializations / 300 iterations (author FAISS versus GraphSlim sklearn, retaining their convergence rules). ClustGDD uses matched 600 pretraining / 100 refinement updates and MiniBatchKMeans with three initializations. Both CGC reconstruction solves use float64; TF32 is disabled.
-- A separate shared-GCN check uses one 300-epoch fit per reduced graph (three graphs per implementation); validation selects the checkpoint. **6/6** pairs have mean one-sided accuracy shortfall below 5%. The reference is the matched pinned author implementation; these checks have their own scope from the paper-reference coverage below.
-- [Measured GraphSlim source and harness](benchmark/results/arxiv_clustering_source_20261101.zip) · [Pinned author versions, adapters and per-seed results](benchmark/results/arxiv_clustering_comparison_20261101.json).
-- Runner prerequisites: `faiss-cpu==1.8.0.post1` with NumPy 1.x, and the pinned CGC / ClustGDD checkouts under `runs/reference`; versions and commits are recorded in the snapshot.
-- Extract the archive with `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`. Plan using the measured development source: `python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`; then run with `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`. GPU selection is explicit.
-- Regenerate with `python -m benchmark.plot_arxiv_efficiency`; append `--check` to validate source records and figure hashes.
-
-</details>
-
-<!-- implementation-comparison:end -->
 
 ## Reproduction coverage
 
@@ -116,6 +84,38 @@ the <5% shortfall rate is **114/116 (98.28%)**.
   Recheck the README tables with `python -m benchmark.render_readme_highlights --check`.
 
 </details>
+
+## Clustering acceleration
+
+[Shared clustering operators](graphslim/reduction/cluster_ops.py) reuse fitted
+assignments and streamline sparse and segmented aggregation.
+
+<!-- implementation-comparison:start -->
+
+Measured on **full ogbn-arxiv: 169,343 nodes and 2,315,598 stored edges after symmetrization**. Both implementations use the same saved inputs, one RTX PRO 6000 Blackwell GPU and four CPU threads. Observed GraphSlim/author reduction-time ratios: **CGC 0.19–0.22×**, **ClustGDD 0.43–0.61×**; **lower is better**.
+
+[![Measured ogbn-arxiv reduction time and peak GPU memory for CGC and ClustGDD at three reduction rates](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
+
+[Vector PDF](figures/arxiv_clustering_comparison.pdf) · [High-resolution PNG](figures/arxiv_clustering_comparison.png) · [Raw measurements](benchmark/results/arxiv_clustering_comparison_20261101.json)
+
+Each bar summarizes **three fresh-process reductions**; whiskers show their observed minimum–maximum. Left: reduction time divided by the matched author's median (1), with measured seconds above the bars. Right: peak GPU memory in GiB. **Lower is better for both metrics.** The 0.1%, 0.5% and 1% budgets refer to the **90,941 labeled training nodes**, retaining 90, 454 and 909 nodes. GPU memory is PyTorch peak allocated memory during reduction.
+
+<details>
+<summary>Measurement protocol and frozen source</summary>
+
+- Timing starts from the common CPU graph after symmetrization and training-fitted standardization. It includes reducer-internal preprocessing and device transfers, with CUDA synchronization; imports, shared input preparation, saving and downstream evaluation are excluded.
+- GPU peaks are reset after context warmup, before input transfers. Process RSS and allocator-reserved peaks are also retained in the raw records.
+- Inputs use the official ogbn-arxiv splits and feature standardization fitted on training nodes. Seeds 1–3 alternate implementation order. All three declared rates and all 36 reduction records are included.
+- CGC retains its rate-specific settings and matched caps of 10 initializations / 300 iterations (author FAISS versus GraphSlim sklearn, retaining their convergence rules). ClustGDD uses matched 600 pretraining / 100 refinement updates and MiniBatchKMeans with three initializations. Both CGC reconstruction solves use float64; TF32 is disabled.
+- A separate shared-GCN check uses one 300-epoch fit per reduced graph (three graphs per implementation); validation selects the checkpoint. **6/6** pairs have mean one-sided accuracy shortfall below 5%. The reference is the matched pinned author implementation; these checks have their own scope from the paper-reference coverage above.
+- [Measured GraphSlim source and harness](benchmark/results/arxiv_clustering_source_20261101.zip) · [Pinned author versions, adapters and per-seed results](benchmark/results/arxiv_clustering_comparison_20261101.json).
+- Runner prerequisites: `faiss-cpu==1.8.0.post1` with NumPy 1.x, and the pinned CGC / ClustGDD checkouts under `runs/reference`; versions and commits are recorded in the snapshot.
+- Extract the archive with `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`. Plan using the measured development source: `python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`; then run with `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`. GPU selection is explicit.
+- Regenerate with `python -m benchmark.plot_arxiv_efficiency`; append `--check` to validate source records and figure hashes.
+
+</details>
+
+<!-- implementation-comparison:end -->
 
 ## Reproduced results
 

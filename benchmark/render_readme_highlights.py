@@ -63,6 +63,34 @@ def replace(text, name, table):
     return before + start + "\n\n" + table + "\n\n" + end + after
 
 
+def order_highlights(text, language):
+    if language == "en":
+        acceleration = "## Clustering acceleration\n"
+        coverage = "## Reproduction coverage\n"
+        old_links = "[Clustering acceleration](#clustering-acceleration) · [Reproduction coverage](#reproduction-coverage)"
+        new_links = "[Reproduction coverage](#reproduction-coverage) · [Clustering acceleration](#clustering-acceleration)"
+    else:
+        acceleration = "## 聚类加速\n"
+        coverage = "## 复现覆盖率\n"
+        old_links = "[聚类加速](#聚类加速) · [复现覆盖率](#复现覆盖率)"
+        new_links = "[复现覆盖率](#复现覆盖率) · [聚类加速](#聚类加速)"
+    text = text.replace(old_links, new_links)
+    speed_start, coverage_start = text.index(acceleration), text.index(coverage)
+    if coverage_start < speed_start:
+        return text
+    coverage_end = text.find("\n## ", coverage_start + len(coverage))
+    if coverage_end < 0:
+        coverage_end = len(text)
+    else:
+        coverage_end += 1
+    return (
+        text[:speed_start]
+        + text[coverage_start:coverage_end]
+        + text[speed_start:coverage_start]
+        + text[coverage_end:]
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
@@ -74,6 +102,7 @@ def main():
         old = path.read_text(encoding="utf-8")
         new = replace(old, "implementation-comparison", speed_figure(language))
         new = replace(new, "reproduction-coverage", coverage_table(coverage, language))
+        new = order_highlights(new, language)
         if args.check:
             if old != new:
                 stale.append(filename)

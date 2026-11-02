@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/arxiv_clustering_comparison_20261101.json",
   "source_sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
-  "renderer_sha256": "716ccd08955ac0300486a92d8cd9a8cb17fe9cf93adb5291c078bf2c095d322e",
+  "renderer_sha256": "fd6da78e55447e997391e91936f1d980aeaac3a45f67ad4cc2726170c872b0cf",
   "source_archive": {
     "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
     "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",
@@ -46,7 +46,11 @@
     "reduction_seconds",
     "peak_cuda_allocated_bytes"
   ],
-  "time_normalization": "Author median divided by each implementation's times within each matched method/budget; author baseline 1x. Labels retain measured median seconds.",
+  "metric_directions": {
+    "reduction_seconds": "lower",
+    "peak_cuda_allocated_bytes": "lower"
+  },
+  "time_normalization": "Each implementation's times divided by the author median within each matched method/budget; author baseline 1. Lower is better; labels retain measured median seconds.",
   "uncertainty": "Bars are medians of three fresh-process reductions; whiskers show observed minimum to maximum.",
   "style_reference": "Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/gray grouped bars, hatched GraphSlim series, serif labels.",
   "pairs": [
@@ -142,6 +146,7 @@
         }
       },
       "time_ratio": 4.585662783323907,
+      "relative_time": 0.218070984991869,
       "memory_ratio": 1.0616178563471603,
       "quality_shortfall_percent": 0.0
     },
@@ -237,6 +242,7 @@
         }
       },
       "time_ratio": 1.8934785419933158,
+      "relative_time": 0.5281285094191103,
       "memory_ratio": 0.9393601776522061,
       "quality_shortfall_percent": 0.0
     },
@@ -332,6 +338,7 @@
         }
       },
       "time_ratio": 5.156166118461659,
+      "relative_time": 0.19394254898411803,
       "memory_ratio": 1.0616178563471603,
       "quality_shortfall_percent": 0.9196992341162158
     },
@@ -427,6 +434,7 @@
         }
       },
       "time_ratio": 2.30709104263013,
+      "relative_time": 0.4334462669752209,
       "memory_ratio": 1.515106983455224,
       "quality_shortfall_percent": 0.0
     },
@@ -522,6 +530,7 @@
         }
       },
       "time_ratio": 5.01933509044702,
+      "relative_time": 0.19922957562710567,
       "memory_ratio": 1.0061460246599596,
       "quality_shortfall_percent": 0.0
     },
@@ -617,13 +626,14 @@
         }
       },
       "time_ratio": 1.6468980409593403,
+      "relative_time": 0.6072021309937842,
       "memory_ratio": 2.542882877620618,
       "quality_shortfall_percent": 0.2649547860816316
     }
   ],
   "assets_sha256": {
-    ".svg": "4dae6f92eef6512b5d4a3b8d6cc887731cf6e0ff646a5ee3b74a2d97564d6668",
-    ".png": "7834635c2b566f388266a41977ba932776de807a285d9cb07deb51404728de01",
-    ".pdf": "441ea6d58e546f87604cdbd84226946aadcc2a704740e8b3943e0688412f1247"
+    ".svg": "d401f2d98449672f67af12f3f74820d44a4a83e0571c0990921722672e71a3f3",
+    ".png": "213052e4876792823d658db1db4c82da0d79c86a5dc9ef54b2959b258364c289",
+    ".pdf": "84ebc3101d599d3dfa8169d0ad889a5af98af491ca15703ca31c1072e533eee1"
   }
 }

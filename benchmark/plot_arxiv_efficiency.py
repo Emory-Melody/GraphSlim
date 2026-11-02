@@ -64,6 +64,9 @@ def reviewed_data():
                 pair["implementations"][backend] = cell
             a, b = (pair["implementations"][k] for k in ("author", "graphslim"))
             pair["time_ratio"] = a["reduction_seconds"]["median"] / b["reduction_seconds"]["median"]
+            pair["relative_time"] = (
+                b["reduction_seconds"]["median"] / a["reduction_seconds"]["median"]
+            )
             pair["memory_ratio"] = (
                 a["peak_cuda_allocated_bytes"]["median"] / b["peak_cuda_allocated_bytes"]["median"]
             )
@@ -82,7 +85,8 @@ def reviewed_data():
         data=source["data"],
         protocol=source["protocol"],
         displayed_metrics=["reduction_seconds", "peak_cuda_allocated_bytes"],
-        time_normalization="Author median divided by each implementation's times within each matched method/budget; author baseline 1x. Labels retain measured median seconds.",
+        metric_directions={"reduction_seconds": "lower", "peak_cuda_allocated_bytes": "lower"},
+        time_normalization="Each implementation's times divided by the author median within each matched method/budget; author baseline 1. Lower is better; labels retain measured median seconds.",
         uncertainty="Bars are medians of three fresh-process reductions; whiskers show observed minimum to maximum.",
         style_reference="Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/gray grouped bars, hatched GraphSlim series, serif labels.",
         pairs=pairs,
@@ -124,6 +128,7 @@ def plot(data):
     fig, axes = plt.subplots(1, 2, figsize=(17, 7.5))
     fig.subplots_adjust(left=0.065, right=0.985, bottom=0.25, top=0.72, wspace=0.24)
     fig.text(0.065, 0.94, "GraphSlim on ogbn-arxiv", fontsize=27, weight="bold")
+    fig.text(0.985, 0.94, "Lower is better ↓", fontsize=16, ha="right", color="#525252")
     fig.text(
         0.065,
         0.89,
@@ -152,14 +157,14 @@ def plot(data):
             axes[0],
             "reduction_seconds",
             1,
-            "Reduction speed",
-            "Speedup (×)",
+            "Reduction time ↓",
+            "Relative time · author = 1",
         ),
         (
             axes[1],
             "peak_cuda_allocated_bytes",
             2**30,
-            "Peak GPU memory",
+            "Peak GPU memory ↓",
             "GiB · PyTorch peak allocated",
         ),
     ]:
@@ -169,9 +174,9 @@ def plot(data):
             if field == "reduction_seconds":
                 reference = pair["implementations"]["author"][field]["median"]
                 return (
-                    reference / summary["median"],
-                    reference / summary["maximum"],
-                    reference / summary["minimum"],
+                    summary["median"] / reference,
+                    summary["minimum"] / reference,
+                    summary["maximum"] / reference,
                 )
             return tuple(summary[key] / scale for key in ("median", "minimum", "maximum"))
 
@@ -230,7 +235,7 @@ def plot(data):
     fig.text(
         0.065,
         0.105,
-        "3 reductions per bar; whiskers: observed min–max. Speed is relative to each author's median (1×); labels retain measured seconds.",
+        "3 reductions per bar; whiskers: observed min–max. Time is relative to each author's median (1); lower is better for both metrics.",
         fontsize=12.5,
         color="#525252",
     )
