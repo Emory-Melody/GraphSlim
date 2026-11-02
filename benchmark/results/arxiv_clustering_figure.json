@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/arxiv_clustering_comparison_20261101.json",
   "source_sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
-  "renderer_sha256": "fd6da78e55447e997391e91936f1d980aeaac3a45f67ad4cc2726170c872b0cf",
+  "renderer_sha256": "182e534236ef84fe38a49b970c2e0ef1abaa41c24a0f209b20cdec17a013d29c",
   "source_archive": {
     "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
     "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",
@@ -52,7 +52,7 @@
   },
   "time_normalization": "Each implementation's times divided by the author median within each matched method/budget; author baseline 1. Lower is better; labels retain measured median seconds.",
   "uncertainty": "Bars are medians of three fresh-process reductions; whiskers show observed minimum to maximum.",
-  "style_reference": "Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/gray grouped bars, hatched GraphSlim series, serif labels.",
+  "style_reference": "Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/open grouped bars, hatched GraphSlim series, serif labels.",
   "pairs": [
     {
       "method": "cgc",
@@ -148,7 +148,7 @@
       "time_ratio": 4.585662783323907,
       "relative_time": 0.218070984991869,
       "memory_ratio": 1.0616178563471603,
-      "quality_shortfall_percent": 0.0
+      "quality_relative_gap_percent": 0.9628078415118038
     },
     {
       "method": "clustgdd",
@@ -244,7 +244,7 @@
       "time_ratio": 1.8934785419933158,
       "relative_time": 0.5281285094191103,
       "memory_ratio": 0.9393601776522061,
-      "quality_shortfall_percent": 0.0
+      "quality_relative_gap_percent": 1.661193158410291
     },
     {
       "method": "cgc",
@@ -340,7 +340,7 @@
       "time_ratio": 5.156166118461659,
       "relative_time": 0.19394254898411803,
       "memory_ratio": 1.0616178563471603,
-      "quality_shortfall_percent": 0.9196992341162158
+      "quality_relative_gap_percent": 0.9196992341162158
     },
     {
       "method": "clustgdd",
@@ -436,7 +436,7 @@
       "time_ratio": 2.30709104263013,
       "relative_time": 0.4334462669752209,
       "memory_ratio": 1.515106983455224,
-      "quality_shortfall_percent": 0.0
+      "quality_relative_gap_percent": 0.04778089205373707
     },
     {
       "method": "cgc",
@@ -532,7 +532,7 @@
       "time_ratio": 5.01933509044702,
       "relative_time": 0.19922957562710567,
       "memory_ratio": 1.0061460246599596,
-      "quality_shortfall_percent": 0.0
+      "quality_relative_gap_percent": 0.04114853502413638
     },
     {
       "method": "clustgdd",
@@ -628,12 +628,13 @@
       "time_ratio": 1.6468980409593403,
       "relative_time": 0.6072021309937842,
       "memory_ratio": 2.542882877620618,
-      "quality_shortfall_percent": 0.2649547860816316
+      "quality_relative_gap_percent": 0.2649547860816316
     }
   ],
   "assets_sha256": {
-    ".svg": "d401f2d98449672f67af12f3f74820d44a4a83e0571c0990921722672e71a3f3",
-    ".png": "213052e4876792823d658db1db4c82da0d79c86a5dc9ef54b2959b258364c289",
-    ".pdf": "84ebc3101d599d3dfa8169d0ad889a5af98af491ca15703ca31c1072e533eee1"
+    ".svg": "0b1c8c61eb567220a594c5709cbe632f545f4881cef5ec7bcbe6b96f139287d8",
+    ".png": "89ac27fbfc805756f54406cf7fcc63e6b4bf617d5a4975cccb9d65dbce115b44",
+    ".pdf": "34b093d16dc329f5e011a20d48994e251e59d15d94a21ec243b6fc12f177b458",
+    "_paper.pdf": "b998c44efd22f1e881cd7d7e9a549788400f59c04dfc6bd9023f822710e21beb"
   }
 }

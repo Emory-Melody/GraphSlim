@@ -1,4 +1,4 @@
-"""Draw measured ogbn-arxiv reduction time and peak GPU memory in blue/gray bars."""
+"""Draw measured ogbn-arxiv reduction time and peak GPU memory in blue/open bars."""
 
 import argparse
 import hashlib
@@ -70,8 +70,8 @@ def reviewed_data():
             pair["memory_ratio"] = (
                 a["peak_cuda_allocated_bytes"]["median"] / b["peak_cuda_allocated_bytes"]["median"]
             )
-            pair["quality_shortfall_percent"] = (
-                100 * max(0, a["accuracy_mean"] - b["accuracy_mean"]) / a["accuracy_mean"]
+            pair["quality_relative_gap_percent"] = (
+                100 * abs(a["accuracy_mean"] - b["accuracy_mean"]) / abs(a["accuracy_mean"])
             )
             assert math.isclose(pair["time_ratio"], a["author_over_graphslim_time"])
             pairs.append(pair)
@@ -88,12 +88,12 @@ def reviewed_data():
         metric_directions={"reduction_seconds": "lower", "peak_cuda_allocated_bytes": "lower"},
         time_normalization="Each implementation's times divided by the author median within each matched method/budget; author baseline 1. Lower is better; labels retain measured median seconds.",
         uncertainty="Bars are medians of three fresh-process reductions; whiskers show observed minimum to maximum.",
-        style_reference="Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/gray grouped bars, hatched GraphSlim series, serif labels.",
+        style_reference="Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/open grouped bars, hatched GraphSlim series, serif labels.",
         pairs=pairs,
     )
 
 
-def plot(data):
+def plot(data, paper=False):
     import matplotlib
 
     matplotlib.use("Agg")
@@ -102,7 +102,7 @@ def plot(data):
     from matplotlib.ticker import MaxNLocator
     import numpy as np
 
-    blue, gray, ink = "#4F6BFF", "#BDBDBD", "#202020"
+    blue, gray, ink = "#4F6BFF", "#FFFFFF", "#000000"
     plt.rcParams.update(
         {
             "font.family": "DejaVu Serif",
@@ -111,10 +111,10 @@ def plot(data):
             "axes.labelweight": "bold",
             "axes.titlesize": 19,
             "axes.titleweight": "bold",
-            "axes.edgecolor": "#C8C8C8",
+            "axes.edgecolor": "#000000",
             "axes.linewidth": 0.9,
-            "xtick.color": "#333333",
-            "ytick.color": "#333333",
+            "xtick.color": "#000000",
+            "ytick.color": "#000000",
             "text.color": ink,
             "axes.labelcolor": ink,
             "hatch.linewidth": 1.0,
@@ -125,27 +125,31 @@ def plot(data):
             "savefig.facecolor": "white",
         }
     )
-    fig, axes = plt.subplots(1, 2, figsize=(17, 7.5))
-    fig.subplots_adjust(left=0.065, right=0.985, bottom=0.25, top=0.72, wspace=0.24)
-    fig.text(0.065, 0.94, "GraphSlim on ogbn-arxiv", fontsize=27, weight="bold")
-    fig.text(0.985, 0.94, "Lower is better ↓", fontsize=16, ha="right", color="#525252")
+    if paper:
+        fig, axes = plt.subplots(2, 1, figsize=(10.4, 8.6))
+        fig.subplots_adjust(left=.12, right=.97, bottom=.25, top=.73, hspace=.78)
+    else:
+        fig, axes = plt.subplots(1, 2, figsize=(17, 7.5))
+        fig.subplots_adjust(left=0.065, right=0.985, bottom=0.25, top=0.72, wspace=0.24)
+    fig.text(0.065, 0.94, "GraphSlim on ogbn-arxiv", fontsize=24 if paper else 27, weight="bold")
+    fig.text(0.985, 0.94, "Lower is better ↓", fontsize=16, ha="right", color="#000000")
     fig.text(
         0.065,
         0.89,
         "169,343 nodes · full undirected graph · one RTX PRO 6000 Blackwell",
-        fontsize=15,
-        color="#525252",
+        fontsize=12 if paper else 15,
+        color="#000000",
     )
     fig.legend(
         handles=[
-            Patch(facecolor=gray, edgecolor="white", label="Author implementation"),
-            Patch(facecolor=blue, edgecolor="white", hatch="//", label="GraphSlim"),
+            Patch(facecolor=gray, edgecolor="black", label="Author implementation"),
+            Patch(facecolor=blue, edgecolor="black", hatch="//", label="GraphSlim"),
         ],
         loc="upper center",
         bbox_to_anchor=(0.52, 0.865),
         ncol=2,
-        frameon=True,
-        edgecolor="#D3D3D3",
+        frameon=False,
+        edgecolor="#000000",
         fontsize=15,
         handlelength=2,
         columnspacing=2.8,
@@ -187,7 +191,7 @@ def plot(data):
         ax.set_xticks(positions, labels, fontsize=12.5)
         ax.set_xlabel("Method / fraction of labeled training nodes", labelpad=15, fontsize=13)
         ax.set_axisbelow(True)
-        ax.grid(axis="y", linestyle="--", color="#E8E8E8", linewidth=0.8)
+        ax.grid(axis="y", linestyle="--", color="#DCE5FF", linewidth=0.8)
         ax.spines[["top", "right"]].set_visible(False)
         ax.tick_params(axis="both", length=0, pad=7)
         ax.yaxis.set_major_locator(MaxNLocator(5))
@@ -205,12 +209,12 @@ def plot(data):
                 medians,
                 0.33,
                 color=color,
-                edgecolor="white",
+                edgecolor="black",
                 linewidth=0.8,
                 hatch=hatch,
                 zorder=3,
                 yerr=np.stack([medians - lows, highs - medians]),
-                error_kw={"ecolor": "#555555", "elinewidth": 0.8, "capsize": 2},
+                error_kw={"ecolor": "#000000", "elinewidth": 0.8, "capsize": 2},
             )
             for x, value, high, summary in zip(positions + offset, medians, highs, summaries):
                 label = (
@@ -229,25 +233,34 @@ def plot(data):
                     label,
                     ha="center",
                     va="bottom",
-                    fontsize=12,
+                    fontsize=11 if paper else 12,
                     weight="bold" if backend == "graphslim" else "normal",
                 )
+    if paper:
+        axes[0].set_xlabel("")
+        axes[0].set_ylabel("Time / author median", fontsize=13)
+        axes[1].set_ylabel("Peak GPU memory (GiB)", fontsize=13)
     fig.text(
         0.065,
         0.105,
-        "3 reductions per bar; whiskers: observed min–max. Time is relative to each author's median (1); lower is better for both metrics.",
-        fontsize=12.5,
-        color="#525252",
+        ("3 reductions per bar; whiskers: observed min–max.\nTime is relative to the author's median (1); both metrics: lower is better."
+         if paper else "3 reductions per bar; whiskers: observed min–max. Time is relative to each author's median (1); lower is better for both metrics."),
+        fontsize=10 if paper else 12.5,
+        color="#000000",
     )
     fig.text(
         0.065,
         0.06,
-        "0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes. Timing and GPU peaks exclude downstream GCN evaluation.",
-        fontsize=12.5,
-        color="#525252",
+        ("0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes.\nTiming and GPU peaks exclude downstream GCN evaluation."
+         if paper else "0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes. Timing and GPU peaks exclude downstream GCN evaluation."),
+        fontsize=10 if paper else 12.5,
+        color="#000000",
     )
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
+    if paper:
+        assert not axes[0].yaxis.label.get_window_extent(renderer).overlaps(axes[1].yaxis.label.get_window_extent(renderer))
+        assert not axes[1].xaxis.label.get_window_extent(renderer).overlaps(fig.texts[-2].get_window_extent(renderer))
     for ax in axes:
         for item in [
             ax.title,
@@ -265,17 +278,19 @@ def plot(data):
                 and bounds.y1 <= fig.bbox.height
             ), item.get_text()
     STEM.parent.mkdir(parents=True, exist_ok=True)
-    for suffix in [".svg", ".png", ".pdf"]:
+    for suffix in (["_paper.pdf"] if paper else [".svg", ".png", ".pdf"]):
         meta = (
             {"Date": None}
             if suffix == ".svg"
             else {"CreationDate": None, "ModDate": None}
-            if suffix == ".pdf"
+            if suffix.endswith(".pdf")
             else {}
         )
-        fig.savefig(STEM.with_suffix(suffix), dpi=220, metadata=meta)
+        fig.savefig(Path(str(STEM) + suffix), dpi=220, metadata=meta)
     plt.close(fig)
     svg = STEM.with_suffix(".svg")
+    if paper:
+        return
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
 
 
@@ -289,12 +304,13 @@ def main():
         hashes = saved.pop("assets_sha256")
         assert saved == data, "Source or renderer changed; regenerate the figure"
         for ext, expected in hashes.items():
-            assert sha(STEM.with_suffix(ext)) == expected
+            assert sha(Path(str(STEM) + ext)) == expected
         print("All 36 ogbn-arxiv records, six pairs and exported figures match.")
     else:
         plot(data)
+        plot(data, paper=True)
         data["assets_sha256"] = {
-            ext: sha(STEM.with_suffix(ext)) for ext in [".svg", ".png", ".pdf"]
+            ext: sha(Path(str(STEM) + ext)) for ext in [".svg", ".png", ".pdf", "_paper.pdf"]
         }
         REVIEWED.write_text(json.dumps(data, indent=2, allow_nan=False) + "\n")
         print("Wrote DeepSeek-inspired ogbn-arxiv efficiency figures and reviewed data.")

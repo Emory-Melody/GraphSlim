@@ -1,6 +1,6 @@
-"""Plot cumulative one-sided reproduction coverage from the fixed 123-pair roster.
+"""Plot cumulative two-sided reproduction coverage from the fixed 123-pair roster.
 
-Measured shortfall bands are disjoint. Policy-credited Clustering pairs retain
+Measured relative-error bands are disjoint. Policy-credited Clustering pairs retain
 unknown numerical gaps and appear as a separate hatched segment at each cutoff.
 """
 
@@ -14,9 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "benchmark/results/reproduction_coverage_20261101.json"
 REVIEWED = ROOT / "benchmark/results/reproduction_coverage_figure.json"
 STEM = ROOT / "figures/reproduction_coverage"
-METRIC = "mean_shortfall_percent"
-THRESHOLDS = (1, 2, 5)
-COLORS = ("#4F6BFF", "#91A5FF", "#CCD6FF", "#D7D7D7")
+METRIC = "mean_relative_gap_percent"
+THRESHOLDS = (1, 2, 5, 10)
+COLORS = ("#4F6BFF", "#7E95FF", "#AAB9FF", "#D4DDFF", "#FFFFFF")
 
 
 def sha(path):
@@ -47,12 +47,12 @@ def reviewed_data():
         members = [p for p in numeric if p["complete_result"] and lower <= p[METRIC] < upper]
         segments.append(
             dict(
-                kind="measured_shortfall",
+                kind="measured_relative_error",
                 lower_inclusive=lower,
                 upper_exclusive=upper,
-                label="Measured shortfall <1%"
+                label="Measured relative error <1%"
                 if lower == 0
-                else f"Measured shortfall {lower}–<{upper}%",
+                else f"Measured relative error {lower}–<{upper}%",
                 count=len(members),
                 pairs=keys(members),
                 color=color,
@@ -67,7 +67,7 @@ def reviewed_data():
             pairs=keys(credits),
             color=COLORS[-1],
             hatch="///",
-            measured_shortfall=None,
+            measured_relative_error=None,
         )
     )
     columns = []
@@ -77,10 +77,11 @@ def reviewed_data():
         ]
         measured_count = sum(p["complete_result"] and p[METRIC] < threshold for p in numeric)
         total = sum(counts)
-        expected = source["thresholds"][METRIC][str(threshold)]
+        expected = source["thresholds"][METRIC].get(str(threshold))
         assert measured_count == sum(counts[:-1])
-        assert total == expected["count"] and expected["denominator"] == denominator
-        assert math.isclose(100 * total / denominator, expected["percent"])
+        if expected is not None:
+            assert total == expected["count"] and expected["denominator"] == denominator
+            assert math.isclose(100 * total / denominator, expected["percent"])
         columns.append(
             dict(
                 threshold_percent=threshold,
@@ -125,19 +126,19 @@ def plot(data):
     from matplotlib.ticker import PercentFormatter
     import numpy as np
 
-    ink = "#202020"
+    ink = "#000000"
     plt.rcParams.update(
         {
             "font.family": "DejaVu Serif",
             "font.size": 14,
             "axes.labelsize": 14,
             "axes.labelweight": "bold",
-            "axes.edgecolor": "#C8C8C8",
+            "axes.edgecolor": "#000000",
             "axes.linewidth": 0.9,
             "text.color": ink,
             "axes.labelcolor": ink,
-            "xtick.color": "#333333",
-            "ytick.color": "#333333",
+            "xtick.color": "#000000",
+            "ytick.color": "#000000",
             "hatch.linewidth": 0.8,
             "svg.fonttype": "none",
             "svg.hashsalt": "graphslim-reproduction-coverage",
@@ -154,30 +155,30 @@ def plot(data):
         0.89,
         f"{data['total_pairs']} declared method–dataset pairs · {data['method_count']} methods · {data['dataset_count']} datasets",
         fontsize=14,
-        color="#525252",
+        color="#000000",
     )
     handles = [
         Patch(
             facecolor=s["color"],
-            edgecolor="#777777" if s["kind"] == "policy_credit" else "white",
+            edgecolor="#000000" if s["kind"] == "policy_credit" else "white",
             hatch=s.get("hatch"),
             label=s["label"],
         )
         for s in data["segments"]
     ]
     fig.legend(
-        handles=[handles[i] for i in (0, 2, 1, 3)],
+        handles=handles,
         loc="upper center",
         bbox_to_anchor=(0.54, 0.84),
         ncol=2,
-        frameon=True,
-        edgecolor="#D3D3D3",
+        frameon=False,
+        edgecolor="#000000",
         fontsize=12,
         handlelength=2.1,
         columnspacing=2.3,
     )
-    positions = np.arange(3) * 1.5
-    base = np.zeros(3)
+    positions = np.arange(len(data["columns"])) * 1.25
+    base = np.zeros(len(data["columns"]))
     denominator = data["total_pairs"]
     for index, segment in enumerate(data["segments"]):
         counts = np.array([c["segment_counts"][index] for c in data["columns"]])
@@ -188,7 +189,7 @@ def plot(data):
             0.68,
             bottom=base,
             color=segment["color"],
-            edgecolor="#777777" if segment["kind"] == "policy_credit" else "white",
+            edgecolor="#000000" if segment["kind"] == "policy_credit" else "white",
             linewidth=0.8,
             hatch=segment.get("hatch"),
             zorder=3,
@@ -202,7 +203,7 @@ def plot(data):
                     ha="center",
                     va="center",
                     color="white" if index == 0 else ink,
-                    fontsize=11 if segment["kind"] == "policy_credit" else 16,
+                    fontsize=9 if height < 6 else 16,
                     weight="bold",
                 )
         base += heights
@@ -222,30 +223,30 @@ def plot(data):
         fontsize=16,
         weight="bold",
     )
-    ax.set_xlabel("Allowed mean one-sided relative shortfall", labelpad=14)
+    ax.set_xlabel("Allowed mean two-sided relative error", labelpad=14)
     ax.set_ylabel("Coverage of fixed roster (%)", labelpad=10)
     ax.set_ylim(0, 116)
-    ax.set_xlim(-0.95, 3.95)
+    ax.set_xlim(-0.75, positions[-1] + 0.75)
     ax.set_yticks([0, 25, 50, 75, 100])
     ax.yaxis.set_major_formatter(PercentFormatter(xmax=100, decimals=0))
     ax.set_axisbelow(True)
-    ax.grid(axis="y", linestyle="--", color="#E8E8E8", linewidth=0.8)
+    ax.grid(axis="y", linestyle="--", color="#DCE5FF", linewidth=0.8)
     ax.tick_params(axis="both", length=0, pad=8)
     ax.spines[["top", "right"]].set_visible(False)
     fig.text(
         0.10,
         0.105,
-        "Hatched: 7 completed Clustering pairs credited by rule; their numerical shortfalls remain unknown.",
+        "Hatched: 7 completed Clustering pairs credited by rule; their numerical errors remain unknown.",
         fontsize=11.5,
-        color="#525252",
+        color="#000000",
     )
     counts = [f"{c['measured_count']}/{data['numeric_reference_pairs']}" for c in data["columns"]]
     fig.text(
         0.10,
         0.06,
-        f"Numerical references only: {', '.join(counts)} meet the three thresholds, respectively.",
+        f"Numerical references only: {', '.join(counts)} meet the four thresholds, respectively.",
         fontsize=11.5,
-        color="#525252",
+        color="#000000",
     )
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()

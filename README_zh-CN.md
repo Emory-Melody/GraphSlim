@@ -40,30 +40,31 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
 ## 复现覆盖率
 
 **固定的 123/123 个“方法×数据集”组合均已完成全部声明压缩率。**
-**121/123（98.37%）** 的平均单边相对短缺低于 5%。
+**111/123（90.24%）** 的平均双边相对误差低于 5%；
+**116/123（94.31%）** 的平均双边相对误差低于 10%。
 该固定范围涉及 **20 种方法、7 个数据集**，每个方法与数据集组合等权。
 各档达标数均包含按既定规则计入的 7 个 Clustering 组合，说明见下文。
 
 <!-- reproduction-coverage:start -->
 
-[![单边相对短缺阈值为 1%、2%、5% 时的累计复现覆盖率，规则计入组合单独用纹理标出](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
+[![双边相对误差阈值为 1%、2%、5%、10% 时的累计复现覆盖率，规则计入组合单独用纹理标出](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
 
-各柱按阈值累计同一固定范围内的组合，蓝色区间对应互斥的实测短缺范围。纹理部分为每档均按规则计入的同样 **7 个 Clustering 组合**，其数值差距仍未知。
+各柱按阈值累计同一固定范围内的组合，蓝色区间对应互斥的实测误差范围。纹理部分为每档均按规则计入的同样 **7 个 Clustering 组合**，其数值差距仍未知。
 
 [矢量 PDF](figures/reproduction_coverage.pdf) · [高清 PNG](figures/reproduction_coverage.png) · [经核对的绘图数据](benchmark/results/reproduction_coverage_figure.json) · [绘图脚本](benchmark/plot_reproduction_coverage.py)
 
-| 判定口径 | <1% | <2% | <5% |
-| --- | ---: | ---: | ---: |
-| 单边相对短缺 | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |
+| 判定口径 | <1% | <2% | <5% | <10% |
+| --- | ---: | ---: | ---: | ---: |
+| 双边相对误差 | 42/123 (34.15%) | 69/123 (56.10%) | 111/123 (90.24%) | 116/123 (94.31%) |
 
 <!-- reproduction-coverage:end -->
 
-单边短缺为 `100 * max(0, 参照值 - 复现值) / 参照值`，高于参照值的结果短缺记为 0。
+双边相对误差为 `100 * abs(复现值 - 参照值) / abs(参照值)`，高于和低于参照值的偏差均计入。
 先在每个声明且匹配的压缩率上计算，再在方法与数据集组合内平均，最后按严格 `<` 判断。
-这里的阈值是相对百分比，并非百分点差。
+图中展示 1%、2%、5%、10% 四档相对容差，并非百分点差。
 
 7 个 Clustering 组合已跑完，但没有论文数值参照，按既定报告规则计入各档达标数；实测差距仍为空。
-仅统计 **116 个有数值参照的组合**时，单边短缺低于 5% 的比例为 **114/116（98.28%）**。
+仅统计 **116 个有数值参照的组合**时，双边误差低于 5% 的比例为 **104/116（89.66%）**，低于 10% 的比例为 **109/116（93.97%）**。
 
 <details>
 <summary>统计范围、参照修正与冻结证据</summary>
@@ -101,13 +102,21 @@ Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据�
 - GPU 峰值在上下文预热后、输入传入 GPU 前重置。原始记录同时保留进程 RSS 和缓存保留显存峰值。
 - 使用 ogbn-arxiv 官方划分，特征标准化仅在训练节点上拟合。种子 1–3 交替执行两种实现，保留全部 3 档预算和 36 次缩减记录。
 - CGC 沿用分档参数，双方聚类上限均为 10 次初始化、300 轮（作者 FAISS 与 GraphSlim sklearn 各自保留收敛规则）。ClustGDD 双方均使用 600 轮预训练、100 轮优化，以及初始化 3 次的 MiniBatchKMeans。CGC 双方重构求解均使用 float64，关闭 TF32。
-- 另行使用共享 GCN 检查效果：每个缩减图训练 1 次、每次 300 轮（每种实现 3 个图），按验证集选检查点。**6/6** 组的准确率均值单边相对短缺低于 5%。此处参照为固定版本的作者实现，与上方采用论文数值参照的覆盖率各有独立统计范围。
+- 另行使用共享 GCN 检查效果：每个缩减图训练 1 次、每次 300 轮（每种实现 3 个图），按验证集选检查点。**6/6** 组的实现间准确率均值的双边相对差距低于 5%。此处参照为固定版本的作者实现，与上方采用论文数值参照的覆盖率各有独立统计范围。
 - [实测 GraphSlim 源码与运行器](benchmark/results/arxiv_clustering_source_20261101.zip) · [作者固定版本、适配说明及逐种子结果](benchmark/results/arxiv_clustering_comparison_20261101.json)。
 - 运行前需安装 `faiss-cpu==1.8.0.post1`（NumPy 1.x），并在 `runs/reference` 准备固定版本的 CGC / ClustGDD；版本与提交均记录于快照中。
 - 先执行 `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`，再用实测开发版本建任务：`python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`，随后执行 `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`；GPU 可显式指定。
 - 执行 `python -m benchmark.plot_arxiv_efficiency` 重新生成图，加 `--check` 核验原始记录与图文件哈希。
 
 </details>
+
+**GECC：已归档的算子测试。**
+
+[![GECC 已归档算子的时间与额外 CUDA 显存比较，越低越好](figures/gecc_operator_comparison.svg)](figures/gecc_operator_comparison.pdf)
+
+硬聚类分支的距离计算在 CPU/CUDA 上分别耗时为参考算子的 0.42×/0.75×（加速 2.35×/1.33×）。流式加权传播在 CPU/CUDA 上的耗时分别为 1.04×/0.99×，时间收益有限；两个算子的 CUDA 额外分配显存均减少。图中保留全部四组配对，包括 CPU 传播略慢的结果。测试归档于 2026 年 10 月 29 日，使用固定张量，预热一次后计时三次，误差线为最小值–最大值，输出逐位一致。该证据限于算子；尚无匹配作者代码的完整 GECC 流程加速测量。
+
+[矢量 PDF](figures/gecc_operator_comparison.pdf) · [CPU 原始记录](benchmark/results/gecc_operator_cpu_20261029.json) · [CUDA 原始记录](benchmark/results/gecc_operator_gpu_20261029.json) · [绘图脚本](benchmark/plot_gecc_efficiency.py)
 
 <!-- implementation-comparison:end -->
 

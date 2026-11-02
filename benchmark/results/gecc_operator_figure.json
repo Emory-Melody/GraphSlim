@@ -1,0 +1,134 @@
+{
+  "sources": [
+    {
+      "path": "benchmark/results/gecc_operator_cpu_20261029.json",
+      "sha256": "27c33735882bb2034d1aa02ac7944f3067ee6d91951d2fb5eca35e6c837853b6",
+      "measured_utc": "2026-10-29T03:24:28.731032+00:00",
+      "source_sha256": "003e13c76b5f9548f3f591e75220ef7c71dd805e5763dd2bc9eb1a12feca1983"
+    },
+    {
+      "path": "benchmark/results/gecc_operator_gpu_20261029.json",
+      "sha256": "98a41be7f2fa649327c82da90de97085ad628285acd88a1d83dd7808fb2888b5",
+      "measured_utc": "2026-10-29T03:26:32.840539+00:00",
+      "source_sha256": "003e13c76b5f9548f3f591e75220ef7c71dd805e5763dd2bc9eb1a12feca1983"
+    }
+  ],
+  "renderer_sha256": "d887de1681c330a8c1819b7748cfbacc674018ca9e871e1308293b3d4243ced7",
+  "pairs": [
+    {
+      "device": "cpu",
+      "operator": "GECC bounded squared distances",
+      "reference": {
+        "seconds": [
+          0.02325659099733457,
+          0.024662436000653543,
+          0.026057039998704568
+        ],
+        "median_seconds": 0.024662436000653543,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.010479549004230648,
+          0.010353420992032625,
+          0.010482819998287596
+        ],
+        "median_seconds": 0.010479549004230648,
+        "peak_additional_gpu_bytes": null
+      },
+      "relative_time": 0.42491946067099556,
+      "speedup": 2.353387153464065,
+      "numerical_check_passed": true
+    },
+    {
+      "device": "cpu",
+      "operator": "GECC streamed weighted hops",
+      "reference": {
+        "seconds": [
+          0.0014589249913115054,
+          0.0014509739994537085,
+          0.0014760049962205812
+        ],
+        "median_seconds": 0.0014589249913115054,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.0014905840071151033,
+          0.0015144139906624332,
+          0.0015189439873211086
+        ],
+        "median_seconds": 0.0015144139906624332,
+        "peak_additional_gpu_bytes": null
+      },
+      "relative_time": 1.0380341687759052,
+      "speedup": 0.96335942503631,
+      "numerical_check_passed": true
+    },
+    {
+      "device": "gpu",
+      "operator": "GECC bounded squared distances",
+      "reference": {
+        "seconds": [
+          0.00040052800613921136,
+          0.00039745800313539803,
+          0.0003969280078308657
+        ],
+        "median_seconds": 0.00039745800313539803,
+        "peak_additional_gpu_bytes": 268435456
+      },
+      "optimized": {
+        "seconds": [
+          0.00030772900208830833,
+          0.0002984790044138208,
+          0.0002878090017475188
+        ],
+        "median_seconds": 0.0002984790044138208,
+        "peak_additional_gpu_bytes": 67695616
+      },
+      "relative_time": 0.7509699189832163,
+      "speedup": 1.3316112599476162,
+      "numerical_check_passed": true
+    },
+    {
+      "device": "gpu",
+      "operator": "GECC streamed weighted hops",
+      "reference": {
+        "seconds": [
+          9.442999726161361e-05,
+          9.48790111579001e-05,
+          9.198900079354644e-05
+        ],
+        "median_seconds": 9.442999726161361e-05,
+        "peak_additional_gpu_bytes": 3145728
+      },
+      "optimized": {
+        "seconds": [
+          9.301899990532547e-05,
+          9.642000077292323e-05,
+          9.01300081750378e-05
+        ],
+        "median_seconds": 9.301899990532547e-05,
+        "peak_additional_gpu_bytes": 1572864
+      },
+      "relative_time": 0.9850577422725213,
+      "speedup": 1.0151689155734231,
+      "numerical_check_passed": true
+    }
+  ],
+  "scope": "Archived isolated operators on synthetic fixed tensors, measured 2026-10-29; no full-GECC or matched-author implementation speedup is established.",
+  "inputs": {
+    "distances": "4096 points x 64 features, 128 centers; hard-clustering distance kernel",
+    "weighted_hops": "2048 nodes, 64 features, four sparse propagation hops"
+  },
+  "protocol": "Four CPU threads; one warmup followed by three timed calls in the same process; CUDA synchronized before and after timing. GPU model and UUID were not recorded in these reports.",
+  "memory": "CUDA memory is maximum additional allocated bytes above resident inputs across timed calls. Per-repeat memory values and CPU memory were not retained.",
+  "uncertainty": "Time whiskers show observed min-max, not confidence intervals. Memory has no interval.",
+  "numerical_validation": "The two operator outputs matched their reference exactly; archived small-graph GECC reducer checks also reported zero tensor difference.",
+  "assets_sha256": {
+    ".svg": "283c8a141b765f2e7cd5a4871328a4bbea3a7790e69171777edcaa67cb6710ef",
+    ".png": "863b9f9a5fbf1e96404013517ca25616d1e4a8b6140d86b4b07db2f2b84796eb",
+    ".pdf": "c9b920d015bfe192b3715d8f8f17bb0c46badfd585c6fa34591d712c3302d367",
+    "_paper.pdf": "d13eca1b49cce61217ddeef7189a85c55598db11f0c2395c633928a7130ea343"
+  }
+}

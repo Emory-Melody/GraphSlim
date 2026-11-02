@@ -42,34 +42,35 @@ node selection or coarsening used to initialize condensation.
 ## Reproduction coverage
 
 **123/123 declared method–dataset pairs completed all their reduction rates.**
-**121/123 (98.37%)** meet a mean one-sided relative shortfall below 5%.
+**111/123 (90.24%)** meet a mean two-sided relative error below 5%;
+**116/123 (94.31%)** meet a tolerance below 10%.
 This fixed roster covers **20 methods and seven datasets**, with equal weight
 per pair. The threshold counts include seven policy-credited Clustering pairs,
 explained below.
 
 <!-- reproduction-coverage:start -->
 
-[![Cumulative reproduction coverage at 1%, 2% and 5% one-sided relative-shortfall thresholds, with policy credits separately hatched](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
+[![Cumulative reproduction coverage at 1%, 2%, 5% and 10% two-sided relative-error thresholds, with policy credits separately hatched](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
 
-Each column is cumulative for the same fixed roster; blue segments show disjoint measured-shortfall ranges. The hatched segment contains the same **seven policy-credited Clustering pairs** at every cutoff; their numerical gaps remain unknown.
+Each column is cumulative for the same fixed roster; blue segments show disjoint measured-error ranges. The hatched segment contains the same **seven policy-credited Clustering pairs** at every cutoff; their numerical gaps remain unknown.
 
 [Vector PDF](figures/reproduction_coverage.pdf) · [High-resolution PNG](figures/reproduction_coverage.png) · [Reviewed chart data](benchmark/results/reproduction_coverage_figure.json) · [Figure renderer](benchmark/plot_reproduction_coverage.py)
 
-| Criterion | <1% | <2% | <5% |
-| --- | ---: | ---: | ---: |
-| Relative shortfall | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |
+| Criterion | <1% | <2% | <5% | <10% |
+| --- | ---: | ---: | ---: | ---: |
+| Two-sided relative error | 42/123 (34.15%) | 69/123 (56.10%) | 111/123 (90.24%) | 116/123 (94.31%) |
 
 <!-- reproduction-coverage:end -->
 
-Shortfall is `100 * max(0, reference - reproduced) / reference`; a score above
-the reference contributes zero shortfall. Compute shortfall per declared
-matched rate, average within a method–dataset pair, then apply the
-strict `<` threshold. These are relative percentages, not percentage-point gaps.
+Two-sided relative error is `100 * abs(reproduced - reference) / abs(reference)`.
+Deviations above and below the reference both count. Compute it per declared
+matched rate, average within a method–dataset pair, then apply the strict `<`
+threshold. The displayed 1%, 2%, 5% and 10% cutoffs are relative percentages, not percentage-point gaps.
 
 The seven completed Clustering pairs have no numerical paper reference and
 receive threshold credit under the declared reporting rule; their measured
 gaps remain missing. For the **116 pairs with numerical references alone**,
-the <5% shortfall rate is **114/116 (98.28%)**.
+the <5% error rate is **104/116 (89.66%)**, and the <10% rate is **109/116 (93.97%)**.
 
 <details>
 <summary>Coverage scope, reference corrections, and frozen evidence</summary>
@@ -113,13 +114,21 @@ Each bar summarizes **three fresh-process reductions**; whiskers show their obse
 - GPU peaks are reset after context warmup, before input transfers. Process RSS and allocator-reserved peaks are also retained in the raw records.
 - Inputs use the official ogbn-arxiv splits and feature standardization fitted on training nodes. Seeds 1–3 alternate implementation order. All three declared rates and all 36 reduction records are included.
 - CGC retains its rate-specific settings and matched caps of 10 initializations / 300 iterations (author FAISS versus GraphSlim sklearn, retaining their convergence rules). ClustGDD uses matched 600 pretraining / 100 refinement updates and MiniBatchKMeans with three initializations. Both CGC reconstruction solves use float64; TF32 is disabled.
-- A separate shared-GCN check uses one 300-epoch fit per reduced graph (three graphs per implementation); validation selects the checkpoint. **6/6** pairs have mean one-sided accuracy shortfall below 5%. The reference is the matched pinned author implementation; these checks have their own scope from the paper-reference coverage above.
+- A separate shared-GCN check uses one 300-epoch fit per reduced graph (three graphs per implementation); validation selects the checkpoint. **6/6** pairs have two-sided relative difference between mean accuracies below 5%. The reference is the matched pinned author implementation; these checks have their own scope from the paper-reference coverage above.
 - [Measured GraphSlim source and harness](benchmark/results/arxiv_clustering_source_20261101.zip) · [Pinned author versions, adapters and per-seed results](benchmark/results/arxiv_clustering_comparison_20261101.json).
 - Runner prerequisites: `faiss-cpu==1.8.0.post1` with NumPy 1.x, and the pinned CGC / ClustGDD checkouts under `runs/reference`; versions and commits are recorded in the snapshot.
 - Extract the archive with `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`. Plan using the measured development source: `python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`; then run with `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`. GPU selection is explicit.
 - Regenerate with `python -m benchmark.plot_arxiv_efficiency`; append `--check` to validate source records and figure hashes.
 
 </details>
+
+**GECC: archived operator checks.**
+
+[![Archived GECC operator time and additional CUDA memory, lower is better](figures/gecc_operator_comparison.svg)](figures/gecc_operator_comparison.pdf)
+
+The hard-clustering distance kernel takes 0.42× the reference time on CPU and 0.75× on CUDA (2.35× and 1.33× speedups). Streamed weighted propagation takes 1.04× / 0.99× time on CPU / CUDA, so its timing benefit is limited; both its additional CUDA memory and the distance kernel's memory decrease. All four operator pairs are shown, including the slightly slower CPU propagation case. These are fixed-tensor checks recorded on 29 October 2026, with one warmup and three timed calls; whiskers show min–max. Outputs matched exactly. The reports establish operator behavior; a matched author-code end-to-end GECC speedup has not been measured.
+
+[Vector PDF](figures/gecc_operator_comparison.pdf) · [CPU report](benchmark/results/gecc_operator_cpu_20261029.json) · [CUDA report](benchmark/results/gecc_operator_gpu_20261029.json) · [Renderer](benchmark/plot_gecc_efficiency.py)
 
 <!-- implementation-comparison:end -->
 

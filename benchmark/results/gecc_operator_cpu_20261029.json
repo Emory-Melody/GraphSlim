@@ -1,0 +1,218 @@
+{
+  "utc": "2026-10-29T03:24:28.731032+00:00",
+  "device": "cpu",
+  "source_sha256": "003e13c76b5f9548f3f591e75220ef7c71dd805e5763dd2bc9eb1a12feca1983",
+  "operators": [
+    {
+      "operator": "GECC bounded squared distances",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.02325659099733457,
+          0.024662436000653543,
+          0.026057039998704568
+        ],
+        "median_seconds": 0.024662436000653543,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.010479549004230648,
+          0.010353420992032625,
+          0.010482819998287596
+        ],
+        "median_seconds": 0.010479549004230648,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 2.353387153464065
+    },
+    {
+      "operator": "CGC segmented weighted centers",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.01380707799398806,
+          0.013626617990667,
+          0.013338199001736939
+        ],
+        "median_seconds": 0.013626617990667,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.00048531799984630197,
+          0.0003941089962609112,
+          0.0006692570023005828
+        ],
+        "median_seconds": 0.00048531799984630197,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 28.077709862363417
+    },
+    {
+      "operator": "ClusteringAgg two sparse propagations",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.02750300499610603,
+          0.026980226990417577,
+          0.027093445998616517
+        ],
+        "median_seconds": 0.027093445998616517,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.0007124770054360852,
+          0.0007124679978005588,
+          0.0007197970116976649
+        ],
+        "median_seconds": 0.0007124770054360852,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 38.02711637273607
+    },
+    {
+      "operator": "GECC streamed weighted hops",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.0014589249913115054,
+          0.0014509739994537085,
+          0.0014760049962205812
+        ],
+        "median_seconds": 0.0014589249913115054,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.0014905840071151033,
+          0.0015144139906624332,
+          0.0015189439873211086
+        ],
+        "median_seconds": 0.0015144139906624332,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 0.96335942503631
+    },
+    {
+      "operator": "Clustering reuse fitted labels",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.05315940600121394,
+          0.05251533900445793,
+          0.05379136500414461
+        ],
+        "median_seconds": 0.05315940600121394,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.04260459700890351,
+          0.04810128599638119,
+          0.04973197999061085
+        ],
+        "median_seconds": 0.04810128599638119,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 1.1051556086299499
+    },
+    {
+      "operator": "VNG sparse weighted membership",
+      "passed": true,
+      "reference": {
+        "seconds": [
+          0.00547178000852,
+          0.005567918007727712,
+          0.005638139002257958
+        ],
+        "median_seconds": 0.005567918007727712,
+        "peak_additional_gpu_bytes": null
+      },
+      "optimized": {
+        "seconds": [
+          0.0007350870000664145,
+          0.0007198469975264743,
+          0.000684758007992059
+        ],
+        "median_seconds": 0.0007198469975264743,
+        "peak_additional_gpu_bytes": null
+      },
+      "speedup": 7.734863140167418
+    }
+  ],
+  "reducers": {
+    "reference_source": "1bd0fdfcaf12705f25a2afb5d7d271edcecd95f4b018d302ada65c20127a2d91",
+    "checks": [
+      {
+        "method": "gecc",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "method": "cgc",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "method": "clustgdd",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "method": "clustering",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      {
+        "method": "clusteringagg",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          1.7881393432617188e-07,
+          0.0
+        ]
+      },
+      {
+        "method": "vng",
+        "passed": true,
+        "atol": 0.0001,
+        "rtol": 0.0001,
+        "max_abs": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      }
+    ],
+    "scope": "Fixed small-graph reduction checks; Products GECC propagation repair is separately tested, not equivalent to its legacy sampled branch"
+  },
+  "scope": "Three timed repeats after warmup; isolated operators, not Products end-to-end speedups. Sparse/segmented results use tolerance; distance ties and GECC hops are exact."
+}
