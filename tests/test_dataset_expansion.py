@@ -86,10 +86,10 @@ def test_heterophilous_selects_official_column_without_resampling(tmp_path, monk
 
 def test_expansion_roster_order_unique_and_rates():
     jobs = runner.plan()
-    assert len(jobs) == 470
+    assert len(jobs) == 564
     assert len({job["id"] for job in jobs}) == len(jobs)
     assert [job["stage"] for job in jobs] == sorted(job["stage"] for job in jobs)
-    assert len([job for job in jobs if job["kind"] == "parity"]) == 10
+    assert len([job for job in jobs if job["kind"] == "parity"]) == 12
     assert {
         job["rate"]
         for job in jobs
@@ -160,3 +160,33 @@ def test_export_never_publishes_partial_or_duplicate_seed(tmp_path):
         )
     with pytest.raises(RuntimeError, match="Missing/duplicate"):
         runner.export(tmp_path, manifest)
+
+
+@pytest.mark.parametrize("dataset", ["photo", "computers"])
+def test_amazon_expansion_rates_and_stage(dataset):
+    jobs = runner.plan([dataset])
+    assert len(jobs) == 47
+    assert {job["dataset"] for job in jobs} == {dataset}
+    assert {job["stage"] for job in jobs} == {4}
+    assert {job["rate"] for job in jobs if job["kind"] == "reduction"} == {"0.005", "0.01", "0.02"}
+
+
+def test_new_defaults_preserve_frozen_three_stage_roster(tmp_path, monkeypatch):
+    monkeypatch.setattr(
+        runner, "science_files", lambda: [runner.ROOT / "benchmark/expand_datasets.py"]
+    )
+    stages = runner.STAGES
+    with monkeypatch.context() as patch:
+        patch.setattr(runner, "STAGES", stages[:3])
+        runner.main(["--run-dir", str(tmp_path), "--initialize-only"])
+    paths = [tmp_path / "manifest.json", tmp_path / "source.zip"]
+    before = [path.read_bytes() for path in paths]
+    runner.main(["--run-dir", str(tmp_path), "--initialize-only"])
+    assert [path.read_bytes() for path in paths] == before
+    manifest = json.loads(paths[0].read_text())
+    assert len(manifest["jobs"]) == 470
+    assert len(manifest["stage_order"]) == 3
+    with pytest.raises(RuntimeError, match="Frozen roster/protocol differs"):
+        runner.main(
+            ["--run-dir", str(tmp_path), "--datasets", "photo", "computers", "--initialize-only"]
+        )

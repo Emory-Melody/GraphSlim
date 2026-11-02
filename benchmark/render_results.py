@@ -1,4 +1,7 @@
-"""Render the frozen published results or check the README for drift."""
+"""Render or validate the frozen published GC4NC Table 9 CSV.
+
+The README presents reproduced results instead; this CSV remains their reference.
+"""
 
 import argparse
 import csv
@@ -8,8 +11,6 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "benchmark" / "results" / "gc4nc_table9.csv"
-START = "<!-- benchmark-results:start -->"
-END = "<!-- benchmark-results:end -->"
 GROUPS = {
     "Coreset / sparsification": ("Cent-D", "Cent-P", "Random", "Herding", "K-Center", "TSpanner"),
     "Coarsening": ("Averaging", "VN", "VNG", "Clustering"),
@@ -74,17 +75,11 @@ def render_results(rows=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="check the embedded README tables")
+    parser.add_argument("--check", action="store_true", help="validate the frozen CSV")
     options = parser.parse_args(argv)
     rendered = render_results()
     if options.check:
-        readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        if readme.count(START) != 1 or readme.count(END) != 1:
-            raise SystemExit("README results markers are missing or duplicated")
-        embedded = readme.split(START, 1)[1].split(END, 1)[0].strip()
-        if embedded != rendered.strip():
-            raise SystemExit("README results differ from the frozen CSV")
-        print("README matches all 21 published dataset/rate rows.")
+        print(f"Frozen Table 9 CSV is valid: {len(read_results())} dataset/rate rows.")
     else:
         sys.stdout.write(rendered)
 

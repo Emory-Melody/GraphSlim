@@ -1,4 +1,4 @@
-"""Render the README's measured time, peak-memory, and accuracy comparisons.
+"""Render the README's measured reduction-time and peak-GPU-memory comparisons.
 
 Uses the complete frozen six-pair roster. Run with ``--check`` to validate the
 reviewed chart data and exported figures without executing a benchmark.
@@ -115,6 +115,7 @@ def reviewed_data():
         "source_sha256": sha(SOURCE),
         "renderer_sha256": sha(__file__),
         "scope": source["scope"],
+        "displayed_metrics": ["time_seconds", "peak_cuda_allocated_mib"],
         "reduction_seeds_per_implementation": 3,
         "uncertainty": "Bars are medians; whiskers show observed min-max across three reductions, not confidence intervals.",
         "memory": "Process RSS sampled every 5 ms includes resident inputs/imports. CUDA is PyTorch peak allocated memory after context warmup; CPU-only cells are not applicable.",
@@ -140,7 +141,6 @@ def plot(data):
 
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
     from matplotlib.ticker import MaxNLocator
     import numpy as np
@@ -164,13 +164,13 @@ def plot(data):
             "svg.hashsalt": "graphslim-controlled-comparison",
         }
     )
-    fig, axes = plt.subplots(2, 2, figsize=(16.6, 13.2))
-    fig.subplots_adjust(left=0.16, right=0.97, top=0.81, bottom=0.15, wspace=0.39, hspace=0.43)
+    fig, axes = plt.subplots(1, 2, figsize=(16.6, 8.8))
+    fig.subplots_adjust(left=0.16, right=0.97, top=0.75, bottom=0.20, wspace=0.39)
     fig.patch.set_facecolor("white")
-    fig.text(0.055, 0.952, "GraphSlim vs. author implementations", fontsize=28, weight="bold")
+    fig.text(0.055, 0.94, "GraphSlim vs. author implementations", fontsize=28, weight="bold")
     fig.text(
         0.055,
-        0.918,
+        0.89,
         "Matched inputs and output sizes · same device within each pair · all six comparisons",
         fontsize=16,
         color=secondary,
@@ -187,7 +187,7 @@ def plot(data):
             Patch(facecolor=package_color, edgecolor=package_color, label="GraphSlim"),
         ],
         loc="upper left",
-        bbox_to_anchor=(0.05, 0.893),
+        bbox_to_anchor=(0.05, 0.86),
         ncol=2,
         frameon=False,
         fontsize=17,
@@ -214,17 +214,10 @@ def plot(data):
             ax.axhline(divide, color=grid, linewidth=0.8)
 
     specs = [
-        (axes[0, 0], "(a) Reduction time", "time_seconds", "Seconds · lower is better", 2.3),
+        (axes[0], "(a) Reduction time", "time_seconds", "Seconds · lower is better", 2.3),
         (
-            axes[0, 1],
-            "(b) Peak process memory",
-            "peak_process_rss_mib",
-            "MiB · sampled process RSS",
-            2650,
-        ),
-        (
-            axes[1, 0],
-            "(c) Peak GPU memory",
+            axes[1],
+            "(b) Peak GPU memory",
             "peak_cuda_allocated_mib",
             "MiB · PyTorch peak allocated",
             345,
@@ -270,70 +263,30 @@ def plot(data):
                     high + maximum * 0.025, i + offset, label, va="center", fontsize=13.5, color=ink
                 )
 
-    ax = axes[1, 1]
-    style(ax, "(d) Accuracy shortfall", "Relative shortfall (%) · lower is better")
-    ax.set_xlim(0, 22)
-    ax.set_xticks([0, 5, 10, 15, 20])
-    ax.axvline(5, color=ink, linewidth=1.2, linestyle=(0, (4, 3)), zorder=2)
-    ax.text(5.35, -0.42, "5% criterion", color=secondary, fontsize=13)
-    for i, pair in enumerate(data["pairs"]):
-        value = pair["common_gcn"]["relative_shortfall_percent"]
-        ax.barh(i - 0.18, value, height=0.30, color="#7C8B9D", zorder=3)
-        if value == 0:
-            ax.plot(0, i - 0.18, marker="|", markersize=12, color="#536172", zorder=4)
-        ax.text(
-            value + 0.35,
-            i - 0.18,
-            f"{value:.2f}%" + (" · outside 5%" if value >= 5 else ""),
-            va="center",
-            fontsize=13.5,
-            color=ink,
-        )
-        if pair["native_gp"]:
-            gp = pair["native_gp"]["relative_shortfall_percent"]
-            ax.plot(
-                gp, i + 0.22, marker="D", markersize=7, color=package_color, clip_on=False, zorder=5
-            )
-            ax.text(
-                gp + 0.65, i + 0.22, f"GP {gp:.2f}%", va="center", fontsize=13.5, color="#A9431E"
-            )
-    ax.legend(
-        handles=[
-            Patch(facecolor="#7C8B9D", label="Shared GCN"),
-            Line2D(
-                [], [], linestyle="none", marker="D", color=package_color, label="Native GP (GCGP)"
-            ),
-        ],
-        loc="upper right",
-        frameon=False,
-        fontsize=12.5,
-        handlelength=1.2,
-        borderaxespad=0,
-    )
     footer = fig.text(
         0.055,
-        0.062,
-        "Time / memory: medians of 3 reductions; whiskers: observed min–max. Accuracy: gap between means (GCN: 30 fits; GP: 3 graphs).",
+        0.085,
+        "Time / memory: medians of 3 reductions; whiskers: observed min–max. All pairs retain 50% of labeled training nodes.",
         fontsize=13,
         color=secondary,
     )
     fig.text(
         0.055,
-        0.033,
-        "CGC: 4 CPU threads. ClustGDD / GCGP: one RTX PRO 6000 Blackwell. RSS sampled every 5 ms; CUDA is allocated, not reserved memory.",
+        0.042,
+        "CGC: 4 CPU threads (GPU memory N/A). ClustGDD / GCGP: one RTX PRO 6000 Blackwell. GPU memory: PyTorch peak allocated.",
         fontsize=13,
         color=secondary,
     )
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
-    for ax in axes.flat:
+    for ax in axes:
         for text in [ax.title, ax.xaxis.label, *ax.texts, *ax.get_yticklabels()]:
             bounds = text.get_window_extent(renderer)
             assert bounds.x0 >= 0 and bounds.x1 <= fig.bbox.width, (
                 f"Clipped label: {text.get_text()}"
             )
     assert footer.get_window_extent(renderer).y1 < min(
-        ax.xaxis.label.get_window_extent(renderer).y0 for ax in axes[1]
+        ax.xaxis.label.get_window_extent(renderer).y0 for ax in axes
     ), "Footer overlaps axis labels"
     STEM.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(STEM.with_suffix(".svg"), metadata={"Date": None}, facecolor="white")
@@ -359,7 +312,7 @@ def main():
         assert saved == data, "Chart data or renderer changed; regenerate the figure."
         for suffix, digest in hashes.items():
             assert sha(STEM.with_suffix(suffix)) == digest, f"Stale {suffix} figure"
-        print("Comparison figure and all six source-backed time/memory/quality pairs match.")
+        print("Comparison figure and all six source-backed reduction-time/GPU-memory pairs match.")
     else:
         plot(data)
         data["assets_sha256"] = {

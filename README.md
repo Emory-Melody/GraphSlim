@@ -23,10 +23,10 @@ reproduction commands.
 
 GPU execution uses native PyTorch operations. Install matching Torch and PyG
 extension wheels for your GPU and CUDA runtime.
-[GPU setup and checks](docs/compatibility.md#gpu-portability).
+[GPU setup and checks](#install).
 
 [Quick start](#quick-start) · [Architecture](#architecture) ·
-[Acceleration](#acceleration) · [Reproduction coverage](#reproduction-coverage) ·
+[Clustering acceleration](#clustering-acceleration) · [Reproduction coverage](#reproduction-coverage) ·
 [HPO](#hyperparameter-optimization-hpo) · [Methods](#methods)
 
 ## Architecture
@@ -39,43 +39,42 @@ condensation, and optional HPO. Solid arrows show graph flow; dashed arrows show
 node selection or coarsening used to initialize condensation.
 [Vector PDF](figures/figure1.pdf) · [Editable source](figures/figure1_architecture.tex).
 
-## Acceleration
+## Clustering acceleration
 
-Compare reduction time, peak process memory, and peak GPU memory on the complete
-six-pair roster. **CGC's measured time ratio reaches 2.69×**; the chart also
-shows unchanged runtime and memory increases where they occur.
+[Shared clustering operators](graphslim/reduction/cluster_ops.py) reuse fitted
+assignments and streamline sparse and segmented aggregation.
+
+**CGC achieves observed author/GraphSlim reduction-time ratios of 1.87–2.69×;
+ClustGDD achieves 1.06–1.22×** in the controlled comparison below.
+All six method–dataset pairs are shown for reduction time and peak GPU memory.
 
 <!-- implementation-comparison:start -->
 
-[![Large comparison of reduction time, peak process RSS, peak GPU allocation, and accuracy shortfall](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)
-
-**Reproduction criterion: relative accuracy shortfall <5%.** **5/6** pairs meet it with shared GCN evaluation; GCGP/Cora has **15.19%** shortfall. With GCGP's native GP predictor, **2/2** pairs meet the criterion (orange diamonds). The threshold concerns predictive quality.
+[![Clustering acceleration and peak GPU memory across all six method–dataset pairs](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)
 
 [Vector PDF](figures/implementation_comparison.pdf) · [High-resolution PNG](figures/implementation_comparison.png) · [Reviewed chart data](benchmark/results/implementation_comparison_figure.json)
 
 <!-- implementation-comparison:end -->
 
 Time and memory bars are medians of **three reductions**; whiskers show the
-observed minimum–maximum, rather than confidence intervals. GCN accuracy averages
-**30 fits nested within three reduced graphs**; the native GP evaluation uses
-three reduced graphs. All pairs use 50% of labeled training nodes
+observed minimum–maximum. All pairs use 50% of labeled training nodes
 (Cora: 70; Citeseer: 60).
 
 <details>
-<summary>Timing, memory, and quality definitions</summary>
+<summary>Timing and GPU memory definitions</summary>
 
 - Each pair uses common saved inputs and the same device: CGC uses four CPU
   threads on an AMD EPYC 9115; ClustGDD and GCGP use one RTX PRO 6000 Blackwell.
 - Timing includes preprocessing and device transfers. Imports, loading,
   serialization, downstream GCN fitting, and diagnostic GP inference are excluded.
-- **Process memory** is peak process RSS sampled every 5 ms, including resident
-  inputs and imported libraries. Shorter peaks may be missed. **GPU memory** is
-  PyTorch peak allocated memory after context warmup; CPU-only cells are marked
-  N/A. Allocator-reserved and total device memory are separate quantities.
+- **GPU memory** is PyTorch peak allocated memory after context warmup;
+  CPU-only cells are marked N/A. Allocator-reserved and total device memory
+  are separate quantities.
 - The 5% criterion uses `100 * max(0, author - GraphSlim) / author`, comparing
   matched mean accuracies. It follows the shortfall formula in the coverage
   section; the reference here is the pinned author implementation. Shared GCN
-  and native GP results retain their own evaluation scope.
+  and native GP results retain their own evaluation scope. The frozen quality
+  results include GCGP/Cora's 15.19% shared-GCN shortfall.
 - [Frozen measurements and adapters](benchmark/results/implementation_comparison_20261031.json) ·
   [Comparison runner](benchmark/compare_implementations.py) ·
   [Figure renderer](benchmark/plot_implementation_comparison.py).
@@ -87,31 +86,28 @@ three reduced graphs. All pairs use 50% of labeled training nodes
 ## Reproduction coverage
 
 **123/123 declared method–dataset pairs completed all their reduction rates.**
-Under the primary criterion, **121/123 (98.37%)** meet a mean relative shortfall
-below 5%; **111/123 (90.24%)** meet an absolute relative gap below 5%.
+**121/123 (98.37%)** meet a mean one-sided relative shortfall below 5%.
 This fixed roster covers **20 methods and seven datasets**, with equal weight
-per pair. Both rates include seven policy-credited Clustering pairs, explained below.
+per pair. The threshold counts include seven policy-credited Clustering pairs,
+explained below.
 
 <!-- reproduction-coverage:start -->
 
 | Criterion | <1% | <2% | <5% |
 | --- | ---: | ---: | ---: |
-| Relative shortfall (primary) | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |
-| Absolute relative gap | 42/123 (34.15%) | 69/123 (56.10%) | 111/123 (90.24%) |
+| Relative shortfall | 71/123 (57.72%) | 93/123 (75.61%) | 121/123 (98.37%) |
 
 <!-- reproduction-coverage:end -->
 
 Shortfall is `100 * max(0, reference - reproduced) / reference`; a score above
-the reference contributes zero shortfall. Absolute relative gap uses
-`100 * abs(reproduced - reference) / reference`. Compute each quantity per
-declared matched rate, average within a method–dataset pair, then apply the
+the reference contributes zero shortfall. Compute shortfall per declared
+matched rate, average within a method–dataset pair, then apply the
 strict `<` threshold. These are relative percentages, not percentage-point gaps.
 
 The seven completed Clustering pairs have no numerical paper reference and
 receive threshold credit under the declared reporting rule; their measured
 gaps remain missing. For the **116 pairs with numerical references alone**,
-the <5% rates are **114/116 (98.28%)** for shortfall and **104/116 (89.66%)**
-for absolute relative gap.
+the <5% shortfall rate is **114/116 (98.28%)**.
 
 <details>
 <summary>Coverage scope, reference corrections, and frozen evidence</summary>
@@ -331,22 +327,6 @@ Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cor
 
 </details>
 
-## ogbn-arxiv accuracy–time tradeoff
-
-Gray points show 17 methods reported in the
-[CGC paper](https://arxiv.org/html/2405.13707). Arrows show three methods
-moving from their author-reported results (open circles) to measured
-GraphSlim package results (filled circles) at matching reduced-node counts.
-The plot has no error bars. GraphSlim's full [40-method roster](#methods) is below.
-
-![ogbn-arxiv tradeoff with arrows from author papers to GraphSlim results for CGC, ClustGDD and GCGP](figures/arxiv_author_vs_graphslim.svg)
-
-GCGP moves to a much shorter reduction time and a much lower test accuracy in
-these records. The papers and GraphSlim runs used different hardware and GCN
-settings. [Exact values, sources and protocol](docs/arxiv_tradeoff.md) ·
-[Plot data](benchmark/results/arxiv_author_vs_graphslim_20261029.json) ·
-[Products results](docs/products.md).
-
 Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
 
 ```bash
@@ -529,8 +509,20 @@ NAS, and graph-property suites require saved reduced graphs. See
 
 ### Reduction rates
 
-The CLI uses fractions of **labeled training nodes**. Table 9 prints percentages of
-the original whole graph for transductive datasets and of the training graph for
+The [dataset loader](graphslim/dataset/loader.py) recognizes **19 dataset names**.
+The original GC4NC benchmark defines rates for seven of them; the
+[dataset expansion runner](benchmark/expand_datasets.py) adds rate grids for five
+more. The remaining seven have loader entries without a benchmark rate grid.
+These counts describe dataset entry points and configured experiments; completed
+results are reported in the results tables above.
+
+For node reduction, the CLI uses fractions of **labeled training nodes**. For edge
+sparsification, the rate is the fraction of input edges kept; `t_spanner` and
+`spanning_forest` do not use it. The node-rate tables below distinguish the
+original benchmark, expansion grids and dataset fallbacks.
+
+**Original GC4NC benchmark: seven datasets.** Table 9 prints percentages of the
+original whole graph for transductive datasets and of the training graph for
 inductive datasets. Preserve this distinction when reproducing a row.
 
 | Dataset | Setting | CLI `-R` values | Table 9 rate labels (%) |
@@ -543,409 +535,42 @@ inductive datasets. Preserve this distinction when reproducing a row.
 | Reddit | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
 | Yelp | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
 
-The paper's Table 8 has inconsistent Pubmed percentages; the results below retain
-Table 9's labels verbatim. CLI fractions produce per-class integer node budgets,
+The paper's Table 8 has inconsistent Pubmed percentages; the reproduced results
+use Table 9's labels. CLI fractions produce per-class integer node budgets,
 so rounded paper percentages need not equal the exact achieved rate.
 
-## Full published performance results
+**Dataset expansion: five additional datasets.** These grids use labeled training
+nodes as the denominator and have no GC4NC Table 9 rate labels. Run them through
+`benchmark.expand_datasets`; `benchmark.reproduce performance` retains the
+original seven-dataset roster.
 
-Source: [GC4NC, arXiv:2406.16715v3, Table 9](https://arxiv.org/html/2406.16715v3#A1.T9)
-(9 November 2025). These are **published measurements**, not results from the code
-cleanup. All seven datasets and all three rates are included. Values and reported
-`±` uncertainties are preserved verbatim; the source caption calls these standard
-errors. Whole-graph baselines are repeated across rates for readability.
+| Dataset | CLI `-D` | Setting | CLI `-R` values | Split |
+| --- | --- | --- | --- | --- |
+| Roman-empire | `roman-empire` | Transductive | 0.005, 0.01, 0.02 | Official split column; default 0 |
+| Amazon-ratings | `amazon-ratings` | Transductive | 0.005, 0.01, 0.02 | Official split column; default 0 |
+| OGBN-Products | `ogbn-products` | Transductive | 0.0005, 0.001, 0.002 | Official OGB split |
+| Amazon Photo | `photo` | Transductive | 0.005, 0.01, 0.02 | Seeded classwise 80/10/10 |
+| Amazon Computers | `computers` | Transductive | 0.005, 0.01, 0.02 | Seeded classwise 80/10/10 |
 
-`OOM` means the source reports out of memory; `-` means no value is provided.
-`NR` means the method is implemented but has no standalone result in this source:
-Clustering, DosCondX, GCDM, SimGC, and GECC. In particular, the source's GCDMX values
-are not assigned to GCDM. VN maps to `variation_neighborhoods`; TSpanner maps to
-`t_spanner`. Additional sparsification/coarsening methods in the catalog also have
-no published Table 9 scores.
+**Other loader entries: seven datasets.** No rate sweep is defined for these in
+either runner. The values below are [dataset fallbacks](graphslim/config.py),
+used when no explicit CLI or method/config rate is supplied. Choose `-R`
+explicitly for a new experiment.
 
-For measured local completions of these `NR` methods, see the
-[package coverage table](#package-measurements-completing-published-nr-coverage)
-below. It includes clustering and all four additional condensation methods,
-keeps repaired SimGC progress explicit, and does not rewrite the published CSV.
+| Dataset | CLI `-D` | Default setting | Fallback `-R` |
+| --- | --- | --- | --- |
+| DBLP | `dblp` | Transductive | 0.1 |
+| Cora-ML | `cora_ml` | Transductive | 0.1 |
+| Coauthor CS | `cs` | Transductive | 0.1 |
+| Coauthor Physics | `physics` | Transductive | 0.1 |
+| Amazon Fraud | `amazon` | Inductive | 0.002 |
+| OGBN-Proteins | `ogbn-proteins` | Transductive | 0.1 |
+| OGBN-Papers100M | `ogbn-papers100m` | Transductive | 0.1 |
 
-The [frozen CSV](benchmark/results/gc4nc_table9.csv) and
-[source record](benchmark/results/provenance.json) retain the table's provenance.
-Check or render the README tables with:
-
-```bash
-python -m benchmark.render_results --check
-python -m benchmark.render_results
-```
-
-<!-- benchmark-results:start -->
-### Citeseer — test accuracy (%)
-
-| Family | Method | 0.36% | 0.90% | 1.80% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 42.86 ± 2.7 | 58.77 ± 0.5 | 62.89 ± 0.4 |
-| Coreset / sparsification | Cent-P | 37.78 ± 1.3 | 52.83 ± 0.4 | 63.37 ± 0.4 |
-| Coreset / sparsification | Random | 35.37 ± 2.8 | 50.71 ± 0.8 | 62.62 ± 0.6 |
-| Coreset / sparsification | Herding | 43.73 ± 1.6 | 59.24 ± 0.4 | 66.66 ± 0.5 |
-| Coreset / sparsification | K-Center | 41.43 ± 1.4 | 51.15 ± 1.1 | 59.04 ± 0.9 |
-| Coreset / sparsification | TSpanner | 71.83 ± 0.3 | 71.62 ± 0.4 | 71.60 ± 0.4 |
-| Coarsening | Averaging | 69.75 ± 0.6 | 69.59 ± 0.5 | 69.50 ± 0.6 |
-| Coarsening | VN | 34.32 ± 5.9 | 40.14 ± 5.3 | 41.98 ± 7.0 |
-| Coarsening | VNG | 66.14 ± 0.3 | 66.07 ± 0.4 | 65.34 ± 0.6 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 67.61 ± 0.7 | 70.70 ± 0.5 | 73.03 ± 0.3 |
-| Condensation | SFGC | 66.27 ± 0.8 | 70.27 ± 0.7 | 72.36 ± 0.5 |
-| Condensation | GCSNTK | 63.51 ± 1.9 | 62.91 ± 0.8 | 63.90 ± 3.4 |
-| Condensation | GCDMX | 70.65 ± 0.5 | 71.27 ± 0.6 | 72.08 ± 0.2 |
-| Condensation | GCondX | 67.79 ± 0.7 | 69.69 ± 0.5 | 68.38 ± 0.5 |
-| Condensation | GCond | 70.05 ± 2.1 | 69.15 ± 1.2 | 69.35 ± 0.8 |
-| Condensation | DosCond | 69.41 ± 0.8 | 70.83 ± 0.4 | 72.18 ± 0.6 |
-| Condensation | MSGC | 60.24 ± 6.0 | 72.08 ± 0.7 | 72.21 ± 0.4 |
-| Condensation | SGDD | 71.87 ± 0.6 | 70.52 ± 0.6 | 69.65 ± 1.7 |
-| Condensation | GDEM | 67.88 ± 1.8 | 70.13 ± 1.1 | 71.74 ± 0.9 |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 72.6 | 72.6 | 72.6 |
-
-### Cora — test accuracy (%)
-
-| Family | Method | 0.50% | 1.30% | 2.60% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 57.79 ± 1.7 | 66.45 ± 2.2 | 75.79 ± 0.7 |
-| Coreset / sparsification | Cent-P | 58.44 ± 1.7 | 66.38 ± 1.7 | 75.64 ± 1.6 |
-| Coreset / sparsification | Random | 35.14 ± 2.5 | 63.63 ± 1.3 | 72.24 ± 0.6 |
-| Coreset / sparsification | Herding | 51.68 ± 2.1 | 68.99 ± 0.7 | 73.77 ± 0.9 |
-| Coreset / sparsification | K-Center | 44.64 ± 4.4 | 63.28 ± 1.4 | 70.55 ± 1.4 |
-| Coreset / sparsification | TSpanner | 79.79 ± 0.4 | 80.84 ± 0.3 | 80.41 ± 0.3 |
-| Coarsening | Averaging | 75.94 ± 0.7 | 75.87 ± 0.6 | 75.76 ± 1.1 |
-| Coarsening | VN | 24.62 ± 5.7 | 51.07 ± 5.8 | 56.75 ± 5.4 |
-| Coarsening | VNG | 70.40 ± 0.6 | 74.48 ± 0.5 | 76.03 ± 0.4 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 78.14 ± 0.5 | 82.29 ± 0.6 | 82.82 ± 0.2 |
-| Condensation | SFGC | 75.11 ± 2.2 | 79.55 ± 0.3 | 80.54 ± 0.5 |
-| Condensation | GCSNTK | 71.58 ± 0.9 | 71.22 ± 2.6 | 73.34 ± 0.6 |
-| Condensation | GCDMX | 79.21 ± 0.4 | 80.26 ± 0.3 | 80.68 ± 0.3 |
-| Condensation | GCondX | 79.74 ± 0.5 | 78.67 ± 0.4 | 78.60 ± 0.3 |
-| Condensation | GCond | 80.17 ± 0.8 | 80.81 ± 0.5 | 80.54 ± 0.7 |
-| Condensation | DosCond | 80.65 ± 0.6 | 80.85 ± 0.4 | 81.15 ± 0.5 |
-| Condensation | MSGC | 80.54 ± 0.3 | 80.98 ± 0.5 | 80.94 ± 0.4 |
-| Condensation | SGDD | 80.15 ± 0.5 | 80.29 ± 0.8 | 81.04 ± 0.5 |
-| Condensation | GDEM | 54.76 ± 4.5 | 72.87 ± 1.8 | 81.76 ± 0.5 |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 81.5 | 81.5 | 81.5 |
-
-### Pubmed — test accuracy (%)
-
-| Family | Method | 0.02% | 0.03% | 0.15% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 56.16 ± 2.6 | 55.61 ± 1.6 | 71.95 ± 0.5 |
-| Coreset / sparsification | Cent-P | 57.28 ± 1.2 | 62.50 ± 1.0 | 73.35 ± 0.4 |
-| Coreset / sparsification | Random | 49.46 ± 1.6 | 56.10 ± 1.8 | 71.84 ± 0.7 |
-| Coreset / sparsification | Herding | 62.91 ± 1.5 | 69.28 ± 1.6 | 75.53 ± 0.4 |
-| Coreset / sparsification | K-Center | 79.18 ± 0.2 | 65.59 ± 2.4 | 74.00 ± 0.2 |
-| Coreset / sparsification | TSpanner | 62.91 ± 1.5 | 79.39 ± 0.3 | 78.39 ± 0.2 |
-| Coarsening | Averaging | 74.09 ± 0.6 | 75.60 ± 0.4 | 75.60 ± 0.4 |
-| Coarsening | VN | 75.60 ± 0.4 | 74.09 ± 0.6 | 73.68 ± 1.6 |
-| Coarsening | VNG | 75.60 ± 0.4 | 75.72 ± 0.3 | 77.53 ± 0.5 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 69.64 ± 1.4 | 76.21 ± 0.7 | 78.49 ± 0.2 |
-| Condensation | SFGC | 67.61 ± 2.0 | 66.89 ± 3.3 | 67.61 ± 4.1 |
-| Condensation | GCSNTK | 29.45 ± 10.9 | 68.37 ± 3.0 | 69.89 ± 2.2 |
-| Condensation | GCDMX | 77.62 ± 0.2 | 76.63 ± 1.2 | 77.48 ± 0.5 |
-| Condensation | GCondX | 72.03 ± 1.6 | 72.05 ± 1.6 | 71.97 ± 0.5 |
-| Condensation | GCond | 77.36 ± 0.7 | 78.05 ± 0.3 | 76.46 ± 0.5 |
-| Condensation | DosCond | 58.13 ± 2.2 | 52.70 ± 0.3 | 76.45 ± 0.1 |
-| Condensation | MSGC | 75.25 ± 0.7 | 78.26 ± 0.3 | 78.20 ± 0.2 |
-| Condensation | SGDD | 78.11 ± 0.3 | 78.07 ± 0.3 | 75.95 ± 0.3 |
-| Condensation | GDEM | 77.52 ± 0.7 | 78.05 ± 1.3 | 78.76 ± 1.1 |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 78.6 | 78.6 | 78.6 |
-
-### Arxiv — test accuracy (%)
-
-| Family | Method | 0.05% | 0.25% | 0.50% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 32.88 ± 2.7 | 48.85 ± 1.1 | 52.01 ± 0.5 |
-| Coreset / sparsification | Cent-P | 36.48 ± 2.0 | 47.90 ± 0.9 | 55.65 ± 0.5 |
-| Coreset / sparsification | Random | 50.39 ± 1.4 | 58.92 ± 0.8 | 60.19 ± 0.5 |
-| Coreset / sparsification | Herding | 51.49 ± 0.7 | 58.00 ± 0.5 | 57.70 ± 0.2 |
-| Coreset / sparsification | K-Center | 50.52 ± 0.5 | 55.28 ± 0.6 | 58.66 ± 0.4 |
-| Coreset / sparsification | TSpanner | - | - | - |
-| Coarsening | Averaging | 59.62 ± 0.4 | 59.96 ± 0.3 | 59.94 ± 0.3 |
-| Coarsening | VN | OOM | OOM | OOM |
-| Coarsening | VNG | 54.89 ± 0.3 | 59.66 ± 0.2 | 60.93 ± 0.2 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 64.91 ± 0.4 | 68.78 ± 0.1 | 69.59 ± 0.2 |
-| Condensation | SFGC | 64.91 ± 0.5 | 66.58 ± 0.3 | 67.03 ± 0.5 |
-| Condensation | GCSNTK | 58.21 ± 1.7 | 59.98 ± 1.7 | 54.73 ± 5.0 |
-| Condensation | GCDMX | 60.04 ± 0.4 | 60.59 ± 0.4 | 60.71 ± 0.7 |
-| Condensation | GCondX | 59.40 ± 0.5 | 62.46 ± 0.3 | 59.93 ± 0.5 |
-| Condensation | GCond | 60.49 ± 0.4 | 63.88 ± 0.2 | 64.23 ± 0.2 |
-| Condensation | DosCond | 55.70 ± 0.3 | 57.39 ± 0.2 | 61.06 ± 0.6 |
-| Condensation | MSGC | 57.66 ± 0.4 | 64.85 ± 0.3 | 65.73 ± 0.2 |
-| Condensation | SGDD | 58.50 ± 0.2 | 59.18 ± 0.2 | 63.76 ± 0.2 |
-| Condensation | GDEM | - | - | - |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 71.4 | 71.4 | 71.4 |
-
-### Flickr — test accuracy (%)
-
-| Family | Method | 0.10% | 0.50% | 1.00% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 40.70 ± 0.4 | 42.90 ± 0.3 | 42.62 ± 0.2 |
-| Coreset / sparsification | Cent-P | 40.97 ± 0.9 | 44.06 ± 0.3 | 44.51 ± 0.3 |
-| Coreset / sparsification | Random | 42.94 ± 0.3 | 44.54 ± 0.5 | 44.68 ± 0.6 |
-| Coreset / sparsification | Herding | 42.80 ± 0.1 | 43.86 ± 0.5 | 45.12 ± 0.4 |
-| Coreset / sparsification | K-Center | 43.01 ± 0.5 | 43.46 ± 0.8 | 43.53 ± 0.6 |
-| Coreset / sparsification | TSpanner | - | - | - |
-| Coarsening | Averaging | 37.93 ± 0.3 | 37.76 ± 0.4 | 37.66 ± 0.3 |
-| Coarsening | VN | 32.77 ± 5.7 | 33.79 ± 5.2 | 34.39 ± 6.0 |
-| Coarsening | VNG | 44.33 ± 0.3 | 43.30 ± 0.6 | 43.84 ± 0.8 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 47.15 ± 0.1 | 46.71 ± 0.2 | 46.13 ± 0.2 |
-| Condensation | SFGC | 46.38 ± 0.2 | 46.38 ± 0.2 | 46.61 ± 0.1 |
-| Condensation | GCSNTK | 41.85 ± 3.1 | 33.39 ± 6.0 | 31.12 ± 4.2 |
-| Condensation | GCDMX | 43.75 ± 0.3 | 45.05 ± 0.3 | 45.88 ± 0.1 |
-| Condensation | GCondX | 46.66 ± 0.1 | 46.69 ± 0.1 | 46.58 ± 0.1 |
-| Condensation | GCond | 46.75 ± 0.1 | 47.01 ± 0.2 | 46.99 ± 0.1 |
-| Condensation | DosCond | 45.87 ± 0.3 | 45.89 ± 0.3 | 45.81 ± 0.1 |
-| Condensation | MSGC | 46.21 ± 0.1 | 46.77 ± 0.1 | 46.12 ± 0.2 |
-| Condensation | SGDD | 46.69 ± 0.1 | 46.39 ± 0.2 | 46.24 ± 0.3 |
-| Condensation | GDEM | - | - | - |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 47.4 | 47.4 | 47.4 |
-
-### Reddit — test accuracy (%)
-
-| Family | Method | 0.05% | 0.10% | 0.20% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 40.00 ± 1.1 | 50.47 ± 1.4 | 55.31 ± 1.8 |
-| Coreset / sparsification | Cent-P | 45.83 ± 1.7 | 51.22 ± 1.4 | 61.56 ± 0.2 |
-| Coreset / sparsification | Random | 40.13 ± 0.9 | 55.73 ± 0.5 | 58.39 ± 2.3 |
-| Coreset / sparsification | Herding | 46.88 ± 0.4 | 59.34 ± 0.7 | 73.46 ± 0.5 |
-| Coreset / sparsification | K-Center | 40.24 ± 0.8 | 48.28 ± 0.7 | 56.81 ± 1.7 |
-| Coreset / sparsification | TSpanner | - | - | - |
-| Coarsening | Averaging | 88.23 ± 0.1 | 88.32 ± 0.1 | 88.33 ± 0.1 |
-| Coarsening | VN | OOM | OOM | OOM |
-| Coarsening | VNG | 69.96 ± 0.5 | 76.95 ± 0.2 | 81.52 ± 0.6 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 90.63 ± 0.2 | 91.33 ± 0.1 | 91.03 ± 0.3 |
-| Condensation | SFGC | 90.18 ± 0.2 | 89.84 ± 0.3 | 90.71 ± 0.1 |
-| Condensation | GCSNTK | OOM | OOM | OOM |
-| Condensation | GCDMX | 87.28 ± 0.2 | 89.96 ± 0.1 | 89.08 ± 0.1 |
-| Condensation | GCondX | 86.56 ± 0.2 | 88.25 ± 0.3 | 88.73 ± 0.2 |
-| Condensation | GCond | 85.39 ± 0.2 | 89.82 ± 0.1 | 90.42 ± 0.1 |
-| Condensation | DosCond | 86.56 ± 0.4 | 88.32 ± 0.2 | 88.84 ± 0.2 |
-| Condensation | MSGC | 87.62 ± 0.1 | 88.15 ± 0.1 | 87.03 ± 0.1 |
-| Condensation | SGDD | 87.37 ± 0.2 | 88.73 ± 0.3 | 90.65 ± 0.1 |
-| Condensation | GDEM | - | - | - |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 94.4 | 94.4 | 94.4 |
-
-### Yelp — F1-macro (%)
-
-| Family | Method | 0.05% | 0.10% | 0.20% |
-| --- | --- | ---: | ---: | ---: |
-| Coreset / sparsification | Cent-D | 48.67 ± 0.3 | 51.03 ± 0.1 | 46.08 ± 0.0 |
-| Coreset / sparsification | Cent-P | 46.81 ± 0.1 | 46.08 ± 0.0 | 46.08 ± 0.0 |
-| Coreset / sparsification | Random | 46.08 ± 0.0 | 46.28 ± 0.1 | 49.31 ± 0.4 |
-| Coreset / sparsification | Herding | 46.08 ± 0.0 | 52.23 ± 0.3 | 47.49 ± 0.1 |
-| Coreset / sparsification | K-Center | 46.07 ± 0.0 | 46.22 ± 0.0 | 46.85 ± 0.2 |
-| Coreset / sparsification | TSpanner | - | - | - |
-| Coarsening | Averaging | 55.04 ± 0.1 | 53.51 ± 0.8 | 54.42 ± 0.3 |
-| Coarsening | VN | 51.52 ± 1.6 | 51.68 ± 1.0 | 52.63 ± 1.1 |
-| Coarsening | VNG | 49.24 ± 0.1 | 47.33 ± 0.5 | 48.63 ± 0.4 |
-| Coarsening | Clustering | NR | NR | NR |
-| Condensation | GEOM | 52.80 ± 2.2 | 47.56 ± 0.2 | 49.48 ± 0.7 |
-| Condensation | SFGC | 46.20 ± 0.1 | 47.96 ± 0.0 | 46.70 ± 0.1 |
-| Condensation | GCSNTK | OOM | OOM | OOM |
-| Condensation | GCDMX | 50.75 ± 0.4 | 52.49 ± 0.1 | 55.89 ± 0.2 |
-| Condensation | GCondX | 52.44 ± 0.4 | 49.70 ± 1.5 | 48.77 ± 1.3 |
-| Condensation | GCond | 52.30 ± 0.1 | 53.22 ± 0.1 | 51.76 ± 0.2 |
-| Condensation | DosCond | 51.10 ± 0.3 | 52.54 ± 0.1 | 52.19 ± 0.5 |
-| Condensation | MSGC | 52.94 ± 0.2 | 50.97 ± 0.8 | 51.35 ± 0.5 |
-| Condensation | SGDD | 52.02 ± 0.2 | 54.13 ± 0.2 | 52.86 ± 0.1 |
-| Condensation | GDEM | - | - | - |
-| Condensation | DosCondX | NR | NR | NR |
-| Condensation | GCDM | NR | NR | NR |
-| Condensation | SimGC | NR | NR | NR |
-| Condensation | GECC | NR | NR | NR |
-| Baseline | Whole | 58.2 | 58.2 | 58.2 |
-<!-- benchmark-results:end -->
-
-<!-- local-nr-results:start -->
-
-### Local NR rerun (separate from published Table 9)
-
-Progress: 306/315 reduction runs complete; 0 failed; 9 require configuration.
-
-Each numeric cell requires all 3 reduction seeds × 10 downstream GCN fits, 300 evaluation epochs, 256 hidden units and 2 layers. Values are mean ± population standard deviation over the 30 test scores, in percent (Yelp: F1-macro). Synthetic checkpoints and GCN weights are selected on validation performance only. No incomplete cell is averaged or ranked.
-
-CLI rates below are fractions of labeled training nodes, not the whole-graph percentages printed in the published tables. Dataset splits are fixed with data seed 1; reduction seeds are 1, 2, 3. Method epochs and hyperparameters come from this repository's JSON configurations. GECC uses its implemented static mode (no evolving splits); its missing Yelp configuration is `CONFIG`, not a score.
-
-These are local reruns of the repository, not an exact replay of the published experiment: the Reddit loader uses the sparser Reddit2 variant; FraudYelp receives the repository's seeded classwise 80/10/10 split. See per-run dataset hashes/counts and resolved configurations for the exact inputs.
-
-| Dataset | CLI rate | Clustering | DosCondX | GCDM | SimGC | GECC |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| cora | 0.1 | 73.74 ± 0.65 | 78.98 ± 0.54 | 78.40 ± 1.01 | 71.31 ± 5.12 | 81.93 ± 0.73 |
-| cora | 0.25 | 75.46 ± 0.71 | 78.38 ± 0.52 | 79.59 ± 0.62 | 68.58 ± 11.56 | 82.81 ± 0.22 |
-| cora | 0.5 | 77.31 ± 0.43 | 79.25 ± 0.78 | 80.90 ± 0.45 | 75.01 ± 4.30 | 82.53 ± 0.41 |
-| citeseer | 0.1 | 69.78 ± 0.48 | 70.45 ± 1.27 | 71.25 ± 0.94 | 24.16 ± 4.18 | 73.06 ± 0.31 |
-| citeseer | 0.25 | 69.35 ± 0.30 | 70.06 ± 1.03 | 71.21 ± 0.80 | 22.95 ± 5.34 | 73.01 ± 0.31 |
-| citeseer | 0.5 | 69.14 ± 0.24 | 70.86 ± 0.99 | 71.96 ± 0.57 | 29.00 ± 7.06 | 72.89 ± 0.27 |
-| pubmed | 0.05 | 75.56 ± 0.40 | 72.53 ± 1.54 | 77.65 ± 0.31 | 43.37 ± 3.93 | 75.09 ± 0.19 |
-| pubmed | 0.1 | 75.10 ± 0.75 | 71.26 ± 1.43 | 77.39 ± 1.44 | 39.82 ± 5.56 | 77.71 ± 0.23 |
-| pubmed | 0.5 | 76.46 ± 0.47 | 71.84 ± 1.26 | 76.76 ± 0.58 | 37.76 ± 10.11 | 80.20 ± 0.40 |
-| ogbn-arxiv | 0.001 | 60.84 ± 0.53 | 60.42 ± 0.59 | 59.97 ± 0.46 | 56.15 ± 2.03 | 61.38 ± 0.55 |
-| ogbn-arxiv | 0.005 | 61.95 ± 0.20 | 62.21 ± 0.98 | 60.59 ± 0.42 | 60.32 ± 0.40 | 64.92 ± 0.26 |
-| ogbn-arxiv | 0.01 | 63.13 ± 0.17 | 61.75 ± 0.54 | 60.67 ± 0.48 | 60.39 ± 0.39 | 66.38 ± 0.35 |
-| flickr | 0.001 | 46.04 ± 0.25 | 46.63 ± 0.22 | 43.56 ± 1.06 | 45.93 ± 0.26 | 46.33 ± 0.25 |
-| flickr | 0.005 | 46.27 ± 0.31 | 46.64 ± 0.19 | 45.07 ± 0.61 | 41.99 ± 2.29 | 45.88 ± 0.22 |
-| flickr | 0.01 | 45.70 ± 0.26 | 46.62 ± 0.16 | 45.33 ± 0.65 | 42.76 ± 1.56 | 46.18 ± 0.24 |
-| reddit | 0.0005 | 89.44 ± 0.11 | 54.07 ± 3.38 | 86.88 ± 0.37 | 61.77 ± 28.60 | 89.50 ± 0.09 |
-| reddit | 0.001 | 90.03 ± 0.18 | 56.83 ± 1.50 | 88.48 ± 0.44 | 79.20 ± 10.17 | 90.89 ± 0.09 |
-| reddit | 0.002 | 91.57 ± 0.06 | 58.02 ± 1.31 | 89.92 ± 0.12 | 81.13 ± 7.56 | 91.63 ± 0.11 |
-| yelp | 0.0005 | 53.63 ± 0.36 | 51.15 ± 1.07 | 51.77 ± 1.47 | 49.26 ± 2.46 | CONFIG |
-| yelp | 0.001 | 53.69 ± 0.19 | 51.09 ± 1.20 | 53.43 ± 1.75 | 49.78 ± 2.78 | CONFIG |
-| yelp | 0.002 | 52.45 ± 0.22 | 50.53 ± 0.73 | 53.87 ± 0.55 | 52.51 ± 3.38 | CONFIG |
-
-`PENDING (n/3)` retains partial reductions without publishing a partial score. `FAILED`/`INTERRUPTED` retains an error record; `CONFIG` requires method configuration. Machine-readable scores, configurations, dataset hashes, source snapshot, checkpoint hashes, and logs are in the run directory.
-
-<!-- local-nr-results:end -->
-
-<!-- paper-hpo-results:start -->
-
-### Paper-sourced HPO (new local batch; earlier untuned results retained)
-
-Jobs: 367/367 complete; 0 running; 0 failed.
-
-Completed validation candidates: GECC 4394/4394; SimGC downstream GCN 756/756.
-
-GECC–Yelp: exhaustive 4,394 settings (13³ propagation weights × 2 weight decays), K=2, hard k-means++, one restart. SimGC: corrected author implementation/settings, then the 108-config downstream GCN grid from GC4NC Table 11. These are different search spaces, not interchangeable.
-
-Searches use only validation metrics, ten fixed evaluation seeds, 300 epochs, and the seed-1 graph at the highest CLI reduction rate. A group must finish every candidate before its choice is frozen. That choice is reused across all three rates; each final cell requires 3 reduction seeds × 10 GCN fits. Values are test mean ± population standard deviation (%) (Yelp: F1-macro).
-
-Scope caveats: GECC has no published Yelp optimum; SimGC has no published Pubmed/Yelp optimum (common author defaults are extensions). Reddit uses Reddit2; FraudYelp uses the fixed local seed-1 split. SimGC synthetic alignment gradients, teacher propagation order/normalization, and smoothness sign were repaired against the pinned author code. GECC inductive propagation depth and downstream training-mode dropout were repaired. Do not interpret this batch as a hyperparameter-only comparison or an exact paper replay.
-
-Sources: [GECC §5.1](https://arxiv.org/html/2502.17614#S5.SS1), [GC4NC Table 11](https://arxiv.org/html/2406.16715v3#A1.SS8.SSS2), [SimGC §5.1](https://arxiv.org/html/2403.14951#S5.SS1), [pinned SimGC code](https://github.com/BangHonor/SimGC/tree/1b3d1d59d9afaf2c9c0c7b652fb183db2a5ffa01).
-
-| Dataset | CLI rate | SimGC (author settings + GCN HPO) | GECC (paper grid, Yelp extension) |
-| --- | ---: | ---: | ---: |
-| citeseer | 0.1 | 44.48 ± 13.99 | — |
-| citeseer | 0.25 | 47.25 ± 13.15 | — |
-| citeseer | 0.5 | 49.77 ± 9.35 | — |
-| cora | 0.1 | 25.71 ± 7.39 | — |
-| cora | 0.25 | 25.25 ± 6.32 | — |
-| cora | 0.5 | 33.40 ± 5.08 | — |
-| pubmed | 0.05 | 63.08 ± 14.26 | — |
-| pubmed | 0.1 | 67.57 ± 8.54 | — |
-| pubmed | 0.5 | 72.76 ± 2.32 | — |
-| ogbn-arxiv | 0.001 | 60.85 ± 0.41 | — |
-| ogbn-arxiv | 0.005 | 63.08 ± 0.42 | — |
-| ogbn-arxiv | 0.01 | 63.05 ± 0.69 | — |
-| flickr | 0.001 | 46.20 ± 0.32 | — |
-| flickr | 0.005 | 46.24 ± 0.29 | — |
-| flickr | 0.01 | 45.59 ± 1.37 | — |
-| reddit | 0.0005 | 88.07 ± 0.47 | — |
-| reddit | 0.001 | 89.01 ± 0.25 | — |
-| reddit | 0.002 | 90.06 ± 0.23 | — |
-| yelp | 0.0005 | 47.41 ± 1.55 | 47.71 ± 2.86 |
-| yelp | 0.001 | 47.56 ± 1.52 | 50.69 ± 2.92 |
-| yelp | 0.002 | 47.54 ± 1.77 | 53.94 ± 0.41 |
-
-Artifacts: `runs/paper_hpo_20261010_v2` (manifest, frozen source, raw validation scores, selections, test records, checkpoint hashes and logs). `PENDING` is not a numeric result.
-
-<!-- paper-hpo-results:end -->
-
-### SimGC citation package correction (2026-10-10)
-
-The archived HPO table above predates a further Cora/Citeseer compatibility fix:
-its generic ReLU GCN and 300-epoch budget did not match the released citation
-evaluation branch. Its SimGC citation values are historical failed-reproduction
-results, not evidence of the method's published performance. The old table,
-source snapshot and raw scores are retained unchanged.
-
-Current package defaults honor `activation=None` (or CLI `--activation none`),
-use the author's separate hidden-2048 graph-selection and hidden-1024 downstream
-GCNs, and preserve zero dropout/weight decay, constant lr=0.001 and the released
-validation cadence. Graph selection uses 3,000 updates; final evaluation uses
-3,001, matching the author's inclusive final loop. Future HPO retains the 108
-GC4NC candidates and adds the released baseline for Cora/Citeseer. See
-[the SimGC protocol](docs/simgc.md) for commands and validation boundaries.
-
-The citation profile also uses raw features (`pre_norm=false`), matching the
-author's effective `dataset.data` conversion that bypasses the attached feature
-transform. This method-specific preprocessing difference is explicit; other
-methods' loader defaults are unchanged. SimGC allocates synthetic nodes using
-the author's per-class ceiling rather than the generic floor-based budget.
-
-No repaired test result is claimed by this correction note. The validation-only
-integration check is separate from benchmark tables. Fresh full-budget checks
-at rate 0.5, reduction seed 1 / downstream seed 0 produced validation accuracy
-of [72.6% on Cora](runs/simgc_fix_cora_20261010_v2/result.json) and
-[51.8% on Citeseer](runs/simgc_fix_citeseer_20261010_v2/result.json). Both matched
-the pinned author input converter and model forward/gradient checks. These
-single-seed validation scores do not establish paper-level reproduction; new
-multi-seed test evaluation is still required.
-
-<!-- repaired-hpo-results:start -->
-
-### Repaired package HPO (fresh source; historical batches retained)
-
-Jobs: 191/191 complete; 0 running; 0 failed.
-
-Completed validation candidates: GECC 0/0; SimGC downstream GCN 758/758.
-
-No new GECC search in this batch; completed GECC results remain in their historical source batch. SimGC: 108 GC4NC downstream GCN candidates per dataset plus the released baseline for Cora/Citeseer (109 each).
-
-Validation-only search with ten fixed evaluation seeds; Cora/Citeseer use the released no-activation GCN profile (3,001 downstream updates, validation every 100); others use the 300-epoch local protocol. Condensation selection is separate (citation: hidden 2048, 3,000 updates). Full groups freeze before testing. Final cells pool 3 reduction seeds × 10 GCN fits, test mean ± population standard deviation (%; Yelp: F1-macro).
-
-Scope caveats: GECC has no published Yelp optimum; SimGC has no published Pubmed/Yelp optimum (common author defaults are extensions). Reddit uses Reddit2; FraudYelp uses the fixed local seed-1 split. SimGC synthetic alignment gradients, teacher propagation order/normalization, and smoothness sign were repaired against the pinned author code. GECC inductive propagation depth and downstream training-mode dropout were repaired. Do not interpret this batch as a hyperparameter-only comparison or an exact paper replay. Cora/Citeseer now use the released effective raw features, separate citation model profiles and Glorot initialization; SimGC uses per-class ceiling budgets. These method-specific repairs change the scientific protocol; do not rank across source batches as one controlled experiment.
-
-Sources: [GECC §5.1](https://arxiv.org/html/2502.17614#S5.SS1), [GC4NC Table 11](https://arxiv.org/html/2406.16715v3#A1.SS8.SSS2), [SimGC §5.1](https://arxiv.org/html/2403.14951#S5.SS1), [pinned SimGC code](https://github.com/BangHonor/SimGC/tree/1b3d1d59d9afaf2c9c0c7b652fb183db2a5ffa01).
-
-| Dataset | CLI rate | SimGC (author settings + GCN HPO) | GECC (paper grid, Yelp extension) |
-| --- | ---: | ---: | ---: |
-| citeseer | 0.1 | 42.13 ± 5.38 | — |
-| citeseer | 0.25 | 51.92 ± 8.36 | — |
-| citeseer | 0.5 | 50.87 ± 4.53 | — |
-| cora | 0.1 | 57.80 ± 16.33 | — |
-| cora | 0.25 | 77.97 ± 2.72 | — |
-| cora | 0.5 | 78.13 ± 2.32 | — |
-| pubmed | 0.05 | 72.19 ± 2.35 | — |
-| pubmed | 0.1 | 68.03 ± 6.62 | — |
-| pubmed | 0.5 | 72.44 ± 1.96 | — |
-| ogbn-arxiv | 0.001 | 61.41 ± 0.63 | — |
-| ogbn-arxiv | 0.005 | 62.91 ± 0.99 | — |
-| ogbn-arxiv | 0.01 | 62.61 ± 0.90 | — |
-| flickr | 0.001 | 46.21 ± 0.32 | — |
-| flickr | 0.005 | 46.26 ± 0.34 | — |
-| flickr | 0.01 | 46.29 ± 0.36 | — |
-| reddit | 0.0005 | 87.12 ± 0.66 | — |
-| reddit | 0.001 | 89.11 ± 0.31 | — |
-| reddit | 0.002 | 90.33 ± 0.11 | — |
-| yelp | 0.0005 | 47.85 ± 1.34 | — |
-| yelp | 0.001 | 47.67 ± 1.69 | — |
-| yelp | 0.002 | 47.71 ± 1.62 | — |
-
-Artifacts: `/home/sgong36/gslim/runs/simgc_repaired_hpo_20261010` (manifest, frozen source, raw validation scores, selections, test records, checkpoint hashes and logs). `PENDING` is not a numeric result.
-
-<!-- repaired-hpo-results:end -->
+`amazon` is the DGL fraud dataset; `photo` and `computers` are PyG co-purchase
+datasets. Loader entries do not establish end-to-end reducer compatibility or
+completed benchmarks, including task handling for `ogbn-proteins` and resource
+feasibility for `ogbn-papers100m`.
 
 <!-- package-results:start -->
 
@@ -962,7 +587,7 @@ NR methods use the archived fixed-GCN protocol; GECC–Yelp uses paper-grid HPO;
 SimGC uses a fresh repaired source and validation-only GCN HPO (citation raw
 features/no-activation/3,001 updates; other datasets 300 updates). Source
 code, preprocessing, training budgets and evaluation seed schedules differ.
-Published results and earlier local batches remain separately preserved above.
+Published results and earlier local batches remain archived under `benchmark/results`.
 
 | Dataset | CLI rate | Clustering | DosCondX | GCDM | SimGC (repaired HPO) | GECC |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |

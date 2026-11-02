@@ -43,17 +43,16 @@ def load_coverage():
 def coverage_table(data, language):
     if language == "en":
         header = "| Criterion | <1% | <2% | <5% |"
-        labels = ("Relative shortfall (primary)", "Absolute relative gap")
+        label = "Relative shortfall"
     else:
         header = "| 判定口径 | <1% | <2% | <5% |"
-        labels = ("单边相对短缺（主口径）", "双边绝对相对差距")
+        label = "单边相对短缺"
     lines = [header, "| --- | ---: | ---: | ---: |"]
-    for metric, label in zip(("mean_shortfall_percent", "mean_relative_gap_percent"), labels):
-        cells = []
-        for threshold in ("1", "2", "5"):
-            row = data["thresholds"][metric][threshold]
-            cells.append(f"{row['count']}/{row['denominator']} ({row['percent']:.2f}%)")
-        lines.append("| " + " | ".join([label, *cells]) + " |")
+    cells = []
+    for threshold in ("1", "2", "5"):
+        row = data["thresholds"]["mean_shortfall_percent"][threshold]
+        cells.append(f"{row['count']}/{row['denominator']} ({row['percent']:.2f}%)")
+    lines.append("| " + " | ".join([label, *cells]) + " |")
     return "\n".join(lines)
 
 
@@ -63,33 +62,17 @@ def speed_figure(language):
     for suffix, expected in data["assets_sha256"].items():
         asset = ROOT / f"figures/implementation_comparison{suffix}"
         assert hashlib.sha256(asset.read_bytes()).hexdigest() == expected
-    fidelity = data["fidelity"]
-    exception = next(p for p in data["pairs"] if (p["method"], p["dataset"]) == ("gcgp", "cora"))
-    gap = exception["common_gcn"]["relative_shortfall_percent"]
+    assert data["displayed_metrics"] == ["time_seconds", "peak_cuda_allocated_mib"]
     if language == "en":
-        alt = "Large comparison of reduction time, peak process RSS, peak GPU allocation, and accuracy shortfall"
-        note = (
-            "**Reproduction criterion: relative accuracy shortfall <5%.** "
-            f"**{fidelity['shared_gcn_passes']}/{fidelity['shared_gcn_pairs']}** pairs meet it with shared GCN evaluation; "
-            f"GCGP/Cora has **{gap:.2f}%** shortfall. With GCGP's native GP predictor, "
-            f"**{fidelity['native_gp_passes']}/{fidelity['native_gp_pairs']}** pairs meet the criterion "
-            "(orange diamonds). The threshold concerns predictive quality."
-        )
+        alt = "Clustering acceleration and peak GPU memory across all six method–dataset pairs"
         links = "[Vector PDF](figures/implementation_comparison.pdf) · [High-resolution PNG](figures/implementation_comparison.png) · [Reviewed chart data](benchmark/results/implementation_comparison_figure.json)"
     else:
-        alt = "缩减耗时、峰值进程内存、峰值 GPU 显存和准确率相对短缺的大图对比"
-        note = (
-            "**复现标准：准确率单边相对短缺低于 5%。** "
-            f"统一 GCN 评估下 **{fidelity['shared_gcn_passes']}/{fidelity['shared_gcn_pairs']}** 组达标；"
-            f"GCGP/Cora 的短缺为 **{gap:.2f}%**。采用 GCGP 原生 GP 预测器时，"
-            f"**{fidelity['native_gp_passes']}/{fidelity['native_gp_pairs']}** 组达标（橙色菱形）。"
-            "该阈值针对预测效果。"
-        )
+        alt = "六个方法与数据集组合的聚类加速和峰值 GPU 显存对比"
         links = "[矢量 PDF](figures/implementation_comparison.pdf) · [高清 PNG](figures/implementation_comparison.png) · [经核对的绘图数据](benchmark/results/implementation_comparison_figure.json)"
     image = (
         f"[![{alt}](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)"
     )
-    return "\n\n".join([image, note, links])
+    return "\n\n".join([image, links])
 
 
 def replace(text, name, table):

@@ -1,8 +1,9 @@
-"""Frozen, resumable three-stage dataset expansion with explicit resource failures.
+"""Frozen, resumable four-stage dataset expansion with explicit resource failures.
 
 Stage 1: original seven datasets. Stage 2: two official heterophilous graphs.
-Stage 3: ogbn-products with official OGB splits. Numerical cells require every
-declared reduction/evaluation seed. Different historical batches are never pooled.
+Stage 3: ogbn-products with official OGB splits. Stage 4: Amazon Photo/Computers.
+Numerical cells require every declared reduction/evaluation seed. Different
+historical batches are never pooled.
 """
 
 import argparse
@@ -33,12 +34,15 @@ STAGES = (
     ("cora", "citeseer", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp"),
     ("roman-empire", "amazon-ratings"),
     ("ogbn-products",),
+    ("photo", "computers"),
 )
 EXPANSION_RATES = {
     **RATES,
     "roman-empire": ("0.005", "0.01", "0.02"),
     "amazon-ratings": ("0.005", "0.01", "0.02"),
     "ogbn-products": ("0.0005", "0.001", "0.002"),
+    "photo": ("0.005", "0.01", "0.02"),
+    "computers": ("0.005", "0.01", "0.02"),
 }
 
 
@@ -108,7 +112,12 @@ def science_files():
 def initialize(options):
     folder = options.run_dir
     folder.mkdir(parents=True, exist_ok=True)
-    jobs = plan(options.datasets, options.methods, options.seeds)
+    datasets = options.datasets
+    if datasets is None and (folder / "manifest.json").exists():
+        # Existing frozen batches keep their original dataset roster.
+        existing = nr.read_json(folder / "manifest.json")
+        datasets = list(dict.fromkeys(job["dataset"] for job in existing["jobs"]))
+    jobs = plan(datasets, options.methods, options.seeds)
     if getattr(options, "reductions_only", False):
         jobs = [job for job in jobs if job["kind"] == "reduction"]
     protocol = dict(
@@ -410,7 +419,7 @@ def export(folder, manifest):
         ]
     lines += [
         "",
-        "NOPE is the existing training-budget condensation adapter, not the original-node classifier from its paper. Unreachable targets, unlabeled-supernode filtering and class loss remain disclosed in per-job metadata. Timeout/resource failures are unavailable, never zero. GPU peaks are allocator peaks; per-job RSS is process peak, including data and training. Three stages execute in order after all prior-stage jobs are terminal, including retained failures.",
+        "NOPE is the existing training-budget condensation adapter, not the original-node classifier from its paper. Unreachable targets, unlabeled-supernode filtering and class loss remain disclosed in per-job metadata. Timeout/resource failures are unavailable, never zero. GPU peaks are allocator peaks; per-job RSS is process peak, including data and training. Stages execute in the frozen order after all prior-stage jobs are terminal, including retained failures.",
         "",
     ]
     (folder / "results.md").write_text("\n".join(lines))

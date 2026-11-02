@@ -1,8 +1,12 @@
 {
   "source": "benchmark/results/implementation_comparison_20261031.json",
   "source_sha256": "76c50b6708446a47159dc3ba38454d087ae49f773d122871e98dfc9c6317302f",
-  "renderer_sha256": "d71759b1f89e7f18f67fc9704497d70e5fb9452ce1c3b09d5041e07a275d761c",
+  "renderer_sha256": "a5a5537c5cfac19559cee2d957d85f135d25bcc619884bbd6174cf4c1740f4b7",
   "scope": "new controlled reduction comparison, not paper-score reproduction or an unmodified author CLI benchmark; no all-method claim",
+  "displayed_metrics": [
+    "time_seconds",
+    "peak_cuda_allocated_mib"
+  ],
   "reduction_seeds_per_implementation": 3,
   "uncertainty": "Bars are medians; whiskers show observed min-max across three reductions, not confidence intervals.",
   "memory": "Process RSS sampled every 5 ms includes resident inputs/imports. CUDA is PyTorch peak allocated memory after context warmup; CPU-only cells are not applicable.",
@@ -348,8 +352,8 @@
     }
   ],
   "assets_sha256": {
-    ".svg": "a32e6788d43e28f848aa36ac8441c17d799be8e11bcb08d0b7f68fc526c149bb",
-    ".png": "63d3b2df5fb418d52f6a872d33e7cd457d9da555fe0e1308cc5d9895ee506576",
-    ".pdf": "00ff76a27e873663eb860d560a75b156b6bf7376e7a3de8fb9bf708c0927192b"
+    ".svg": "74b3c933867ce0b98d306a5cc871d54022d21f02c5aa11dcd3c266c0a707590a",
+    ".png": "9176cc6793ea5ca4e3f20f2a18bdf45b8d3017aa46938b63bb6a2f046a0cf4de",
+    ".pdf": "ebf67f3ae17cdf20998fa109edf6428b8008aab4651ce17b52b67864d50297d0"
   }
 }

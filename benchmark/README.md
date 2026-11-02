@@ -1,14 +1,16 @@
 # GC4NC benchmark reproduction
 
-The [ordered dataset expansion](../docs/dataset_expansion.md) adds repeated-seed
+The [ordered dataset expansion](expand_datasets.py) adds repeated-seed
 lightweight-method experiments on the original seven datasets, followed by
-Roman-empire/Amazon-ratings and ogbn-products. Frozen-source new measurements,
+Roman-empire/Amazon-ratings, ogbn-products, and Amazon Photo/Computers.
+Use `--datasets photo computers` for a separate co-purchase batch. Frozen-source new measurements,
 resource failures and GCGP numerical-parity checks remain separate from published
 results and historical local batches.
 
 Source: [GC4NC, arXiv:2406.16715v3](https://arxiv.org/abs/2406.16715).
-The main [README](../README.md#full-published-performance-results) includes the full
-published performance table, clustering coverage, missing values, and rate definitions.
+The main [README](../README.md#reproduced-results) presents reproduced results.
+The full published table remains in the [frozen CSV](results/gc4nc_table9.csv);
+[reduction-rate definitions](../README.md#reduction-rates) cover all dataset entries.
 
 Run commands from the repository root after installing GraphSlim:
 
