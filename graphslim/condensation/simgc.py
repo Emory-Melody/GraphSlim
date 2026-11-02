@@ -17,12 +17,24 @@ from graphslim.utils import accuracy, normalize_adj_tensor, to_tensor
 
 
 def training_view(features, data, setting):
-    """Global indices apply only to the full transductive graph."""
+    """Select training node feature rows using global IDs only in the transductive setting.
+
+    :param features: Node feature matrix with one row per node.
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+    :returns: Training node feature matrix in the matching split-local order.
+    """
     return features[data.idx_train] if setting == "trans" else features
 
 
 def propagated_features(features, adj, depth):
-    """Keep synthetic multi-hop representations differentiable (author code)."""
+    """Concatenate zero-hop through depth-hop graph feature representations.
+
+    :param features: Node feature matrix with one row per node.
+    :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :param depth: Number of graph propagation hops included after the original features.
+    :returns: Tensor with the hop representations concatenated along the feature dimension.
+    """
     hops = [features]
     for _ in range(depth):
         hops.append(adj @ hops[-1])
@@ -30,7 +42,13 @@ def propagated_features(features, adj, depth):
 
 
 def smoothness_loss(features, edge_index, edge_weight):
-    """Minimize negative similarity, as in the released SimGC implementation."""
+    """Compute the negative edge-weighted mean feature similarity used by SimGC.
+
+    :param features: Node feature matrix with one row per node.
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :param edge_weight: One scalar weight per edge; ``None`` uses unit weights.
+    :returns: Scalar differentiable feature smoothness objective.
+    """
     similarity = torch.exp(-0.5 * (features[edge_index[0]] - features[edge_index[1]]).pow(2))
     return -(edge_weight * similarity.mean(dim=1)).sum() / edge_weight.sum().clamp_min(1e-12)
 
@@ -39,6 +57,14 @@ class SimGCTeacher(SGC):
     """Author SGC: propagate first, then apply the linear/nonlinear predictor."""
 
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
+        """Initialize SimGCTeacher and its configuration.
+
+        :param nfeat: Number of input features per node.
+        :param nhid: Hidden representation width.
+        :param nclass: Number of output classes.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings. Defaults to ``'train'``.
+        """
         super().__init__(nfeat, nhid, nclass, args, mode)
         initializer = None if self.ntrans > 1 else "glorot"
         self.layers = torch.nn.ModuleList(
@@ -47,6 +73,13 @@ class SimGCTeacher(SGC):
         )
 
     def forward(self, x, adj, output_layer_features=False):
+        """Propagate input features, apply the teacher MLP, and compute class log probabilities.
+
+        :param x: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Log probabilities, or ``(final_logits, log_probabilities)`` when layer features are requested.
+        """
         for hop in range(self.nlayers):
             x = (adj[hop] if isinstance(adj, list) else adj) @ x
         for index, layer in enumerate(self.layers):
@@ -59,11 +92,25 @@ class SimGCTeacher(SGC):
 
 
 class SimGC(GCondBase):
+    """Condense a graph by matching a trained teacher and multihop feature statistics.
+
+    """
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize SimGC and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(SimGC, self).__init__(setting, data, args, **kwargs)
 
     def generate_labels_syn(self, data):
-        """Use the released SimGC per-class ceiling, not the generic budget floor."""
+        """Allocate synthetic labels with the released per-class ceiling rule.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :returns: NumPy int64 label vector; per-class counts and class slices are also recorded.
+        """
         labels = []
         self.syn_class_indices, self.num_class_dict = {}, {}
         counter = Counter(data.labels_train.tolist())
@@ -76,6 +123,10 @@ class SimGC(GCondBase):
         return np.asarray(labels, dtype=np.int64)
 
     def validation_model_args(self):
+        """Apply validation configuration defaults while preserving explicit CLI overrides.
+
+        :returns: Shallow configuration copy used to train the validation model.
+        """
         args = copy(self.args)
         explicit = getattr(args, "_explicit_cli_keys", set())
         for key, value in getattr(args, "validation_config", {}).items():
@@ -85,6 +136,12 @@ class SimGC(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Condense a graph by matching a trained teacher and multihop feature statistics.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         pge = self.pge
         device = self.device

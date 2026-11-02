@@ -24,8 +24,7 @@ from graphslim.utils import one_hot, to_tensor
 
 
 class Coarsen:
-    """
-    Graph Coarsening
+    """Graph Coarsening
 
     This class provides methods to coarsen a graph, which involves reducing the number of nodes while
     preserving certain properties of the original graph.
@@ -38,14 +37,10 @@ class Coarsen:
         The data to be coarsened.
     args : Namespace
         Arguments containing configurations and device information.
-    **kwargs : dict, optional
-        Additional keyword arguments.
-
     """
 
     def __init__(self, setting, data, args):
-        """
-        Initializes the Coarsen object.
+        """Initializes the Coarsen object.
 
         Parameters
         ----------
@@ -55,8 +50,6 @@ class Coarsen:
             The data to be coarsened.
         args : Namespace
             Arguments containing configurations and device information.
-        **kwargs : dict
-            Additional keyword arguments.
         """
         self.setting = setting
         self.args = args

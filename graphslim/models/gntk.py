@@ -9,11 +9,14 @@ class GNTK(object):
     """
 
     def __init__(self, num_layers, num_mlp_layers, jk, scale):
-        """
-        num_layers: number of layers in the neural networks (including the input layer)
-        num_mlp_layers: number of MLP layers
-        jk: a bool variable indicating whether to add jumping knowledge
-        scale: the scale used aggregate neighbors [uniform, degree]
+        """Configure graph aggregation and the ReLU covariance recurrence.
+
+        :param num_layers: Number of graph-network layers including the input layer.
+        :param num_mlp_layers: Number of MLP covariance updates per graph layer.
+        :param jk: Whether to sum kernel contributions across graph layers
+            using jumping knowledge instead of taking only the final layer.
+        :param scale: Neighbor aggregation scaling, ``'uniform'`` or ``'degree'``.
+        :raises AssertionError: If ``scale`` is not a supported scaling rule.
         """
         self.num_layers = num_layers
         self.num_mlp_layers = num_mlp_layers
@@ -23,9 +26,10 @@ class GNTK(object):
         assert scale in ["uniform", "degree"]
 
     def __next_diag(self, S):
-        """
-        go through one normal layer, for diagonal element
-        S: covariance of last layer
+        """Update within-graph ReLU covariance and extract node standard deviations.
+
+        :param S: Covariance or kernel matrix being propagated through the recurrence.
+        :returns: Tuple ``(covariance, derivative_factor, standard_deviations)``.
         """
         diag = np.sqrt(np.diag(S))
         # tmp = diag[:, None]
@@ -38,18 +42,23 @@ class GNTK(object):
         return S, DS, diag
 
     def __adj_diag(self, S, adj_block, N, scale_mat):
-        """
-        go through one adj layer
-        S: the covariance
-        adj_block: the adjacency relation
-        N: number of vertices
-        scale_mat: scaling matrix
+        """Aggregate within-graph covariance through a sparse Kronecker adjacency operator.
+
+        :param S: Covariance or kernel matrix being propagated through the recurrence.
+        :param adj_block: Sparse Kronecker graph-pair adjacency operator.
+        :param N: Node count of the corresponding covariance dimension.
+        :param scale_mat: Scalar or node-pair normalization factor applied after aggregation.
+        :returns: Square aggregated covariance matrix.
         """
         return adj_block.dot(S.reshape(-1)).reshape(N, N) * scale_mat
 
     def __next(self, S, diag1, diag2):
-        """
-        go through one normal layer, for all elements
+        """Update cross-graph ReLU covariance using saved variance scales.
+
+        :param S: Covariance or kernel matrix being propagated through the recurrence.
+        :param diag1: Standard-deviation vectors for the left and right node sets.
+        :param diag2: Standard-deviation vectors for the left and right node sets.
+        :returns: Tuple ``(updated_covariance, derivative_factor)``.
         """
         S = S / diag1[:, None] / diag2[None, :]
         S = np.clip(S, -1, 1)
@@ -59,8 +68,14 @@ class GNTK(object):
         return S, DS
 
     def __adj(self, S, adj_block, N1, N2, scale_mat):
-        """
-        go through one adj layer, for all elements
+        """Aggregate cross-graph covariance through the graph-pair adjacency operator.
+
+        :param S: Covariance or kernel matrix being propagated through the recurrence.
+        :param adj_block: Sparse Kronecker graph-pair adjacency operator.
+        :param N1: Node count of the corresponding covariance dimension.
+        :param N2: Node count of the corresponding covariance dimension.
+        :param scale_mat: Scalar or node-pair normalization factor applied after aggregation.
+        :returns: Matrix of shape ``(N1, N2)`` after pairwise scaling.
         """
         return adj_block.dot(S.reshape(-1)).reshape(N1, N2) * scale_mat
 
@@ -79,10 +94,11 @@ class GNTK(object):
                 print(i, memory)
 
     def diag(self, feat, A):
-        """
-        compute the diagonal element of GNTK for graph `g` with adjacency matrix `A`
-        g: graph g
-        A: adjacency matrix
+        """Collect node variance scales used by cross-graph GNTK recursion.
+
+        :param feat: Node feature matrix with one row per graph node.
+        :param A: SciPy adjacency matrix of the graph.
+        :returns: List of node standard-deviation arrays in dense-layer recursion order.
         """
         N = A.shape[0]
         # tmp0 = np.sum(A, axis=1)
@@ -114,12 +130,17 @@ class GNTK(object):
         return diag_list
 
     def gntk(self, feat1, feat2, diag_list1, diag_list2, A1, A2):
-        """
-        compute the GNTK value \Theta(g1, g2)
-        g1: graph1
-        g2: graph2
-        diag_list1, diag_list2: g1, g2's the diagonal elements of covariance matrix in all layers
-        A1, A2: g1, g2's adjacency matrix
+        """Compute the graph-pair GNTK and retain its intermediate recurrences.
+
+        :param feat1: First graph's node features with shape ``(num_nodes1, d)``.
+        :param feat2: Second graph's node features with the same feature width.
+        :param diag_list1: First graph's node standard deviations returned by ``diag``.
+        :param diag_list2: Second graph's node standard deviations returned by ``diag``.
+        :param A1: First graph's SciPy adjacency matrix.
+        :param A2: Second graph's SciPy adjacency matrix.
+        :returns: Tuple ``(kernel_value, covariances, tangent_kernels, derivatives)``.
+            The scalar kernel value uses the configured jumping-knowledge rule;
+            the remaining values are lists of intermediate node-pair matrices.
         """
 
         n1 = A1.shape[0]

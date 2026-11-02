@@ -264,26 +264,11 @@ class GECC(GCondBase):
         return data
 
     def prepare_select(self, data, args):
-        """
-        Prepares and selects synthetic labels and features for coarsening.
+        """Allocate synthetic labels and class slices in rarest-class-first order.
 
-        Parameters
-        ----------
-        data : TransAndInd
-            The data to be processed.
-        args : object
-            Arguments containing various settings for the coarsening process.
-
-        Returns
-        -------
-        tuple
-            A tuple containing:
-            - labels_syn : ndarray
-                Synthesized labels.
-            - labels_train : tensor
-                Training labels.
-            - syn_class_indices : dict
-                Dictionary mapping class indices to their start and end positions in labels_syn.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :returns: Tuple ``(synthetic_labels, training_labels, synthetic_class_slices)``.
         """
 
         labels_train = data.labels_train.numpy()
@@ -519,21 +504,26 @@ def perform_balance_evolve_clusteringjk(
     save_p=False,
     class_id=0,
 ) -> torch.Tensor:
-    """
-    Incremental Clustering with support for both K-Means and Fuzzy C-Means based on the fuzziness parameter.
+    """Update class centroids using balanced k-means or fuzzy c-means restarts.
 
-    - x_c_current: Cumulative data for class c (numpy array of shape [#points, d])
-    - y_syn: Not used in this snippet, but left for future expansions
-    - c: Class label (unused in snippet, but can be used for logging)
-    - x_syn_c: Previous centroids (Tensor or None). If provided but has a different number of centroids than n_c,
-               it will be adjusted by adding or removing centroids.
-    - args: Argument container with attributes 'device' and 'seed'.
-    - data: Not used in this snippet
-    - n_c: Number of clusters for class c
-    - fuzziness: Fuzziness parameter m. If m=1.0, performs K-Means. If m > 1.0, performs Fuzzy C-Means.
-    - epsilon: Convergence threshold for centroid/membership updates
-    - max_iters: Maximum number of iterations to prevent infinite loops
-    - returns: Updated centroids (Tensor of shape [n_c, d])
+    :param x_c_current: Cumulative NumPy class features with shape ``(num_points, d)``.
+    :param y_syn: Compatibility argument for synthetic labels; currently unused.
+    :param c: Class label included in insufficient-data error messages.
+    :param x_syn_c: Previous centroids, or ``None`` to initialize from the class
+        features. Existing centroids are extended or truncated to ``n_c`` rows.
+    :param args: Configuration containing ``device``, ``seed``, ``fuzziness``,
+        ``rep_fuzz`` and ``balance_alpha``. ``fuzziness=1.0`` selects k-means;
+        values greater than one select fuzzy c-means.
+    :param n_c: Requested number of class centroids.
+    :param epsilon: Convergence tolerance for center or membership updates.
+        Defaults to ``1e-5``.
+    :param max_iters: Maximum iterations per restart. Defaults to ``100``.
+    :param save_p: Whether to save the selected k-means partition matrix in the
+        current directory. The fuzzy branch does not save it. Defaults to ``False``.
+    :param class_id: Class identifier used in the saved partition filename.
+        Defaults to ``0``.
+    :returns: Updated centroid tensor with shape ``(n_c, d)``.
+    :raises ValueError: If too few points are available for centroid initialization.
     """
     device = torch.device(args.device)
     x_c_torch = torch.as_tensor(x_c_current, dtype=torch.float32, device=device)
@@ -693,6 +683,12 @@ def perform_balance_evolve_clusteringjk(
             n_samples = data_T.shape[1]
 
             def init_membership_from_centers(centers_array, data):
+                """Initialize fuzzy cluster memberships from the current class center distances.
+
+                :param centers_array: Initial centers with shape ``(num_centers, feature_dim)``.
+                :param data: Transposed class features with shape ``(feature_dim, num_samples)``.
+                :returns: Cluster-by-sample membership array.
+                """
                 n_c_local = centers_array.shape[0]
                 n_samples_local = data.shape[1]
                 dists = pairwise_distances(data.T, centers_array)  # (n_samples, n_clusters)
@@ -755,6 +751,13 @@ def perform_balance_evolve_clusteringjk(
 
 
 def init_membership_from_centers(centers_array, data, m):
+    """Initialize normalized fuzzy memberships from clipped center distances.
+
+    :param centers_array: Initial centers with shape ``(num_centers, feature_dim)``.
+    :param data: NumPy features with shape ``(feature_dim, num_samples)``.
+    :param m: Fuzzy c-means exponent, greater than one.
+    :returns: NumPy membership matrix of shape ``(num_centers, num_samples)``.
+    """
     n_samples_local = data.shape[1]
     dists = pairwise_distances(data.T, centers_array)  # (n_samples, n_clusters)
     dists = np.clip(dists, 1e-10, None)
@@ -767,6 +770,19 @@ def init_membership_from_centers(centers_array, data, m):
 
 
 def run_fuzzy_cmeans(rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_samples):
+    """Run one seeded fuzzy c-means restart and add the cluster-balance penalty.
+
+    :param rep: Restart index added to the configured base random seed.
+    :param args: Configuration namespace containing the options used by this operation.
+    :param data_T: Transposed features with shape ``(feature_dim, num_samples)``.
+    :param n_c: Number of fuzzy cluster centers.
+    :param m: Fuzzy c-means exponent, greater than one.
+    :param epsilon: Numerical or convergence tolerance.
+    :param max_iters: Maximum number of optimization iterations.
+    :param init_u: Optional initial fuzzy membership matrix for the first restart.
+    :param n_samples: Number of feature samples.
+    :returns: Tuple ``(penalized_objective, centers, membership_matrix)``.
+    """
     current_seed = args.seed + rep
 
     if rep == 0 and init_u is not None:
@@ -795,6 +811,18 @@ def run_fuzzy_cmeans(rep, args, data_T, n_c, m, epsilon, max_iters, init_u, n_sa
 def parallel_fuzzy_cmeans(
     args, x_c_current, n_c, epsilon, max_iters, device="cpu", save_p=False, class_id=0
 ):
+    """Run fuzzy c-means restarts in worker processes and select the lowest penalized objective.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param x_c_current: Class-specific feature array with shape ``(num_samples, feature_dim)``.
+    :param n_c: Number of fuzzy cluster centers.
+    :param epsilon: Numerical or convergence tolerance.
+    :param max_iters: Maximum number of optimization iterations.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cpu'``.
+    :param save_p: Whether to save the selected partition matrix as a NumPy file. Defaults to ``False``.
+    :param class_id: Class identifier. Defaults to ``0``.
+    :returns: Best center tensor on the requested device; optionally also saves memberships to disk.
+    """
     m = args.fuzziness
     data_T = np.array(x_c_current, dtype=np.float64).T  # shape: (d, n_samples)
     n_samples = data_T.shape[1]
@@ -839,9 +867,13 @@ def parallel_fuzzy_cmeans(
 def incremental_kmeanspp_init(
     new_data: torch.Tensor, old_centers: torch.Tensor, needed: int, device: torch.device
 ) -> torch.Tensor:
-    """
-    Pick `needed` new centroids from `new_data` via an incremental kmeans++ approach,
-    given already-existing `old_centers`.
+    """Extend existing centers by sampling new class features with k-means++ distance weights.
+
+    :param new_data: Candidate feature rows from which to select new centers.
+    :param old_centers: Previously selected center rows, or None for initialization without centers.
+    :param needed: Number of additional centers to select.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+    :returns: Tensor of newly selected centers, or an empty tensor when no centers are needed.
     """
     # If nothing to pick, return empty
     if needed <= 0:

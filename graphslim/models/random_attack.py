@@ -39,6 +39,14 @@ class RandomAttack(BaseAttack):
     def __init__(
         self, model=None, nnodes=None, attack_structure=True, attack_features=False, device="cpu"
     ):
+        """Initialize RandomAttack and its configuration.
+
+        :param model: Model instance used for training, prediction, or cache attachment. Defaults to ``None``.
+        :param nnodes: Number of nodes used to construct candidate edge pairs. Defaults to ``None``.
+        :param attack_structure: Whether the random attacker may modify graph edges. Defaults to ``True``.
+        :param attack_features: Whether feature attacks are enabled; unsupported modes are rejected by the attacker. Defaults to ``False``.
+        :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cpu'``.
+        """
         super(RandomAttack, self).__init__(
             model,
             nnodes,
@@ -52,17 +60,20 @@ class RandomAttack(BaseAttack):
 
         Parameters
         ----------
-        ori_adj : scipy.sparse.csr_matrix
-            Original (unperturbed) adjacency matrix.
+        target : scipy.sparse.csr_matrix or torch.Tensor
+            Original adjacency when attacking structure, or original feature
+            tensor when attacking features.
         n_perturbations : int
-            Number of edge removals/additions.
-        type: str
-            perturbation type. Could be 'add', 'remove' or 'flip'.
+            Number of edge modifications or feature columns to zero.
+        type : str, optional
+            Edge perturbation: 'add', 'remove' or 'flip'. Defaults to 'add'.
+        **kwargs : dict
+            Compatibility keyword arguments; currently unused.
 
         Returns
         -------
-        None.
-
+        None
+            Results are stored in ``modified_adj`` and/or ``modified_features``.
         """
 
         if self.attack_structure:
@@ -142,7 +153,14 @@ class RandomAttack(BaseAttack):
         return modified_features
 
     def inject_nodes(self, adj, n_add, n_perturbations):
-        """For each added node, randomly connect with other nodes."""
+        """Unsupported node-injection attack entry point.
+
+        Always raises ``NotImplementedError``.
+
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param n_add: Requested number of injected nodes; node injection is currently unsupported.
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        """
         # adj: sp.csr_matrix
         print("number of pertubations: %s" % n_perturbations)
         raise NotImplementedError
@@ -151,12 +169,22 @@ class RandomAttack(BaseAttack):
         return modified_adj
 
     def random_sample_edges(self, adj, n, exclude):
+        """Draw a fixed number of allowed random edge pairs.
+
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param n: Number of edge pairs to sample.
+        :param exclude: Set of forbidden endpoint pairs; new pairs are added to this set.
+        :returns: List of sampled edge endpoint pairs.
+        """
         itr = self.sample_forever(adj, exclude=exclude)
         return [next(itr) for _ in range(n)]
 
     def sample_forever(self, adj, exclude):
-        """Randomly random sample edges from adjacency matrix, `exclude` is a set
-        which contains the edges we do not want to sample and the ones already sampled
+        """Sample unique non-diagonal node pairs indefinitely while updating the exclusion set.
+
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param exclude: Set of forbidden endpoint pairs; new pairs are added to this set.
+        :returns: Iterator of allowed edge endpoint pairs.
         """
         while True:
             # t = tuple(np.random.randint(0, adj.shape[0], 2))

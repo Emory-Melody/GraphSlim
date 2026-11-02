@@ -13,7 +13,13 @@ from graphslim.tracking import build_tracker
 
 
 def run(args, *, load_dataset=None, on_result=None):
-    """Return summary pairs, with optional dataset loading and result-recording hooks."""
+    """Execute the configured reduction and downstream evaluation with optional caller hooks.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param load_dataset: Optional callable ``(dataset, args, load_path)`` used to load the graph. Defaults to ``None``.
+    :param on_result: Optional callback ``(run_args, reduced_graph, evaluator, result)`` invoked after each evaluation. Defaults to ``None``.
+    :returns: List of evaluation summary pairs, or the selected trial record (possibly None) in HPO mode.
+    """
     from graphslim.dataset import attack, get_dataset
     from graphslim.evaluation import Evaluator
     from graphslim.utils import seed_everything
@@ -69,12 +75,20 @@ def run(args, *, load_dataset=None, on_result=None):
 
 
 def main(argv=None, *, default_method=None):
+    """Parse CLI arguments and execute reduction, evaluation, or hyperparameter search.
+
+    :param argv: Command line arguments; ``None`` reads the process arguments. Defaults to ``None``.
+    :param default_method: Method used when the caller does not supply ``--method``. Defaults to ``None``.
+    :returns: Result of the shared ``run`` workflow, or ``None`` when no run configuration is produced.
+    """
     args = get_args(argv, default_method=default_method)
     return run(args) if hasattr(args, "method") else None
 
 
 def entrypoint():
-    """Keep console exit codes independent from the returned results."""
+    """Invoke the training CLI without returning evaluation data as a process exit code.
+
+    """
     main()
 
 

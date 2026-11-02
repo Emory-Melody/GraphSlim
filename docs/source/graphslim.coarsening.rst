@@ -1,16 +1,23 @@
 graphslim.coarsening package
-============================
+================================
 
 graphslim.coarsening.coarsening\_base
---------------------------------------------
+-----------------------------------------
 
 .. automodule:: graphslim.coarsening.coarsening_base
    :members:
    :undoc-members:
    :show-inheritance:
 
+graphslim.coarsening.labels module
+--------------------------------------
+
+.. automodule:: graphslim.coarsening.labels
+   :members:
+   :undoc-members:
+
 graphslim.coarsening.affinity\_gs module
-----------------------------------------
+--------------------------------------------
 
 .. automodule:: graphslim.coarsening.affinity_gs
    :members:
@@ -19,7 +26,7 @@ graphslim.coarsening.affinity\_gs module
 
 
 graphslim.coarsening.algebraic\_jc module
------------------------------------------
+---------------------------------------------
 
 .. automodule:: graphslim.coarsening.algebraic_jc
    :members:
@@ -28,7 +35,7 @@ graphslim.coarsening.algebraic\_jc module
 
 
 graphslim.coarsening.heavy\_edge module
----------------------------------------
+-------------------------------------------
 
 .. automodule:: graphslim.coarsening.heavy_edge
    :members:
@@ -36,7 +43,7 @@ graphslim.coarsening.heavy\_edge module
    :show-inheritance:
 
 graphslim.coarsening.kron module
---------------------------------
+------------------------------------
 
 .. automodule:: graphslim.coarsening.kron
    :members:
@@ -44,7 +51,7 @@ graphslim.coarsening.kron module
    :show-inheritance:
 
 graphslim.coarsening.variation\_cliques module
-----------------------------------------------
+--------------------------------------------------
 
 .. automodule:: graphslim.coarsening.variation_cliques
    :members:
@@ -52,7 +59,7 @@ graphslim.coarsening.variation\_cliques module
    :show-inheritance:
 
 graphslim.coarsening.variation\_edges module
---------------------------------------------
+------------------------------------------------
 
 .. automodule:: graphslim.coarsening.variation_edges
    :members:
@@ -60,7 +67,7 @@ graphslim.coarsening.variation\_edges module
    :show-inheritance:
 
 graphslim.coarsening.variation\_neighborhoods module
-----------------------------------------------------
+--------------------------------------------------------
 
 .. automodule:: graphslim.coarsening.variation_neighborhoods
    :members:
@@ -68,7 +75,7 @@ graphslim.coarsening.variation\_neighborhoods module
    :show-inheritance:
 
 graphslim.coarsening.averaging module
--------------------------------------
+-----------------------------------------
 
 .. automodule:: graphslim.coarsening.averaging
    :members:
@@ -76,7 +83,7 @@ graphslim.coarsening.averaging module
    :show-inheritance:
 
 graphslim.coarsening.clustering module
---------------------------------------
+------------------------------------------
 
 .. automodule:: graphslim.coarsening.clustering
    :members:
@@ -84,7 +91,7 @@ graphslim.coarsening.clustering module
    :show-inheritance:
 
 graphslim.coarsening.clusteringagg module
------------------------------------------
+---------------------------------------------
 
 .. automodule:: graphslim.coarsening.clusteringagg
    :members:
@@ -92,7 +99,7 @@ graphslim.coarsening.clusteringagg module
    :show-inheritance:
 
 graphslim.coarsening.vng module
--------------------------------
+-----------------------------------
 
 .. automodule:: graphslim.coarsening.vng
    :members:
@@ -100,7 +107,7 @@ graphslim.coarsening.vng module
    :show-inheritance:
 
 graphslim.coarsening.utils module
----------------------------------
+-------------------------------------
 
 .. automodule:: graphslim.coarsening.utils
    :members:

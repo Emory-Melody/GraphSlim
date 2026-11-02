@@ -17,12 +17,25 @@ import time
 
 
 class Mirage(GCondBase):
+    """Mine class-specific frequent computation trees from graph samples.
+
+    """
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize Mirage and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(Mirage, self).__init__(setting, data, args, **kwargs)
 
     def append_to_file(self, message, filename):
-        r"""This functions is used to log strings and general python objects
-        in a pretty format to the log file specified by param filename."""
+        """Append a timestamped string or pretty-printed Python object to a log file.
+
+        :param message: String or Python object to append to the log.
+        :param filename: Output log path, opened in append mode.
+        """
         if not isinstance(message, str):
             with StringIO() as stream:
                 pprint(message, stream=stream)
@@ -35,6 +48,12 @@ class Mirage(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Mine class-specific frequent computation trees from graph samples.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         pge = self.pge
         self.feat_syn, labels_syn = to_tensor(

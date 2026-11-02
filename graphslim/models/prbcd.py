@@ -14,6 +14,9 @@ from torch_sparse import coalesce
 
 
 class PRBCD:
+    """Projected randomized block coordinate descent structural graph attack.
+
+    """
     def __init__(
         self,
         data,
@@ -31,11 +34,22 @@ class PRBCD:
         pretrain_epochs=600,
         **kwargs,
     ):
-        """
-        Parameters
-        ----------
-        data : pyg format data
-        model : the model to be attacked, should be models in deeprobust.graph.defense_pyg
+        """Initialize the structural attack and prepare a surrogate if no model is supplied.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param model: Model instance used for training, prediction, or cache attachment. Defaults to ``None``.
+        :param make_undirected: Whether candidate perturbations represent undirected edge pairs. Defaults to ``True``.
+        :param eps: Numerical or convergence tolerance. Defaults to ``1e-07``.
+        :param search_space_size: Number of candidate edge flips in each randomized search block. Defaults to ``10000000``.
+        :param max_final_samples: Maximum number of discrete perturbation samples considered at final selection. Defaults to ``20``.
+        :param fine_tune_epochs: Number of final epochs during which the candidate block is kept fixed. Defaults to ``100``.
+        :param epochs: Total number of attack optimization epochs. Defaults to ``400``.
+        :param lr_adj: Learning rate for continuous edge perturbation weights. Defaults to ``0.1``.
+        :param with_early_stopping: Whether to retain the best attack state by its monitored objective. Defaults to ``True``.
+        :param do_synchronize: Whether to synchronize CUDA execution where requested by the attack configuration. Defaults to ``True``.
+        :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cuda'``.
+        :param pretrain_epochs: Number of surrogate pretraining epochs when no trained model is supplied. Defaults to ``600``.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
         """
         self.device = device
         self.data = data
@@ -71,6 +85,11 @@ class PRBCD:
         self.do_synchronize = do_synchronize
 
     def pretrain_model(self, model=None):
+        """Fit the surrogate model without reading or reporting held-out test labels.
+
+        :param model: Model instance used for training, prediction, or cache attachment. Defaults to ``None``.
+        :returns: Evaluation-mode surrogate with the attack data attached.
+        """
         data = self.data
         device = self.device
         feat, labels = data.x, data.y
@@ -101,6 +120,10 @@ class PRBCD:
         return model
 
     def sample_random_block(self, n_perturbations):
+        """Sample candidate edge flips and initialize their differentiable weights.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        """
         for _ in range(self.max_final_samples):
             self.current_search_space = torch.randint(
                 self.n_possible_edges, (self.search_space_size,), device=self.device
@@ -125,6 +148,11 @@ class PRBCD:
 
     @torch.no_grad()
     def sample_final_edges(self, n_perturbations):
+        """Select a discrete attacked graph from sampled perturbations within the edge budget.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        :returns: Tuple ``(attacked_edge_index, attacked_edge_weight)``.
+        """
         best_loss = -float("Inf")
         perturbed_edge_weight = self.perturbed_edge_weight.detach()
         perturbed_edge_weight[perturbed_edge_weight <= self.eps] = 0
@@ -172,6 +200,10 @@ class PRBCD:
         return edge_index[:, edge_mask], edge_weight[edge_mask]
 
     def resample_random_block(self, n_perturbations: int):
+        """Replace low-weight candidate edge flips while retaining stronger candidates.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        """
         self.keep_heuristic = "WeightOnly"
         if self.keep_heuristic == "WeightOnly":
             sorted_idx = torch.argsort(self.perturbed_edge_weight)
@@ -225,6 +257,14 @@ class PRBCD:
         )
 
     def project(self, n_perturbations, values, eps, inplace=False):
+        """Project perturbation weights to box constraints and the total edge-flip budget.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        :param values: Continuous candidate edge perturbation weights.
+        :param eps: Numerical or convergence tolerance.
+        :param inplace: Whether to modify the supplied weights rather than a clone. Defaults to ``False``.
+        :returns: Projected weight tensor; optionally modifies the supplied tensor in place.
+        """
         if not inplace:
             values = values.clone()
 
@@ -238,6 +278,10 @@ class PRBCD:
         return values
 
     def get_modified_adj(self):
+        """Merge original edges with differentiable addition and removal candidates.
+
+        :returns: Tuple ``(modified_edge_index, modified_edge_weight)``.
+        """
         if self.make_undirected:
             modified_edge_index, modified_edge_weight = to_symmetric(
                 self.modified_edge_index, self.perturbed_edge_weight, self.n
@@ -259,12 +303,24 @@ class PRBCD:
         return edge_index, edge_weight
 
     def update_edge_weights(self, n_perturbations, epoch, gradient):
+        """Take an Adam ascent step on perturbation weights using the supplied gradient.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        :param epoch: Current zero-based optimization epoch.
+        :param gradient: Gradient of the attack objective with respect to perturbation weights.
+        """
         self.optimizer_adj.zero_grad()
         self.perturbed_edge_weight.grad = -gradient
         self.optimizer_adj.step()
         self.perturbed_edge_weight.data[self.perturbed_edge_weight < self.eps] = self.eps
 
     def _update_edge_weights(self, n_perturbations, epoch, gradient):
+        """Take a scheduled direct gradient ascent step on perturbation weights.
+
+        :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+        :param epoch: Current zero-based optimization epoch.
+        :param gradient: Gradient of the attack objective with respect to perturbation weights.
+        """
         lr_factor = n_perturbations / self.n / 2 * self.lr_factor
         lr = lr_factor / np.sqrt(max(0, epoch - self.epochs_resampling) + 1)
         self.perturbed_edge_weight.data.add_(lr * gradient)
@@ -272,6 +328,13 @@ class PRBCD:
         return None
 
     def attack(self, edge_index=None, edge_weight=None, ptb_rate=0.1):
+        """Optimize and discretize a randomized block coordinate descent structural attack.
+
+        :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``. Defaults to ``None``.
+        :param edge_weight: One scalar weight per edge; ``None`` uses unit weights. Defaults to ``None``.
+        :param ptb_rate: Edge perturbation fraction used to derive the attack budget. Defaults to ``0.1``.
+        :returns: Tuple ``(attacked_edge_index, attacked_edge_weight)``.
+        """
         data = self.data
         epochs, lr_adj = self.epochs, self.lr_adj
         model = self.model
@@ -341,6 +404,13 @@ class PRBCD:
         return edge_index, edge_weight
 
     def loss_attack(self, logits, labels, type="CE"):
+        """Compute the requested untargeted attack objective from logits and class labels.
+
+        :param logits: Model class outputs with one row per node.
+        :param labels: Node labels in the same node ordering as the corresponding features.
+        :param type: Attack loss variant, such as ``CE``, ``NCE``, or ``tanhMargin``. Defaults to ``'CE'``.
+        :returns: Scalar attack loss tensor.
+        """
         self.loss_type = type
         if self.loss_type == "tanhMargin":
             sorted = logits.argsort(-1)
@@ -366,6 +436,14 @@ class PRBCD:
         return loss
 
     def get_perf(self, output, labels, mask, verbose=True):
+        """Evaluate negative log-likelihood and classification accuracy on a node mask.
+
+        :param output: Model class outputs with one row per node.
+        :param labels: Node labels in the same node ordering as the corresponding features.
+        :param mask: Boolean mask or indices specifying the nodes to evaluate.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: Tuple ``(loss_float, accuracy_fraction)``.
+        """
         loss = F.nll_loss(output[mask], labels[mask])
         acc = utils.accuracy(output[mask], labels[mask])
         if verbose:
@@ -375,17 +453,33 @@ class PRBCD:
 
 @torch.jit.script
 def softmax_entropy(x: torch.Tensor) -> torch.Tensor:
-    """Entropy of softmax distribution from **logits**."""
+    """Compute per-row predictive entropy from unnormalized class logits.
+
+    :param x: Unnormalized class logit matrix.
+    :returns: Tensor containing one entropy value per input row.
+    """
     return -(x.softmax(1) * x.log_softmax(1)).sum(1)
 
 
 @torch.jit.script
 def entropy(x: torch.Tensor) -> torch.Tensor:
-    """Entropy of softmax distribution from **log_softmax**."""
+    """Compute per-row predictive entropy from log-softmax class probabilities.
+
+    :param x: Log-softmax class probability matrix.
+    :returns: Tensor containing one entropy value per input row.
+    """
     return -(torch.exp(x) * x).sum(1)
 
 
 def to_symmetric(edge_index, edge_weight, n, op="mean"):
+    """Add reverse edges and coalesce duplicate weights with the selected reduction.
+
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :param edge_weight: One scalar weight per edge; ``None`` uses unit weights.
+    :param n: Number of graph nodes or degree observations, as required by the operation.
+    :param op: Reduction used when duplicate symmetric edge weights are coalesced. Defaults to ``'mean'``.
+    :returns: Tuple ``(symmetric_edge_index, symmetric_edge_weight)``.
+    """
     symmetric_edge_index = torch.cat((edge_index, edge_index.flip(0)), dim=-1)
 
     symmetric_edge_weight = edge_weight.repeat(2)
@@ -397,12 +491,24 @@ def to_symmetric(edge_index, edge_weight, n, op="mean"):
 
 
 def linear_to_full_idx(n: int, lin_idx: torch.Tensor) -> torch.Tensor:
+    """Decode flattened indices of an n-by-n adjacency.
+
+    :param n: Number of graph nodes or degree observations, as required by the operation.
+    :param lin_idx: Flattened integer edge IDs to decode.
+    :returns: Integer tensor of row and column endpoints with shape ``(2, num_indices)``.
+    """
     row_idx = lin_idx // n
     col_idx = lin_idx % n
     return torch.stack((row_idx, col_idx))
 
 
 def linear_to_triu_idx(n: int, lin_idx: torch.Tensor) -> torch.Tensor:
+    """Decode flattened strict-upper-triangle edge IDs into node endpoints.
+
+    :param n: Number of graph nodes or degree observations, as required by the operation.
+    :param lin_idx: Flattened integer edge IDs to decode.
+    :returns: Integer edge endpoint tensor with shape ``(2, num_indices)``.
+    """
     row_idx = (
         n - 2 - torch.floor(torch.sqrt(-8 * lin_idx.double() + 4 * n * (n - 1) - 7) / 2.0 - 0.5)
     ).long()
@@ -411,6 +517,12 @@ def linear_to_triu_idx(n: int, lin_idx: torch.Tensor) -> torch.Tensor:
 
 
 def grad_with_checkpoint(outputs, inputs):
+    """Backpropagate outputs, copy input gradients, and clear those input gradients.
+
+    :param outputs: Differentiable outputs from which to backpropagate.
+    :param inputs: Positional inputs forwarded to the wrapped model.
+    :returns: List of gradient tensors corresponding to the inputs.
+    """
     inputs = (inputs,) if isinstance(inputs, torch.Tensor) else tuple(inputs)
     for input in inputs:
         if not input.is_leaf:
@@ -425,7 +537,22 @@ def grad_with_checkpoint(outputs, inputs):
 
 
 def bisection(edge_weights, a, b, n_perturbations, epsilon=1e-5, iter_max=1e5):
+    """Find the shift that projects clamped edge weights onto the attack budget.
+
+    :param edge_weights: Continuous candidate edge perturbation weights.
+    :param a: Lower and upper bounds of the projection shift search interval.
+    :param b: Lower and upper bounds of the projection shift search interval.
+    :param n_perturbations: Maximum number of edge flips allowed by the attack budget.
+    :param epsilon: Numerical or convergence tolerance. Defaults to ``1e-05``.
+    :param iter_max: Maximum number of optimization iterations. Defaults to ``100000.0``.
+    :returns: Scalar projection shift found by bisection.
+    """
     def func(x):
+        """Evaluate excess clamped perturbation mass for a proposed shift.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Difference between projected edge mass and the perturbation budget.
+        """
         return torch.clamp(edge_weights - x, 0, 1).sum() - n_perturbations
 
     miu = a

@@ -11,8 +11,19 @@ from graphslim.models.layers import MyLinear
 
 
 class APPNP(BaseGNN):
+    """MLP classifier followed by approximate personalized PageRank propagation.
+
+    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
 
+        """Initialize APPNP and its configuration.
+
+        :param nfeat: Number of input features per node.
+        :param nhid: Hidden representation width.
+        :param nclass: Number of output classes.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings. Defaults to ``'train'``.
+        """
         super(APPNP, self).__init__(nfeat, nhid, nclass, args, mode)
 
         # if mode in ['eval']:
@@ -36,6 +47,13 @@ class APPNP(BaseGNN):
         # activation module with a functional callable raises TypeError in Torch.
 
     def forward(self, x, adj, output_layer_features=False):
+        """Apply the MLP and personalized PageRank propagation.
+
+        :param x: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Class log probabilities; ``output_layer_features`` is accepted but does not change the output.
+        """
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:
@@ -59,6 +77,12 @@ class APPNP(BaseGNN):
         return F.log_softmax(x, dim=1)
 
     def forward_sampler(self, x, adjs):
+        """Run APPNP on neighbor-sampled layer blocks.
+
+        :param x: Node feature matrix with one row per node.
+        :param adjs: Neighbor-sampled adjacency blocks in model propagation order.
+        :returns: Class log probabilities, or sigmoid probabilities for multilabel classification.
+        """
         for ix, layer in enumerate(self.layers):
             x = layer(x)
             if ix != len(self.layers) - 1:
@@ -81,11 +105,24 @@ class APPNP(BaseGNN):
 
 
 class SparseDropout(torch.nn.Module):
+    """Dropout on sparse COO values with retained-value rescaling.
+
+    """
     def __init__(self, dprob=0.5):
+        """Initialize SparseDropout and its configuration.
+
+        :param dprob: Dropout probability. Defaults to ``0.5``.
+        """
         super(SparseDropout, self).__init__()
         self.kprob = 1 - dprob
 
     def forward(self, x, training):
+        """Drop sparse tensor values and rescale retained entries during training.
+
+        :param x: Node feature matrix with one row per node.
+        :param training: Whether to apply dropout rather than return the input unchanged.
+        :returns: Sparse tensor with the original shape; evaluation returns the input unchanged.
+        """
         if training:
             mask = ((torch.rand(x._values().size()) + (self.kprob)).floor()).type(torch.bool)
             rc = x._indices()[:, mask]

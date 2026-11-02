@@ -9,8 +9,19 @@ from graphslim.acceleration import CUDAGraphStep
 
 
 class BaseGNN(nn.Module):
+    """Shared graph model training, validation selection, and prediction interface.
+
+    """
     def __init__(self, nfeat, nhid, nclass, args, mode):
 
+        """Initialize BaseGNN and its configuration.
+
+        :param nfeat: Number of input features per node.
+        :param nhid: Hidden representation width.
+        :param nclass: Number of output classes.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings.
+        """
         super(BaseGNN, self).__init__()
         self.args = args
         self.with_bn = args.with_bn
@@ -48,6 +59,9 @@ class BaseGNN(nn.Module):
         self.metric = args.metric
 
     def initialize(self):
+        """Reset model layers and enabled batch normalization statistics.
+
+        """
         for layer in self.layers:
             layer.reset_parameters()
         if self.with_bn:
@@ -56,6 +70,13 @@ class BaseGNN(nn.Module):
 
     def forward(self, x, adj, output_layer_features=False):
 
+        """Compute node predictions from features and one adjacency or a list of layer adjacencies.
+
+        :param x: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Class log probabilities, sigmoid probabilities for multilabel tasks, or ``(layer_features, log_probabilities)`` when requested.
+        """
         if isinstance(adj, list):
             for i, layer in enumerate(self.layers):
                 x = layer(x, adj[i])
@@ -96,6 +117,19 @@ class BaseGNN(nn.Module):
         best_val=None,
         **kwargs,
     ):
+        """Train on the original or synthetic graph and select weights using validation performance.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param train_iters: Number of training iterations. Defaults to ``600``.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :param normadj: Whether to normalize the adjacency before use. Defaults to ``True``.
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs. Defaults to ``'trans'``.
+        :param reduced: Whether to use the synthetic graph instead of the original training graph. Defaults to ``False``.
+        :param final_output: Whether to leave the final-iteration weights in place and return early. Defaults to ``False``.
+        :param best_val: Initial best validation score used when selecting model weights. Defaults to ``None``.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        :returns: Best validation score as a float; ``final_output=True`` returns ``None`` before restoring validation-selected weights.
+        """
         args = self.args
 
         self.initialize()
@@ -192,6 +226,10 @@ class BaseGNN(nn.Module):
                 training_index = torch.as_tensor(training_index, device=self.device)
 
         def training_loss():
+            """Compute predictions and the training objective on the selected graph.
+
+            :returns: Tuple ``(node_predictions, scalar_training_loss)``.
+            """
             output = self.forward(features, adj)
             loss = self.loss(
                 output if output.shape[0] == labels.shape[0] else output[training_index], labels
@@ -256,11 +294,12 @@ class BaseGNN(nn.Module):
 
     @torch.no_grad()
     def test(self, data, setting="trans", verbose=False):
-        """Evaluate GCN performance on test set.
-        Parameters
-        ----------
-        idx_test :
-            node testing indices
+        """Evaluate the configured classification metric on the test graph or test nodes.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs. Defaults to ``'trans'``.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :returns: Test metric as a Python float; verbose mode also prints the test loss.
         """
         self.eval()
         idx_test = data.idx_test
@@ -287,6 +326,14 @@ class BaseGNN(nn.Module):
     @torch.no_grad()
     def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):
 
+        """Switch to evaluation mode, prepare graph tensors, and compute node predictions.
+
+        :param features: Node feature matrix with one row per node. Defaults to ``None``.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features. Defaults to ``None``.
+        :param normadj: Whether to normalize the adjacency before use. Defaults to ``True``.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Output of ``forward``, including intermediate features when requested.
+        """
         self.eval()
         features, adj = to_tensor(features, adj, device=self.device)
         if normadj:

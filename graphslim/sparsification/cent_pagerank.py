@@ -7,7 +7,15 @@ from numpy.linalg import norm
 
 class CentP(MFCoreSet):
     # select nodes with topk PR value in each class
+    """Choose the highest-PageRank training nodes within each class.
+
+    """
     def select(self, embedds=None):
+        """Choose the highest-PageRank training nodes within each class.
+
+        :param embedds: Unused argument retained for the common selector interface. Defaults to ``None``.
+        :returns: One-dimensional NumPy array of selected node IDs; IDs are local to the training subgraph in the inductive setting.
+        """
         pr = (
             self.pagerank_algorithm()
         )  # Retrieve PageRank values, assumed to be a dictionary or array
@@ -30,6 +38,13 @@ class CentP(MFCoreSet):
     def pagerank_algorithm(
         self, damping_factor=0.85, max_iterations=100, convergence_threshold=0.0001
     ):
+        """Iterate the normalized adjacency PageRank recurrence until convergence or the iteration limit.
+
+        :param damping_factor: Weight of the graph transition term relative to uniform teleportation. Defaults to ``0.85``.
+        :param max_iterations: Maximum number of optimization iterations. Defaults to ``100``.
+        :param convergence_threshold: L1 distance threshold between successive PageRank vectors. Defaults to ``0.0001``.
+        :returns: NumPy PageRank vector with one entry per node in the active graph.
+        """
         if self.args.setting == "ind":
             adj = self.data.adj_train.astype(np.uint8)
         else:

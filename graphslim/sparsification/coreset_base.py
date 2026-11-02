@@ -4,7 +4,17 @@ import numpy as np
 
 
 class CoreSet:
+    """Base for classwise node selection and per-class synthetic node budgets.
+
+    """
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize CoreSet and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         self.data = data
         self.args = args
         self.setting = setting
@@ -23,6 +33,14 @@ class CoreSet:
         # n = int(data.feat_train.shape[0] * args.reduction_rate)
 
     def prepare_select(self, data, args):
+        """Allocate at least one representative per observed training class.
+
+        Each class budget is ``max(int(class_size * reduction_rate), 1)``.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :returns: Tuple ``(class_budget, training_labels, training_node_ids)``.
+        """
         num_class_dict = {}
         syn_class_indices = {}
         if args.setting == "ind":

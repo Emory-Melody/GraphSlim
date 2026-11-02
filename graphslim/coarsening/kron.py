@@ -25,11 +25,27 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class Kron(Coarsen):
+    """Multilevel graph coarsening using Kron reduction.
+
+    """
     def __init__(self, setting, data, args):
+        """Initialize Kron and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         super(Kron, self).__init__(setting, data, args)
         args.method = "kron"
 
     def coarsen(self, G):
+        """Coarsen a PyGSP graph using Kron reduction.
+
+        The target node count is derived from ``args.reduction_rate``.
+
+        :param G: PyGSP graph to coarsen, or NetworKit graph for an edge sparsifier.
+        :returns: Tuple ``(C, coarse_graph, level_matrices, level_graphs)`` with the cumulative restriction matrix and the multilevel hierarchy.
+        """
         K = 10
         r = 0.5
         max_levels = 10

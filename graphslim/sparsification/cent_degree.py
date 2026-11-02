@@ -5,7 +5,15 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 class CentD(MFCoreSet):
     # select nodes with topk PR value in each class
+    """Choose the highest-degree training nodes within each class.
+
+    """
     def select(self, embedds=None):
+        """Choose the highest-degree training nodes within each class.
+
+        :param embedds: Unused argument retained for the common selector interface. Defaults to ``None``.
+        :returns: One-dimensional NumPy array of selected node IDs; IDs are local to the training subgraph in the inductive setting.
+        """
         if self.args.setting == "ind":
             adj = self.data.adj_train.astype(np.uint8).todense()
         else:

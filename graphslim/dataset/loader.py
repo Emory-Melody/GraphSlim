@@ -46,7 +46,10 @@ except ImportError:
 
 
 def ogb_cache_context():
-    """Allow only PyG's required storage classes, retaining weights-only loading."""
+    """Allow only required PyG storage classes when loading compatible OGB caches.
+
+    :returns: PyTorch safe-globals context manager, or a no-op context when unavailable.
+    """
     safe_globals = getattr(torch_serialization, "safe_globals", None)
     classes = [
         value for value in (DataEdgeAttr, DataTensorAttr, GlobalStorage) if value is not None
@@ -55,6 +58,16 @@ def ogb_cache_context():
 
 
 def get_dataset(name="cora", args=None, load_path="./data"):
+    """Load a supported node classification dataset and construct transductive and inductive views.
+
+    Dataset names ignore case, hyphens, and underscores. Existing official splits
+    are retained; otherwise ``args.split`` controls classwise splitting.
+
+    :param name: Supported dataset name. Defaults to ``'cora'``.
+    :param args: Configuration with ``split``, ``pre_norm``, and dataset-specific options. Defaults to ``None``.
+    :param load_path: Root directory for downloaded and cached dataset files. Defaults to ``'./data'``.
+    :returns: ``TransAndInd`` data wrapper with features, labels, adjacencies, and split indices.
+    """
     path = osp.join(load_path)
     # Create a dictionary that maps standard names to normalized names
     standard_names = [
@@ -159,7 +172,16 @@ def get_dataset(name="cora", args=None, load_path="./data"):
 
 
 class TransAndInd:
+    """Shared graph wrapper exposing full-graph and split-local learning views.
+
+    """
     def __init__(self, data, dataset, norm=True):
+        """Initialize TransAndInd and its configuration.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param dataset: Dataset name or dataset collection, as required by this operation.
+        :param norm: Whether to apply the wrapper feature normalization during initialization. Defaults to ``True``.
+        """
         self.class_dict = (
             None  # sample the training data per class when initializing synthetic graph
         )
@@ -201,7 +223,11 @@ class TransAndInd:
         self.feat_test = self.feat_full[self.idx_test]
 
     def to(self, device):
-        """Move data to the specified device."""
+        """Move direct tensor and torch_sparse attributes to a selected device in place.
+
+        :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+        :returns: This graph wrapper.
+        """
         self.feat_full = self.feat_full.to(device)
         self.labels_full = self.labels_full.to(device)
         self.x = self.x.to(device)
@@ -221,6 +247,11 @@ class TransAndInd:
     def pyg_saint(self, data):
         # reference type
         # pyg format use x,y,edge_index
+        """Populate shared full-graph attributes from PyG or GraphSAINT-style inputs.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :returns: The original data object; normalized attribute aliases are stored on this wrapper.
+        """
         if hasattr(data, "x"):
             self.x = data.x
             self.y = data.y
@@ -242,6 +273,12 @@ class TransAndInd:
 
     def retrieve_class(self, c, num=256):
         # change the initialization strategy here
+        """Sample training-subgraph positions belonging to one class.
+
+        :param c: Class identifier.
+        :param num: Maximum number of nodes to sample. Defaults to ``256``.
+        :returns: Randomly permuted NumPy indices, truncated to the requested count.
+        """
         if self.class_dict is None:
             self.class_dict = {}
             for i in range(self.nclass):
@@ -251,6 +288,14 @@ class TransAndInd:
         return np.random.permutation(idx)[:num]
 
     def retrieve_class_sampler(self, c, adj, args, num=256):
+        """Sample a class-specific neighbor batch using the configured GNN depth.
+
+        :param c: Class identifier.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param num: Maximum number of nodes to sample. Defaults to ``256``.
+        :returns: NeighborSampler output ``(batch_size, node_ids, adjacency_blocks)``.
+        """
         if self.class_dict2 is None:
             self.class_dict2 = {}
             for i in range(self.nclass):
@@ -296,13 +341,30 @@ class TransAndInd:
         return out
 
     def reset(self):
+        """Clear cached class masks and neighbor samplers.
+
+        """
         self.samplers = None
         self.class_dict2 = None
         self.labels_syn, self.feat_syn, self.adj_syn = None, None, None
 
 
 class LargeDataLoader(nn.Module):
+    """Partitioned feature and adjacency loader for large-graph kernel condensation.
+
+    """
     def __init__(self, name="Flickr", split="train", batch_size=200, split_method="kmeans"):
+        """Load a graph and prepare partitioned, filtered split features.
+
+        :param name: Dataset name. The stored default is ``'Flickr'``; the implemented
+            dataset branches recognize ``'flickr'``, ``'reddit'`` and ``'ogbn-arxiv'``.
+        :param split: Split mask selected for Flickr or Reddit; the OGB branch selects
+            training indices. Defaults to ``'train'``.
+        :param batch_size: Target nodes per partition, used to determine the partition count.
+            Defaults to ``200``.
+        :param split_method: Partitioning rule stored for batch construction.
+            Defaults to ``'kmeans'``.
+        """
         super(LargeDataLoader, self).__init__()
         path = osp.join("./data")
         if name in ["ogbn-arxiv"]:
@@ -376,12 +438,10 @@ class LargeDataLoader(nn.Module):
             self.n_classes = Dataset.num_classes
 
     def normalize_data(self, data):
-        """
-        normalize data
-        parameters:
-            data: torch.Tensor, data need to be normalized
-        return:
-            torch.Tensor, normalized data
+        """Standardize feature columns, treating constant columns as unit variance.
+
+        :param data: Feature tensor whose columns will be standardized.
+        :returns: Column-standardized feature tensor.
         """
         mean = data.mean(dim=0)
         std = data.std(dim=0)
@@ -412,13 +472,15 @@ class LargeDataLoader(nn.Module):
         return x
 
     def properties(self):
+        """Report partition count and graph dimensions for batched kernel training.
+
+        :returns: Tuple ``(num_batches, num_split_nodes, num_classes, feature_dim, num_all_nodes)``.
+        """
         return self.k, self.n_split, self.n_classes, self.dim, self.n
 
     def split_batch(self):
-        """
-        split data into batches
-        parameters:
-            split_method: str, method to split data, default is 'kmeans'
+        """Assign split nodes to k-means partitions using the configured partition count.
+
         """
         if self.split_method == "kmeans":
             kmeans = KMeans(n_clusters=self.k.item(), n_init=10)
@@ -427,8 +489,10 @@ class LargeDataLoader(nn.Module):
             self.batch_labels = fitted_labels(kmeans, self.split_feat.numpy())
 
     def getitem(self, idx):
-        """
-        Return node features, labels and the adjacency submatrix for the given indices.
+        """Extract node features, labels, and a locally indexed adjacency submatrix.
+
+        :param idx: Index or indices to access.
+        :returns: Tuple ``(features, labels, sparse_adjacency)``.
         """
         # idx   = [idx]
         n_idx = len(idx)
@@ -448,15 +512,30 @@ class LargeDataLoader(nn.Module):
         return (feat, label, sub_A)
 
     def get_batch(self, i):
+        """Extract one graph partition with locally indexed adjacency and features.
+
+        :param i: Zero-based partition index.
+        :returns: Return value of ``getitem`` for the selected partition.
+        """
         idx = torch.where(torch.tensor(self.batch_labels) == i)[0]
         batch_i = self.getitem(idx)
         return batch_i
 
 
 class OgbDataLoader(nn.Module):
+    """OGB-backed specialization of the large-graph partition loader.
+
+    """
     def __init__(
         self, dataset_name="ogbn-arxiv", split="train", batch_size=5000, split_method="kmeans"
     ):
+        """Initialize OgbDataLoader and its configuration.
+
+        :param dataset_name: Dataset name or dataset collection, as required by this operation. Defaults to ``'ogbn-arxiv'``.
+        :param split: Dataset split to load, such as ``train``, ``val``, or ``test``. Defaults to ``'train'``.
+        :param batch_size: Approximate target number of nodes per partition; k-means partition sizes may differ. Defaults to ``5000``.
+        :param split_method: Partitioning method used to assign nodes to batches. Defaults to ``'kmeans'``.
+        """
         super(OgbDataLoader, self).__init__()
 
 
@@ -464,6 +543,12 @@ class DataGraphSAINT:
     """datasets used in GraphSAINT paper"""
 
     def __init__(self, root, dataset, **kwargs):
+        """Initialize DataGraphSAINT and its configuration.
+
+        :param root: Filesystem location used by this operation.
+        :param dataset: Dataset name or dataset collection, as required by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         import gdown
 
         dataset = dataset.replace("-", "_")
@@ -537,6 +622,11 @@ class DataGraphSAINT:
         self.labels_full = to_tensor(label=self.process_labels(class_map))
 
     def _prepare_ogbn_arxiv_from_ogb(self, dataset_str, root):
+        """Download ogbn-arxiv and write GraphSAINT adjacency, feature, role, and label files.
+
+        :param dataset_str: Directory in which to write the GraphSAINT-compatible dataset files.
+        :param root: Filesystem location used by this operation.
+        """
         from ogb.nodeproppred import PygNodePropPredDataset
 
         if torch_serialization is not None:
@@ -583,8 +673,10 @@ class DataGraphSAINT:
             json.dump(class_map, f)
 
     def process_labels(self, class_map):
-        """
-        setup vertex property map for output classests
+        """Convert GraphSAINT class maps to single-label or multilabel arrays.
+
+        :param class_map: GraphSAINT mapping from node ID strings to class IDs or class indicator lists.
+        :returns: NumPy class label array aligned to graph node IDs.
         """
         num_vertices = self.num_nodes
         if isinstance(list(class_map.values())[0], list):
@@ -602,7 +694,17 @@ class DataGraphSAINT:
         return class_arr
 
     def get(self, idx):
+        """Return the single graph represented by this dataset wrapper.
+
+        :param idx: Index or indices to access.
+        :returns: This ``DataGraphSAINT`` instance; the index is unused.
+        """
         return self
 
     def __getitem__(self, idx):
+        """Access the dataset single-graph view through ``get``.
+
+        :param idx: Index or indices to access.
+        :returns: This ``DataGraphSAINT`` instance.
+        """
         return self.get(idx)

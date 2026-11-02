@@ -48,3 +48,10 @@ A comprehensive package for node sparsification, :edge-sparsification:`edge spar
    :caption: Evaluation
 
    source/graphslim.evaluation
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Package API
+
+   source/graphslim
+   source/graphslim.reduction

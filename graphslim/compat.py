@@ -9,10 +9,20 @@ from torch_geometric.data import Data
 
 
 def is_pyg_data(graph: Any) -> bool:
+    """Check whether an object is a PyG Data or HeteroData instance without importing PyG.
+
+    :param graph: Input graph object.
+    :returns: Boolean indicating whether the graph has a recognized PyG type.
+    """
     return isinstance(graph, Data)
 
 
 def is_dgl_graph(graph: Any) -> bool:
+    """Check whether an object is a DGL graph without importing DGL.
+
+    :param graph: Input graph object.
+    :returns: Boolean indicating whether the graph has a recognized DGL type.
+    """
     return graph.__class__.__module__.startswith("dgl.") or graph.__class__.__module__ == "dgl"
 
 
@@ -23,7 +33,14 @@ def to_pyg_data(
     node_label: str = "label",
     edge_weight: str = "weight",
 ) -> Data:
-    """Convert a DGL graph or PyG-like reduced object to PyG ``Data``."""
+    """Convert a homogeneous DGL graph, PyG graph, or reduced-graph object into PyG Data.
+
+    :param graph: Input graph object.
+    :param node_feature: DGL node-data key used for features. Defaults to ``'feat'``.
+    :param node_label: DGL node-data key used for labels. Defaults to ``'label'``.
+    :param edge_weight: DGL edge-data key used for scalar edge weights. Defaults to ``'weight'``.
+    :returns: PyG Data preserving declared node count, supported attributes, and split masks.
+    """
 
     if isinstance(graph, Data):
         return graph
@@ -112,7 +129,16 @@ def to_dgl_graph(
     node_label: str = "label",
     edge_weight: str = "weight",
 ):
-    """Convert a PyG graph to DGL when DGL is installed."""
+    """Convert a PyG-compatible graph to a homogeneous DGL graph.
+
+    Unavailable DGL runtimes raise ``RuntimeError`` with installation guidance.
+
+    :param graph: Input graph object.
+    :param node_feature: DGL node-data key used for features. Defaults to ``'feat'``.
+    :param node_label: DGL node-data key used for labels. Defaults to ``'label'``.
+    :param edge_weight: DGL edge-data key used for scalar edge weights. Defaults to ``'weight'``.
+    :returns: DGL graph preserving node features, labels, edge weights, and split masks.
+    """
 
     try:
         import dgl

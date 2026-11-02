@@ -5,7 +5,15 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
 class KCenterAgg(MFCoreSet):
+    """Choose classwise representatives by farthest-first coverage of propagated features.
+
+    """
     def select(self, embeds):
+        """Choose classwise representatives by farthest-first coverage of propagated features.
+
+        :param embeds: Node embeddings indexed in the current graph node ordering.
+        :returns: One-dimensional NumPy array of selected node IDs; IDs are local to the training subgraph in the inductive setting.
+        """
         idx_selected = []
         for class_id, cnt in self.num_class_dict.items():
             idx = self.idx_train[self.labels_train == class_id]

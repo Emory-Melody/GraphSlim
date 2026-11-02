@@ -23,6 +23,13 @@ class SFGC(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize SFGC and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(SFGC, self).__init__(setting, data, args, **kwargs)
         assert args.teacher_epochs + 100 >= args.expert_epochs
         args.condense_model = "GCN"
@@ -37,6 +44,12 @@ class SFGC(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Learn structure-free synthetic features by matching buffered expert training trajectories.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         # =============stage 1 trajectory save and load==================#
         # can skip to save time
@@ -79,6 +92,10 @@ class SFGC(GCondBase):
                 )
 
                 def expert_loss():
+                    """Compute current expert predictions and the training-split objective.
+
+                    :returns: Tuple ``(predictions, negative_log_likelihood)``.
+                    """
                     output = model.forward(features, adj)
                     loss = (
                         F.nll_loss(output, labels)
@@ -243,8 +260,12 @@ class SFGC(GCondBase):
         return data
 
     def expert_load(self, expert_dir):
-        """
-        randomly select one expert from expert files
+        """Shuffle consecutive replay-buffer files and load the first buffer.
+
+        :param expert_dir: Directory containing consecutively numbered ``replay_buffer_N.pt`` files.
+        :returns: Tuple ``(file_index, expert_index, expert_files)``; the loaded and shuffled
+            expert trajectories are stored on ``self.buffer``.
+        :raises AssertionError: If no replay buffer starting at index zero is found.
         """
 
         expert_files = []

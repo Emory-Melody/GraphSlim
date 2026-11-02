@@ -6,7 +6,18 @@ from graphslim.utils import *
 
 
 class GCN(BaseGNN):
+    """Graph convolutional classifier supporting dense and sparse adjacency.
+
+    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
+        """Initialize GCN and its configuration.
+
+        :param nfeat: Number of input features per node.
+        :param nhid: Hidden representation width.
+        :param nclass: Number of output classes.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings. Defaults to ``'train'``.
+        """
         super(GCN, self).__init__(nfeat, nhid, nclass, args, mode)
         initializer = getattr(args, "gcn_init", None)
 

@@ -9,12 +9,32 @@ from graphslim.utils import to_tensor
 
 
 class MBCoreSet(CoreSet):
+    """Node coreset reduction using embeddings from a trained graph model.
+
+    """
     def __init__(self, setting, data, args, **kwarg):
+        """Initialize MBCoreSet and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwarg: Additional keyword options passed to the underlying implementation.
+        """
         super(MBCoreSet, self).__init__(setting, data, args, **kwarg)
 
     @verbose_time_memory
     def reduce(self, data, verbose=False, save=True):
 
+        """Train an embedding model, select a coreset, and build its induced graph.
+
+        Synthetic tensors are attached to ``data`` and converted to CPU tensors.
+        The aggregation path uses an identity synthetic adjacency.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :param save: Whether to write the reduced graph checkpoint to ``args.save_path``. Defaults to ``True``.
+        :returns: The input data with ``adj_syn``, ``feat_syn``, and ``labels_syn`` set.
+        """
         args = self.args
         model = get_model_class(self.condense_model)(
             data.feat_full.shape[1], args.hidden, data.nclass, args

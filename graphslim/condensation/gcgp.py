@@ -20,7 +20,13 @@ from graphslim.reduction.lightweight import (
 
 
 def neural_kernel(x, y, layers=2):
-    """Released SGNK: sum of the input and erf activation covariance kernels."""
+    """Sum input and successive erf activation covariance kernels using the released SGNK recurrence.
+
+    :param x: Left node feature matrix.
+    :param y: Right node feature matrix.
+    :param layers: Number of layers. Defaults to ``2``.
+    :returns: Dense cross-kernel matrix between the input feature rows.
+    """
     cross = x @ y.T
     xx, yy = x.square().sum(1)[:, None], y.square().sum(1)[None, :]
     result = cross
@@ -39,6 +45,15 @@ def released_neural_kernel(x, y, layers=2, diagonal_x=None):
     MIT-licensed GCGP release; see THIRD_PARTY_NOTICES. Only a detached fixed
     query diagonal may be cached. The historical row-norm implementation remains
     the default; select ``gcgp_arithmetic='released'`` explicitly for this path.
+
+    :param x: Left feature matrix with shape ``(num_left, feature_dim)``.
+    :param y: Right feature matrix with shape ``(num_right, feature_dim)``.
+    :param layers: Number of erf covariance updates; the input linear kernel is
+        also included in the sum. Defaults to ``2``.
+    :param diagonal_x: Optional cached ``diag(x @ x.T)`` with shape
+        ``(num_left, 1)``. Use only for fixed, detached query features.
+        ``None`` computes the diagonal from ``x``.
+    :returns: Cross-kernel matrix with shape ``(num_left, num_right)``.
     """
     xx = torch.diag(x @ x.t()).reshape(-1, 1) if diagonal_x is None else diagonal_x
     yy = torch.diag(y @ y.t()).reshape(1, -1)
@@ -54,6 +69,13 @@ def released_neural_kernel(x, y, layers=2, diagonal_x=None):
 
 
 def _relu_update(covariance, diagonal_x, diagonal_y):
+    """Update covariance and derivative factors using the released ReLU kernel recurrence.
+
+    :param covariance: Cross-covariance matrix between the two node sets.
+    :param diagonal_x: Per-node standard deviations for the left or right covariance matrix.
+    :param diagonal_y: Per-node standard deviations for the left or right covariance matrix.
+    :returns: Tuple ``(updated_covariance, derivative_factor)``.
+    """
     scale = diagonal_x[:, None] * diagonal_y[None, :]
     correlation = (covariance / scale.clamp_min(1e-12)).clamp(-0.9999, 0.9999)
     activated = (
@@ -68,7 +90,16 @@ def _relu_update(covariance, diagonal_x, diagonal_y):
 
 
 def tangent_kernel(x, y, adjacency_x=None, adjacency_y=None, layers=2, hops=0):
-    """NTK (hops=0) or structure-based NTK, with differentiable adjacency."""
+    """Compute a ReLU NTK, optionally including structure-based adjacency aggregation.
+
+    :param x: Left node feature matrix.
+    :param y: Right node feature matrix.
+    :param adjacency_x: Adjacency operator for the left or right feature set, respectively. Defaults to ``None``.
+    :param adjacency_y: Adjacency operator for the left or right feature set, respectively. Defaults to ``None``.
+    :param layers: Number of layers. Defaults to ``2``.
+    :param hops: Number of graph aggregation stages; zero evaluates the feature-only NTK. Defaults to ``0``.
+    :returns: Dense tangent kernel matrix; both adjacencies are required when hops is positive.
+    """
     cross, self_x, self_y = x @ y.T, x @ x.T, y @ y.T
     tangent = cross
     for _ in range(max(hops, 1)):
@@ -88,7 +119,14 @@ def tangent_kernel(x, y, adjacency_x=None, adjacency_y=None, layers=2, hops=0):
 
 
 def concrete_adjacency(alpha, epoch=0, training=True, uniform=None):
-    """Symmetric BinConcrete with the released 0.3 -> 0.01 temperature schedule."""
+    """Sample symmetric BinConcrete connectivity with annealed temperature and identity diagonal.
+
+    :param alpha: Trainable nonnegative connectivity parameters before symmetrization.
+    :param epoch: Current zero-based optimization epoch. Defaults to ``0``.
+    :param training: Whether to apply dropout rather than return the input unchanged. Defaults to ``True``.
+    :param uniform: Optional pre-drawn symmetric uniform noise for reproducible BinConcrete sampling. Defaults to ``None``.
+    :returns: Dense adjacency sample during training or thresholded adjacency during evaluation.
+    """
     alpha = (alpha + alpha.T) / 2
     if training:
         if uniform is None:
@@ -107,7 +145,15 @@ def concrete_adjacency(alpha, epoch=0, training=True, uniform=None):
 
 
 def gp_predict(cross_kernel, synthetic_kernel, targets, ridge, released_arithmetic=False):
-    """Trace-scaled GP ridge solve, followed by the author's softmax."""
+    """Solve a trace-regularized support kernel system and apply the released output softmax.
+
+    :param cross_kernel: Target-to-support kernel matrix.
+    :param synthetic_kernel: Support-to-support kernel matrix.
+    :param targets: Synthetic support class targets.
+    :param ridge: Trace-scaled ridge coefficient for the support Gram matrix.
+    :param released_arithmetic: Whether to preserve the released solve expression instead of flooring its ridge term. Defaults to ``False``.
+    :returns: Target class probability matrix.
+    """
     if ridge <= 0:
         raise ValueError("gcgp_ridge must be positive")
     n = len(synthetic_kernel)
@@ -125,7 +171,17 @@ def gp_predict(cross_kernel, synthetic_kernel, targets, ridge, released_arithmet
 
 
 class GCGP(LightweightReducer):
+    """Optimize synthetic features and soft targets through graph Gaussian-process kernel prediction.
+
+    """
     def reduce(self, data, verbose=True, save=True):
+        """Optimize synthetic features and soft targets through graph Gaussian-process kernel prediction.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :param save: Whether to write the reduced graph checkpoint to ``args.save_path``. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         features, adjacency, train, labels = self.inputs(data)
         filtered = propagate(
@@ -166,6 +222,12 @@ class GCGP(LightweightReducer):
         )
 
         def kernel_pair(original, synthetic):
+            """Evaluate support and target kernel matrices under the selected kernel arithmetic.
+
+            :param original: Original training or synthetic support feature matrix, respectively.
+            :param synthetic: Original training or synthetic support feature matrix, respectively.
+            :returns: Tuple of support and target-to-support Gram matrices.
+            """
             if kernel == "NTK":
                 return (
                     tangent_kernel(synthetic, synthetic, layers=layers),

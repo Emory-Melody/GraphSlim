@@ -5,7 +5,19 @@ import torch.nn.functional as F
 
 
 class PGE(nn.Module):
+    """Parameterized adjacency estimator from pairs of synthetic node features.
+
+    """
     def __init__(self, nfeat, nnodes, nhid=128, nlayers=3, device=None, args=None):
+        """Initialize PGE and its configuration.
+
+        :param nfeat: Number of input features per node.
+        :param nnodes: Number of nodes used to construct candidate edge pairs.
+        :param nhid: Hidden representation width. Defaults to ``128``.
+        :param nlayers: Number of layers. Defaults to ``3``.
+        :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``None``.
+        :param args: Configuration namespace containing the options used by this operation. Defaults to ``None``.
+        """
         super(PGE, self).__init__()
         if args.dataset in ["ogbn-arxiv", "arxiv", "flickr"]:
             nhid = 256
@@ -37,6 +49,12 @@ class PGE(nn.Module):
         self.nnodes = nnodes
 
     def forward(self, x, inference=False):
+        """Predict a symmetric adjacency from pairs of synthetic node features.
+
+        :param x: Node feature matrix with one row per node.
+        :param inference: Compatibility flag; the current forward computation is identical for both values. Defaults to ``False``.
+        :returns: Dense adjacency probability matrix with its diagonal removed.
+        """
         if self.args.dataset == "reddit" and self.args.reduction_rate >= 0.01:
             edge_index = self.edge_index
             n_part = 5
@@ -70,11 +88,23 @@ class PGE(nn.Module):
     @torch.no_grad()
     def inference(self, x):
         # self.eval()
+        """Evaluate the graph estimator with gradients disabled.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Predicted dense synthetic adjacency.
+        """
         adj_syn = self.forward(x, inference=True)
         return adj_syn
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         def weight_reset(m):
+            """Reset linear and batch normalization submodule parameters.
+
+            :param m: PyTorch submodule to reset.
+            """
             if isinstance(m, nn.Linear):
                 m.reset_parameters()
             if isinstance(m, nn.BatchNorm1d):

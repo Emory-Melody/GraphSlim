@@ -9,12 +9,32 @@ from graphslim.utils import normalize_adj_tensor, to_tensor
 
 
 class MFCoreSet(CoreSet):
+    """Node coreset reduction using input features or graph statistics.
+
+    """
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize MFCoreSet and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(MFCoreSet, self).__init__(setting, data, args, **kwargs)
 
     @verbose_time_memory
     def reduce(self, data, verbose=False, save=True):
 
+        """Select a coreset using graph statistics or propagated input features.
+
+        Synthetic tensors are attached to ``data`` and converted to CPU tensors.
+        The aggregation path uses an identity synthetic adjacency.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :param save: Whether to write the reduced graph checkpoint to ``args.save_path``. Defaults to ``True``.
+        :returns: The input data with ``adj_syn``, ``feat_syn``, and ``labels_syn`` set.
+        """
         args = self.args
         if self.setting == "trans":
             if args.agg:

@@ -14,6 +14,11 @@ from datetime import datetime, timezone
 
 
 def version(name):
+    """Look up an installed distribution version without importing the package.
+
+    :param name: Installed distribution name, such as ``torch`` or ``graphslim``.
+    :returns: Version string, or ``None`` if the distribution is not installed.
+    """
     try:
         return importlib.metadata.version(name)
     except importlib.metadata.PackageNotFoundError:
@@ -21,6 +26,12 @@ def version(name):
 
 
 def diagnose(device="cpu", *, dgl=False):
+    """Check Python and graph-learning kernels on the requested device.
+
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cpu'``.
+    :param dgl: Whether to also test optional DGL CPU graph interchange. Defaults to ``False``.
+    :returns: Report dictionary containing platform, versions, selected device, and per-check status and detail.
+    """
     report = {
         "utc": datetime.now(timezone.utc).isoformat(),
         "platform": platform.platform(),
@@ -49,6 +60,11 @@ def diagnose(device="cpu", *, dgl=False):
     }
 
     def check(name, action):
+        """Run a diagnostic and record either success details or the caught exception.
+
+        :param name: Name used to identify the diagnostic result in the report.
+        :param action: Callable that performs one environment diagnostic.
+        """
         captured = io.StringIO()
         try:
             with redirect_stdout(captured):
@@ -64,6 +80,10 @@ def diagnose(device="cpu", *, dgl=False):
             report["checks"][name]["stdout_messages_suppressed"] = True
 
     def interpreter():
+        """Validate that the Python minor version is supported.
+
+        :returns: Successful interpreter diagnostic message.
+        """
         if sys.version_info[:2] not in ((3, 10), (3, 11)):
             raise RuntimeError("This package currently declares Python 3.10/3.11 support.")
         return "supported Python minor"
@@ -94,6 +114,10 @@ def diagnose(device="cpu", *, dgl=False):
         return report
 
     def native_sparse():
+        """Probe native COO multiplication and gradient propagation.
+
+        :returns: Successful sparse COO diagnostic message.
+        """
         index = torch.tensor([[0, 1, 2], [1, 2, 0]], device=selected)
         values = torch.tensor([0.2, 0.7, 1.0], device=selected, requires_grad=True)
         sparse = torch.sparse_coo_tensor(index, values, (4, 4)).coalesce()
@@ -104,6 +128,10 @@ def diagnose(device="cpu", *, dgl=False):
         return "COO sparse matmul and value/feature backward; isolated node retained"
 
     def sparse_extension():
+        """Probe torch-sparse multiplication and feature gradients.
+
+        :returns: Successful torch-sparse diagnostic message.
+        """
         from torch_sparse import SparseTensor
 
         index = torch.tensor([[0, 1, 2], [1, 2, 0]], device=selected)
@@ -116,6 +144,10 @@ def diagnose(device="cpu", *, dgl=False):
         return "torch-sparse matmul and feature backward"
 
     def native_csr():
+        """Probe native CSR multiplication and feature gradients.
+
+        :returns: Successful sparse CSR diagnostic message.
+        """
         index = torch.tensor([[0, 1, 2], [1, 2, 0]], device=selected)
         matrix = (
             torch.sparse_coo_tensor(index, torch.ones(3, device=selected), (4, 4))
@@ -128,6 +160,10 @@ def diagnose(device="cpu", *, dgl=False):
         return "CSR matmul and feature backward; edge-value backward not probed"
 
     def solve_backward():
+        """Probe a dense linear solve and its matrix gradient.
+
+        :returns: Successful linear solve diagnostic message.
+        """
         matrix = torch.eye(3, device=selected).requires_grad_()
         target = torch.ones(3, 2, device=selected)
         torch.linalg.solve(matrix, target).square().mean().backward()
@@ -135,6 +171,10 @@ def diagnose(device="cpu", *, dgl=False):
         return "dense linear solve and matrix backward"
 
     def scatter_extension():
+        """Probe torch-scatter grouped sums and gradients.
+
+        :returns: Successful scatter diagnostic message.
+        """
         from torch_scatter import scatter_add
 
         values = torch.ones(4, device=selected, requires_grad=True)
@@ -144,6 +184,10 @@ def diagnose(device="cpu", *, dgl=False):
         return "torch-scatter grouped sum and backward"
 
     def pyg_model():
+        """Probe a PyG GCN forward and backward pass on the requested device.
+
+        :returns: Successful PyG diagnostic message.
+        """
         from torch_geometric.nn import GCNConv
 
         model = GCNConv(3, 2).to(selected)
@@ -163,6 +207,10 @@ def diagnose(device="cpu", *, dgl=False):
     if dgl:
 
         def dgl_roundtrip():
+            """Probe optional DGL-to-PyG round-trip preservation of graph tensors and masks.
+
+            :returns: Successful DGL interchange diagnostic message.
+            """
             from torch_geometric.data import Data
             from graphslim.compat import to_dgl_graph, to_pyg_data
 
@@ -202,6 +250,12 @@ def diagnose(device="cpu", *, dgl=False):
 
 
 def main(argv=None):
+    """Print or save the runtime diagnostic report.
+
+    Raises ``SystemExit(1)`` when any requested check fails.
+
+    :param argv: Command line arguments; ``None`` reads the process arguments. Defaults to ``None``.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--device", default="cpu", help="explicit cpu or visible CUDA device, e.g. cuda:0"

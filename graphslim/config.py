@@ -10,24 +10,50 @@ from graphslim.reduction import get_method_spec, list_methods
 
 
 class Obj(object):
+    """Attribute-access container for JSON configuration mappings.
+
+    """
     def __init__(self, dict_):
+        """Initialize Obj and its configuration.
+
+        :param dict_: Mapping of configuration keys to values.
+        """
         self.__dict__.update(dict_)
 
     def __repr__(self):
         # Use pprint's pformat to print the dictionary in a pretty manner
+        """Format stored configuration attributes with pretty-printing.
+
+        :returns: String representation of the attribute dictionary.
+        """
         return pformat(self.__dict__, compact=True)
 
 
 def dict2obj(d):
+    """Convert a JSON-serializable mapping into nested attribute-access objects.
+
+    :param d: Mapping of configuration keys to values.
+    :returns: An ``Obj`` instance with nested JSON objects converted recursively.
+    """
     return json.loads(json.dumps(d), object_hook=Obj)
 
 
 def update_from_dict(obj, updates):
+    """Set attributes on a configuration object from a mapping.
+
+    :param obj: Object whose configuration attributes will be updated.
+    :param updates: Mapping of parameter names to replacement values.
+    """
     for key, value in updates.items():
         setattr(obj, key, value)
 
 
 def _stringify_value(value):
+    """Format a configuration value on one line for display.
+
+    :param value: Value to convert or identify.
+    :returns: Display string, using logger names and callable names where possible.
+    """
     if isinstance(value, logging.Logger):
         return value.name
     if callable(value):
@@ -156,12 +182,23 @@ CATEGORY_METHOD_REQUIREMENTS = {
 
 
 def _build_table(rows, headers=("Parameter", "Value")):
+    """Render parameter rows as a bordered plain text table.
+
+    :param rows: Table body rows.
+    :param headers: Column headings for the rendered table. Defaults to ``('Parameter', 'Value')``.
+    :returns: Table string, or an empty string when there are no rows.
+    """
     if not rows:
         return ""
     processed_rows = [headers] + [(key, value) for key, value in rows]
     widths = [max(len(str(row[idx])) for row in processed_rows) for idx in range(len(headers))]
 
     def _format_row(row):
+        """Pad and join cells into one bordered text-table row.
+
+        :param row: Sequence of cells forming one table row.
+        :returns: Formatted table row string.
+        """
         return (
             "| " + " | ".join(str(cell).ljust(widths[idx]) for idx, cell in enumerate(row)) + " |"
         )
@@ -175,6 +212,11 @@ def _build_table(rows, headers=("Parameter", "Value")):
 
 
 def _get_category_for_key(key):
+    """Find the display category associated with a configuration key.
+
+    :param key: Configuration parameter name.
+    :returns: Category name, or ``None`` for an uncategorized key.
+    """
     if key in PARAMETER_CATEGORIES["Common"]:
         return "Common"
     for category, keys in PARAMETER_CATEGORIES.items():
@@ -186,6 +228,12 @@ def _get_category_for_key(key):
 
 
 def _should_include_category(category, args):
+    """Determine whether a parameter category applies to the selected method or attack.
+
+    :param category: Parameter display category.
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Boolean indicating whether to display the category.
+    """
     if category == "Attack":
         attack = getattr(args, "attack", None)
         return attack not in (None, "none", "None")
@@ -198,6 +246,11 @@ def _should_include_category(category, args):
 
 
 def format_args_tables(args):
+    """Group visible configuration attributes into method-aware parameter tables.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: Formatted text containing the applicable parameter categories.
+    """
     args_dict = getattr(args, "__dict__", {})
     if not args_dict:
         return ""
@@ -243,6 +296,11 @@ def format_args_tables(args):
 
 # fix setting here
 def setting_config(args):
+    """Configure graph setting, checkpoint schedule, device, logging, and run defaults.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: The updated configuration namespace.
+    """
     representative_r = {
         "cora": 0.5,
         "citeseer": 0.5,
@@ -278,6 +336,11 @@ def setting_config(args):
 
 # recommend hyperparameters here
 def method_config(args):
+    """Merge the selected method JSON configuration and explicit command line overrides.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: The updated configuration namespace.
+    """
     default_path = Path(__file__).parent / "configs" / args.method / "default.json"
     if default_path.is_file():
         defaults = json.loads(default_path.read_text(encoding="utf-8"))
@@ -601,6 +664,12 @@ def method_config(args):
 @click.option("--gamma", default=0.5, show_default=True, help="eigenvalue loss weight")
 @click.pass_context
 def cli(ctx, **kwargs):
+    """Parse CLI options, validate the method, and create the run configuration.
+
+    :param ctx: Active Click context, or autograd context for a custom tensor operation.
+    :param kwargs: Additional keyword options passed to the underlying implementation.
+    :returns: Configuration namespace for reduction and evaluation.
+    """
     args = dict2obj(kwargs)
     args._explicit_cli_keys = {
         key
@@ -675,7 +744,12 @@ def cli(ctx, **kwargs):
 
 
 def get_args(argv=None, *, default_method=None):
-    """Resolve CLI options, optionally selecting an example's method defaults."""
+    """Resolve CLI options and optional caller-provided defaults.
+
+    :param argv: Command line arguments; ``None`` reads the process arguments. Defaults to ``None``.
+    :param default_method: Method used when the caller does not supply ``--method``. Defaults to ``None``.
+    :returns: Configuration namespace produced by Click.
+    """
     defaults = {"method": default_method} if default_method else None
     return cli(args=argv, default_map=defaults, standalone_mode=False)
 

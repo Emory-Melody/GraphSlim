@@ -11,6 +11,11 @@ from graphslim.evaluation.eval_agent import Evaluator
 
 
 def save_csv(file_path, num):
+    """Write one architecture or score sequence as a single CSV row.
+
+    :param file_path: Filesystem location used by this operation.
+    :param num: Sequence of cell values written as one CSV row.
+    """
     file_path = Path(file_path)
     with file_path.open(mode="w", newline="") as file:
         writer = csv.writer(file)
@@ -19,6 +24,11 @@ def save_csv(file_path, num):
 
 
 def load_csv(file_path):
+    """Read CSV rows used by the architecture search evaluator.
+
+    :param file_path: Filesystem location used by this operation.
+    :returns: List of CSV rows, with cells represented as strings.
+    """
     file_path = Path(file_path)
     with file_path.open(mode="r", newline="") as file:
         reader = csv.reader(file)
@@ -27,12 +37,22 @@ def load_csv(file_path):
 
 
 def save_pkl(file_path, data):
+    """Serialize architecture search data with pickle.
+
+    :param file_path: Filesystem location used by this operation.
+    :param data: Python object to serialize.
+    """
     file_path = Path(file_path)
     with open(file_path, "wb") as f:
         pkl.dump(data, f)
 
 
 def load_pkl(file_path):
+    """Read a pickle file produced by the architecture search workflow.
+
+    :param file_path: Filesystem location used by this operation.
+    :returns: Deserialized Python object.
+    """
     file_path = Path(file_path)
     with open(file_path, "rb") as f:
         data = pkl.load(f)
@@ -45,6 +65,10 @@ class NasEvaluator:
     """
 
     def __init__(self, args):
+        """Initialize NasEvaluator and its configuration.
+
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         self.args = args
         self.best_params_syn, self.best_params_ori = None, None
         self.results_syn, self.results_ori = [], []

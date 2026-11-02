@@ -14,14 +14,12 @@ from torch.nn import NLLLoss
 
 
 def normalize_adj(adj):
-    """
-    Normalize the adjacency matrix (sparse COO tensor).
+    """Normalize dense adjacency by weighted degree or sparse adjacency by edge counts.
 
-    Args:
-    adj (torch.sparse_coo_tensor): The sparse COO adjacency matrix.
-
-    Returns:
-    torch.sparse_coo_tensor: The normalized sparse COO adjacency matrix.
+    :param adj: Dense Torch matrix or coalesced native sparse COO matrix. The sparse
+        path uses column edge counts for its degree factors.
+    :returns: Normalized adjacency in the input layout, with non-finite normalized
+        entries replaced by zero. No self-loops are added.
     """
     # Extract indices and values from the sparse COO tensor
     if is_sparse_tensor(adj):
@@ -59,7 +57,17 @@ def normalize_adj(adj):
 
 
 class GraphConvLayer(nn.Module):
+    """SGFormer graph propagation layer with optional initial-feature concatenation.
+
+    """
     def __init__(self, in_channels, out_channels, use_weight=True, use_init=False):
+        """Initialize GraphConvLayer and its configuration.
+
+        :param in_channels: Input representation width, or a pair of source and target widths where supported.
+        :param out_channels: Output representation width.
+        :param use_weight: Whether to learn a linear feature transformation. Defaults to ``True``.
+        :param use_init: Whether to include the initial node representation in each layer. Defaults to ``False``.
+        """
         super(GraphConvLayer, self).__init__()
 
         self.use_init = use_init
@@ -71,6 +79,9 @@ class GraphConvLayer(nn.Module):
         self.W = nn.Linear(in_channels_, out_channels)
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         self.W.reset_parameters()
 
     def forward(self, x, adj, x0):
@@ -83,6 +94,13 @@ class GraphConvLayer(nn.Module):
         # value = torch.ones_like(row) * d_norm_in * d_norm_out
         # value = torch.nan_to_num(value, nan=0.0, posinf=0.0, neginf=0.0)
         # adj = SparseTensor(row=col, col=row, value=value, sparse_sizes=(N, N))
+        """Normalize graph adjacency, propagate features, and optionally concatenate initial representations.
+
+        :param x: Node feature matrix with one row per node.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :param x0: Initial node representations used by layers configured with ``use_init``.
+        :returns: Updated node representations.
+        """
         adj = normalize_adj(adj)
         x = adj @ x
 
@@ -96,6 +114,9 @@ class GraphConvLayer(nn.Module):
 
 
 class GraphConv(nn.Module):
+    """SGFormer graph branch with configurable normalization and residual connections.
+
+    """
     def __init__(
         self,
         in_channels,
@@ -108,6 +129,18 @@ class GraphConv(nn.Module):
         use_init=False,
         use_act=True,
     ):
+        """Initialize GraphConv and its configuration.
+
+        :param in_channels: Input representation width, or a pair of source and target widths where supported.
+        :param hidden_channels: Hidden representation width.
+        :param num_layers: Number of layers. Defaults to ``2``.
+        :param dropout: Dropout probability. Defaults to ``0.5``.
+        :param use_bn: Whether to use batch normalization. Defaults to ``True``.
+        :param use_residual: Whether to add residual connections. Defaults to ``True``.
+        :param use_weight: Whether to learn a linear feature transformation. Defaults to ``True``.
+        :param use_init: Whether to include the initial node representation in each layer. Defaults to ``False``.
+        :param use_act: Whether to apply nonlinear activation between layers. Defaults to ``True``.
+        """
         super(GraphConv, self).__init__()
 
         self.convs = nn.ModuleList()
@@ -129,6 +162,9 @@ class GraphConv(nn.Module):
         self.use_act = use_act
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         for conv in self.convs:
             conv.reset_parameters()
         for bn in self.bns:
@@ -137,6 +173,12 @@ class GraphConv(nn.Module):
             fc.reset_parameters()
 
     def forward(self, x, edge_index):
+        """Run the graph branch with its configured normalization, dropout, and residual options.
+
+        :param x: Node feature matrix with one row per node.
+        :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+        :returns: Graph branch node representations.
+        """
         layer_ = []
 
         x = self.fcs[0](x)
@@ -165,6 +207,13 @@ class TransConvLayer(nn.Module):
     """
 
     def __init__(self, in_channels, out_channels, num_heads, use_weight=True):
+        """Initialize TransConvLayer and its configuration.
+
+        :param in_channels: Input representation width, or a pair of source and target widths where supported.
+        :param out_channels: Output representation width.
+        :param num_heads: Number of attention heads.
+        :param use_weight: Whether to learn a linear feature transformation. Defaults to ``True``.
+        """
         super().__init__()
         self.Wk = nn.Linear(in_channels, out_channels * num_heads)
         self.Wq = nn.Linear(in_channels, out_channels * num_heads)
@@ -176,6 +225,9 @@ class TransConvLayer(nn.Module):
         self.use_weight = use_weight
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         self.Wk.reset_parameters()
         self.Wq.reset_parameters()
         if self.use_weight:
@@ -183,6 +235,13 @@ class TransConvLayer(nn.Module):
 
     def forward(self, query_input, source_input, output_attn=False):
         # feature transformation
+        """Compute normalized multihead linear attention between query and source nodes.
+
+        :param query_input: Query or key/value node feature matrix, respectively.
+        :param source_input: Query or key/value node feature matrix, respectively.
+        :param output_attn: Whether to also return the dense node attention matrix. Defaults to ``False``.
+        :returns: Attention output, or ``(output, attention_matrix)`` when attention weights are requested.
+        """
         qs = self.Wq(query_input).reshape(-1, self.num_heads, self.out_channels)
         ks = self.Wk(source_input).reshape(-1, self.num_heads, self.out_channels)
         if self.use_weight:
@@ -228,6 +287,9 @@ class TransConvLayer(nn.Module):
 
 
 class TransConv(nn.Module):
+    """SGFormer transformer branch built from linear attention layers.
+
+    """
     def __init__(
         self,
         in_channels,
@@ -240,6 +302,18 @@ class TransConv(nn.Module):
         use_weight=True,
         use_act=True,
     ):
+        """Initialize TransConv and its configuration.
+
+        :param in_channels: Input representation width, or a pair of source and target widths where supported.
+        :param hidden_channels: Hidden representation width.
+        :param num_layers: Number of layers. Defaults to ``2``.
+        :param num_heads: Number of attention heads. Defaults to ``1``.
+        :param dropout: Dropout probability. Defaults to ``0.5``.
+        :param use_bn: Whether to use batch normalization. Defaults to ``True``.
+        :param use_residual: Whether to add residual connections. Defaults to ``True``.
+        :param use_weight: Whether to learn a linear feature transformation. Defaults to ``True``.
+        :param use_act: Whether to apply nonlinear activation between layers. Defaults to ``True``.
+        """
         super().__init__()
 
         self.convs = nn.ModuleList()
@@ -262,6 +336,9 @@ class TransConv(nn.Module):
         self.use_act = use_act
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         for conv in self.convs:
             conv.reset_parameters()
         for bn in self.bns:
@@ -270,6 +347,11 @@ class TransConv(nn.Module):
             fc.reset_parameters()
 
     def forward(self, x):
+        """Run stacked all-pairs linear attention layers with configured residual and normalization options.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Transformer branch node representations.
+        """
         layer_ = []
 
         # input MLP layer
@@ -297,6 +379,11 @@ class TransConv(nn.Module):
         return x
 
     def get_attentions(self, x):
+        """Collect attention weights from each transformer layer.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Tensor of shape ``(num_layers, num_nodes, num_nodes)``.
+        """
         layer_, attentions = [], []
         x = self.fcs[0](x)
         if self.use_bn:
@@ -317,6 +404,9 @@ class TransConv(nn.Module):
 
 
 class SGFormer(nn.Module):
+    """Node classifier combining global linear attention and a graph convolution branch.
+
+    """
     def __init__(
         self,
         in_channels,
@@ -344,6 +434,33 @@ class SGFormer(nn.Module):
         graph_weight=0.8,
         aggregate="add",
     ):
+        """Initialize SGFormer and its configuration.
+
+        :param in_channels: Input representation width, or a pair of source and target widths where supported.
+        :param hidden_channels: Hidden representation width.
+        :param out_channels: Output representation width.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param mode: Model configuration mode; selects training or evaluation settings. Defaults to ``'eval'``.
+        :param trans_num_layers: Number of layers in this branch. Defaults to ``3``.
+        :param trans_num_heads: Number of attention heads in the transformer branch. Defaults to ``1``.
+        :param trans_dropout: Dropout probability in this branch. Defaults to ``0.2``.
+        :param trans_weight_decay: Optimizer weight decay applied to this branch. Defaults to ``0.001``.
+        :param trans_use_bn: Whether this branch uses batch normalization. Defaults to ``False``.
+        :param trans_use_residual: Whether this branch uses residual connections. Defaults to ``True``.
+        :param trans_use_weight: Whether this branch learns a feature transform during propagation. Defaults to ``False``.
+        :param trans_use_act: Whether this branch applies nonlinear activations. Defaults to ``False``.
+        :param gnn_num_layers: Number of layers in this branch. Defaults to ``2``.
+        :param gnn_dropout: Dropout probability in this branch. Defaults to ``0.5``.
+        :param gnn_use_weight: Whether this branch learns a feature transform during propagation. Defaults to ``False``.
+        :param gnn_weight_decay: Optimizer weight decay applied to this branch. Defaults to ``0.0005``.
+        :param gnn_use_init: Whether graph layers concatenate the initial node representation. Defaults to ``False``.
+        :param gnn_use_bn: Whether this branch uses batch normalization. Defaults to ``False``.
+        :param gnn_use_residual: Whether this branch uses residual connections. Defaults to ``False``.
+        :param gnn_use_act: Whether this branch applies nonlinear activations. Defaults to ``False``.
+        :param use_graph: Whether to include the graph convolution branch. Defaults to ``True``.
+        :param graph_weight: Weight of the graph branch when branch outputs are added. Defaults to ``0.8``.
+        :param aggregate: Branch combination: ``add`` for weighted addition, otherwise concatenation. Defaults to ``'add'``.
+        """
         super().__init__()
         self.args = args
         self.device = args.device
@@ -400,6 +517,12 @@ class SGFormer(nn.Module):
         self.params2.extend(list(self.fc.parameters()))
 
     def forward(self, x, edge_index):
+        """Combine transformer and optional graph branches and classify each node.
+
+        :param x: Node feature matrix with one row per node.
+        :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+        :returns: Class log probabilities of shape ``(num_nodes, num_classes)``.
+        """
         x1 = self.trans_conv(x)
         if self.use_graph:
             x2 = self.graph_conv(x, edge_index)
@@ -413,11 +536,19 @@ class SGFormer(nn.Module):
         return F.log_softmax(x, dim=1)
 
     def get_attentions(self, x):
+        """Return attention matrices from the transformer branch.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Tensor of shape ``(num_transformer_layers, num_nodes, num_nodes)``.
+        """
         attns = self.trans_conv.get_attentions(x)  # [layer num, N, N]
 
         return attns
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         self.trans_conv.reset_parameters()
         if self.use_graph:
             self.graph_conv.reset_parameters()
@@ -433,6 +564,18 @@ class SGFormer(nn.Module):
         reindex=False,
         **kwargs,
     ):
+        """Train SGFormer and restore the state with the highest validation accuracy.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param train_iters: Number of training iterations. Defaults to ``600``.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :param normadj: Whether to normalize the adjacency before use. Defaults to ``True``.
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs. Defaults to ``'trans'``.
+        :param reduced: Whether to use the synthetic graph instead of the original training graph. Defaults to ``False``.
+        :param reindex: Whether to reindex reduced-graph training outputs through the original training indices. Defaults to ``False``.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        :returns: Best validation accuracy tensor.
+        """
         args = self.args
         from graphslim.acceleration import CUDAGraphStep
 
@@ -509,6 +652,10 @@ class SGFormer(nn.Module):
         )
 
         def training_loss():
+            """Compute SGFormer predictions and the current training objective.
+
+            :returns: Tuple ``(node_predictions, scalar_training_loss)``.
+            """
             output = self.forward(features, adj)
             return output, self.loss(output if reindex else output[training_index], labels)
 
@@ -555,11 +702,12 @@ class SGFormer(nn.Module):
 
     @torch.no_grad()
     def test(self, data, setting="trans", verbose=False):
-        """Evaluate GCN performance on test set.
-        Parameters
-        ----------
-        idx_test :
-            node testing indices
+        """Evaluate the selected SGFormer on the test graph or full-graph test indices.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs. Defaults to ``'trans'``.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
+        :returns: Test accuracy as a Python float in the interval [0, 1].
         """
         self.eval()
         idx_test = data.idx_test
@@ -586,6 +734,17 @@ class SGFormer(nn.Module):
     @torch.no_grad()
     def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):
 
+        """Convert graph inputs to device tensors and run evaluation-mode prediction.
+
+        ``normadj`` and ``output_layer_features`` are accepted for the shared model
+        interface; this method directly returns class predictions.
+
+        :param features: Node feature matrix with one row per node. Defaults to ``None``.
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features. Defaults to ``None``.
+        :param normadj: Whether to normalize the adjacency before use. Defaults to ``True``.
+        :param output_layer_features: Whether to also return intermediate layer features with the predictions. Defaults to ``False``.
+        :returns: Class log probability tensor.
+        """
         self.eval()
         features, adj = to_tensor(features, adj, device=self.device)
         return self.forward(features, adj)

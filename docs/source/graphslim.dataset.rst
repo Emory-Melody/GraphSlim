@@ -1,16 +1,24 @@
 graphslim.dataset package
-=========================
+=============================
 
 graphslim.dataset.attack module
--------------------------------
+-----------------------------------
 
 .. automodule:: graphslim.dataset.attack
    :members:
    :undoc-members:
    :show-inheritance:
 
-graphslim.dataset.convertor module
+graphslim.dataset.noise module
 ----------------------------------
+
+.. automodule:: graphslim.dataset.noise
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.dataset.convertor module
+--------------------------------------
 
 .. automodule:: graphslim.dataset.convertor
    :members:
@@ -18,7 +26,7 @@ graphslim.dataset.convertor module
    :show-inheritance:
 
 graphslim.dataset.loader module
--------------------------------
+-----------------------------------
 
 .. automodule:: graphslim.dataset.loader
    :members:
@@ -26,7 +34,7 @@ graphslim.dataset.loader module
    :show-inheritance:
 
 graphslim.dataset.utils module
-------------------------------
+----------------------------------
 
 .. automodule:: graphslim.dataset.utils
    :members:

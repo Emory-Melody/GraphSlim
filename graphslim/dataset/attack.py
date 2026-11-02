@@ -14,6 +14,12 @@ from graphslim.utils import seed_everything
 
 
 def attack(data, args):
+    """Apply or load the configured structural or feature attack on the graph.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param args: Configuration namespace containing the options used by this operation.
+    :returns: The data object containing the attacked graph inputs.
+    """
     if args.attack in (
         "random_adj",
         "random_feat",

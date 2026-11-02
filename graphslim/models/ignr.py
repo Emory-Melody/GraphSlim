@@ -12,6 +12,12 @@ from torch import nn
 
 
 def mx_inv(mx, device):
+    """Compute the thresholded symmetric inverse of a dense or supported sparse matrix.
+
+    :param mx: Input matrix to transform.
+    :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``.
+    :returns: Dense inverse tensor; eigenvalues with absolute value at most 0.009 are suppressed.
+    """
     if isinstance(mx, torch_sparse.tensor.SparseTensor):
         mx = mx.to_dense()
     elif isinstance(mx, scipy.sparse.csr.csr_matrix):
@@ -31,6 +37,11 @@ def mx_inv(mx, device):
 
 def mx_inv_sqrt(mx):
     # singular values need to be distinct for backprop
+    """Compute thresholded symmetric inverse square-root and inverse operators.
+
+    :param mx: Input matrix to transform.
+    :returns: Tuple ``(signed_inverse_square_root, signed_inverse)``.
+    """
     U, D, V = torch.svd(mx)
     D_min = torch.min(D)
     eps = 0.009
@@ -44,10 +55,21 @@ def mx_inv_sqrt(mx):
 
 
 def mx_tr(mx):
+    """Sum the diagonal entries of a matrix.
+
+    :param mx: Input matrix to transform.
+    :returns: Scalar matrix trace.
+    """
     return mx.diag().sum()
 
 
 def get_mgrid(sidelen, dim=2):
+    """Create flattened two- or three-dimensional coordinates normalized to the interval [-1, 1].
+
+    :param sidelen: Grid side length, or a tuple with one length per coordinate dimension.
+    :param dim: Coordinate dimensionality: two or three. Defaults to ``2``.
+    :returns: Float32 coordinate tensor of shape ``(product(sidelen), dim)``.
+    """
     if isinstance(sidelen, int):
         sidelen = dim * (sidelen,)
 
@@ -74,15 +96,35 @@ def get_mgrid(sidelen, dim=2):
 
 
 class Sine(nn.Module):
+    """Elementwise high-frequency sine activation for graphon generation.
+
+    """
     def __init__(self):
+        """Initialize Sine and its configuration.
+
+        """
         super().__init__()
 
     def forward(self, input):
+        """Apply the sinusoidal activation ``sin(30 * input)``.
+
+        :param input: Input feature tensor.
+        :returns: Elementwise activated tensor.
+        """
         return torch.sin(30 * input)
 
 
 class EdgeBlock(nn.Module):
+    """Linear, batch normalization, and ReLU block for edge features.
+
+    """
     def __init__(self, in_, out_, dtype=torch.float32) -> None:
+        """Initialize EdgeBlock and its configuration.
+
+        :param in_: Input or output width of the edge block, respectively.
+        :param out_: Input or output width of the edge block, respectively.
+        :param dtype: Desired numeric dtype. Defaults to ``torch.float32``.
+        """
         super(EdgeBlock, self).__init__()
         self.net = nn.Sequential(
             nn.Linear(in_, out_, dtype=dtype),
@@ -91,10 +133,18 @@ class EdgeBlock(nn.Module):
         )
 
     def forward(self, x):
+        """Transform concatenated endpoint features through the edge block network.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Edge representation tensor.
+        """
         return self.net(x)
 
 
 class GraphonLearner(nn.Module):
+    """Feature-conditioned implicit graphon generator with spectral transport guidance.
+
+    """
     def __init__(
         self,
         node_feature,
@@ -105,6 +155,16 @@ class GraphonLearner(nn.Module):
         num_hidden_layers=3,
         **kwargs,
     ):
+        """Initialize GraphonLearner and its configuration.
+
+        :param node_feature: Input feature width used to condition the graphon generator.
+        :param nfeat: Number of input features per node. Defaults to ``256``.
+        :param nnodes: Number of nodes used to construct candidate edge pairs. Defaults to ``50``.
+        :param device: Target PyTorch device, such as ``cpu`` or ``cuda:0``. Defaults to ``'cuda'``.
+        :param args: Configuration namespace containing the options used by this operation. Defaults to ``{}``.
+        :param num_hidden_layers: Requested hidden layer count retained in the graphon configuration. Defaults to ``3``.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super().__init__()
         self.num_hidden_layers = num_hidden_layers
         self.step_size = nnodes
@@ -141,7 +201,14 @@ class GraphonLearner(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
+        """Reset trainable layers and normalization state using their initialization rules.
+
+        """
         def weight_reset(m):
+            """Reset linear and batch normalization submodule parameters.
+
+            :param m: PyTorch submodule to reset.
+            """
             if isinstance(m, nn.Linear):
                 m.reset_parameters()
             if isinstance(m, nn.BatchNorm1d):
@@ -150,6 +217,15 @@ class GraphonLearner(nn.Module):
         self.apply(weight_reset)
 
     def forward(self, c, inference=False, Lx=None):
+        """Generate symmetric graphon adjacency and its spectral transport loss.
+
+        :param c: Synthetic node features used to form endpoint pairs.
+        :param inference: Whether to switch to evaluation mode and return only the
+            adjacency. Defaults to ``False``.
+        :param Lx: Real-graph operator whose inverse is cached for spectral guidance
+            on its first use. Defaults to ``None``.
+        :returns: Adjacency alone in inference mode; otherwise ``(adjacency, spectral_loss)``.
+        """
         if inference == True:
             self.eval()
         else:
@@ -190,6 +266,11 @@ class GraphonLearner(nn.Module):
         return adj, opt_loss
 
     def opt_loss(self, adj):
+        """Compute spectral transport guidance using learned coupling and cached real-graph inverse.
+
+        :param adj: Graph adjacency; rows and columns refer to the same node ordering as the features.
+        :returns: Scalar spectral guidance loss.
+        """
         Ly_inv_rt, Ly_inv = mx_inv_sqrt(adj)
         m = self.step_size
         P = self.P.abs()
@@ -206,4 +287,9 @@ class GraphonLearner(nn.Module):
 
     @torch.no_grad()
     def inference(self, c):
+        """Generate graphon adjacency in inference mode.
+
+        :param c: Synthetic node feature matrix.
+        :returns: Dense synthetic adjacency.
+        """
         return self.forward(c, inference=True)

@@ -30,6 +30,13 @@ class VNG:
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize VNG and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         self.setting = setting
         self.args = args
         self.device = args.device
@@ -108,15 +115,16 @@ class VNG:
         return data
 
     def vng(self, X_tr_0, embeds, adj, labels, verbose=False):
-        """
-        Virtual Node Graph (VNG) method to coarsen the graph.
+        """Virtual Node Graph (VNG) method to coarsen the graph.
 
         Parameters
         ----------
+        X_tr_0 : torch.Tensor
+            Original training-node features with shape ``(num_train, num_features)``.
         embeds : list of tensors
             List of embeddings.
-        adj : tensor
-            Adjacency matrix.
+        adj : scipy.sparse matrix
+            Training-node adjacency in the same node order as the features.
         labels : tensor
             One-hot encoded labels.
         verbose : bool, optional

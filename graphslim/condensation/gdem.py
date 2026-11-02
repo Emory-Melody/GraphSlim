@@ -20,6 +20,13 @@ class GDEM(GCondBase):
     """
 
     def __init__(self, setting, data, args, **kwargs):
+        """Initialize GDEM and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super(GDEM, self).__init__(setting, data, args, **kwargs)
         args.eigen_k = min(args.eigen_k, self.nnodes_syn)
         self.eigenvecs_syn = Parameter(
@@ -37,6 +44,12 @@ class GDEM(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
+        """Match real and synthetic spectral feature statistics while learning eigenvectors and features.
+
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information. Defaults to ``True``.
+        :returns: The input data with synthetic graph attributes populated at evaluation checkpoints.
+        """
         args = self.args
         pge = self.pge
         # calculate eigenvalues and eigenvectors
@@ -95,6 +108,10 @@ class GDEM(GCondBase):
         )
 
         def spectral_loss():
+            """Combine spectral covariance, class embedding, and eigenvector orthogonality terms.
+
+            :returns: Tuple ``(eigenbasis_loss, class_loss, orthogonality_loss, weighted_total_loss)``.
+            """
             loss = 0.0
             x_syn = self.x_syn
             eigenvecs_syn = self.eigenvecs_syn
@@ -167,6 +184,12 @@ class GDEM(GCondBase):
         return data
 
     def get_eigenspace_embed(self, eigen_vecs, x):
+        """Project features onto individual rank-one eigenspaces.
+
+        :param eigen_vecs: Eigenvectors stored as rows, with shape ``(num_components, num_nodes)``.
+        :param x: Node feature matrix with one row per node.
+        :returns: Tensor of shape ``(num_eigenvectors, num_nodes, feature_dim)``.
+        """
         eigen_vecs = eigen_vecs.unsqueeze(2)  # k * n * 1
         eigen_vecs_t = eigen_vecs.permute(0, 2, 1)  # k * 1 * n
         eigenspace = torch.bmm(eigen_vecs, eigen_vecs_t)  # knn
@@ -174,6 +197,13 @@ class GDEM(GCondBase):
         return embed
 
     def get_real_embed(self, k, L, x):
+        """Stack successive real-graph Laplacian applications to features.
+
+        :param k: Number of spectral components or propagation steps to use.
+        :param L: Graph Laplacian or graph filtering operator.
+        :param x: Node feature matrix with one row per node.
+        :returns: Tensor containing ``L @ x`` through ``L**k @ x``.
+        """
         filtered_x = x
 
         emb_list = []
@@ -185,6 +215,14 @@ class GDEM(GCondBase):
         return embed
 
     def get_syn_embed(self, k, eigenvals, eigen_vecs, x):
+        """Filter synthetic features in spectral coordinates and reconstruct each propagation step.
+
+        :param k: Number of spectral components or propagation steps to use.
+        :param eigenvals: Eigenvalues ordered consistently with the eigenvector columns.
+        :param eigen_vecs: Eigenvectors stored as rows, with shape ``(num_components, num_nodes)``.
+        :param x: Node feature matrix with one row per node.
+        :returns: Stacked node feature embeddings with shape ``(k, num_nodes, feature_dim)``.
+        """
         trans_x = eigen_vecs @ x
         filtered_x = trans_x
 
@@ -197,6 +235,12 @@ class GDEM(GCondBase):
         return embed
 
     def get_init_syn_feat(self, dataset, reduction_rate):
+        """Load a precomputed feature initialization for the configured dataset, rate, and seed.
+
+        :param dataset: Dataset name or dataset collection, as required by this operation.
+        :param reduction_rate: Fraction of labeled training nodes used to set the synthetic node budget.
+        :returns: Saved feature tensor loaded on the CPU.
+        """
         expID = self.args.seed
         init_syn_x = torch.load(
             f"./initial_feat/{dataset}/x_init_{reduction_rate}_{expID}.pt", map_location="cpu"
@@ -204,6 +248,12 @@ class GDEM(GCondBase):
         return init_syn_x
 
     def get_init_syn_eigenvecs(self, n_syn, num_classes):
+        """Initialize eigenvectors from a class-sized stochastic block model graph.
+
+        :param n_syn: Number of nodes in the graph.
+        :param num_classes: Number of output classes.
+        :returns: Float eigenvector tensor on the reducer device.
+        """
         n_nodes_per_class = n_syn // num_classes
         n_nodes_last = n_syn % num_classes
 
@@ -228,6 +278,13 @@ class GDEM(GCondBase):
         return torch.FloatTensor(eigen_vecs).to(self.device)
 
     def mlp_trainer(self, args, data, verbose):
+        """Train the feature initialization classifier and restore its best validation weights.
+
+        :param args: Configuration namespace containing the options used by this operation.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param verbose: Whether to print progress and diagnostic information.
+        :returns: Trained MLP selected using validation accuracy.
+        """
         x_full, y_full = to_tensor(data.feat_full, label=data.labels_full, device=self.device)
 
         model = MLP(
@@ -286,6 +343,10 @@ class GDEM(GCondBase):
         return model
 
     def init_feat(self):
+        """Initialize synthetic features with Xavier values and optimize them against a trained MLP.
+
+        :returns: Trainable synthetic feature tensor stored as ``self.x_syn``.
+        """
         args = self.args
         data = self.data
         labels_syn = to_tensor(label=data.labels_syn, device=self.device)
@@ -306,8 +367,18 @@ class GDEM(GCondBase):
 
 
 class MLP(nn.Module):
+    """Two-layer feature classifier used for GDEM feature initialization.
+
+    """
     def __init__(self, num_features, num_classes, hidden_dim, dropout):
 
+        """Initialize MLP and its configuration.
+
+        :param num_features: Number of input features per node.
+        :param num_classes: Number of output classes.
+        :param hidden_dim: Hidden representation width.
+        :param dropout: Dropout probability.
+        """
         super(MLP, self).__init__()
         self.dropout = dropout
         self.layers = nn.ModuleList(
@@ -316,12 +387,20 @@ class MLP(nn.Module):
         self.reset_parameter()
 
     def reset_parameter(self):
+        """Reset linear weights with Xavier initialization and zero biases.
+
+        """
         for lin in self.layers:
             nn.init.xavier_uniform_(lin.weight.data)
             if lin.bias is not None:
                 lin.bias.data.zero_()
 
     def forward(self, x):
+        """Apply the feature initialization MLP with ReLU and dropout.
+
+        :param x: Node feature matrix with one row per node.
+        :returns: Log-softmax class predictions.
+        """
         x = F.dropout(x, self.dropout, training=self.training)
         for ix, layer in enumerate(self.layers):
             x = layer(x)

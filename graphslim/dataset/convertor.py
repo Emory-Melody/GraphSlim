@@ -12,6 +12,16 @@ from torch_geometric.data import Data, HeteroData
 
 
 def from_dgl(g, name, hetero=True):
+    """Convert DGL connectivity and attributes to PyG Data or HeteroData.
+
+    Flattening a graph with multiple node types raises ``ValueError`` because
+    an explicit node ID mapping is required.
+
+    :param g: DGL graph with homogeneous or typed node and edge stores.
+    :param name: Name assigned to a heterogeneous output graph.
+    :param hetero: Whether to retain typed stores for heterogeneous inputs. Defaults to ``True``.
+    :returns: PyG graph; heterogeneous node and edge stores are preserved when requested.
+    """
     if g.is_homogeneous:
         data = Data()
         data.edge_index = torch.stack(g.edges(), dim=0)
@@ -76,11 +86,23 @@ def from_dgl(g, name, hetero=True):
 
 
 def pyg2gsp(edge_index):
+    """Construct an undirected PyGSP graph from a PyG edge index.
+
+    This helper materializes a dense adjacency matrix.
+
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :returns: PyGSP ``Graph`` with inferred node count.
+    """
     G = graphs.Graph(to_dense_adj(to_undirected(edge_index))[0])
     return G
 
 
 def csr2ei(adjacency_matrix_csr):
+    """Extract nonzero endpoints from a SciPy sparse adjacency.
+
+    :param adjacency_matrix_csr: Graph adjacency; rows and columns refer to the same node ordering as the features.
+    :returns: CPU integer tensor of shape ``(2, num_edges)``; edge weights are not returned.
+    """
     adjacency_matrix_coo = adjacency_matrix_csr.tocoo()
     # Convert numpy arrays directly to a tensor
     edge_index = torch.tensor(
@@ -90,6 +112,14 @@ def csr2ei(adjacency_matrix_csr):
 
 
 def ei2csr(edge_index, num_nodes):
+    """Build a SciPy CSR adjacency from CPU edge endpoints.
+
+    Duplicate endpoints are summed and isolated nodes are retained by ``num_nodes``.
+
+    :param edge_index: Integer edge endpoints with shape ``(2, num_edges)``.
+    :param num_nodes: Number of nodes in the graph.
+    :returns: Square SciPy CSR matrix with unit weight for each input edge occurrence.
+    """
     edge_index = edge_index.numpy()
     scoo = coo_matrix(
         (np.ones_like(edge_index[0]), (edge_index[0], edge_index[1])), shape=(num_nodes, num_nodes)
@@ -99,6 +129,12 @@ def ei2csr(edge_index, num_nodes):
 
 
 def dense2sparsetensor(mat: torch.Tensor, has_value: bool = True):
+    """Convert nonzero entries of a dense tensor to torch_sparse SparseTensor.
+
+    :param mat: Input matrix to transform.
+    :param has_value: Whether to preserve the nonzero input values in the sparse representation. Defaults to ``True``.
+    :returns: SparseTensor with the first two input dimensions as its sparse shape.
+    """
     if mat.dim() > 2:
         index = mat.abs().sum([i for i in range(2, mat.dim())]).nonzero()
     else:
@@ -125,6 +161,11 @@ def dense2sparsetensor(mat: torch.Tensor, has_value: bool = True):
 
 def networkit_to_pyg(graph):
     # Extract edges from Networkit graph
+    """Convert NetworKit edges and optional scalar weights to a PyG graph.
+
+    :param graph: Input graph object.
+    :returns: PyG Data retaining the declared node count, including isolated nodes.
+    """
     edges = list(graph.edges())
     edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
 
@@ -146,6 +187,11 @@ def pyg_to_networkit(pyg_graph):
     #     graph = nk.Graph(weighted=False, directed=False)
 
     # Add edges to the Networkit graph
+    """Convert PyG edges to an undirected NetworKit graph with validated node IDs.
+
+    :param pyg_graph: PyG graph with ``edge_index``, ``num_nodes``, and optional scalar ``edge_attr``.
+    :returns: NetworKit graph retaining isolated nodes and optional scalar edge weights.
+    """
     edge_index = pyg_graph.edge_index.numpy()
     if hasattr(pyg_graph, "edge_attr") and pyg_graph.edge_attr is not None:
         edge_attr = pyg_graph.edge_attr.numpy()
@@ -169,20 +215,11 @@ def pyg_to_networkit(pyg_graph):
 
 
 def loadSparseGraph(dataset_name, load_path="../data"):
-    """Load original graph from file from paper
-    CHEN Y, YE H, VEDULA S, et al. Demystifying graph sparsification algorithms in graph properties preservation[M/OL].
+    """Load an undirected NetworKit graph from the dataset's ``raw/uduw.el`` file.
 
-    GraphSlim package only supports undirected graph and we do not distinguish the weighted and unweighted
-    pyg->nt->save sparsified nt->pyg->evaluation
-
-    Args:
-        dataset_name (str): dataset name
-        config (dict): config loaded from json
-        undirected_only (bool, optional): Set to True to override graph directness in config file and load undirected graph only.
-                                          Defaults to False. This is used for sparsifiers that only support undirected graph.
-
-    Returns:
-        nk graph: original graph
+    :param dataset_name: Dataset subdirectory beneath ``load_path``.
+    :param load_path: Parent data directory. Defaults to ``'../data'``.
+    :returns: NetworKit graph with edge IDs indexed.
     """
 
     # else:

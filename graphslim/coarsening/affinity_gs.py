@@ -16,11 +16,27 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class AffinityGs(Coarsen):
+    """Multilevel graph coarsening using Gauss-Seidel affinity matching.
+
+    """
     def __init__(self, setting, data, args):
+        """Initialize AffinityGs and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         super(AffinityGs, self).__init__(setting, data, args)
         args.method = "affinity_GS"
 
     def coarsen(self, G):
+        """Coarsen a PyGSP graph using Gauss-Seidel affinity matching.
+
+        The target node count is derived from ``args.reduction_rate``.
+
+        :param G: PyGSP graph to coarsen, or NetworKit graph for an edge sparsifier.
+        :returns: Tuple ``(C, coarse_graph, level_matrices, level_graphs)`` with the cumulative restriction matrix and the multilevel hierarchy.
+        """
         K = 10
         r = self.args.reduction_rate
         max_levels = 10

@@ -100,6 +100,16 @@ def index2mask(index, size):
 
 def splits(data, exp="default"):
     # customize your split here
+    """Keep existing train/validation/test masks or create classwise random splits.
+
+    ``random`` uses 20/30 training/validation nodes per class, ``few`` uses 5/5,
+    and other values use classwise 80/10/10 proportions. Split indices are attached
+    to the returned data.
+
+    :param data: Graph data containing features, adjacency, labels, and split indices.
+    :param exp: Split protocol: ``random``, ``few``, or the default classwise proportions. Defaults to ``'default'``.
+    :returns: The input data with masks and ``idx_train``, ``idx_val``, and ``idx_test`` set.
+    """
     if hasattr(data, "y"):
         num_classes = max(data.y) + 1
     else:
@@ -140,6 +150,17 @@ def splits(data, exp="default"):
 
 
 def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
+    """Save available synthetic graph tensors under the method checkpoint directory.
+
+    Files are named by dataset, reduction rate, and seed beneath
+    ``args.save_path/reduced_graph/args.method``; attacked Flickr graphs use
+    the corresponding ``corrupt_graph`` subtree.
+
+    :param adj_syn: Synthetic adjacency, features, or labels to save; ``None`` skips this component. Defaults to ``None``.
+    :param feat_syn: Synthetic adjacency, features, or labels to save; ``None`` skips this component. Defaults to ``None``.
+    :param labels_syn: Synthetic adjacency, features, or labels to save; ``None`` skips this component. Defaults to ``None``.
+    :param args: Configuration namespace containing the options used by this operation. Defaults to ``None``.
+    """
     base_path = os.path.abspath(os.path.expanduser(args.save_path))
     save_path = os.path.join(base_path, "reduced_graph", args.method)
     if args.attack is not None and args.dataset in ["flickr"]:
@@ -169,6 +190,16 @@ def save_reduced(adj_syn=None, feat_syn=None, labels_syn=None, args=None):
 
 
 def load_reduced(args, data=None):
+    """Load synthetic graph checkpoints for a dataset, method, rate, and seed.
+
+    Raises ``FileNotFoundError`` when no matching component exists. For partial
+    checkpoints, missing features or labels can use the supplied original data,
+    and a missing adjacency uses an identity graph.
+
+    :param args: Configuration namespace containing the options used by this operation.
+    :param data: Graph data containing features, adjacency, labels, and split indices. Defaults to ``None``.
+    :returns: Tuple ``(adjacency, features, labels)`` on the resolved device.
+    """
     flag = 0
     base_path = os.path.abspath(os.path.expanduser(args.save_path))
     save_path = os.path.join(base_path, "reduced_graph", args.method)
@@ -188,6 +219,11 @@ def load_reduced(args, data=None):
         )
 
     def _resolve_device(device_str):
+        """Resolve checkpoint loading device and fall back to CPU when CUDA is unavailable.
+
+        :param device_str: Requested checkpoint loading device.
+        :returns: Resolved device string.
+        """
         if device_str is None:
             return "cpu"
         if isinstance(device_str, str) and device_str.lower() == "cpu":
@@ -219,6 +255,11 @@ def load_reduced(args, data=None):
         args.device = target_device
 
     def _safe_load_tensor(file_path):
+        """Load a tensor checkpoint with compatibility handling for PyTorch loading options.
+
+        :param file_path: Filesystem location used by this operation.
+        :returns: Deserialized tensor on the resolved device.
+        """
         if not os.path.exists(file_path):
             raise FileNotFoundError(file_path)
         load_locations = []
@@ -303,15 +344,17 @@ def load_reduced(args, data=None):
 
 
 def get_syn_data(data, args, model_type, verbose=False):
-    """
-    Loads or computes synthetic data for evaluation.
+    """Loads or computes synthetic data for evaluation.
 
     Parameters
     ----------
     data : Dataset
         The dataset containing the graph data.
+    args : Namespace
+        Configuration containing the checkpoint paths, reduction method and
+        adjacency sparsification options.
     model_type : str
-        The type of model used for generating synthetic data.
+        Downstream model name used to select adjacency sparsification.
     verbose : bool, optional, default=False
         Whether to print detailed logs.
 
@@ -625,9 +668,17 @@ import torch
 
 
 def disjointed_union(tree_list, class_=None, device=None):
-    r"""Computes disjointed union of trees inside tree_list. trees are in
-    torch_geometric.data.Data format. Returns a torch_geometric.data.Data
-    graph without the roots_to_embed information."""
+    """Combine nontrivial PyG trees without adding edges between trees.
+
+    :param tree_list: PyG graphs sharing a class, feature width and device.
+        Single-node trees are omitted; edge attributes are preserved when present.
+    :param class_: Label assigned to the combined graph's ``y`` attribute.
+        Defaults to ``None``.
+    :param device: Output device, which must match every retained input tree.
+        ``None`` uses the first retained tree's device.
+    :returns: PyG ``Data`` with offset edge indices and no ``roots_to_embed``
+        attribute, or ``None`` when at most one node remains after filtering.
+    """
     tree_list = [
         tree for tree in tree_list if tree.x.shape[0] > 1
     ]  # skipping single node trees for now because it causes issues
@@ -687,6 +738,12 @@ def disjointed_union(tree_list, class_=None, device=None):
 
 
 def roots_to_embed(data):
+    """Mark child-to-parent tree roots that occur as targets but never as sources.
+
+    :param data: PyG graph containing node features and directed ``edge_index``.
+    :returns: The input graph with a ``roots_to_embed`` mask. Isolated nodes are
+        not marked by this implementation.
+    """
     nn = data.x.shape[0]
     root = torch.zeros((nn,), device=data.x.device)
     root_indices = torch.tensor(
@@ -698,7 +755,16 @@ def roots_to_embed(data):
 
 
 class myDataset(Dataset):
+    """PyG dataset wrapper around an in-memory sequence of graph samples.
+
+    """
     def __init__(this, dataset_list, dataset_len=0, **kwargs):
+        """Initialize myDataset and its configuration.
+
+        :param dataset_list: Sequence of graph samples stored by the dataset wrapper.
+        :param dataset_len: Exposed sample count; zero uses the stored list length. Defaults to ``0``.
+        :param kwargs: Additional keyword options passed to the underlying implementation.
+        """
         super().__init__()
         this.dataset_list = [list(d.values())[0] for d in dataset_list]
         this.dataset_len = max(len(this.dataset_list), dataset_len)
@@ -712,13 +778,28 @@ class myDataset(Dataset):
         this.data = data
 
     def len(this):
+        """Report the configured dataset length.
+
+        :returns: Number of graph samples exposed by this wrapper.
+        """
         return this.dataset_len
 
     def get(this, idx):
+        """Retrieve a graph from the stored sample list.
+
+        :param idx: Index or indices to access.
+        :returns: PyG graph at the requested index.
+        """
         return this.data[idx]
 
 
 def get_dataloader(dataset_classwise, **kwargs):
+    """Build a PyG DataLoader from graphs or a two-class graph dictionary.
+
+    :param dataset_classwise: Graph collection or dictionary with graph lists for classes 0 and 1.
+    :param kwargs: Additional keyword options passed to the underlying implementation.
+    :returns: Configured PyG DataLoader.
+    """
     if isinstance(dataset_classwise, dict):
         dataset = (
             dataset_classwise[0] + dataset_classwise[1]
@@ -734,6 +815,11 @@ def get_dataloader(dataset_classwise, **kwargs):
 
 # ---------------  PROCESS DATASET (LABELS)  ------------------
 def get_label_maps(dataset):
+    """Enumerate node labels and complete feature tuples for canonical tree encoding.
+
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :returns: Tuple ``(node_label_map, node_feature_tuple_map)``.
+    """
     node_labels = set()
     node_labels_full = set()
     for d in dataset:
@@ -750,6 +836,13 @@ def get_label_maps(dataset):
 
 
 def process_labels(dataset, node_label_map, node_label_map_full):
+    """Encode node labels and feature tuples as categorical IDs for tree mining.
+
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :param node_label_map: Mapping between node labels and categorical IDs, or parsed node IDs and labels.
+    :param node_label_map_full: Dictionary mapping original node feature tuples to canonical IDs.
+    :returns: List of PyG Data objects retaining original features and edge indices.
+    """
     dataset_ = []
     for d in dataset:
         data = Data(
@@ -768,6 +861,12 @@ def process_labels(dataset, node_label_map, node_label_map_full):
 
 
 def preprocess_dataset(dataset, full_dataset):
+    """Create canonical node dictionaries from a full dataset and encode a subset.
+
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :param full_dataset: Reference dataset used to enumerate all supported labels and feature tuples.
+    :returns: Tuple ``(encoded_dataset, node_label_map, node_feature_tuple_map)``.
+    """
     node_label_map, node_label_map_full = get_label_maps(full_dataset)
     label_processed_dataset = process_labels(
         dataset,
@@ -778,6 +877,14 @@ def preprocess_dataset(dataset, full_dataset):
 
 
 def preprocess_dataset_test(dataset, node_label_map, edge_label_map, node_label_map_full):
+    """Encode held-out graphs using the existing training label dictionaries.
+
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :param node_label_map: Mapping between node labels and categorical IDs, or parsed node IDs and labels.
+    :param edge_label_map: Parsed or original dictionary of categorical edge labels.
+    :param node_label_map_full: Dictionary mapping original node feature tuples to canonical IDs.
+    :returns: List of encoded PyG graphs; ``edge_label_map`` is retained for interface compatibility.
+    """
     label_processed_dataset = process_labels(
         dataset, node_label_map, edge_label_map, node_label_map_full
     )
@@ -786,6 +893,11 @@ def preprocess_dataset_test(dataset, node_label_map, edge_label_map, node_label_
 
 # ----------------  PROCESS CANONICAL LABELS  -----------------
 def prettify_canonical_label(label):
+    """Convert whitespace-separated tree tokens to bracketed canonical notation.
+
+    :param label: Canonical tree string to parse or format.
+    :returns: Formatted canonical tree string.
+    """
     assert isinstance(label, str)
     tokens = label.split()
     label2 = f"<{tokens[0]},{tokens[1]}>"
@@ -804,6 +916,11 @@ def prettify_canonical_label(label):
 
 
 def canonical_label_to_naturals(dataset_labels):
+    """Assign contiguous integer IDs to unique canonical tree labels.
+
+    :param dataset_labels: Canonical label lists, one list per graph.
+    :returns: Mapping from canonical label strings to integer IDs in encounter order.
+    """
     mapping = {}
     ctr = 0
     for graph_labels in dataset_labels:
@@ -816,6 +933,12 @@ def canonical_label_to_naturals(dataset_labels):
 
 # ---------------  COMPUTE FREQUENT PATTERNS  -----------------
 def tree_class_ctr(classes, dataset):
+    """Count occurrences of each canonical tree within each graph class.
+
+    :param classes: Graph class IDs aligned with the graph transaction lists.
+    :param dataset: Dataset name or dataset collection, as required by this operation.
+    :returns: Nested mapping ``tree -> class -> occurrence_count``.
+    """
     tree_class_count = {}
     for class_, graph in zip(classes, dataset):
         for tree in graph:
@@ -828,6 +951,11 @@ def tree_class_ctr(classes, dataset):
 
 
 def get_invalid_trees(tree_class_count):
+    """Find tree patterns that occur in more than one class.
+
+    :param tree_class_count: Nested tree-to-class occurrence counts.
+    :returns: List of tree labels with non-exclusive class membership.
+    """
     trees = []
     for tree, ctr in tree_class_count.items():
         if len(ctr) != 1:
@@ -836,6 +964,12 @@ def get_invalid_trees(tree_class_count):
 
 
 def pyfpgrowth_wrapper(classwise, freq_thresholds):
+    """Mine frequent tree transactions separately for each class.
+
+    :param classwise: Mapping from class IDs to tree transaction lists.
+    :param freq_thresholds: Minimum pattern frequency for each class.
+    :returns: Mapping from class IDs to the frequent patterns returned by pyfpgrowth.
+    """
     import pyfpgrowth
 
     patterns = {}
@@ -850,6 +984,11 @@ def pyfpgrowth_wrapper(classwise, freq_thresholds):
 
 
 def parse_canonical_label_bak(label):
+    """Parse the legacy bracketed tree representation into nodes and child-to-parent edges.
+
+    :param label: Canonical tree string to parse or format.
+    :returns: Tuple ``(node_label_map, edge_label_map)``.
+    """
     q = 0
     parsed = []
     idx = 0
@@ -909,6 +1048,11 @@ def parse_canonical_label_bak(label):
 
 
 def parse_canonical_label(label):
+    """Parse canonical tree labels including encoded original feature IDs.
+
+    :param label: Canonical tree string to parse or format.
+    :returns: Tuple ``(node_label_map, edge_label_map, original_node_label_map)``.
+    """
     q = 0
     idx = 0
     tmp = ""
@@ -986,6 +1130,17 @@ def get_data(
     node_label_map_full,
     class_,
 ):
+    """Reconstruct a PyG tree graph from canonical IDs and inverse label dictionaries.
+
+    :param node_label_map: Mapping between node labels and categorical IDs, or parsed node IDs and labels.
+    :param edge_label_map: Parsed or original dictionary of categorical edge labels.
+    :param node_label_map_original: Parsed mapping from tree node IDs to original feature tuple IDs.
+    :param node_label_map_orig: Original mapping from node labels to canonical IDs.
+    :param edge_label_map_orig: Parsed or original dictionary of categorical edge labels.
+    :param node_label_map_full: Dictionary mapping original node feature tuples to canonical IDs.
+    :param class_: Class identifier.
+    :returns: PyG Data with original features, node labels, and directed labeled edges; ``class_`` is unused.
+    """
     i2n = {v: k for k, v in node_label_map_orig.items()}
     i2n_o = {v: k for k, v in node_label_map_full.items()}
     i2e = {v: k for k, v in edge_label_map_orig.items()}

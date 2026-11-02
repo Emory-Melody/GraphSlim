@@ -24,6 +24,12 @@ class Average(Coarsen):
     """
 
     def __init__(self, setting, data, args):
+        """Initialize Average and its configuration.
+
+        :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs.
+        :param data: Graph data containing features, adjacency, labels, and split indices.
+        :param args: Configuration namespace containing the options used by this operation.
+        """
         super(Average, self).__init__(setting, data, args)
         args.method = "averaging"
 
