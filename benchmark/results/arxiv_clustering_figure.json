@@ -1,0 +1,629 @@
+{
+  "source": "benchmark/results/arxiv_clustering_comparison_20261101.json",
+  "source_sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
+  "renderer_sha256": "716ccd08955ac0300486a92d8cd9a8cb17fe9cf93adb5291c078bf2c095d322e",
+  "source_archive": {
+    "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
+    "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",
+    "scope": "Measured GraphSlim source and runner; author code is obtained from the pinned repositories in source_manifest.references."
+  },
+  "data": {
+    "nodes": 169343,
+    "edges": 2315598,
+    "features": 128,
+    "classes": 40,
+    "train": 90941,
+    "val": 29799,
+    "test": 48603,
+    "raw_sha256": {
+      "feats.npy": "e2e4dda733eff8130a8e3ff0167ce091ee145eb6f0e6eedb8e04fef36100e40b",
+      "adj_full.npz": "920dae5bad3f63b07f5b8883493b298f026778d7358c14b955985bacbbd13771",
+      "role.json": "ef30aec176315e5dd6b5f4bdc2a40741542723c55348b9141a70aeed2c00babb",
+      "class_map.json": "7db3b1c89beeaa51c10d43b5888b60fb8b23a73ced4ca6df0a413240a3820b77"
+    }
+  },
+  "protocol": {
+    "threads": 4,
+    "device": "cuda:0",
+    "rates_denominator": "labeled training nodes",
+    "preprocessing": "full undirected ogbn-arxiv; StandardScaler fitted on official training nodes, shared saved tensors",
+    "precision": "float32; both CGC reconstruction solves float64, ridge=0; TF32 disabled",
+    "cgc": "rate-specific package parameters; spectral clustering; FAISS/sklearn both 10 restarts, 300 iterations",
+    "clustgdd": "rate-specific propagation/alpha/loss settings; 600 MLP pretraining and 100 refinement updates, hidden256, 2 post-propagation steps; both MiniBatchKMeans n_init3, max_iter100, batch_size1000",
+    "adapters": [
+      "shared inputs/splits/output contract instead of repository loaders",
+      "CGC confidence masks copied to CPU for its CPU confidence tensors; native CPU clustering and GPU aggregation retained",
+      "CGC reconstruction precision harmonized to float64",
+      "ClustGDD MiniBatchKMeans restart budget harmonized; integer IDs passed into native compression"
+    ],
+    "timing": "wall time with CUDA synchronization around entire in-memory reduction, including preprocessing/transfers; excludes imports, data loading, graph serialization, and downstream evaluation",
+    "memory": "fresh process; process RSS sampled every5ms; PyTorch peak GPU allocated/reserved reset after context warmup, before input transfers; excludes downstream evaluation",
+    "quality": "one shared GCN fit per reduced graph, seed0, 300 epochs, hidden256, validation selection every10; outside timing/memory; descriptive quality shortfall retained",
+    "timeout_seconds": 1800,
+    "max_rss_gib": 96
+  },
+  "displayed_metrics": [
+    "reduction_seconds",
+    "peak_cuda_allocated_bytes"
+  ],
+  "time_normalization": "Author median divided by each implementation's times within each matched method/budget; author baseline 1x. Labels retain measured median seconds.",
+  "uncertainty": "Bars are medians of three fresh-process reductions; whiskers show observed minimum to maximum.",
+  "style_reference": "Established GraphSlim DeepSeek-inspired benchmark styling: white background, blue/gray grouped bars, hatched GraphSlim series, serif labels.",
+  "pairs": [
+    {
+      "method": "cgc",
+      "rate": "0.001",
+      "implementations": {
+        "author": {
+          "method": "cgc",
+          "rate": "0.001",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              8.125130332016852,
+              6.131981259968597,
+              6.611277076008264
+            ],
+            "median": 6.611277076008264,
+            "minimum": 6.131981259968597,
+            "maximum": 8.125130332016852
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              597721088,
+              597721088,
+              597721088
+            ],
+            "median": 597721088,
+            "minimum": 597721088,
+            "maximum": 597721088
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2341933056,
+              2404892672,
+              2348363776
+            ],
+            "median": 2348363776,
+            "minimum": 2341933056,
+            "maximum": 2404892672
+          },
+          "synthetic_nodes": 90,
+          "accuracy_mean": 60.76099673906962,
+          "author_over_graphslim_time": 4.585662783323907,
+          "author_over_graphslim_gpu_memory": 1.0616178563471603,
+          "relative_accuracy_shortfall_percent": 0.0
+        },
+        "graphslim": {
+          "method": "cgc",
+          "rate": "0.001",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              1.4417277040192857,
+              1.6555584169691429,
+              1.3301379620097578
+            ],
+            "median": 1.4417277040192857,
+            "minimum": 1.3301379620097578,
+            "maximum": 1.6555584169691429
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              563028480,
+              563028480,
+              563028480
+            ],
+            "median": 563028480,
+            "minimum": 563028480,
+            "maximum": 563028480
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2329862144,
+              2325340160,
+              2332561408
+            ],
+            "median": 2329862144,
+            "minimum": 2325340160,
+            "maximum": 2332561408
+          },
+          "synthetic_nodes": 90,
+          "accuracy_mean": 61.34600838025411,
+          "author_over_graphslim_time": 4.585662783323907,
+          "author_over_graphslim_gpu_memory": 1.0616178563471603,
+          "relative_accuracy_shortfall_percent": 0.0
+        }
+      },
+      "time_ratio": 4.585662783323907,
+      "memory_ratio": 1.0616178563471603,
+      "quality_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.001",
+      "implementations": {
+        "author": {
+          "method": "clustgdd",
+          "rate": "0.001",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              9.943884895998053,
+              9.083286139008123,
+              10.74205121299019
+            ],
+            "median": 9.943884895998053,
+            "minimum": 9.083286139008123,
+            "maximum": 10.74205121299019
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              1135753728,
+              1135753728,
+              1135753728
+            ],
+            "median": 1135753728,
+            "minimum": 1135753728,
+            "maximum": 1135753728
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              4510179328,
+              4536434688,
+              4536242176
+            ],
+            "median": 4536242176,
+            "minimum": 4510179328,
+            "maximum": 4536434688
+          },
+          "synthetic_nodes": 90,
+          "accuracy_mean": 60.152667760849,
+          "author_over_graphslim_time": 1.8934785419933158,
+          "author_over_graphslim_gpu_memory": 0.9393601776522061,
+          "relative_accuracy_shortfall_percent": 0.0
+        },
+        "graphslim": {
+          "method": "clustgdd",
+          "rate": "0.001",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              4.6066183659713715,
+              5.333732194034383,
+              5.251649107958656
+            ],
+            "median": 5.251649107958656,
+            "minimum": 4.6066183659713715,
+            "maximum": 5.333732194034383
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              1209071616,
+              1209071616,
+              1209071616
+            ],
+            "median": 1209071616,
+            "minimum": 1209071616,
+            "maximum": 1209071616
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2471239680,
+              2453823488,
+              2488799232
+            ],
+            "median": 2471239680,
+            "minimum": 2453823488,
+            "maximum": 2488799232
+          },
+          "synthetic_nodes": 90,
+          "accuracy_mean": 61.151919762293495,
+          "author_over_graphslim_time": 1.8934785419933158,
+          "author_over_graphslim_gpu_memory": 0.9393601776522061,
+          "relative_accuracy_shortfall_percent": 0.0
+        }
+      },
+      "time_ratio": 1.8934785419933158,
+      "memory_ratio": 0.9393601776522061,
+      "quality_shortfall_percent": 0.0
+    },
+    {
+      "method": "cgc",
+      "rate": "0.005",
+      "implementations": {
+        "author": {
+          "method": "cgc",
+          "rate": "0.005",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              61.875111264991574,
+              62.057894645025954,
+              65.05983653001022
+            ],
+            "median": 62.057894645025954,
+            "minimum": 61.875111264991574,
+            "maximum": 65.05983653001022
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              597721088,
+              597721088,
+              597721088
+            ],
+            "median": 597721088,
+            "minimum": 597721088,
+            "maximum": 597721088
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              4213006336,
+              4210798592,
+              4184027136
+            ],
+            "median": 4210798592,
+            "minimum": 4184027136,
+            "maximum": 4213006336
+          },
+          "synthetic_nodes": 454,
+          "accuracy_mean": 63.83282343546549,
+          "author_over_graphslim_time": 5.156166118461659,
+          "author_over_graphslim_gpu_memory": 1.0616178563471603,
+          "relative_accuracy_shortfall_percent": 0.9196992341162158
+        },
+        "graphslim": {
+          "method": "cgc",
+          "rate": "0.005",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              11.011554210970644,
+              12.035666272044182,
+              12.504045171954203
+            ],
+            "median": 12.035666272044182,
+            "minimum": 11.011554210970644,
+            "maximum": 12.504045171954203
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              563028480,
+              563028480,
+              563028480
+            ],
+            "median": 563028480,
+            "minimum": 563028480,
+            "maximum": 563028480
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2818973696,
+              2820227072,
+              2830856192
+            ],
+            "median": 2820227072,
+            "minimum": 2818973696,
+            "maximum": 2830856192
+          },
+          "synthetic_nodes": 454,
+          "accuracy_mean": 63.24575344721476,
+          "author_over_graphslim_time": 5.156166118461659,
+          "author_over_graphslim_gpu_memory": 1.0616178563471603,
+          "relative_accuracy_shortfall_percent": 0.9196992341162158
+        }
+      },
+      "time_ratio": 5.156166118461659,
+      "memory_ratio": 1.0616178563471603,
+      "quality_shortfall_percent": 0.9196992341162158
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.005",
+      "implementations": {
+        "author": {
+          "method": "clustgdd",
+          "rate": "0.005",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              10.568784634990152,
+              11.794184717000462,
+              11.192750379035715
+            ],
+            "median": 11.192750379035715,
+            "minimum": 10.568784634990152,
+            "maximum": 11.794184717000462
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              1832095232,
+              1832249856,
+              1832604160
+            ],
+            "median": 1832249856,
+            "minimum": 1832095232,
+            "maximum": 1832604160
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              4508827648,
+              4556886016,
+              4529049600
+            ],
+            "median": 4529049600,
+            "minimum": 4508827648,
+            "maximum": 4556886016
+          },
+          "synthetic_nodes": 454,
+          "accuracy_mean": 64.59752122561136,
+          "author_over_graphslim_time": 2.30709104263013,
+          "author_over_graphslim_gpu_memory": 1.515106983455224,
+          "relative_accuracy_shortfall_percent": 0.0
+        },
+        "graphslim": {
+          "method": "clustgdd",
+          "rate": "0.005",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              4.851455868978519,
+              4.788720049022231,
+              5.276381111994851
+            ],
+            "median": 4.851455868978519,
+            "minimum": 4.788720049022231,
+            "maximum": 5.276381111994851
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              1209320448,
+              1209320448,
+              1209320448
+            ],
+            "median": 1209320448,
+            "minimum": 1209320448,
+            "maximum": 1209320448
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2510008320,
+              2512220160,
+              2490195968
+            ],
+            "median": 2510008320,
+            "minimum": 2490195968,
+            "maximum": 2512220160
+          },
+          "synthetic_nodes": 454,
+          "accuracy_mean": 64.62838649749756,
+          "author_over_graphslim_time": 2.30709104263013,
+          "author_over_graphslim_gpu_memory": 1.515106983455224,
+          "relative_accuracy_shortfall_percent": 0.0
+        }
+      },
+      "time_ratio": 2.30709104263013,
+      "memory_ratio": 1.515106983455224,
+      "quality_shortfall_percent": 0.0
+    },
+    {
+      "method": "cgc",
+      "rate": "0.01",
+      "implementations": {
+        "author": {
+          "method": "cgc",
+          "rate": "0.01",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              320.8623477820074,
+              303.1545380090247,
+              245.26833355700364
+            ],
+            "median": 303.1545380090247,
+            "minimum": 245.26833355700364,
+            "maximum": 320.8623477820074
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              801298944,
+              801298944,
+              801298944
+            ],
+            "median": 801298944,
+            "minimum": 801298944,
+            "maximum": 801298944
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              9082687488,
+              9042784256,
+              9055772672
+            ],
+            "median": 9055772672,
+            "minimum": 9042784256,
+            "maximum": 9082687488
+          },
+          "synthetic_nodes": 909,
+          "accuracy_mean": 65.0001049041748,
+          "author_over_graphslim_time": 5.01933509044702,
+          "author_over_graphslim_gpu_memory": 1.0061460246599596,
+          "relative_accuracy_shortfall_percent": 0.0
+        },
+        "graphslim": {
+          "method": "cgc",
+          "rate": "0.01",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              60.397349956969265,
+              62.07911964302184,
+              42.10777944099391
+            ],
+            "median": 60.397349956969265,
+            "minimum": 42.10777944099391,
+            "maximum": 62.07911964302184
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              796404224,
+              796404224,
+              796404224
+            ],
+            "median": 796404224,
+            "minimum": 796404224,
+            "maximum": 796404224
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              4477165568,
+              4499869696,
+              4501975040
+            ],
+            "median": 4499869696,
+            "minimum": 4477165568,
+            "maximum": 4501975040
+          },
+          "synthetic_nodes": 909,
+          "accuracy_mean": 65.02685149510702,
+          "author_over_graphslim_time": 5.01933509044702,
+          "author_over_graphslim_gpu_memory": 1.0061460246599596,
+          "relative_accuracy_shortfall_percent": 0.0
+        }
+      },
+      "time_ratio": 5.01933509044702,
+      "memory_ratio": 1.0061460246599596,
+      "quality_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.01",
+      "implementations": {
+        "author": {
+          "method": "clustgdd",
+          "rate": "0.01",
+          "backend": "author",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              8.881884288974106,
+              9.033391910023056,
+              9.02262184099527
+            ],
+            "median": 9.02262184099527,
+            "minimum": 8.881884288974106,
+            "maximum": 9.033391910023056
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              3075969024,
+              3075877376,
+              3075953152
+            ],
+            "median": 3075953152,
+            "minimum": 3075877376,
+            "maximum": 3075969024
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              5100318720,
+              4980219904,
+              5115809792
+            ],
+            "median": 5100318720,
+            "minimum": 4980219904,
+            "maximum": 5115809792
+          },
+          "synthetic_nodes": 909,
+          "accuracy_mean": 65.22985696792603,
+          "author_over_graphslim_time": 1.6468980409593403,
+          "author_over_graphslim_gpu_memory": 2.542882877620618,
+          "relative_accuracy_shortfall_percent": 0.2649547860816316
+        },
+        "graphslim": {
+          "method": "clustgdd",
+          "rate": "0.01",
+          "backend": "graphslim",
+          "status": "complete",
+          "completed_seeds": 3,
+          "expected_seeds": 3,
+          "reduction_seconds": {
+            "values": [
+              5.670498575025704,
+              5.2341748449834995,
+              5.478555209003389
+            ],
+            "median": 5.478555209003389,
+            "minimum": 5.2341748449834995,
+            "maximum": 5.670498575025704
+          },
+          "peak_cuda_allocated_bytes": {
+            "values": [
+              1209632256,
+              1209632256,
+              1209632256
+            ],
+            "median": 1209632256,
+            "minimum": 1209632256,
+            "maximum": 1209632256
+          },
+          "peak_sampled_rss_bytes": {
+            "values": [
+              2494894080,
+              2491588608,
+              2503323648
+            ],
+            "median": 2494894080,
+            "minimum": 2491588608,
+            "maximum": 2503323648
+          },
+          "synthetic_nodes": 909,
+          "accuracy_mean": 65.0570273399353,
+          "author_over_graphslim_time": 1.6468980409593403,
+          "author_over_graphslim_gpu_memory": 2.542882877620618,
+          "relative_accuracy_shortfall_percent": 0.2649547860816316
+        }
+      },
+      "time_ratio": 1.6468980409593403,
+      "memory_ratio": 2.542882877620618,
+      "quality_shortfall_percent": 0.2649547860816316
+    }
+  ],
+  "assets_sha256": {
+    ".svg": "4dae6f92eef6512b5d4a3b8d6cc887731cf6e0ff646a5ee3b74a2d97564d6668",
+    ".png": "7834635c2b566f388266a41977ba932776de807a285d9cb07deb51404728de01",
+    ".pdf": "441ea6d58e546f87604cdbd84226946aadcc2a704740e8b3943e0688412f1247"
+  }
+}

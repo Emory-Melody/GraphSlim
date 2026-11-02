@@ -6,15 +6,14 @@ roster, formulas, policy credits, reference corrections, and source hashes.
 """
 
 import argparse
-import hashlib
 import json
 import math
 from pathlib import Path
 
+from benchmark.render_arxiv_efficiency import speed_figure
+
 ROOT = Path(__file__).resolve().parents[1]
 COVERAGE = ROOT / "benchmark/results/reproduction_coverage_20261101.json"
-COMPARISON = ROOT / "benchmark/results/implementation_comparison_20261031.json"
-FIGURE = ROOT / "benchmark/results/implementation_comparison_figure.json"
 
 
 def load_coverage():
@@ -54,25 +53,6 @@ def coverage_table(data, language):
         cells.append(f"{row['count']}/{row['denominator']} ({row['percent']:.2f}%)")
     lines.append("| " + " | ".join([label, *cells]) + " |")
     return "\n".join(lines)
-
-
-def speed_figure(language):
-    data = json.loads(FIGURE.read_text(encoding="utf-8"))
-    assert data["source_sha256"] == hashlib.sha256(COMPARISON.read_bytes()).hexdigest()
-    for suffix, expected in data["assets_sha256"].items():
-        asset = ROOT / f"figures/implementation_comparison{suffix}"
-        assert hashlib.sha256(asset.read_bytes()).hexdigest() == expected
-    assert data["displayed_metrics"] == ["time_seconds", "peak_cuda_allocated_mib"]
-    if language == "en":
-        alt = "Clustering acceleration and peak GPU memory across all six method–dataset pairs"
-        links = "[Vector PDF](figures/implementation_comparison.pdf) · [High-resolution PNG](figures/implementation_comparison.png) · [Reviewed chart data](benchmark/results/implementation_comparison_figure.json)"
-    else:
-        alt = "六个方法与数据集组合的聚类加速和峰值 GPU 显存对比"
-        links = "[矢量 PDF](figures/implementation_comparison.pdf) · [高清 PNG](figures/implementation_comparison.png) · [经核对的绘图数据](benchmark/results/implementation_comparison_figure.json)"
-    image = (
-        f"[![{alt}](figures/implementation_comparison.svg)](figures/implementation_comparison.pdf)"
-    )
-    return "\n\n".join([image, links])
 
 
 def replace(text, name, table):

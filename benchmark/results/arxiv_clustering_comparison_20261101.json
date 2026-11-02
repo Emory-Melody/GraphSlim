@@ -1,0 +1,3721 @@
+{
+  "data": {
+    "nodes": 169343,
+    "edges": 2315598,
+    "features": 128,
+    "classes": 40,
+    "train": 90941,
+    "val": 29799,
+    "test": 48603,
+    "raw_sha256": {
+      "feats.npy": "e2e4dda733eff8130a8e3ff0167ce091ee145eb6f0e6eedb8e04fef36100e40b",
+      "adj_full.npz": "920dae5bad3f63b07f5b8883493b298f026778d7358c14b955985bacbbd13771",
+      "role.json": "ef30aec176315e5dd6b5f4bdc2a40741542723c55348b9141a70aeed2c00babb",
+      "class_map.json": "7db3b1c89beeaa51c10d43b5888b60fb8b23a73ced4ca6df0a413240a3820b77"
+    }
+  },
+  "protocol": {
+    "threads": 4,
+    "device": "cuda:0",
+    "rates_denominator": "labeled training nodes",
+    "preprocessing": "full undirected ogbn-arxiv; StandardScaler fitted on official training nodes, shared saved tensors",
+    "precision": "float32; both CGC reconstruction solves float64, ridge=0; TF32 disabled",
+    "cgc": "rate-specific package parameters; spectral clustering; FAISS/sklearn both 10 restarts, 300 iterations",
+    "clustgdd": "rate-specific propagation/alpha/loss settings; 600 MLP pretraining and 100 refinement updates, hidden256, 2 post-propagation steps; both MiniBatchKMeans n_init3, max_iter100, batch_size1000",
+    "adapters": [
+      "shared inputs/splits/output contract instead of repository loaders",
+      "CGC confidence masks copied to CPU for its CPU confidence tensors; native CPU clustering and GPU aggregation retained",
+      "CGC reconstruction precision harmonized to float64",
+      "ClustGDD MiniBatchKMeans restart budget harmonized; integer IDs passed into native compression"
+    ],
+    "timing": "wall time with CUDA synchronization around entire in-memory reduction, including preprocessing/transfers; excludes imports, data loading, graph serialization, and downstream evaluation",
+    "memory": "fresh process; process RSS sampled every5ms; PyTorch peak GPU allocated/reserved reset after context warmup, before input transfers; excludes downstream evaluation",
+    "quality": "one shared GCN fit per reduced graph, seed0, 300 epochs, hidden256, validation selection every10; outside timing/memory; descriptive quality shortfall retained",
+    "timeout_seconds": 1800,
+    "max_rss_gib": 96
+  },
+  "references": {
+    "cgc": {
+      "commit": "08ff04dc0d23110ff53445438f30bcff887e7c31",
+      "url": "https://github.com/XYGaoG/CGC"
+    },
+    "clustgdd": {
+      "commit": "60825c536f794e7a3bb0ff22ae4efc07ea2d3e3a",
+      "url": "https://github.com/HKBU-LAGAS/ClustGDD"
+    }
+  },
+  "manifest_sha256": "1daac8092732d486150dd529f6c1326189dd74e86f1d1718eaa1204587ddacd9",
+  "cells": [
+    {
+      "method": "cgc",
+      "rate": "0.001",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          8.125130332016852,
+          6.131981259968597,
+          6.611277076008264
+        ],
+        "median": 6.611277076008264,
+        "minimum": 6.131981259968597,
+        "maximum": 8.125130332016852
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          597721088,
+          597721088,
+          597721088
+        ],
+        "median": 597721088,
+        "minimum": 597721088,
+        "maximum": 597721088
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2341933056,
+          2404892672,
+          2348363776
+        ],
+        "median": 2348363776,
+        "minimum": 2341933056,
+        "maximum": 2404892672
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 60.76099673906962,
+      "author_over_graphslim_time": 4.585662783323907,
+      "author_over_graphslim_gpu_memory": 1.0616178563471603,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "cgc",
+      "rate": "0.001",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          1.4417277040192857,
+          1.6555584169691429,
+          1.3301379620097578
+        ],
+        "median": 1.4417277040192857,
+        "minimum": 1.3301379620097578,
+        "maximum": 1.6555584169691429
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          563028480,
+          563028480,
+          563028480
+        ],
+        "median": 563028480,
+        "minimum": 563028480,
+        "maximum": 563028480
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2329862144,
+          2325340160,
+          2332561408
+        ],
+        "median": 2329862144,
+        "minimum": 2325340160,
+        "maximum": 2332561408
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 61.34600838025411,
+      "author_over_graphslim_time": 4.585662783323907,
+      "author_over_graphslim_gpu_memory": 1.0616178563471603,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "cgc",
+      "rate": "0.005",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          61.875111264991574,
+          62.057894645025954,
+          65.05983653001022
+        ],
+        "median": 62.057894645025954,
+        "minimum": 61.875111264991574,
+        "maximum": 65.05983653001022
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          597721088,
+          597721088,
+          597721088
+        ],
+        "median": 597721088,
+        "minimum": 597721088,
+        "maximum": 597721088
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          4213006336,
+          4210798592,
+          4184027136
+        ],
+        "median": 4210798592,
+        "minimum": 4184027136,
+        "maximum": 4213006336
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 63.83282343546549,
+      "author_over_graphslim_time": 5.156166118461659,
+      "author_over_graphslim_gpu_memory": 1.0616178563471603,
+      "relative_accuracy_shortfall_percent": 0.9196992341162158
+    },
+    {
+      "method": "cgc",
+      "rate": "0.005",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          11.011554210970644,
+          12.035666272044182,
+          12.504045171954203
+        ],
+        "median": 12.035666272044182,
+        "minimum": 11.011554210970644,
+        "maximum": 12.504045171954203
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          563028480,
+          563028480,
+          563028480
+        ],
+        "median": 563028480,
+        "minimum": 563028480,
+        "maximum": 563028480
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2818973696,
+          2820227072,
+          2830856192
+        ],
+        "median": 2820227072,
+        "minimum": 2818973696,
+        "maximum": 2830856192
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 63.24575344721476,
+      "author_over_graphslim_time": 5.156166118461659,
+      "author_over_graphslim_gpu_memory": 1.0616178563471603,
+      "relative_accuracy_shortfall_percent": 0.9196992341162158
+    },
+    {
+      "method": "cgc",
+      "rate": "0.01",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          320.8623477820074,
+          303.1545380090247,
+          245.26833355700364
+        ],
+        "median": 303.1545380090247,
+        "minimum": 245.26833355700364,
+        "maximum": 320.8623477820074
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          801298944,
+          801298944,
+          801298944
+        ],
+        "median": 801298944,
+        "minimum": 801298944,
+        "maximum": 801298944
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          9082687488,
+          9042784256,
+          9055772672
+        ],
+        "median": 9055772672,
+        "minimum": 9042784256,
+        "maximum": 9082687488
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 65.0001049041748,
+      "author_over_graphslim_time": 5.01933509044702,
+      "author_over_graphslim_gpu_memory": 1.0061460246599596,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "cgc",
+      "rate": "0.01",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          60.397349956969265,
+          62.07911964302184,
+          42.10777944099391
+        ],
+        "median": 60.397349956969265,
+        "minimum": 42.10777944099391,
+        "maximum": 62.07911964302184
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          796404224,
+          796404224,
+          796404224
+        ],
+        "median": 796404224,
+        "minimum": 796404224,
+        "maximum": 796404224
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          4477165568,
+          4499869696,
+          4501975040
+        ],
+        "median": 4499869696,
+        "minimum": 4477165568,
+        "maximum": 4501975040
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 65.02685149510702,
+      "author_over_graphslim_time": 5.01933509044702,
+      "author_over_graphslim_gpu_memory": 1.0061460246599596,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.001",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          9.943884895998053,
+          9.083286139008123,
+          10.74205121299019
+        ],
+        "median": 9.943884895998053,
+        "minimum": 9.083286139008123,
+        "maximum": 10.74205121299019
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          1135753728,
+          1135753728,
+          1135753728
+        ],
+        "median": 1135753728,
+        "minimum": 1135753728,
+        "maximum": 1135753728
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          4510179328,
+          4536434688,
+          4536242176
+        ],
+        "median": 4536242176,
+        "minimum": 4510179328,
+        "maximum": 4536434688
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 60.152667760849,
+      "author_over_graphslim_time": 1.8934785419933158,
+      "author_over_graphslim_gpu_memory": 0.9393601776522061,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.001",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          4.6066183659713715,
+          5.333732194034383,
+          5.251649107958656
+        ],
+        "median": 5.251649107958656,
+        "minimum": 4.6066183659713715,
+        "maximum": 5.333732194034383
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          1209071616,
+          1209071616,
+          1209071616
+        ],
+        "median": 1209071616,
+        "minimum": 1209071616,
+        "maximum": 1209071616
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2471239680,
+          2453823488,
+          2488799232
+        ],
+        "median": 2471239680,
+        "minimum": 2453823488,
+        "maximum": 2488799232
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 61.151919762293495,
+      "author_over_graphslim_time": 1.8934785419933158,
+      "author_over_graphslim_gpu_memory": 0.9393601776522061,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.005",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          10.568784634990152,
+          11.794184717000462,
+          11.192750379035715
+        ],
+        "median": 11.192750379035715,
+        "minimum": 10.568784634990152,
+        "maximum": 11.794184717000462
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          1832095232,
+          1832249856,
+          1832604160
+        ],
+        "median": 1832249856,
+        "minimum": 1832095232,
+        "maximum": 1832604160
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          4508827648,
+          4556886016,
+          4529049600
+        ],
+        "median": 4529049600,
+        "minimum": 4508827648,
+        "maximum": 4556886016
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 64.59752122561136,
+      "author_over_graphslim_time": 2.30709104263013,
+      "author_over_graphslim_gpu_memory": 1.515106983455224,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.005",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          4.851455868978519,
+          4.788720049022231,
+          5.276381111994851
+        ],
+        "median": 4.851455868978519,
+        "minimum": 4.788720049022231,
+        "maximum": 5.276381111994851
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          1209320448,
+          1209320448,
+          1209320448
+        ],
+        "median": 1209320448,
+        "minimum": 1209320448,
+        "maximum": 1209320448
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2510008320,
+          2512220160,
+          2490195968
+        ],
+        "median": 2510008320,
+        "minimum": 2490195968,
+        "maximum": 2512220160
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 64.62838649749756,
+      "author_over_graphslim_time": 2.30709104263013,
+      "author_over_graphslim_gpu_memory": 1.515106983455224,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.01",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          8.881884288974106,
+          9.033391910023056,
+          9.02262184099527
+        ],
+        "median": 9.02262184099527,
+        "minimum": 8.881884288974106,
+        "maximum": 9.033391910023056
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          3075969024,
+          3075877376,
+          3075953152
+        ],
+        "median": 3075953152,
+        "minimum": 3075877376,
+        "maximum": 3075969024
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          5100318720,
+          4980219904,
+          5115809792
+        ],
+        "median": 5100318720,
+        "minimum": 4980219904,
+        "maximum": 5115809792
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 65.22985696792603,
+      "author_over_graphslim_time": 1.6468980409593403,
+      "author_over_graphslim_gpu_memory": 2.542882877620618,
+      "relative_accuracy_shortfall_percent": 0.2649547860816316
+    },
+    {
+      "method": "clustgdd",
+      "rate": "0.01",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          5.670498575025704,
+          5.2341748449834995,
+          5.478555209003389
+        ],
+        "median": 5.478555209003389,
+        "minimum": 5.2341748449834995,
+        "maximum": 5.670498575025704
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          1209632256,
+          1209632256,
+          1209632256
+        ],
+        "median": 1209632256,
+        "minimum": 1209632256,
+        "maximum": 1209632256
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2494894080,
+          2491588608,
+          2503323648
+        ],
+        "median": 2494894080,
+        "minimum": 2491588608,
+        "maximum": 2503323648
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 65.0570273399353,
+      "author_over_graphslim_time": 1.6468980409593403,
+      "author_over_graphslim_gpu_memory": 2.542882877620618,
+      "relative_accuracy_shortfall_percent": 0.2649547860816316
+    }
+  ],
+  "records": [
+    {
+      "id": "cgc__r0.001__s1__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1413558272,
+        "peak_sampled_rss_bytes": 2341933056,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 8.125130332016852,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "6442342e0008ecae81a8010f011fa7b54c0d6f667b61166468b089f80cd7f990",
+        "422ddab71618ea60f6d1bab45058c775c00dd795d723ef007883946c77411a47",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6223362684249878,
+          "test_accuracy": 0.6114437580108643,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.001__s1__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432162304,
+        "peak_sampled_rss_bytes": 2329862144,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 639631360,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 1.4417277040192857,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "9059dc4af1f836272651f36bad6a01ea9aefcbec18f04ed9a92736f110d02345",
+        "e6beec1454a15152c61ee99c47339c10e18cfd40a006746bca92a06f1b3136a7",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6167656183242798,
+          "test_accuracy": 0.6098594665527344,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.001__s2__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432064000,
+        "peak_sampled_rss_bytes": 2325340160,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 639631360,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 1.6555584169691429,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "791306c070fa5c7e614544d37c6a8adac3a3992d4f0e0a738b4ef1da837afd65",
+        "9618491c9b0f5bd9898f254ef2804af6dd5de5e6b10ef5719535b2c542551db9",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6211617588996887,
+          "test_accuracy": 0.6143653988838196,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.001__s2__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1430028288,
+        "peak_sampled_rss_bytes": 2404892672,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 6.131981259968597,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "4c3d4cd80d9c348cc925da844d9d963e68c9830662f53436e32914ff11bbd41d",
+        "3b2cf710dab734aa09730a8ae3ac27c06c36b0dca9dc643c27ce7b89a04241bf",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6100540161132812,
+          "test_accuracy": 0.6115260720252991,
+          "selected_epoch": 140
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.001__s3__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1419939840,
+        "peak_sampled_rss_bytes": 2348363776,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 6.611277076008264,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "b022ed4dcab6e87f600467c6b363ea8730d6a47d37298bdce7d7ee18026ea5f1",
+        "de88790f75ce311569eb14ff2c9c9b9994efac4a7e797abcf369c2fc5c0a6c0f",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6123359799385071,
+          "test_accuracy": 0.5998600721359253,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.001__s3__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1434394624,
+        "peak_sampled_rss_bytes": 2332561408,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 637534208,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 1.3301379620097578,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "4ca40bb5e257c8d7fc4cae905ef9e461c75c2c4876eaa1caff96cf4b4f468fce",
+        "5bec07aa2523f46b76010a62469f0fdcec8a5b37a15204fcd49075160f49e454",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 5.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6273364424705505,
+          "test_accuracy": 0.6161553859710693,
+          "selected_epoch": 200
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s1__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1490563072,
+        "peak_sampled_rss_bytes": 4510179328,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1135753728,
+        "peak_cuda_reserved_bytes": 1841299456,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.943884895998053,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "e5e9810dfe539beddfe93075ded03de00ffb504116c57e97a4ebd4832654d703",
+        "c8fa0c9a0725524fbaf5d816d349c06d2e7d4c96151fa09e6772a46952f05b65",
+        "417aa7019e96ee4b6aa53d3bf684d33e7748490fe6d6c855d1e2e3b7c014ba7a"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6120675206184387,
+          "test_accuracy": 0.6176779270172119,
+          "selected_epoch": 10
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s1__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489793024,
+        "peak_sampled_rss_bytes": 2471239680,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209071616,
+        "peak_cuda_reserved_bytes": 1893728256,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 4.6066183659713715,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "f4e6a6e995e40bae9c545795b4d7ac4982163f63514cdc9e8fa296259f6f8ef1",
+        "b4ff535f2f80565cd1132fc550a1688a61b2d0d4e30354cb2d28669f85bc0d64",
+        "0e708465ee2b6e11c8fed25e593b757267a65ca361a9d877e22161aa35571aa7"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6132084727287292,
+          "test_accuracy": 0.6164845824241638,
+          "selected_epoch": 10
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s2__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1472401408,
+        "peak_sampled_rss_bytes": 2453823488,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209071616,
+        "peak_cuda_reserved_bytes": 1893728256,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.333732194034383,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "e20f12295e6be86c0206809eb23d4e59d4c364dad41a5eb52ed7daa0ac014744",
+        "e817d554ef99784daeb6b8b8bd3dd94bf69f550552d65576eb5e3776547e85e4",
+        "70be6a39eaa03361f105a71b9f3c73d41fa2adc14d9d19764382be6c6c6c70fd"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6203228235244751,
+          "test_accuracy": 0.6225336194038391,
+          "selected_epoch": 100
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s2__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489936384,
+        "peak_sampled_rss_bytes": 4536434688,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1135753728,
+        "peak_cuda_reserved_bytes": 1841299456,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.083286139008123,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "c73bb04feb5d20a7f752098f839fa67be17c0a3179d9047441186fd93b1c8e68",
+        "679d3f1d3bf5812f28d121a6ec18263c3b223bb786ca0222dab487ac47fa28fb",
+        "b9870ea1cbf37822f20d9855c07bf5804563b3c92ea0e3ae73960b802ae59c57"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6008926033973694,
+          "test_accuracy": 0.5983375906944275,
+          "selected_epoch": 10
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s3__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489395712,
+        "peak_sampled_rss_bytes": 4536242176,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1135753728,
+        "peak_cuda_reserved_bytes": 1843396608,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 10.74205121299019,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "052ae39cfd5a510cb36aa75b22f290f53205b345b13b5390e4154b4cdcdf37f5",
+        "c7d549d3d6e9f706e1ed4e88f5b8bc61c8102f4d7cff38793d4cbea53fac6650",
+        "8dbe85cb344aacc5321d16384c1112ac8f9d76b8af33fd26c672fb4c76c6a140"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.5888452529907227,
+          "test_accuracy": 0.5885645151138306,
+          "selected_epoch": 20
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.001__s3__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1491558400,
+        "peak_sampled_rss_bytes": 2488799232,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209071616,
+        "peak_cuda_reserved_bytes": 1893728256,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.251649107958656,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "79a6e1cabd3b4daf278af043a5351094a6c760bc3538d403303cbae22277cb54",
+        "351032f7919148fa33c0d6c20dbc3347e22ef878ca4af783c8681881141ab895",
+        "a9a09641dfa96c304f55056a18874a4cf0385323eba29e32d101cb8d569b49a0"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.4,
+        "clustgdd_prediction_weight": 0.0125,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.5970334410667419,
+          "test_accuracy": 0.595539391040802,
+          "selected_epoch": 20
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s1__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432543232,
+        "peak_sampled_rss_bytes": 4213006336,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 61.875111264991574,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "eb6589717ebc9579f9cc9cb98506c7eb63c0109d2530ec8159ee193512f02f9b",
+        "0ee282522cf06bc71a2f64577d74204409d970dd25b4cf1699505b167dd44084",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6550890803337097,
+          "test_accuracy": 0.642820417881012,
+          "selected_epoch": 250
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s1__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432391680,
+        "peak_sampled_rss_bytes": 2818973696,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 639631360,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 11.011554210970644,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "46d7b08df758cc8d961eeb374461a1dd529788e7658bd3ae9060aa8b6081b8e6",
+        "7551020d1212eea8785f976bf42bfa28a0ab69f331b2f2215fe832c148538602",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6430752277374268,
+          "test_accuracy": 0.6226776242256165,
+          "selected_epoch": 240
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s2__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432371200,
+        "peak_sampled_rss_bytes": 2820227072,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 639631360,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 12.035666272044182,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "dbfb0c2aef48be97684495da4bfb5a48d09e8a93c5d434c86f751946a616922c",
+        "3205b057e0c60cf10cd4c1639df676d4a3ecf178f91e782d115e4e558379b8ef",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.655290424823761,
+          "test_accuracy": 0.644363522529602,
+          "selected_epoch": 120
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s2__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1434505216,
+        "peak_sampled_rss_bytes": 4210798592,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 62.057894645025954,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "bb2f8db77d255e328ca7bb298127f2c2db84ca56910b5aa663127d23e52a9f76",
+        "9e9e4317bc2585e10420523f9c86b515ced601810574a5f21cc204c095b2bd3a",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6428403258323669,
+          "test_accuracy": 0.6258872747421265,
+          "selected_epoch": 250
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s3__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432436736,
+        "peak_sampled_rss_bytes": 4184027136,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 597721088,
+        "peak_cuda_reserved_bytes": 729808896,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 65.05983653001022,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "f8a3909c27882e234d979ce5f50a5be8a6c336af5b82776c3a3473fa32d5c30f",
+        "a0d2de5debefc4919193ad94f8d484eec192f10935bad072be461965bbaf5793",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6542501449584961,
+          "test_accuracy": 0.6462770104408264,
+          "selected_epoch": 180
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.005__s3__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432506368,
+        "peak_sampled_rss_bytes": 2830856192,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 563028480,
+        "peak_cuda_reserved_bytes": 639631360,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 12.504045171954203,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "c38cb6e8895a3bc352467d49edb0d56e4efcf7a8466502112bd0692bbb563b88",
+        "6e7fe6b86f91883dd7ef9191c7f69a854a0cb8a666f73774291ee119f1c1ce8d",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 15.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 0.4,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6511627435684204,
+          "test_accuracy": 0.6303314566612244,
+          "selected_epoch": 240
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s1__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489723392,
+        "peak_sampled_rss_bytes": 4508827648,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1832095232,
+        "peak_cuda_reserved_bytes": 2864709632,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 10.568784634990152,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "75089657b49cec9efa868855e341ec36a86a695bdb56d0e1fe055d7c63256319",
+        "71f6aadabc2cd233e8235389ad6a811e32e49c9d76fc21246b3b9a1a0c4f0367",
+        "656e0ac43dacd0311328da1d654d7fa6ae8462f341f0345d909bfa2ecf8c56d7"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6458269953727722,
+          "test_accuracy": 0.6389523148536682,
+          "selected_epoch": 40
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s1__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1487462400,
+        "peak_sampled_rss_bytes": 2510008320,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209320448,
+        "peak_cuda_reserved_bytes": 1958739968,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 4.851455868978519,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "1c050de8af1f9de3f535b06db27e998f968c9dfc76dc2e35ebe847e59dcfbff9",
+        "574c35a4ee7405e04f33fc2967f592b0465750c673eff6973760a2edd73bde7e",
+        "dd48e1ecc47ba84bf60abe1c8455bc7f7b11f6da615757a08cd0a983a9cdac33"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6576059460639954,
+          "test_accuracy": 0.6569347977638245,
+          "selected_epoch": 90
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s2__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489772544,
+        "peak_sampled_rss_bytes": 2512220160,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209320448,
+        "peak_cuda_reserved_bytes": 1958739968,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 4.788720049022231,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "438fa7ab6a7d9de9ee929cdddfb9d89d0ca2d9cad74b7454e7e27b5dcbb2846f",
+        "c4e735bb7c1ab2a63c097cfbdf136001b1ba2ecb7f0dd7db084cf5295c1d0f4d",
+        "9f3953dbf34dc403769e41fbf35fa8b4146fd49a47a203e7935955549217571e"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6505587100982666,
+          "test_accuracy": 0.6432113647460938,
+          "selected_epoch": 160
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s2__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489412096,
+        "peak_sampled_rss_bytes": 4556886016,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1832249856,
+        "peak_cuda_reserved_bytes": 2864709632,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 11.794184717000462,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "53ad3f3533842b4bd3bffdf794ad8ef28a2e3c434399dc2d79a1c547aede78d9",
+        "a2de71dbf9225e448863e47b16a4ff6513b5dda333aa019f86cf6db07e53de48",
+        "62766524f1af09579cdbd3f399b5fcb7b7c1fdab8ecd1f1f2ac1125425b942a4"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6555924415588379,
+          "test_accuracy": 0.6552270650863647,
+          "selected_epoch": 30
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s3__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489678336,
+        "peak_sampled_rss_bytes": 4529049600,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1832604160,
+        "peak_cuda_reserved_bytes": 2866806784,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 11.192750379035715,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "91cf06351dd58d54056ee1b1c89c34fa36ab821015b06e7b86ef381c9fd57739",
+        "742e194ce633408f8b5cf45a4d5b73abf3e150127ea6ab226351d427017739ea",
+        "e4369f361d41a2a586cda6040b2d6ae46172121071dd23c9130ccbb9b3481ff5"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6519346237182617,
+          "test_accuracy": 0.6437462568283081,
+          "selected_epoch": 100
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.005__s3__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1472294912,
+        "peak_sampled_rss_bytes": 2490195968,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209320448,
+        "peak_cuda_reserved_bytes": 1958739968,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.276381111994851,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "08639a6825bf173aabb46faee778d014ac82d8822eeb4ed4ca3e373c2538a6c7",
+        "e0ca825382cc01c333fd35e182679878367ac811c6e2f6ea408a806e7f69ed85",
+        "3ea16eb4c370ce5dc39fe50ebe0be22cddcc3c74864783708b85e84da2f1f8bf"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 18,
+        "clustgdd_alpha": 0.91,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.9,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6396523118019104,
+          "test_accuracy": 0.6387054324150085,
+          "selected_epoch": 30
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s1__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432199168,
+        "peak_sampled_rss_bytes": 9082687488,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 801298944,
+        "peak_cuda_reserved_bytes": 1038090240,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 320.8623477820074,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "ce5b8cca370134ad79fda6d1376e72af9f5ec1b23778e11fb7eec502a58a1451",
+        "c841acee67120972750c1fe0e9b67bc245bf3326d46f042b2ea443960a995981",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6658612489700317,
+          "test_accuracy": 0.6581487059593201,
+          "selected_epoch": 240
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s1__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1432420352,
+        "peak_sampled_rss_bytes": 4477165568,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 796404224,
+        "peak_cuda_reserved_bytes": 966787072,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 60.397349956969265,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "9e3f7bc2232e1b4c2943ef76b9af140bda61a87b4f5d76c6c223087de1dd2cd7",
+        "7a23a070b9cf19487fa26f3a05f15e3ffa2cb0d78889df652620b1881bf36807",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6552568674087524,
+          "test_accuracy": 0.649198591709137,
+          "selected_epoch": 250
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s2__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1434210304,
+        "peak_sampled_rss_bytes": 4499869696,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 796404224,
+        "peak_cuda_reserved_bytes": 966787072,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 62.07911964302184,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "e42e17bc709c30eeb39ad3bbd74ebe7511e74d80ccf42d71dffeae05b132dd64",
+        "10abb79862de1e20b3a5b2ef55f9d0d75aa96652580af377a82a1531a7f4004f",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.651565432548523,
+          "test_accuracy": 0.6498981714248657,
+          "selected_epoch": 130
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s2__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1433337856,
+        "peak_sampled_rss_bytes": 9042784256,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 801298944,
+        "peak_cuda_reserved_bytes": 1038090240,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 303.1545380090247,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "d8c474c9a7fde79c586e46a46af2d99e14f4468dab9b2aef167c552dc53ecf10",
+        "b6ab3a54c544bf8b264a06173986189770e982e065ff6dbfbca345cfb56dfe96",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6603241562843323,
+          "test_accuracy": 0.6468119621276855,
+          "selected_epoch": 220
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s3__author",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1431486464,
+        "peak_sampled_rss_bytes": 9055772672,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 801298944,
+        "peak_cuda_reserved_bytes": 1038090240,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 245.26833355700364,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "8936760d07a1cb1dbd69acb38b355badb0c423f69d366cf86172e2fc0ca5d723",
+        "0e9120bdfca67b5105ffcc0c9366856eec9911c927f123e50c6c3d7739a6dd1b",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6546863913536072,
+          "test_accuracy": 0.6450424790382385,
+          "selected_epoch": 260
+        }
+      ]
+    },
+    {
+      "id": "cgc__r0.01__s3__graphslim",
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1431719936,
+        "peak_sampled_rss_bytes": 4501975040,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 796404224,
+        "peak_cuda_reserved_bytes": 966787072,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 42.10777944099391,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "9b21357f788e2e954579d8bee6736c9652eec85bc8e098efa7fa385388f4e33f",
+        "99564405e8484724230a5b94d40bba4fda74a5e910318494dc41cc08f5d07ad8",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "cgc_clustering": "spectral",
+        "cgc_tau": 1.0,
+        "cgc_alpha": 3.0,
+        "cgc_aug_ratio": 3.0,
+        "cgc_adj_threshold": 0.92,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.660122811794281,
+          "test_accuracy": 0.6517087817192078,
+          "selected_epoch": 260
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s1__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1488834560,
+        "peak_sampled_rss_bytes": 5100318720,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3075969024,
+        "peak_cuda_reserved_bytes": 4456448000,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 8.881884288974106,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "46fe8396cd99d22b69c0689b5b241dc8a44337b712f89738fb3310c482fc7e4c",
+        "f41fd1de59f9ef455b0b3caf196c86e8016fd43fcf6dee5a1660cda8c0f51b4a",
+        "97a3b5fe455475bc4266805a2badfaa5786a547717e3d2b679e3ca5aaa017859"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6642168760299683,
+          "test_accuracy": 0.6499187350273132,
+          "selected_epoch": 90
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s1__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1488982016,
+        "peak_sampled_rss_bytes": 2494894080,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209632256,
+        "peak_cuda_reserved_bytes": 1969225728,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.670498575025704,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "3c8bb7e2568c90fdc5bcfc974d7c717faee2624187497c420a742df2354c193c",
+        "c757148403b3bbf7ef74aad1d4a22225fa3c586c995c1aa2c032e525741dad6d",
+        "bc21d338deddb947c453455626f6b21b06031b0c901a4ba9988f75e389668721"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6622369885444641,
+          "test_accuracy": 0.647881805896759,
+          "selected_epoch": 90
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s2__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1488953344,
+        "peak_sampled_rss_bytes": 2491588608,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209632256,
+        "peak_cuda_reserved_bytes": 1969225728,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.2341748449834995,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "bfbcc468550cad464712b9d4d5905cbf639728943da9a0eb19b6b813c6e11bbe",
+        "bec8d8ac1af7106789daf7235a5de852f1801fb19f688b3bf7534154c6f11db6",
+        "81b396de57644685a8a03ebde835ae2462140f433208ce6acff7e6d75024cac0"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6628074645996094,
+          "test_accuracy": 0.647840678691864,
+          "selected_epoch": 60
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s2__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1488957440,
+        "peak_sampled_rss_bytes": 4980219904,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3075877376,
+        "peak_cuda_reserved_bytes": 4456448000,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.033391910023056,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "1ff7c11e8232a9337afa19c3413b60449f21c07054eb548fae69a13c96f880f0",
+        "6c8f6bc3fc2201769c24f17070c04b05e6b27085cbf3da06452f078580a1a637",
+        "025cb238dea5f89b8292bbef15735238effa97adcf5ff0b3eba9e407d7823fc5"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6636128425598145,
+          "test_accuracy": 0.6568319201469421,
+          "selected_epoch": 120
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s3__author",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1488736256,
+        "peak_sampled_rss_bytes": 5115809792,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3075953152,
+        "peak_cuda_reserved_bytes": 4456448000,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.02262184099527,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "10ae14df0e16abc83d5aac49be6065d75421b37265e2e566b7b139f7e3bee82a",
+        "3ce0a3decbbb9bd19589e925d33fae860144c5a6f53cd47d8d49b8e29d39409b",
+        "61cfe669b01bb4a296aa41cecd42eaf39151c83770411f664847def03db16616"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6633108258247375,
+          "test_accuracy": 0.6501450538635254,
+          "selected_epoch": 60
+        }
+      ]
+    },
+    {
+      "id": "clustgdd__r0.01__s3__graphslim",
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1489100800,
+        "peak_sampled_rss_bytes": 2503323648,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 1209632256,
+        "peak_cuda_reserved_bytes": 1969225728,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.478555209003389,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "61706be6103b74d895e770080f8d6c821c946ad1b3f5ddd1e8058596c0960006",
+        "b0e5753a99c791923867375354364d05954b42bbf35cda84413f79f51b40566b",
+        "abce82657b22c0df2122c8718ee17c72a35f35d864dcb297a1f144480350a96b"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_prop_steps": 20,
+        "clustgdd_alpha": 0.92,
+        "clustgdd_hidden": 256,
+        "clustgdd_layers": 2,
+        "clustgdd_dropout": 0.6,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_pre_lr": 0.01,
+        "clustgdd_pre_wd": 0.0,
+        "clustgdd_sampling_ratio": 0.1,
+        "clustgdd_edge_chunk_size": 1000000,
+        "clustgdd_post_steps": 2,
+        "clustgdd_post_lr": 0.01,
+        "clustgdd_post_wd": 0.0005,
+        "clustgdd_feature_lr": 0.0001,
+        "clustgdd_refinement_scale": 1.0,
+        "clustgdd_prediction_weight": 0.025,
+        "clustgdd_consistency_weight": 0.1,
+        "clustgdd_temperature": 0.5
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6650558710098267,
+          "test_accuracy": 0.655988335609436,
+          "selected_epoch": 110
+        }
+      ]
+    }
+  ],
+  "exported_utc": "2026-11-02T05:26:19Z",
+  "execution_environment": {
+    "python": "3.11.15",
+    "torch": "2.8.0+cu128",
+    "cuda_runtime": "12.8",
+    "numpy": "1.26.4",
+    "sklearn": "1.9.1",
+    "psutil": "7.2.2",
+    "cpu_model": "AMD EPYC 9115 16-Core Processor",
+    "faiss_dependency_source": "runs/implementation_comparison_deps_20261031/faiss_cpu-1.8.0.post1.dist-info"
+  },
+  "source_run": "runs/arxiv_clustering_comparison_20261101_v2",
+  "measurement_scope": "The timed input is the common CPU graph after symmetrization and training-fitted standardization. Timing includes reducer-internal normalization, clustering, updates and transfers; the shared input preparation is excluded.",
+  "source_manifest": {
+    "schema_version": 1,
+    "created_utc": "2026-11-02T04:54:17Z",
+    "methods": [
+      "cgc",
+      "clustgdd"
+    ],
+    "rates": [
+      "0.001",
+      "0.005",
+      "0.01"
+    ],
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "jobs": [
+      {
+        "id": "cgc__r0.001__s1__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.001__s1__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.001__s2__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.001__s2__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.001__s3__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.001__s3__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.001__s1__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.001__s1__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.001__s2__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.001__s2__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.001__s3__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.001__s3__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.005__s1__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.005__s1__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.005__s2__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.005__s2__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.005__s3__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.005__s3__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.005__s1__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.005__s1__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.005__s2__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.005__s2__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.005__s3__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.005__s3__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.01__s1__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.01__s1__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.01__s2__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "cgc__r0.01__s2__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.01__s3__author",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "cgc__r0.01__s3__graphslim",
+        "method": "cgc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.01__s1__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.01__s1__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.01__s2__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "clustgdd__r0.01__s2__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.01__s3__author",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "clustgdd__r0.01__s3__graphslim",
+        "method": "clustgdd",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "graphslim"
+      }
+    ],
+    "references": {
+      "cgc": {
+        "commit": "08ff04dc0d23110ff53445438f30bcff887e7c31",
+        "url": "https://github.com/XYGaoG/CGC"
+      },
+      "clustgdd": {
+        "commit": "60825c536f794e7a3bb0ff22ae4efc07ea2d3e3a",
+        "url": "https://github.com/HKBU-LAGAS/ClustGDD"
+      }
+    },
+    "files": {
+      "inputs.pt": "a3d423d5cb7dcdf3d5d07f0792af8061b875681f38fac72a66c28ce3fb0d4d04",
+      "references/CGC/fig.png": "e147a4342d264261fc79263bdcf9989a5f7df88a3d8314d100bcff251b6958d9",
+      "references/CGC/main.py": "80eff3b8a3a458d570952786ae9f622d3a6b46d439f9ede0ceeeb865e45441c2",
+      "references/CGC/readme.md": "80a4e882fd9f34e6d5398ef82185db647682ee3ce1b0ead91055971408b51799",
+      "references/CGC/requirements.txt": "acb8f8ace0a0d7177d0f12770c4b2ed0f0c572fe587021fdceb9af2f327fdf88",
+      "references/CGC/run.sh": "7061e226510f5dae583cded193b31b6bdeec46a670b942354171a97db4950533",
+      "references/CGC/scr/dataloader.py": "c32bdca461b5a0d344cbcb78f23894ad37e2ec6f46f9911d0fe7645037461bf7",
+      "references/CGC/scr/models.py": "f9cdd2bb20f090065812c78a0c79a0435014b03a69a978e177c97bb2df90d3fa",
+      "references/CGC/scr/module.py": "63bb166992720494a873634bd2b3101831e19a7df120b262dc846c397832552e",
+      "references/CGC/scr/para.py": "ce941868b5ae45a6f82cfaf7f8e1ebe985d99b0c98f43170372ad1346d34bee5",
+      "references/CGC/scr/utils.py": "3fe04f24d17c1b74ba779b8f70f34b60c649c8d3912b5787c596f9aa0489c037",
+      "references/ClustGDD/LICENSE": "9884421ef1074f1aa1d0c516d9f03ec36d1e1f921b228932d2fbdf7ed2c65bc0",
+      "references/ClustGDD/README.md": "c2f5de0a0afa020fbfb4a5c735687da82a78b404ca306e9a244aa7e1f9a9efbb",
+      "references/ClustGDD/clustgdd_agent_induct.py": "2724c153ae54ec0db9a75441d2f7b4a704b713c2d065611487b05824bad3de7e",
+      "references/ClustGDD/clustgdd_agent_transduct.py": "bc0ff4a5c74d742999a499ae4c350b93685968f7c08c8f7bf2647dfda5a8e79c",
+      "references/ClustGDD/deep_robust_data.py": "c44e85993b200d3aae05cbc37a217fccc0065d0014c062ba661e70ab96f0df9a",
+      "references/ClustGDD/deep_robust_utils.py": "9ac9efcb89a129715f5b45f413aa352b6b70a78b71790dced048804af13765b1",
+      "references/ClustGDD/main_induct.sh": "3d2f03dc4b5336053d7447f1f1ce79c4112737391383c0a72b128ab7da5f0d07",
+      "references/ClustGDD/main_transduct.sh": "c4a91ca0a3c25408f11ce55946b0797afbc6fe11f07bcd99b4c7c2a9191ad140",
+      "references/ClustGDD/models/gat.py": "7c81447bc80aa9f821b871f9defe04960ac122e7541a59318a44c6e66550d73b",
+      "references/ClustGDD/models/gcn.py": "ac8f2cbe401a37fe104bb37f498dba3a7adb560be0c93193eacd011dfd78bc38",
+      "references/ClustGDD/models/link_predictor.py": "03d39435299be51dcef86115b7f524dfba1ea8ee35e3b49fca8f56dba26fc251",
+      "references/ClustGDD/models/myappnp.py": "38520e0931d70fd6fff152a7f72b15a7ce09e09beb7d619bd0291208c75ce497",
+      "references/ClustGDD/models/myappnp1.py": "1998fdbbfa2178da5f7089cc33eabac983e82aea272acd300fc13a4c495110a3",
+      "references/ClustGDD/models/mycheby.py": "f67d39ca359ec68dcfcf9745da15653d4bc402c10253073674d276f49e994f3a",
+      "references/ClustGDD/models/mygatconv.py": "89db7bc69e3ee026b53d1f506e220f486abc3e9c0913b29b8557a0963e575d34",
+      "references/ClustGDD/models/mygraphsage.py": "8394c23851de35f5bac27cfc7e73300bff7ddf7db73d478f081ac4677ab693ee",
+      "references/ClustGDD/models/parametrized_adj.py": "40f9fe9f9fba7b4d76eaf393a771e08b3d27780e9f15786cbdcd8a216a83fd66",
+      "references/ClustGDD/models/sgc.py": "7ae0107544d0321b89bc7cba2072f16b7cfbb60ec16f995e02ac980b1b452ddb",
+      "references/ClustGDD/models/sgc_multi.py": "b0ae6c0f6230a6723ecbe93d817de975047768e4af3a00c388f4cb9d90fa6729",
+      "references/ClustGDD/train_clustgdd_induct.py": "d23bc33bc1cb80138a97d2e92637a0f99fe4e4a9b3b80b7ed8bfd955f6bed736",
+      "references/ClustGDD/train_clustgdd_transduct.py": "5cac81b9620c96c617b8acc5244caeef928eb26822f0273e8db4d603889b32bf",
+      "references/ClustGDD/utils.py": "4c7e85b33453e94be5c19fe81efea004c555e43cb802416fe7c9b7f2df626292",
+      "references/ClustGDD/utils_clustgdd.py": "f6117d6eebf7d64ed85eada4f02e6b4d6d29dc794415a16d6cffa600536b4a99",
+      "references/ClustGDD/utils_graphsaint.py": "901fb049e12dd4212d48d84a2d6e3c1116eb14bbab9c46ec0aba0d14760b426f",
+      "runner.py": "ed700e79ce0e9aaf333a05b8702192cafb5a488eaf9b901c708c713df066ae5f",
+      "source/benchmark/__init__.py": "fbffd754b77fad4c6003019e19402d40b244e53c45094b5e11a801a83bc6a21a",
+      "source/benchmark/compare_implementations.py": "5838776f1e2dd09c13463d2428bac8541a665f784eb1e0e0bf930fb6140cecbf",
+      "source/graphslim/.gitignore": "a7b0e2a34684d358e3963bc763025decbbe2dd81d1953284eb89afa121924af5",
+      "source/graphslim/THIRD_PARTY_NOTICES.md": "2e98ea18ac3d34a28135d2cc0166d28cf268720583fe4c4f4c11aa30de46aebe",
+      "source/graphslim/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source/graphslim/_lazy.py": "c744dc1a221b1d9fc2123517bee16fc02295e08caf56c0ef67d5c4f5b334253d",
+      "source/graphslim/coarsening/__init__.py": "25828def679401f63354dd0c178df43b161dd2ee83249459d9d1a237cb8c1242",
+      "source/graphslim/coarsening/affinity_gs.py": "46205c2883a47e09970e941f770ab5bf08dad21e7eb0759fd3fe9a992cc356c5",
+      "source/graphslim/coarsening/algebraic_jc.py": "1baa145630f7a80fb59d24dce919ef800e9e73801c5ca03e196389bc246b6bc9",
+      "source/graphslim/coarsening/averaging.py": "8382a051c9237628974e6613f589fd5eb8c128f53a7be41e408960639f9534a2",
+      "source/graphslim/coarsening/clustering.py": "41c626fa4c7dc03bf497700db55f8555572ab1b212b15d19ee7cb5609b291294",
+      "source/graphslim/coarsening/clusteringagg.py": "4bda09d6f73994e3597e07a8babe314b76369f47e0ef22a8c39f3afb8aa9a9e6",
+      "source/graphslim/coarsening/coarsening_base.py": "47bbc0822dcaa96b5fbe5eb496dc14415ad13e2f0c11cdfd6cf4f05bd284d3ae",
+      "source/graphslim/coarsening/heavy_edge.py": "0fffd00496364dcc7145f64c869d8b98c09810de9248ee8079dc169ba8a2bce7",
+      "source/graphslim/coarsening/kron.py": "28a47d4ec737d7c06a5b5cc6ad74f81bb5a2e8163b76b2d7b1d3a341b9e0d853",
+      "source/graphslim/coarsening/labels.py": "c2a1a828d7f95be7a4958840ef9bfbac1227d2eb89b6f8fa5ff705cc87d33f05",
+      "source/graphslim/coarsening/utils.py": "4cc746ef3011fb2b88bec1e4f4323497886f826177c490b26342ae767b1727f5",
+      "source/graphslim/coarsening/variation_cliques.py": "cc88cd7d834eb928a9865a4d71d378f2137b4777b030d222f2b54f32cd08df92",
+      "source/graphslim/coarsening/variation_edges.py": "c563e2a049ac269e0cdd389f75fda9306275e93b261ff2a93f13540aa3f1b22f",
+      "source/graphslim/coarsening/variation_neighborhoods.py": "8b97375cdbebde125a06107a85d87fed461d3058ce90710586f14699ccc3286e",
+      "source/graphslim/coarsening/vng.py": "d74c5ed54aeee2fa4d4af0d39c8dbb861ffc2f282c97f89bbefa230464dc520a",
+      "source/graphslim/compat.py": "84e4d35a7ef0a7331398911d8af5f241abd96f427cbe83736a5488622d213b9a",
+      "source/graphslim/condensation/__init__.py": "d589e2c03df23a98c80b376ee1887c766167c0ce13e34882f3976e296b845b42",
+      "source/graphslim/condensation/cgc.py": "c885afc1f453c909d12ff989fb34c96247786196b856ee9abc78ba4fcbd5ab66",
+      "source/graphslim/condensation/clustgdd.py": "c8e9f757730550e6d52398544b7f70b0ce771657593623439b0562873efba4c3",
+      "source/graphslim/condensation/doscond.py": "1ce00cb408fafb42c0c61023cb6cfa0c89d28e37364bdc0fedbef2edd9886aac",
+      "source/graphslim/condensation/doscondx.py": "20d54ac5960197a6874edb4c4c8e9597f43951624aaa2894a1193dc0d09b4fe6",
+      "source/graphslim/condensation/gcdm.py": "1f5109da61dd84763f2ce6f0f84bcb210207f57565e3ec50707883592c0daf75",
+      "source/graphslim/condensation/gcdmx.py": "9b4199bb79e7e5e473aea94be4da899df8ea1a9d31d6782e6b9960216a232b4a",
+      "source/graphslim/condensation/gcgp.py": "038095a2cc55ead1cf17a7418b3b96c42678d48fbfb1a074a535845e05a88025",
+      "source/graphslim/condensation/gcond.py": "de69368eb28056c4145eb4819cf06bd3e06df7e81b3606ef6774b01d039aa486",
+      "source/graphslim/condensation/gcond_base.py": "8d27b5ee911928944c102978749817d1436d2111dc023e29a8648ec68a1a0da3",
+      "source/graphslim/condensation/gcsntk.py": "50304c96a48c6489eb9287e1e6f93f0faee743e805cded81ec99d2d694ae7b19",
+      "source/graphslim/condensation/gdem.py": "5c2cfe7e2a315a447595a2eebd415b12dcf79ffa0fa59413c7ff2418d00999d5",
+      "source/graphslim/condensation/gecc.py": "63c4676aa126998889af27050c59cd5436811a49a7235848bcc7b10a59ad00c2",
+      "source/graphslim/condensation/geom.py": "4bec1f1a10ccabbfb1df5565c6b1b81c293e87a5ad7b90cfb96e995c878534f8",
+      "source/graphslim/condensation/mirage.py": "42bb2b2630fa4cb8fb2b47a6b06cd687169595bed0a3e94a861fc797ade6a469",
+      "source/graphslim/condensation/msgc.py": "fda3a9f642a8a403eee62d999e30d74fdaf6d7fa8b40208e47e11151ae6c1749",
+      "source/graphslim/condensation/sfgc.py": "72cd18ab78b9ad1c0e62b4f2dad861293b049f624596a6f80cc1d664ebadc438",
+      "source/graphslim/condensation/sgdd.py": "9bf2f4eb982d5285014bc88cf3acf564656e44b143e91394f1cb934aaa0747c4",
+      "source/graphslim/condensation/simgc.py": "95c414d3dad86c469ff042f552a536a1a5f63467b006f8ff0e2c6b27acbac16b",
+      "source/graphslim/condensation/utils.py": "5f57702bc98935588a0704da067f2c6ad8742a8ba49b6c420e937488c04fd71b",
+      "source/graphslim/config.py": "18d9927a04b5df85f5185a0e6ada7dd4b88df67a441839b6511dc51d9fcff6a8",
+      "source/graphslim/configs/cgc/citeseer.json": "8d67e0da11fddbf586bf6ceeaf45f011ce963cfce8daa89ba2ffa38ea55a2004",
+      "source/graphslim/configs/cgc/cora.json": "cb36e8a3ae8840018435b50b1b37675fa1494e79c4197e0248a70ff215419d24",
+      "source/graphslim/configs/cgc/default.json": "1731ea3f68509e005f4bfa2c1efd30f948201cec418cc7b38f3af62f602d9d24",
+      "source/graphslim/configs/cgc/flickr.json": "f301d354dd670841d741c34694b596768ff16ec1c400fbd427824527ae9a76a6",
+      "source/graphslim/configs/cgc/ogbn-arxiv.json": "ee39323180e200815389b6254597eed4f0f8dfe03e53a885d099fe0faaaf2d89",
+      "source/graphslim/configs/cgc/reddit.json": "78574e1e2e63ad700b5276e2f1da3fe9b2ea6d8fc27b408c22b0c2d1922c4b86",
+      "source/graphslim/configs/clustgdd/citeseer.json": "94595b347328ee026250c885894deed0b3f0e1dfdc2f0ad311194eac08f8b1bc",
+      "source/graphslim/configs/clustgdd/cora.json": "fd941a766a9ef0656bf408ad42b28f468f7f241b8a15ace7058de1a1b2b4db0a",
+      "source/graphslim/configs/clustgdd/default.json": "94727686549460309b088fda3c534d1b7a6237afeb4da892fc5d970e3ea9ed63",
+      "source/graphslim/configs/clustgdd/flickr.json": "1929ac600f4f9196482dc402123faf63dd8b8436bbc98e94c3f9ec294b0af39e",
+      "source/graphslim/configs/clustgdd/ogbn-arxiv.json": "a68c43dbab264f79e25b0f79b699fff0261905f4999b7501529c1127ee693412",
+      "source/graphslim/configs/clustgdd/reddit.json": "a726a6771fac5eb6d068f37a5c98640cc6ecd0a3c382101cc60c138644fb35ef",
+      "source/graphslim/configs/doscond/amazon.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscond/citeseer.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "source/graphslim/configs/doscond/cora.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscond/flickr.json": "44175bbbdd00587dadceec7bafdb22ebf1dfcd916a79af7b4d5a4f228e02e1f7",
+      "source/graphslim/configs/doscond/ogbn-arxiv.json": "c6c4f297d3d5c03bf5ba8844c75cfcca2d7d48e41a20c84de3f88240af84267a",
+      "source/graphslim/configs/doscond/pubmed.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "source/graphslim/configs/doscond/reddit.json": "b9dba5930006d82078c62f426b32f15da9d7e1c505016632bafd9dc4c022d32e",
+      "source/graphslim/configs/doscond/yelp.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscondx/amazon.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/doscondx/citeseer.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "source/graphslim/configs/doscondx/cora.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/doscondx/flickr.json": "bfc902ac3226a1b336cf5d658fbee55e63f9f51866df6701a8514a963cfbb8f0",
+      "source/graphslim/configs/doscondx/ogbn-arxiv.json": "516eaacd0c6fcdddf308bfa0046588e81b6c1649b6d93b372e0a27c17d918b4d",
+      "source/graphslim/configs/doscondx/pubmed.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "source/graphslim/configs/doscondx/reddit.json": "5c1be4b2fff996386fe87a85fdd7a6b6592e973a78cffb099056a1890b94a821",
+      "source/graphslim/configs/doscondx/yelp.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/gcdm/amazon.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdm/citeseer.json": "d91c40c4e982f388d6acdc36dd28962084fc052bdcfd60a288f0987020a26688",
+      "source/graphslim/configs/gcdm/cora.json": "6b0dbabd5b77a186c820f2de190926b3d35874922d0aaecb0c40a8ba2c576b3f",
+      "source/graphslim/configs/gcdm/flickr.json": "40ded01a18b203e4f4d512aa58979cf0ad3a71060df02ceb12a27f3c4cc84349",
+      "source/graphslim/configs/gcdm/ogbn-arxiv.json": "38d6d29ba35f059f1a701011a0fc3827382ef3f115e3b93a33f3235319200113",
+      "source/graphslim/configs/gcdm/pubmed.json": "98a5a10e4e15d0b1b253b5b4fbd0dde8c34ebb8cc39327d96f27cdf7522aaba1",
+      "source/graphslim/configs/gcdm/reddit.json": "7fdf9ad38d640297bc04bc7674a376b60dff467e38a52001e22c79518d944378",
+      "source/graphslim/configs/gcdm/yelp.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdmx/amazon.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdmx/citeseer.json": "d91c40c4e982f388d6acdc36dd28962084fc052bdcfd60a288f0987020a26688",
+      "source/graphslim/configs/gcdmx/cora.json": "6b0dbabd5b77a186c820f2de190926b3d35874922d0aaecb0c40a8ba2c576b3f",
+      "source/graphslim/configs/gcdmx/flickr.json": "40ded01a18b203e4f4d512aa58979cf0ad3a71060df02ceb12a27f3c4cc84349",
+      "source/graphslim/configs/gcdmx/ogbn-arxiv.json": "38d6d29ba35f059f1a701011a0fc3827382ef3f115e3b93a33f3235319200113",
+      "source/graphslim/configs/gcdmx/pubmed.json": "98a5a10e4e15d0b1b253b5b4fbd0dde8c34ebb8cc39327d96f27cdf7522aaba1",
+      "source/graphslim/configs/gcdmx/reddit.json": "7fdf9ad38d640297bc04bc7674a376b60dff467e38a52001e22c79518d944378",
+      "source/graphslim/configs/gcdmx/yelp.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcgp/citeseer.json": "ef1908e300dab1ebbaded2b19818101f9fe70d585a7a92e07ceeaab9203c58d2",
+      "source/graphslim/configs/gcgp/cora.json": "b41dc9b99f877b930c82221c34ca0c5db91d85e68cf2ea54542cf8d11e3b8909",
+      "source/graphslim/configs/gcgp/default.json": "c90e19f6c2ad89699c4d24c67cb1eab5d6b4ff679d5035f2f0615940d27d05cb",
+      "source/graphslim/configs/gcgp/ogbn-arxiv.json": "80cbbbaaa5349f8c7db1fc0207b500346e2daf1702bbf6c0a0fba3a31ecfed9b",
+      "source/graphslim/configs/gcgp/pubmed.json": "e0356900b2764aa1f617b3d2a4e7fdbf99a440ef91eda71d13d571ff3ee316ca",
+      "source/graphslim/configs/gcgp/reddit.json": "df407ab8d5a3e2269ef0c5a0a25fb35a0d74259da613e325449e41033e462072",
+      "source/graphslim/configs/gcond/amazon.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/citeseer.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/flickr.json": "065280d6246101c83026a2be15a71c54e173b1e44b3b960e198be3e0bdf1fcdc",
+      "source/graphslim/configs/gcond/ogbn-arxiv.json": "15b7f6848ec5a1e7412c87fd10cef78d4641926af183e7146b42698e9a613681",
+      "source/graphslim/configs/gcond/pubmed.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/reddit.json": "69ec5eb71263dba4e5d95184e8d6d4a109d9219770fa35d8a1a95f8732507f39",
+      "source/graphslim/configs/gcond/yelp.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcsntk/amazon.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/citeseer.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/cora.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/default.json": "cf3fc87bfe47daac43679efbf6a1b2d6ab03bc40a5dfbbcea827ebbfecd29cdc",
+      "source/graphslim/configs/gcsntk/flickr.json": "b1a823dcee6eeb0331425ee6c0d2e91deab502c60362c3130d9cb6e2adb2312a",
+      "source/graphslim/configs/gcsntk/ogbn-arxiv.json": "59c416f2dc0eed25a61a05cbe88362a97c17396318a6a501717a174d5714f282",
+      "source/graphslim/configs/gcsntk/pubmed.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/reddit.json": "912cda1dc5b413644bdc5d56bf8884702a2f317c581c92ac385a5a01011153dc",
+      "source/graphslim/configs/gcsntk/yelp.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gdem/amazon.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem/citeseer.json": "f945e92b5ae4649b3665f0c6160e87f5fb117cc9925b256623b9ced565ea5005",
+      "source/graphslim/configs/gdem/cora.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem/flickr.json": "7f574d75f7b85534e02f27ef3f62fde1e2c4d4a05a03cf6959a76cbebba3a950",
+      "source/graphslim/configs/gdem/ogbn-arxiv.json": "06301e27340c26ca1f096636e9a86d4a517dde1026e6cca39cc360599a74dfd4",
+      "source/graphslim/configs/gdem/pubmed.json": "943e42e77c8fa69f725a9341b6ea2e1f49380558462e7fc6e58b8450aa552685",
+      "source/graphslim/configs/gdem/reddit.json": "22f50218d6bee1b98547c769b28bdeba6d849f62e5f526079b43cb4b765f3068",
+      "source/graphslim/configs/gdem/yelp.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem_author_init/README.md": "a6290bfcf741d53472fdd280937750085f1e5e554d1c7a1c321f59edafa05228",
+      "source/graphslim/configs/gdem_author_init/flickr.json": "a368d62de2e1fa42f50e2886c02b3faf0a27291bbb526efe241841e2a60df6c4",
+      "source/graphslim/configs/gdem_author_init/ogbn-arxiv.json": "87cf77370ae239eadb39fad47fc2eef08f971ce37b6986636ed01802579fb95a",
+      "source/graphslim/configs/gdem_author_init/reddit.json": "fd2d314764ff34d1f4be1f106912b74da394698025e63ff3541d8331d344b926",
+      "source/graphslim/configs/gdem_author_init/yelp.json": "fb9eeb5c00190f926b05b1b23abfd2b849a92aed47f5a50f084a54272f05ad29",
+      "source/graphslim/configs/gecc/citeseer.json": "076e72f47caf425ce6155b50993f20791c985a300b15a4c8c8c930f627006ae8",
+      "source/graphslim/configs/gecc/cora.json": "cb17054baf6b9b1ed9f66cc47773fd1d8c6ca1f1a6587185403b48111740309f",
+      "source/graphslim/configs/gecc/flickr.json": "e7e5c13534831702addb25aadec42795919bc0fcfc8c5bc895f5cadf30cd5744",
+      "source/graphslim/configs/gecc/ogbn-arxiv.json": "36abb1fb77da77556f78fb627e931ae929306dbf2e3cc637300de9ccd3ca5376",
+      "source/graphslim/configs/gecc/ogbn-products.json": "9055a1ac12a73d383b22b1f1421150e33c9c332d94b6987f1a09e641f7aca736",
+      "source/graphslim/configs/gecc/pubmed.json": "dcbefd0043621be4aac443dbe98b2edd5558a5700e7b2c69d45109da8adedd43",
+      "source/graphslim/configs/gecc/reddit.json": "3ccbfb624f94776f313d83da09c30a5a059c03f32e813b3be31279bc49edc2e9",
+      "source/graphslim/configs/geom/amazon.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/geom/citeseer.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "source/graphslim/configs/geom/cora.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/geom/flickr.json": "01ad1ee21aebfa7ec612446571eafb4f6baa2e31883268839968b855883c562c",
+      "source/graphslim/configs/geom/ogbn-arxiv.json": "cef2b658eefc5ac0e040cb1cc608100dfabf619f5989d05c079c3467560da2bc",
+      "source/graphslim/configs/geom/pubmed.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "source/graphslim/configs/geom/reddit.json": "d47ed3a02afc2b433dc3ec8d5ef826a5afd7ec73ed4b3f948f98176b3f74a647",
+      "source/graphslim/configs/geom/yelp.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/hpo/README.md": "fcb40aeafbb603c03657778f4d0722e84cf76887642de1cf996a9affd1c41ead",
+      "source/graphslim/configs/hpo/gdem.json": "46988cff7736f61fe2d3301ec74e223a1715f13a0890abb247e4254b5435e3bd",
+      "source/graphslim/configs/msgc/amazon.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/msgc/citeseer.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "source/graphslim/configs/msgc/cora.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/msgc/flickr.json": "15261f59c9616fea1caf4507e42683ce154d7d5746f41e769ed1c4769e1442bc",
+      "source/graphslim/configs/msgc/ogbn-arxiv.json": "3bd5b050a9da42bebfa0cac9e38775589cf15dcf3ce5a767f9462f5dc50bc2bc",
+      "source/graphslim/configs/msgc/pubmed.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "source/graphslim/configs/msgc/reddit.json": "fcaa227fc15f03e42d0c73ef05e50b19da82df067bf46376652c96e1ac9d72ad",
+      "source/graphslim/configs/msgc/yelp.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/sfgc/amazon.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sfgc/citeseer.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "source/graphslim/configs/sfgc/cora.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sfgc/flickr.json": "5c72b5b3af9d326f226be805187652b727f7fd8a7b14628fe1f0135d7fbc5827",
+      "source/graphslim/configs/sfgc/ogbn-arxiv.json": "e4e1bad9718ab037be9ed2d68f1aff06af634efc94a9fa34044d14b3d81ddc62",
+      "source/graphslim/configs/sfgc/pubmed.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "source/graphslim/configs/sfgc/reddit.json": "f4f4789cabf9042b1d2e1806a51782d13f1409abf0eb65c254bd259a161724c7",
+      "source/graphslim/configs/sfgc/yelp.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sgdd/amazon.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/sgdd/citeseer.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "source/graphslim/configs/sgdd/cora.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/sgdd/flickr.json": "543c15bef1ff5a425b48334a600117221753a90e85a9c5a8f9856d60ef20ceb5",
+      "source/graphslim/configs/sgdd/ogbn-arxiv.json": "d897422fa19c87032a9d63f69a9885662d3701e79828141908475171fa821f9f",
+      "source/graphslim/configs/sgdd/pubmed.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "source/graphslim/configs/sgdd/reddit.json": "21a55b0b675821179617da5ada4ac853bf3da3195041b9f92fd6e808cfc4eae1",
+      "source/graphslim/configs/sgdd/yelp.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/simgc/amazon.json": "c72c174f3a836b130e19718b009ab70da5856a11f1e16d7fa3fa8cbbe0686b86",
+      "source/graphslim/configs/simgc/citeseer.json": "1488b18a947e948d51938213bb2e9b7ddc434db0048130fb6a9f171222da4f42",
+      "source/graphslim/configs/simgc/cora.json": "cd4f4674f0093e3dab46c75e1c046d1c0904d468daae5e4243738199df65ed81",
+      "source/graphslim/configs/simgc/flickr.json": "499bfa1d2d9213f432fad7679ae70905271ec243d6b7f632a844072defa78755",
+      "source/graphslim/configs/simgc/ogbn-arxiv.json": "3b565fbb409cb0f607eaadf9ec64f6e0db301e23fd0212d69b18d4390a950046",
+      "source/graphslim/configs/simgc/pubmed.json": "3b565fbb409cb0f607eaadf9ec64f6e0db301e23fd0212d69b18d4390a950046",
+      "source/graphslim/configs/simgc/reddit.json": "ae708e86ac85c4da73c1cef0b1c9c803226790a0ef7aa7cd0826e25ef8a7f02f",
+      "source/graphslim/configs/simgc/yelp.json": "ae708e86ac85c4da73c1cef0b1c9c803226790a0ef7aa7cd0826e25ef8a7f02f",
+      "source/graphslim/dataset/__init__.py": "4b44442e75c6996a8a0e24d89e6f9c0d784142b451e12447d8eb9deb30f32a09",
+      "source/graphslim/dataset/attack.py": "92ad86dfd945dc3c83282bbb1c0311c313f13b7db7dd277910de60c5faed83d8",
+      "source/graphslim/dataset/convertor.py": "9dc78834991a6d25368866df4e35907a7616172e8a2dadefc6cc9fb514801470",
+      "source/graphslim/dataset/loader.py": "8d773a3f909d5c1949b6275db9e7816b1d389233176e65405976557ea9c3cecc",
+      "source/graphslim/dataset/noise.py": "375537bc9b84b1cb751039eed77aad51866a42cba44cfcc07cf2ee4d880b2a24",
+      "source/graphslim/dataset/utils.py": "63b8d5f6394ab825236167366ab5dc572299d5fe3039b9f5b12d280b26765854",
+      "source/graphslim/doctor.py": "73f51c3fbb1050cf66324c9baf616d0a38531702c56c7f50587fee988b21e9da",
+      "source/graphslim/evaluation/__init__.py": "861560effead077ed080b6d70b1176dc3dee77de28a80ea21fcf36c2fdc0798c",
+      "source/graphslim/evaluation/eval_agent.py": "4b0e80fcd49b4b2d56f484ea612b83650285ddd8d14223142c60b8d082649e3f",
+      "source/graphslim/evaluation/graph_cache.py": "2f3c84b60fb913f1a7ce43108f6722af413557fb2a37a50fa4604e3ca4a022d9",
+      "source/graphslim/evaluation/graph_property.py": "81300dc9a177b438a3c126a5d82674103e6acb6bc05aecd6f8fb14b671938700",
+      "source/graphslim/evaluation/nas_eval.py": "34bd88f315c6d016e5558a9bd03a631b617ced7a564a7ca0dcbc1a5c03bb27a3",
+      "source/graphslim/evaluation/scripts/run_cross.sh": "887ec9ad5d8b180ca3b377347abc6e9aebe92707c9482cf728acc130b0dc5305",
+      "source/graphslim/evaluation/scripts/run_main.sh": "66c3f856ed74e1fc637c46f34fd0c1c8f158c641f65072d6173f6d039c1d4f8f",
+      "source/graphslim/evaluation/scripts/script_cross.sh": "e278a138c233ef3f1991a025305eff74c279687cc593288806dd38e7023c6c66",
+      "source/graphslim/evaluation/utils.py": "88f76e2cdcbf7b6666ffb384d49f60331309b25726b2ebcb53fd2feddba4ab9d",
+      "source/graphslim/hpo.py": "944419303583188c7a283435b7bbd55cda15c164833a9daa668ab7c18724ff44",
+      "source/graphslim/layers/__init__.py": "9aaa3084e62f2dda5b7316d83f88d4606b36d4018f0a53d056ea51960a9a7809",
+      "source/graphslim/models/__init__.py": "8b7cefc879a8efb56bf3454994cf6919345eca5b0d9accf8c745c1f911a68f15",
+      "source/graphslim/models/appnp.py": "82df8fe747e43173f63086f62acb2c76f27b6e642cf79a9fd4bab95e2c07c65e",
+      "source/graphslim/models/base.py": "0326211e41b2a2a0eefc0e50654033a3dade981b2a5fd4e875e59c7479c99e6a",
+      "source/graphslim/models/cheby.py": "8a6727ca93e2f5bae6772cf03e62c1bfa9f32f49b7169bd0c8eb3cd600ba94aa",
+      "source/graphslim/models/gat.py": "7bc0891cbc706fd9ba4fbf9d1a62daa86afaf4ef779b63ace1d189e00a7e4262",
+      "source/graphslim/models/gcn.py": "f721ab1a6b7d20758c44cd05a47a16e92c84692ca519956aad5afffe9e4d26e4",
+      "source/graphslim/models/gntk.py": "747f14a44d39096fe9998151b42024fdfd09fc15eb909a8465a68d57752b14a2",
+      "source/graphslim/models/graphsage.py": "4b0ba510fb0bd630ce00b1744ae4ea046ab215981e53f06b9a5d41367f0fe29a",
+      "source/graphslim/models/ignr.py": "f1cb5e76588f6786715e3289280b9fc2825d49de06c90f795654216314a741f6",
+      "source/graphslim/models/krr.py": "013ec9938886d6ab405af1dab484f2400d412d4daa2d97e2f5fd2ee78c212408",
+      "source/graphslim/models/layers.py": "c70fb1e806cd7dd65e5aad2e2d808b73744092326fbdb7440825e042567759bb",
+      "source/graphslim/models/parametrized_adj.py": "5e39cedb1c01a1cc2434a88365ebc9997a6de1515520f4073de2954195ba28ee",
+      "source/graphslim/models/prbcd.py": "cbabff22f851e59c2b86fa0b4bdd4c5c114834f993f4444fd08099e0e9329bd2",
+      "source/graphslim/models/random_attack.py": "06792b99234b2b856fe6c9aebd7052769036e388def8dec1d3fd4754f8b61a04",
+      "source/graphslim/models/reparam_module.py": "fbb99e14bd8d3ea9de257883cb408962cc108b4f32fd3374119eec78842b70cb",
+      "source/graphslim/models/sgc.py": "4262f4b2cdc59f2ed4882fe88df254ea414cce05b6c13a81d15607f30c50ddf2",
+      "source/graphslim/models/sgformer.py": "a441a32e8492213f5611871bac1b3b8bcef10897ed9f231616f5a85ade18bc5a",
+      "source/graphslim/models/sntk.py": "2867099007a7c837d0087f617dbfe920f3166eafb94362d15bcfdad5996403ed",
+      "source/graphslim/reduction/__init__.py": "bb2651c0e199bac6a9a61876b053acb11419a9c077eaf41fe5648ba0a8ad662c",
+      "source/graphslim/reduction/cluster_ops.py": "b2d291cf7e793dccb8f954209f0497909c33bfcb5f047db4eee1a3e4f549e207",
+      "source/graphslim/reduction/lightweight.py": "476e84eb0fee356346119cc96316129f19cd80b1b02de4e237942174587f6bf3",
+      "source/graphslim/reduction/registry.py": "972e7b512c1a6d3253728c0259b27332618e99c5808bb2dfcbf2f4af2878ee1e",
+      "source/graphslim/requirements.txt": "13db6c4c3b32d06c9e85b662e16650b6093036900a1dd40b3d81d49418f0b2ac",
+      "source/graphslim/requirements_torch1+.txt": "27bae61a0eb90e1acd49666228fc9f8ba5def1815b861fba4b55b6549d37c5b1",
+      "source/graphslim/run_eval.py": "08a2f378fcea8ca7e74b456bf46975de8c02486f3ce161b1b4cee7162c3b8f1a",
+      "source/graphslim/scripts/all.sh": "92aa93a73f67108fdf5ed65e723af5ae425622de3d5911405bba50d1d64bcd8d",
+      "source/graphslim/scripts/common.sh": "6e23369eb35b82110ce2421f67b28332fa48171950821edfdb917b43462eb724",
+      "source/graphslim/scripts/main.sh": "6496bcd06de4d0fe2e0f403e2bb7c1aa82008acadf1303a809595f114d5f046a",
+      "source/graphslim/scripts/nas.sh": "ea396b0bf0b8ef8c2dffda1a30df36538b7edf3a713eaf0b0efa8edaed6e0d2f",
+      "source/graphslim/scripts/requirement.txt": "d13eb2609aa83314921df5210e6620c9495e34eba15f840470c60ddc4cbf3bf3",
+      "source/graphslim/scripts/run_cross.sh": "9ca9ab7b7fae4c1372f1c8e77d78edcdea213134d746cfd3d0170fcbb0d7a203",
+      "source/graphslim/scripts/run_main.sh": "91546e606b66a804eeae9585683ec506def971aa9cf0e136338c200a3cf867aa",
+      "source/graphslim/scripts/script_cross.sh": "f09e3bfdf993258436d76916a9f4a66e79f28db0746bac0e093a6014678fe5e2",
+      "source/graphslim/scripts/script_robust.sh": "7cca879e4f68528dd0300bc8db1365789bba52f7bd3b263dfdc95e0226be9ca6",
+      "source/graphslim/scripts/sogb.sh": "e5eccb19a4334dee44fe5788d7ad65c3002b07f164a9ca3b6717ec3be7837832",
+      "source/graphslim/scripts/sub_all.sh": "8221fba832b6dc26e544a05b11421f5ec51eff840837436082152768eb1d8825",
+      "source/graphslim/scripts/sub_eval.sh": "71f5b63c19818660d01b445ef4739e77c78515541c5d762ac575f89f649b5ecd",
+      "source/graphslim/scripts/sub_flickr.sh": "4b76abb68e139e61d0eb61c8db9b9d7c0b74c09aaa54fe05860ba7ebc8e39622",
+      "source/graphslim/scripts/sub_grid.sh": "ede42d15211faea0e5377921eb4eb184f15f0dc1b55fc0c71c5d690974af7ff3",
+      "source/graphslim/scripts/sub_pub.sh": "c734fbb03a0f47856cd07af903ca20bf7e063bbd2e7177cbc93580fc580bfce7",
+      "source/graphslim/scripts/sub_reddit.sh": "73a41e10ca00b42cd4d07a31865a3ff4d259f86d6fbb4c40385fef27160ae167",
+      "source/graphslim/scripts/submit_IPC.sh": "f7db9b8472aa4d5315d8a640d4f4b261060cbfe2b9db8bac62984e14a7fcbd72",
+      "source/graphslim/scripts/submit_main.sh": "8cb8226fd3572a154953bc65465ed811999195d10311f0fc689d0e8d94b8b09b",
+      "source/graphslim/scripts/submit_nas.sh": "5351d2739d60d0b5b479c294674efff8ee967f23f5251da4343f357ed0160abf",
+      "source/graphslim/scripts/submit_robust.sh": "6af36e4129ba9b783becb4603987f6d84dbc6e981f8e2dc6103f8f9f1c2cc9be",
+      "source/graphslim/scripts/submit_transferbility.sh": "cae48e6230195954e00ac27800dd5a67cab547e832febbfc60f2fd036eae733b",
+      "source/graphslim/scripts/transferbility.sh": "df78b7f18a99ef29fc25af195c03773c53c6846bb83840230d409e36030da93a",
+      "source/graphslim/sparsification/__init__.py": "65336d811611ff4f61dfbcc214e6bc697868d5b3d2951e6afc09bba7008646b8",
+      "source/graphslim/sparsification/cent_degree.py": "810a80ae275a3895df0d15f85d7f2fed6d93ffa6c3669247fa25fbd75862d1d2",
+      "source/graphslim/sparsification/cent_pagerank.py": "64d950248a7f4ee373c7c31a37887080a473748ef0862ce073effee1c480bc71",
+      "source/graphslim/sparsification/coreset_base.py": "4f368057acf2f44c986246d8f095dcd9b01910e1a9ef20c30d52ddede48fb8ac",
+      "source/graphslim/sparsification/edge_sparsification_base.py": "5a4081b371547642c3841261b045806dcfea77475dc88919161b809f0f074c39",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy": "a82c648ac9a41256a0a9683f154a32cada8dee6a502af4f7545f80e216400116",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy": "415819ef8df951fcbd6430a54ecd91545a84ebe9b81c9e0ffefdc48945c70896",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy": "c973145ec28a1193ebc88593680a5d7df15560fe9b85f6ac383b076c4753cb03",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy": "85dc935fbc8c30015e45921a0e3bba5009de01d53342a49813068a14bdf6c101",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy": "43b834311096a69673aa061ee256575bab2401d1e317ba34cbd16c1c6c0785aa",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy": "e558f33c716d9371cac913a9a724ad4422ef7416647ee3ad798a93bdbcc84cf8",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy": "106b799a50d7d7781dd5b973b3fde7d62aa8fdf654455a53fb470a0c731cbc41",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy": "0f1a2b6484dc00c499269e498a98a7c5be24db1c2db55ea018c5adb3f259aa7b",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy": "48de5e2ba2e5b3c8f9485d86e9cd7d50cb0c1c71866d5b100de181f1e22609e8",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy": "dc3b4ca322fc7ad12c6637727e88ae1892f61ea7f60c05a5e5faf778e235ef3e",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy": "acf5455f7b7dc5092baef027eb0463658c555df9c5e71b1651b7535644d20203",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy": "4b30d7a67fdf99d0bf251a434b9d1132da82c5e3550a3fec0882dd7b0da6af71",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy": "a6ed87c1663b879a0fff4b87efa94dafe9717ad797a44487a167b78ab561982a",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy": "ccd09195f7a7d2292bb93cc0a292bd2a1a79da7a87c299a6fbc46715a56a2066",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy": "baee69778120f3689203692f0d4882c5dc8a970035e0910d0d4018b88c5ce314",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy": "2ee458251759dd38fb69e3931de785d5a0c0d6d4464aa2791ad756e855e34daa",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy": "2ea40dd9a09d29a80f88b525ee43aca908f482177ca726f1cba19524c9ff07aa",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy": "8c2cfd76960e633d8b1673fe885ecae39e8824f480d824a1c54f3753c1f7c97f",
+      "source/graphslim/sparsification/g_spar.py": "c502aac8a94925b71678c15b2902ce74a8d9d684e48a8437bbf842f73e7fa495",
+      "source/graphslim/sparsification/herding.py": "b74910b90b960ab526d00b6cd95c120593fe807e03943fb28fd3cca90836bc2f",
+      "source/graphslim/sparsification/herding_agg.py": "37d15c7a1d5dd718a78a2eac4f95f8cdbc9e5461e6fc53a6d01e43b6f270310e",
+      "source/graphslim/sparsification/kcenter.py": "7d9d8b3359dd7325d480e0d2bcebdb2b85ccba072063c4717556fdd8b151e321",
+      "source/graphslim/sparsification/kcenter_agg.py": "42b9e2dc85800220fdbf5cff2425fce105ffc1341297cafe43bf66ddc1b18830",
+      "source/graphslim/sparsification/kcenter_sample.py": "7b3e8605325443fbf6daad66bfa862703c2f55e5e24cb7836106c5a4997d2fcd",
+      "source/graphslim/sparsification/local_degree.py": "786cdb75eb52f903a1bd984831f41ef6fde2ba110e30ae41c8fe446479c5e952",
+      "source/graphslim/sparsification/model_based_coreset_base.py": "1acd253f97984358ed831b9c38723d07045c17b54b44c647a8558553020ec509",
+      "source/graphslim/sparsification/model_free_coreset_base.py": "1aba7b6723e85d6722e5508b072d073d3fa0c4f9cac4d8dd330d751c3b6df001",
+      "source/graphslim/sparsification/random.py": "fd1bda702f80f065a2522adaa852c0aa3c8a8dd2a3952c33194028f5e4a8e47d",
+      "source/graphslim/sparsification/random_edge.py": "10a19d248f70b51e2ee29aa2ec1a7e29ac94172d7128cb74dba04db2c19e4832",
+      "source/graphslim/sparsification/rank_degree.py": "dac94fe94c6331f7bfec6020d0443cb1a6e5b4c3e7e934ee6aad0b060415c6d8",
+      "source/graphslim/sparsification/scan.py": "9b035b0b14874bcd61294afe3750a3eea2445b398017ed18f39c0396c7ec935a",
+      "source/graphslim/sparsification/spanning_forest.py": "804ef7292ad10d18e0d176316f5d6f2ac266d64d6b366a0e2df87e5e019ee621",
+      "source/graphslim/sparsification/t_spanner.py": "2eb8499a90b5885f3fc724a8b3d5ae57a941fac61a12b9174c453eb477605f9d",
+      "source/graphslim/sparsification/utils.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source/graphslim/tracking.py": "e3639e792674fa1eea286e279f185d52152e0a8641d13e5f9d92ef760ee8db36",
+      "source/graphslim/train_all.py": "73e84ae97bc2369cf4530217d74be5ddda96899269e67e866fe58b5df40e865f",
+      "source/graphslim/utils.py": "9b2163df96dab6fdff5c596a4ec272b16b00e9368462550630b61d7d98d30a3a",
+      "source/graphslim/visualization.py": "8a72684098b5d82ffdbfb54d20cd21b3e411206e5e642f64af32f1305a019c63",
+      "source/pyproject.toml": "a150bc0321fb4e759b262e05f9570f9e6b10b7e0ba161d76ffa3b58c283eb5a3"
+    },
+    "input_sha256": {
+      "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+      "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+      "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+      "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+      "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+      "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+      "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+    },
+    "data": {
+      "nodes": 169343,
+      "edges": 2315598,
+      "features": 128,
+      "classes": 40,
+      "train": 90941,
+      "val": 29799,
+      "test": 48603,
+      "raw_sha256": {
+        "feats.npy": "e2e4dda733eff8130a8e3ff0167ce091ee145eb6f0e6eedb8e04fef36100e40b",
+        "adj_full.npz": "920dae5bad3f63b07f5b8883493b298f026778d7358c14b955985bacbbd13771",
+        "role.json": "ef30aec176315e5dd6b5f4bdc2a40741542723c55348b9141a70aeed2c00babb",
+        "class_map.json": "7db3b1c89beeaa51c10d43b5888b60fb8b23a73ced4ca6df0a413240a3820b77"
+      }
+    },
+    "gpu": {
+      "index": 2,
+      "uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952"
+    },
+    "protocol": {
+      "threads": 4,
+      "device": "cuda:0",
+      "rates_denominator": "labeled training nodes",
+      "preprocessing": "full undirected ogbn-arxiv; StandardScaler fitted on official training nodes, shared saved tensors",
+      "precision": "float32; both CGC reconstruction solves float64, ridge=0; TF32 disabled",
+      "cgc": "rate-specific package parameters; spectral clustering; FAISS/sklearn both 10 restarts, 300 iterations",
+      "clustgdd": "rate-specific propagation/alpha/loss settings; 600 MLP pretraining and 100 refinement updates, hidden256, 2 post-propagation steps; both MiniBatchKMeans n_init3, max_iter100, batch_size1000",
+      "adapters": [
+        "shared inputs/splits/output contract instead of repository loaders",
+        "CGC confidence masks copied to CPU for its CPU confidence tensors; native CPU clustering and GPU aggregation retained",
+        "CGC reconstruction precision harmonized to float64",
+        "ClustGDD MiniBatchKMeans restart budget harmonized; integer IDs passed into native compression"
+      ],
+      "timing": "wall time with CUDA synchronization around entire in-memory reduction, including preprocessing/transfers; excludes imports, data loading, graph serialization, and downstream evaluation",
+      "memory": "fresh process; process RSS sampled every5ms; PyTorch peak GPU allocated/reserved reset after context warmup, before input transfers; excludes downstream evaluation",
+      "quality": "one shared GCN fit per reduced graph, seed0, 300 epochs, hidden256, validation selection every10; outside timing/memory; descriptive quality shortfall retained",
+      "timeout_seconds": 1800,
+      "max_rss_gib": 96
+    }
+  },
+  "source_archive": {
+    "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
+    "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",
+    "scope": "Measured GraphSlim source and runner; author code is obtained from the pinned repositories in source_manifest.references."
+  },
+  "result_sha256": {
+    "cgc__r0.001__s1__author": "595b6ea1fa17680833a28bfea4ec5a76ff83ad7622e74b14526486fe957b7bd0",
+    "cgc__r0.001__s1__graphslim": "6353b02f720a7255493da378ff7456a4f39e9d3539df214e2767bb033ba9087e",
+    "cgc__r0.001__s2__graphslim": "4ad1a46deaa258b15032224007793465265f42807488c7eb4fe6fb77629dc5a0",
+    "cgc__r0.001__s2__author": "4b14298c2ef0cc5593956a91321c60752e764d51f1dc8524967ff48834d68e23",
+    "cgc__r0.001__s3__author": "5038c9a12dca22f6d6ff843fff1d04fe87869cd47dcc359e75d9251f17440a6a",
+    "cgc__r0.001__s3__graphslim": "49a731168af0d824976793000c567c571b8647d6d65689300316672571a6f8a6",
+    "clustgdd__r0.001__s1__author": "6e5319653ae390e2cdf8101423a1e22ea0ed7d9d0d46ff0c11214f9f3968ea56",
+    "clustgdd__r0.001__s1__graphslim": "8def9b3d2fb63c3e67857f20b86985059b68f66ddf97f24a51b8aae08e03d38e",
+    "clustgdd__r0.001__s2__graphslim": "537e29bea316c34cb574110b818066868fc3118f1462e1917708b06bca5a89dd",
+    "clustgdd__r0.001__s2__author": "5b950ddf69ada7cae9e0f450e523802716b6167057ce248caeb81c64166f8f03",
+    "clustgdd__r0.001__s3__author": "59f5900b5d9072d2f6b0861fe1e49652436e3cfd597d60bef949dcf817af4ade",
+    "clustgdd__r0.001__s3__graphslim": "563530cba6f0cd92eede75f64064a6c9952283d1b3175e673dd82e3a04d37a21",
+    "cgc__r0.005__s1__author": "e06af9d0cf3ae38437a4ae34ea7ba90e4d2d1be0b21597f0c4f31a2036b58b2c",
+    "cgc__r0.005__s1__graphslim": "bb405023cecf3efc95a52e44a6739904d7e2defda35e8f5ab7197cba68a37cab",
+    "cgc__r0.005__s2__graphslim": "742280dcb885e9f110dd7973bf011b2083775977fdb2cd3c3afb8944fffc581d",
+    "cgc__r0.005__s2__author": "0024202c6142adc64e8b555cbf18e626a566855e484a245a6e9a4a23211229ce",
+    "cgc__r0.005__s3__author": "a36597ee559bebe62ba3486da0d9e0313a75a2a4762c81133f33bb5a8a717d7f",
+    "cgc__r0.005__s3__graphslim": "5d3cff219849aea776e248e678bd877a5813304727d940ede87f2addd005bf08",
+    "clustgdd__r0.005__s1__author": "8bb42e12de43dde69c5cdd8deeee9dfd9fb3c7caf72171c93913f9a27332a0f5",
+    "clustgdd__r0.005__s1__graphslim": "8d0a1ba1026eee0d39bb26cce6c392ecad1104fc61f5ecddf94e69e6aee0d43f",
+    "clustgdd__r0.005__s2__graphslim": "c9710a7c1ec2fef47460ceb08868eed8dd69b93f2edd0f53fe8f753894b6fabe",
+    "clustgdd__r0.005__s2__author": "60717163dd831ac29664254273d3d1e478a2e7cc113e710ea787330fefa2ec28",
+    "clustgdd__r0.005__s3__author": "8c87b3239cebbb174f26d4aada2f9488d2ae84536278c11aa80feb5a0381b86c",
+    "clustgdd__r0.005__s3__graphslim": "359d58b7c00fbe3c844b8be9e18c495ee40e4cbf40273c7535f1fc61a8ba4134",
+    "cgc__r0.01__s1__author": "e91d78248fd7bc3fd009cd09db72d4332a20ec39e9ab09eaca6fe6319e8b8c7c",
+    "cgc__r0.01__s1__graphslim": "27088c5f092da970305e55c86576fcfbcc8c4492eff5146c2b6b289e765c485e",
+    "cgc__r0.01__s2__graphslim": "2158717024fe9a13cb7ad511faa73e9e4137196a0e32e0938e36e0da3934076c",
+    "cgc__r0.01__s2__author": "f17079bd53cd238214b71d9cbe444938f570a0627d87a6051cc5d07982f2ef10",
+    "cgc__r0.01__s3__author": "d729fc491a2f82732b9cc507681aa0c11ab553f17ec44e17eeea0a63b7eeaf13",
+    "cgc__r0.01__s3__graphslim": "2e8c9e9715a49cb906d92e16481e20badf60ddb9f306bc90021e9a2ae9d9b651",
+    "clustgdd__r0.01__s1__author": "dd0fafbe68d35620dd76b514ab13e6529134f87f4cbe7a318df894d33f2b869d",
+    "clustgdd__r0.01__s1__graphslim": "b3f11044f87cba6798d9add2493ffe09cbb533effd5ef20ba2cc34f9978f691e",
+    "clustgdd__r0.01__s2__graphslim": "aa8d0420c044197fc53f45589d649f4742a589c924e5913d7d2fc98c37dc95b7",
+    "clustgdd__r0.01__s2__author": "9d2b9c6dcc4f38ef6515642855fe32abc0d662c46e8fb56c55f3498a4b356547",
+    "clustgdd__r0.01__s3__author": "c3e55d2cdbbbc950ff7c35730d6892347f25c2977f4b6052ca0aaa9b3e437b6f",
+    "clustgdd__r0.01__s3__graphslim": "b469de2daec717d464b3e4cb04bcf3ad9b7091aeddf30b0dd98874a68458005b"
+  }
+}
