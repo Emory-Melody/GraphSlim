@@ -480,61 +480,45 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 
 ### 缩减比例
 
-[数据加载器](graphslim/dataset/loader.py)当前识别 **19 个数据集名称**。
-原始 GC4NC 基准为其中 7 个定义了实验比例，
-[扩展实验入口](benchmark/expand_datasets.py)为另外 5 个配置了比例网格，
-其余 7 个具有加载入口，尚无基准比例网格。
-这些数量表示数据集入口和实验配置；已完成的结果见上方结果表。
+下表统一列出[数据集加载器](graphslim/dataset/loader.py)识别的 **19 个数据集**的节点缩减比例。
+**R**（命令行 `-R`）以**有标签训练节点数**为分母，表示保留的节点比例。
 
-节点缩减的命令行比例以**有标签训练节点数**为分母。
-边稀疏化的比例表示保留的输入边比例；`t_spanner` 和 `spanning_forest` 不使用该比例。
-以下节点比例表分别列出原始基准、扩展网格和数据集回退值。
+对于边稀疏化，`-R` 表示保留的输入边比例；`t_spanner` 和 `spanning_forest` 不使用该参数。
 
-**原始 GC4NC 基准：7 个数据集。** 表 9 对直推式数据集使用原始完整图的节点百分比，
-对归纳式数据集使用训练图的节点百分比。复现某一行结果时，请保持这一分母区别。
-
-| 数据集 | 设置 | 命令行 `-R` 值 | 表 9 比例标签（%） |
-| --- | --- | --- | --- |
-| Citeseer | 直推式 | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
-| Cora | 直推式 | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
-| Pubmed | 直推式 | 0.05, 0.1, 0.5 | 0.02, 0.03, 0.15 |
-| Arxiv (`ogbn-arxiv`) | 直推式 | 0.001, 0.005, 0.01 | 0.05, 0.25, 0.50 |
-| Flickr | 归纳式 | 0.001, 0.005, 0.01 | 0.10, 0.50, 1.00 |
-| Reddit | 归纳式 | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
-| Yelp | 归纳式 | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
-
-论文表 8 中的 Pubmed 百分比存在不一致；复现结果使用表 9 的比例标签。
-命令行比例会转换为各类别的整数节点预算，因此论文中四舍五入后的百分比不一定等于实际达到的精确比例。
-
-**扩展实验：另外 5 个数据集。** 以下网格均以有标签训练节点数为分母，
-没有对应的 GC4NC 表 9 比例标签。请使用 `benchmark.expand_datasets` 运行；
-`benchmark.reproduce performance` 保留原始 7 个数据集的范围。
-
-| 数据集 | 命令行 `-D` | 设置 | 命令行 `-R` 值 | 数据划分 |
+| 数据集 | 命令行 `-D` | 设置 | R (`-R`) | 表 9 比例标签（%） |
 | --- | --- | --- | --- | --- |
-| Roman-empire | `roman-empire` | 直推式 | 0.005, 0.01, 0.02 | 官方划分列，默认第 0 列 |
-| Amazon-ratings | `amazon-ratings` | 直推式 | 0.005, 0.01, 0.02 | 官方划分列，默认第 0 列 |
-| OGBN-Products | `ogbn-products` | 直推式 | 0.0005, 0.001, 0.002 | OGB 官方划分 |
-| Amazon Photo | `photo` | 直推式 | 0.005, 0.01, 0.02 | 按类别生成的 80/10/10 划分，固定种子 |
-| Amazon Computers | `computers` | 直推式 | 0.005, 0.01, 0.02 | 按类别生成的 80/10/10 划分，固定种子 |
+| Citeseer | `citeseer` | 直推式 | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
+| Cora | `cora` | 直推式 | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
+| Pubmed | `pubmed` | 直推式 | 0.05, 0.1, 0.5 | 0.02, 0.03, 0.15 |
+| Arxiv | `ogbn-arxiv` | 直推式 | 0.001, 0.005, 0.01 | 0.05, 0.25, 0.50 |
+| Flickr | `flickr` | 归纳式 | 0.001, 0.005, 0.01 | 0.10, 0.50, 1.00 |
+| Reddit | `reddit` | 归纳式 | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
+| Yelp | `yelp` | 归纳式 | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
+| Roman-empire | `roman-empire` | 直推式 | 0.005, 0.01, 0.02 | — |
+| Amazon-ratings | `amazon-ratings` | 直推式 | 0.005, 0.01, 0.02 | — |
+| OGBN-Products | `ogbn-products` | 直推式 | 0.0005, 0.001, 0.002 | — |
+| Amazon Photo | `photo` | 直推式 | 0.005, 0.01, 0.02 | — |
+| Amazon Computers | `computers` | 直推式 | 0.005, 0.01, 0.02 | — |
+| DBLP | `dblp` | 直推式 | 0.1 | — |
+| Cora-ML | `cora_ml` | 直推式 | 0.1 | — |
+| Coauthor CS | `cs` | 直推式 | 0.1 | — |
+| Coauthor Physics | `physics` | 直推式 | 0.1 | — |
+| Amazon Fraud | `amazon` | 归纳式 | 0.002 | — |
+| OGBN-Proteins | `ogbn-proteins` | 直推式 | 0.1 | — |
+| OGBN-Papers100M | `ogbn-papers100m` | 直推式 | 0.1 | — |
 
-**其他加载入口：7 个数据集。** 两个运行器均未为它们定义比例网格。
-下表为[数据集回退值](graphslim/config.py)，仅在命令行和方法/配置均未指定比例时使用。
-开展新实验时请显式设置 `-R`。
+表 9 比例标签对应 GC4NC 原始 7 个数据集：直推式数据集以完整图为分母，归纳式数据集以训练图为分母，均以百分比表示。
+横线表示没有对应的表 9 标签。论文表 8 中的 Pubmed 百分比存在不一致；复现结果使用表 9 的比例标签。
+各类别的整数节点预算可能与论文中四舍五入后的百分比略有差异。
 
-| 数据集 | 命令行 `-D` | 默认设置 | 回退 `-R` 值 |
-| --- | --- | --- | --- |
-| DBLP | `dblp` | 直推式 | 0.1 |
-| Cora-ML | `cora_ml` | 直推式 | 0.1 |
-| Coauthor CS | `cs` | 直推式 | 0.1 |
-| Coauthor Physics | `physics` | 直推式 | 0.1 |
-| Amazon Fraud | `amazon` | 归纳式 | 0.002 |
-| OGBN-Proteins | `ogbn-proteins` | 直推式 | 0.1 |
-| OGBN-Papers100M | `ogbn-papers100m` | 直推式 | 0.1 |
+原始 7 个数据集通过 `benchmark.reproduce performance` 运行；Roman-empire、Amazon-ratings、
+OGBN-Products、Photo 和 Computers 通过[扩展实验入口](benchmark/expand_datasets.py)运行。
+Roman-empire 和 Amazon-ratings 默认使用官方划分的第 0 列；OGBN-Products 使用 OGB 官方划分；
+Photo 和 Computers 使用按类别生成的 80/10/10 划分，并固定随机种子。
 
 `amazon` 指 DGL 欺诈检测数据集；`photo` 和 `computers` 指 PyG 共同购买数据集。
-加载入口不代表所有约简方法均已适配或基准已完成；`ogbn-proteins` 的任务适配与
-`ogbn-papers100m` 的资源可行性也需分别验证。
+已完成的结果见上方表格；加载入口不代表所有约简方法均已适配或基准已完成，包括
+`ogbn-proteins` 的任务适配与 `ogbn-papers100m` 的资源可行性。
 
 <!-- package-results:start -->
 

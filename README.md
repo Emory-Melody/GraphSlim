@@ -503,68 +503,51 @@ NAS, and graph-property suites require saved reduced graphs. See
 
 ### Reduction rates
 
-The [dataset loader](graphslim/dataset/loader.py) recognizes **19 dataset names**.
-The original GC4NC benchmark defines rates for seven of them; the
-[dataset expansion runner](benchmark/expand_datasets.py) adds rate grids for five
-more. The remaining seven have loader entries without a benchmark rate grid.
-These counts describe dataset entry points and configured experiments; completed
-results are reported in the results tables above.
+Node reduction rates for all **19 datasets** recognized by the
+[dataset loader](graphslim/dataset/loader.py) are listed below. **R** (CLI `-R`)
+is the fraction of **labeled training nodes** retained.
 
-For node reduction, the CLI uses fractions of **labeled training nodes**. For edge
-sparsification, the rate is the fraction of input edges kept; `t_spanner` and
-`spanning_forest` do not use it. The node-rate tables below distinguish the
-original benchmark, expansion grids and dataset fallbacks.
+For edge sparsification, `-R` is the fraction of input edges kept;
+`t_spanner` and `spanning_forest` do not use it.
 
-**Original GC4NC benchmark: seven datasets.** Table 9 prints percentages of the
-original whole graph for transductive datasets and of the training graph for
-inductive datasets. Preserve this distinction when reproducing a row.
-
-| Dataset | Setting | CLI `-R` values | Table 9 rate labels (%) |
-| --- | --- | --- | --- |
-| Citeseer | Transductive | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
-| Cora | Transductive | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
-| Pubmed | Transductive | 0.05, 0.1, 0.5 | 0.02, 0.03, 0.15 |
-| Arxiv (`ogbn-arxiv`) | Transductive | 0.001, 0.005, 0.01 | 0.05, 0.25, 0.50 |
-| Flickr | Inductive | 0.001, 0.005, 0.01 | 0.10, 0.50, 1.00 |
-| Reddit | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
-| Yelp | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
-
-The paper's Table 8 has inconsistent Pubmed percentages; the reproduced results
-use Table 9's labels. CLI fractions produce per-class integer node budgets,
-so rounded paper percentages need not equal the exact achieved rate.
-
-**Dataset expansion: five additional datasets.** These grids use labeled training
-nodes as the denominator and have no GC4NC Table 9 rate labels. Run them through
-`benchmark.expand_datasets`; `benchmark.reproduce performance` retains the
-original seven-dataset roster.
-
-| Dataset | CLI `-D` | Setting | CLI `-R` values | Split |
+| Dataset | CLI `-D` | Setting | R (`-R`) | Table 9 rate labels (%) |
 | --- | --- | --- | --- | --- |
-| Roman-empire | `roman-empire` | Transductive | 0.005, 0.01, 0.02 | Official split column; default 0 |
-| Amazon-ratings | `amazon-ratings` | Transductive | 0.005, 0.01, 0.02 | Official split column; default 0 |
-| OGBN-Products | `ogbn-products` | Transductive | 0.0005, 0.001, 0.002 | Official OGB split |
-| Amazon Photo | `photo` | Transductive | 0.005, 0.01, 0.02 | Seeded classwise 80/10/10 |
-| Amazon Computers | `computers` | Transductive | 0.005, 0.01, 0.02 | Seeded classwise 80/10/10 |
+| Citeseer | `citeseer` | Transductive | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
+| Cora | `cora` | Transductive | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
+| Pubmed | `pubmed` | Transductive | 0.05, 0.1, 0.5 | 0.02, 0.03, 0.15 |
+| Arxiv | `ogbn-arxiv` | Transductive | 0.001, 0.005, 0.01 | 0.05, 0.25, 0.50 |
+| Flickr | `flickr` | Inductive | 0.001, 0.005, 0.01 | 0.10, 0.50, 1.00 |
+| Reddit | `reddit` | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
+| Yelp | `yelp` | Inductive | 0.0005, 0.001, 0.002 | 0.05, 0.10, 0.20 |
+| Roman-empire | `roman-empire` | Transductive | 0.005, 0.01, 0.02 | — |
+| Amazon-ratings | `amazon-ratings` | Transductive | 0.005, 0.01, 0.02 | — |
+| OGBN-Products | `ogbn-products` | Transductive | 0.0005, 0.001, 0.002 | — |
+| Amazon Photo | `photo` | Transductive | 0.005, 0.01, 0.02 | — |
+| Amazon Computers | `computers` | Transductive | 0.005, 0.01, 0.02 | — |
+| DBLP | `dblp` | Transductive | 0.1 | — |
+| Cora-ML | `cora_ml` | Transductive | 0.1 | — |
+| Coauthor CS | `cs` | Transductive | 0.1 | — |
+| Coauthor Physics | `physics` | Transductive | 0.1 | — |
+| Amazon Fraud | `amazon` | Inductive | 0.002 | — |
+| OGBN-Proteins | `ogbn-proteins` | Transductive | 0.1 | — |
+| OGBN-Papers100M | `ogbn-papers100m` | Transductive | 0.1 | — |
 
-**Other loader entries: seven datasets.** No rate sweep is defined for these in
-either runner. The values below are [dataset fallbacks](graphslim/config.py),
-used when no explicit CLI or method/config rate is supplied. Choose `-R`
-explicitly for a new experiment.
+Table 9 labels apply to the original seven GC4NC datasets: percentages of the
+whole graph for transductive datasets and of the training graph for inductive
+datasets. A dash indicates no corresponding Table 9 label. The paper's Table 8
+has inconsistent Pubmed percentages; the reproduced results use Table 9's labels.
+Per-class integer node budgets can differ from rounded paper percentages.
 
-| Dataset | CLI `-D` | Default setting | Fallback `-R` |
-| --- | --- | --- | --- |
-| DBLP | `dblp` | Transductive | 0.1 |
-| Cora-ML | `cora_ml` | Transductive | 0.1 |
-| Coauthor CS | `cs` | Transductive | 0.1 |
-| Coauthor Physics | `physics` | Transductive | 0.1 |
-| Amazon Fraud | `amazon` | Inductive | 0.002 |
-| OGBN-Proteins | `ogbn-proteins` | Transductive | 0.1 |
-| OGBN-Papers100M | `ogbn-papers100m` | Transductive | 0.1 |
+Use `benchmark.reproduce performance` for the original seven datasets and the
+[dataset expansion runner](benchmark/expand_datasets.py) for Roman-empire,
+Amazon-ratings, OGBN-Products, Photo and Computers. Roman-empire and Amazon-ratings
+use official split column 0 by default; OGBN-Products uses the official OGB split.
+Photo and Computers use seeded classwise 80/10/10 splits.
 
 `amazon` is the DGL fraud dataset; `photo` and `computers` are PyG co-purchase
-datasets. Loader entries do not establish end-to-end reducer compatibility or
-completed benchmarks, including task handling for `ogbn-proteins` and resource
-feasibility for `ogbn-papers100m`.
+datasets. Completed results are reported above; loader entries alone do not
+establish end-to-end reducer compatibility or completed benchmarks, including
+task handling for `ogbn-proteins` and resource feasibility for `ogbn-papers100m`.
 
 <!-- package-results:start -->
 
