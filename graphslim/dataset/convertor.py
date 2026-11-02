@@ -187,14 +187,27 @@ def pyg_to_networkit(pyg_graph):
     #     graph = nk.Graph(weighted=False, directed=False)
 
     # Add edges to the Networkit graph
+    # NetworKit reads node buffers as 64-bit IDs without checking their bounds.
+    # SciPy/PyG can supply int32 indices; passing them through can segfault.
     """Convert PyG edges to an undirected NetworKit graph with validated node IDs.
 
     :param pyg_graph: PyG graph with ``edge_index``, ``num_nodes``, and optional scalar ``edge_attr``.
     :returns: NetworKit graph retaining isolated nodes and optional scalar edge weights.
     """
-    edge_index = pyg_graph.edge_index.numpy()
+    edge_index = pyg_graph.edge_index.detach().cpu().numpy()
+    if edge_index.ndim != 2 or edge_index.shape[0] != 2:
+        raise ValueError("edge_index must have shape (2, num_edges)")
+    if not np.issubdtype(edge_index.dtype, np.integer):
+        raise ValueError("edge_index must contain integer node IDs")
+    if edge_index.size and (edge_index.min() < 0 or edge_index.max() >= pyg_graph.num_nodes):
+        raise ValueError("edge_index contains node IDs outside num_nodes")
+    edge_index = np.ascontiguousarray(edge_index, dtype=np.uint64)
     if hasattr(pyg_graph, "edge_attr") and pyg_graph.edge_attr is not None:
-        edge_attr = pyg_graph.edge_attr.numpy()
+        edge_attr = np.ascontiguousarray(
+            pyg_graph.edge_attr.detach().cpu().numpy(), dtype=np.float64
+        )
+        if edge_attr.ndim != 1 or len(edge_attr) != edge_index.shape[1]:
+            raise ValueError("edge_attr must contain one scalar weight per edge")
         graph = nk.GraphFromCoo(
             inputData=(edge_attr, (edge_index[0], edge_index[1])),
             n=pyg_graph.num_nodes,
@@ -209,6 +222,10 @@ def pyg_to_networkit(pyg_graph):
             directed=False,
         )
 
+    # PyG normally stores both orientations of undirected edges. NetworKit's
+    # bulk constructor inserts each orientation again; algorithms expect a
+    # simple graph rather than parallel copies of those edges.
+    graph.removeMultiEdges()
     graph.indexEdges()
 
     return graph

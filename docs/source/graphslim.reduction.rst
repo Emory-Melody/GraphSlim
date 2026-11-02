@@ -2,6 +2,10 @@ graphslim.reduction package
 ===============================
 
 The registry resolves canonical method names without importing every reducer.
+It contains **49 canonical methods**: 5 node sparsifiers, **18 edge sparsifiers**,
+10 coarsening methods, and 16 condensation methods. The two sparsification
+groups total 23 methods; aliases do not add to these counts.
+
 Use ``create_reducer(method, setting, data, args)`` to construct a reducer and
 ``reducer.reduce(data)`` to populate ``feat_syn``, ``adj_syn``, and ``labels_syn``.
 Node methods interpret ``reduction_rate`` as a fraction of labeled training

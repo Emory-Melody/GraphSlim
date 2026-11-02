@@ -15,11 +15,15 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
-GraphSlim brings sparsification, coarsening, condensation, **7 downstream GNN backbones**,
+GraphSlim brings **49 graph reduction methods**, **7 downstream GNN backbones**,
 and **validation-only hyperparameter optimization (HPO)** into a shared workflow.
 Load a graph, choose a reducer, and evaluate its output through the same interfaces.
 The repository includes runnable examples, regression tests, and benchmark
 reproduction commands.
+
+The 49 methods comprise **5 node sparsifiers, 18 edge sparsifiers, 10 coarsening
+methods, and 16 condensation methods**. Node and edge sparsification together
+account for 23 methods; aliases are not counted as additional methods.
 
 GPU execution uses native PyTorch operations. Install matching Torch and PyG
 extension wheels for your GPU and CUDA runtime.
@@ -33,7 +37,7 @@ extension wheels for your GPU and CUDA runtime.
 
 [![Figure 1. GraphSlim architecture: data, reduction with HPO, and evaluation layers](figures/figure1.png)](figures/figure1.pdf)
 
-Figure 1 depicts the package paper's 38-method development roster. The data, reduction, and evaluation layers are
+Figure 1 depicts the package paper's 49-method development roster. The data, reduction, and evaluation layers are
 independently callable. The reduction layer covers sparsification, coarsening,
 condensation, and optional HPO. Solid arrows show graph flow; dashed arrows show
 node selection or coarsening used to initialize condensation.
@@ -466,16 +470,49 @@ print(list_methods("condensation"))
 
 | Family | Canonical method names |
 | --- | --- |
-| Node / edge sparsification | `random`, `kcenter`, `herding`, `cent_d`, `cent_p`, `random_edge`, `spanning_forest`, `g_spar`, `local_degree`, `rank_degree`, `scan`, `t_spanner` |
-| Coarsening / clustering | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron`, `nope` |
-| Graph condensation | `gcond`, `gcondx`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
+| Node sparsification / coreset (5) | `random`, `kcenter`, `herding`, `cent_d`, `cent_p` |
+| Edge sparsification (18) | `random_edge`, `spanning_forest`, `g_spar`, `local_degree`, `rank_degree`, `scan`, `t_spanner`, `simmelian_parametric`, `simmelian_non_parametric`, `quadrilateral_simmelian`, `simmelian_multiscale`, `degree_multiscale`, `local_similarity`, `multiscale`, `random_node_edge`, `forest_fire`, `triangle`, `algebraic_distance` |
+| Coarsening / clustering (10) | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron` |
+| Graph condensation (16) | `gcond`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
 
 See each method's configuration for its settings, including GECC's evolving-graph
 workflow.
 
-CGC and NOPE reduce graphs without GNN training. ClustGDD uses linear pretraining
+Node sparsifiers select existing nodes, with `-R` setting a fraction of labeled
+training nodes for the reduced-node budget. All 18 edge sparsifiers keep every node. For them `args.edge_reduction`
+is `True` and `--reduction_rate` is the fraction of edges kept; `t_spanner` and
+`spanning_forest` ignore the rate (`--ts` sets the spanner stretch). The flag is
+derived from the method and `--edge_reduction` / `--node_reduction` only assert
+it; the inductive setting sparsifies the training subgraph so that the adjacency
+matches the features the evaluator trains on.
+
+```bash
+# Select nodes: target 10% of labeled training nodes.
+python -m graphslim.train_all -D cora -M kcenter -R 0.1 -G -1 --run_reduction 1
+# Keep nodes and sparsify edges: target 10% of input edges.
+python -m graphslim.train_all -D cora -M random_edge -R 0.1 -G -1 --run_reduction 1
+```
+
+All 15 concrete Python sparsifiers in NetworKit are available, alongside
+`spanning_forest`, `rank_degree`, and `t_spanner`. Existing `g_spar` uses
+NetworKit's Jaccard similarity backend (`jaccard_similarity` is a Python registry
+alias). Constructor settings can be passed through `--sparsifier_options` or a
+`"sparsifier_options"` object in `--config`. For example:
+
+```bash
+python -m graphslim.train_all -D cora -M simmelian_parametric -R 0.1 -G -1 --run_reduction 1 --sparsifier_options '{"maxRank": 20}'
+```
+
+Native threshold methods target the requested ratio but can retain more or fewer
+edges when scores tie. `triangle` uses NetworKit triangle counts with an exact
+`floor(R * edges)` budget and endpoint order to break ties, since upstream has
+no size parameterization. The existing reduction workflow uses unweighted,
+undirected connectivity. See the [full backend mapping and constructor defaults](docs/source/graphslim.sparsification.rst).
+The fixed reproduction snapshot above does not include the 11 newly integrated methods.
+
+CGC reduces graphs without GNN training. ClustGDD uses linear pretraining
 and refinement; GCGP uses a Gaussian process to optimize reduced features and
-targets. [Method descriptions, sources and validation](docs/lightweight_methods.md).
+targets. [Method configurations](graphslim/configs).
 
 ```bash
 python -m examples.train_lightweight -D cora -M cgc -G -1 --save_path ./checkpoints
@@ -484,7 +521,23 @@ python -m graphslim.train_all -D cora -M gcgp -G -1 --save_path ./checkpoints
 
 Use `--config method_overrides.json` for method-specific options; explicit CLI
 options take precedence. Public imports include `CGC`, `ClustGDD`, `GCGP` from
-`graphslim.condensation` and `NOPE` from `graphslim.coarsening`.
+`graphslim.condensation`.
+
+## Search a method's settings
+
+GC4NC reports every method with its authors' settings. For a new dataset or method, `--hpo`
+grid-searches the reduction settings themselves with validation-only selection:
+
+```bash
+python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./checkpoints
+```
+
+It prints the search space (from `--hpo_space`, else `graphslim/configs/hpo/<method>.json`,
+else a one-point template written under `save_path/hpo/` for you to widen), the number of
+trials and a time estimate, then asks for confirmation (`--hpo_yes` skips it). Every trial
+reduces the graph and scores it by the mean validation accuracy of `--hpo_eval_runs` GCN
+fits; no test score is computed. Finished trials are appended to `trials.jsonl`, so an
+interrupted search resumes, and the winner lands in `best.json` for `--config`.
 
 ## Reproduce the benchmark
 
@@ -627,7 +680,7 @@ settings, noise, saved-graph reloads and validation-based model selection.
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --profile smoke
-python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp nope --dry-run
+python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp --dry-run
 ```
 
 <!-- lightweight-checks:start -->

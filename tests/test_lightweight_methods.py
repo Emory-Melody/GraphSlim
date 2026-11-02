@@ -17,7 +17,7 @@ from graphslim.models import DOWNSTREAM_MODELS
 from graphslim.reduction import create_reducer, get_method_spec
 from graphslim.utils import seed_everything
 
-METHODS = ("cgc", "clustgdd", "gcgp", "nope")
+METHODS = ("cgc", "clustgdd", "gcgp")
 
 
 @pytest.mark.parametrize("method", METHODS)
@@ -122,7 +122,7 @@ def quick_args(tmp_path, method, setting):
 @pytest.mark.parametrize("setting", ["trans", "ind"])
 @pytest.mark.parametrize("noise", NOISE_TYPES)
 def test_every_model_on_clean_and_training_noise(tmp_path, method, setting, noise):
-    """4 methods x 2 settings x 7 conditions x 7 actual GNN fits = 392 fits."""
+    """3 methods x 2 settings x 7 conditions x 7 actual GNN fits = 392 fits."""
     args = quick_args(tmp_path, method, setting)
     source = tiny_graph()
     original_features = source.feat_full.clone()
@@ -211,9 +211,8 @@ def test_tiny_degenerate_and_missing_training_class(tmp_path, method):
 
 def test_public_classes_and_profiles(tmp_path):
     from graphslim.condensation import CGC, ClustGDD, GCGP
-    from graphslim.coarsening import NOPE
 
-    for name, cls in zip(METHODS, (CGC, ClustGDD, GCGP, NOPE)):
+    for name, cls in zip(METHODS, (CGC, ClustGDD, GCGP)):
         assert get_method_spec(name).load_class() is cls
     args = get_args(
         ["-M", "ClustGDD", "-D", "cora", "-R", "0.25", "-G", "-1", "--save_path", str(tmp_path)]
@@ -272,31 +271,6 @@ def test_gcgp_structure_kernel_really_updates_adjacency(tmp_path):
         create_reducer("gcgp", "trans", graph, args).reduce(graph, save=False)
 
 
-def test_nope_isolates_are_not_silently_merged(tmp_path):
-    args = quick_args(tmp_path, "nope", "trans")
-    graph = tiny_graph()
-    graph.adj_full = sp.csr_matrix(graph.adj_full.shape)
-    with pytest.warns(RuntimeWarning, match="disconnected"):
-        result = create_reducer("nope", "trans", graph, args).reduce(
-            graph, save=False, verbose=False
-        )
-    assert not result.reduction_metadata["budget_reached"]
-    assert len(result.feat_syn) == len(graph.idx_train)
-    assert result.reduction_metadata["unlabeled_supernodes_removed"] == 16
-
-
-@pytest.mark.parametrize("setting", ["trans", "ind"])
-def test_nope_whole_graph_budget_is_explicit(tmp_path, setting):
-    args = quick_args(tmp_path, "nope", setting)
-    args.nope_budget_base = "graph"
-    graph = tiny_graph()
-    nodes = len(graph.feat_full if setting == "trans" else graph.feat_train)
-    result = create_reducer("nope", setting, graph, args).reduce(graph, save=False, verbose=False)
-    assert result.reduction_metadata["budget_base"] == "graph"
-    assert result.reduction_metadata["requested_nodes"] == round(nodes * args.reduction_rate)
-    assert len(result.nope_mapping) == nodes
-
-
 def test_cross_without_search_uses_every_actual_model(tmp_path):
     args = quick_args(tmp_path, "cgc", "trans")
     graph = tiny_graph()
@@ -340,13 +314,11 @@ def test_legacy_metattack_prbcd_and_all_models(tmp_path, method, setting):
         assert np.isfinite(score) and np.isfinite(deviation)
 
 
-@pytest.mark.parametrize("method", ["cgc", "nope", "gcgp"])
+@pytest.mark.parametrize("method", ["cgc", "gcgp"])
 def test_optional_variants_support_all_downstream(tmp_path, method):
     args = quick_args(tmp_path, method, "trans")
     if method == "cgc":
         args.with_structure = 0
-    elif method == "nope":
-        args.nope_relaxed = True
     else:
         args.gcgp_kernel, args.gcgp_learn_adj = "SNTK", True
     graph = tiny_graph()

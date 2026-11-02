@@ -19,7 +19,7 @@ import traceback
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-METHODS = ("cgc", "clustgdd", "gcgp", "nope")
+METHODS = ("cgc", "clustgdd", "gcgp")
 CONDITIONS = (
     "clean",
     "random_adj",

@@ -18,7 +18,7 @@ def test_all_registered_methods_have_stage_policy():
     assert all(r["downstream"] == "shared_first_order_training" for r in rows)
     assert next(r for r in rows if r["method"] == "gcond")["reduction"] == "eager_second_order"
     assert (
-        next(r for r in rows if r["method"] == "nope")["reduction"] == "eager_cpu_or_noniterative"
+        next(r for r in rows if r["method"] == "random_edge")["reduction"] == "eager_cpu_or_noniterative"
     )
 
 

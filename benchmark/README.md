@@ -81,18 +81,18 @@ clustering, DosCondX, GCDM, SimGC, or GECC scores; their README cells are `NR`.
 
 ## Lightweight methods and complete downstream integration checks
 
-CGC, ClustGDD, GCGP and NOPE use the standard reducer/checkpoint/evaluator API.
+CGC, ClustGDD and GCGP use the standard reducer/checkpoint/evaluator API.
 The planner accepts their canonical names in every applicable suite:
 
 ```bash
 python -m examples.train_lightweight -D cora -M cgc -G -1 --save_path ./checkpoints
-python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp nope --dry-run
+python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp --dry-run
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_NEW --dry-run
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_NEW --profile smoke
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_full_NEW --profile full --conditions clean
 ```
 
-The default integration roster is four methods × eight training conditions ×
+The default integration roster is three methods × eight training conditions ×
 seven downstream models: GCN, SGC, APPNP, Cheby, GraphSage, GAT and SGFormer.
 Conditions include clean, edge addition/deletion, column/entry feature masking,
 Gaussian feature noise, training-label corruption and the legacy `metattack`
@@ -110,7 +110,7 @@ and 300 downstream steps, not a paper-specific HPO/repeated benchmark. Use a new
 run directory whenever source or protocol changes.
 
 See [method documentation](../docs/lightweight_methods.md) for primary sources,
-costs, soft-target handling, NOPE's training-relative versus whole-graph budget,
+costs, soft-target handling, reduction budgets,
 undefined property metrics, perturbation contracts and algorithmic adaptations.
 The [README integration table](../README.md#lightweight-methods-downstream-validation)
 is separate from the published and repeated local performance tables.

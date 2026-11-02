@@ -29,7 +29,7 @@ def main():
     parser.add_argument(
         "--methods",
         nargs="+",
-        choices=["gcgp", "clustgdd", "cgc", "nope"],
+        choices=["gcgp", "clustgdd", "cgc"],
         default=["gcgp", "clustgdd"],
     )
     parser.add_argument("--steps", type=int, default=200)

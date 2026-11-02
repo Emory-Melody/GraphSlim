@@ -11,7 +11,6 @@ __all__, __getattr__, __dir__ = lazy_exports(
         "DosCond": (".doscond", "DosCond"),
         "DosCondX": (".doscondx", "DosCondX"),
         "GCond": (".gcond", "GCond"),
-        "GCondX": (".gcondx", "GCondX"),
         "GCSNTK": (".gcsntk", "GCSNTK"),
         "GEOM": (".geom", "GEOM"),
         "MSGC": (".msgc", "MSGC"),

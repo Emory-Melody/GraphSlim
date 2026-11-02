@@ -73,12 +73,12 @@
 \node[rowtext] at (3.03,.4375) {\includegraphics[width=.75cm]{\gsLogoPath/dgl.png}};
 
 % Reduction families share one interface; node-level reducers can seed condensation.
-\foreach \yy/\label/\count in {2.15/Sparsification/12,1.55/Coarsening/10,.95/Condensation/16} {
+\foreach \yy/\label/\count in {2.15/Sparsification/23,1.55/Coarsening/10,.95/Condensation/16} {
   \fill[white,rounded corners=2pt] (5.02,\yy-.25) rectangle (8.9,\yy+.25);
   \ifdim\yy pt>2pt
     \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy+.075) {\label};
     \node[rowtext,text=gsInk,font=\sffamily\fontsize{6.4}{7.4}\selectfont]
-      at (5.60,\yy-.15) {5 node / 7 edge};
+      at (5.60,\yy-.15) {5 node / 18 edge};
   \else
     \node[rowtext,font=\sffamily\bfseries\fontsize{7.8}{9}\selectfont] at (5.60,\yy) {\label};
   \fi

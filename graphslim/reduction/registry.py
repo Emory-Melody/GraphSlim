@@ -21,6 +21,9 @@ class MethodSpec:
     class_name: str
     agg_module: Optional[str] = None
     agg_class_name: Optional[str] = None
+    # Edge sparsifiers keep every node and interpret ``reduction_rate`` as the
+    # fraction of edges retained (see ``--edge_reduction``).
+    edge_reduction: bool = False
 
     def load_class(self, use_agg: bool = False) -> Type:
         """Import and return the registered reducer class lazily.
@@ -72,29 +75,69 @@ _METHODS: Dict[str, MethodSpec] = {
     "cent_d": MethodSpec(
         "cent_d", "sparsification", "graphslim.sparsification.cent_degree", "CentD"
     ),
-    # Sparsification: edge methods.
+    # Sparsification: edge methods (every node is kept; the rate applies to edges).
     "random_edge": MethodSpec(
-        "random_edge", "sparsification", "graphslim.sparsification.random_edge", "RandomEdge"
+        "random_edge",
+        "sparsification",
+        "graphslim.sparsification.random_edge",
+        "RandomEdge",
+        edge_reduction=True,
     ),
     "spanning_forest": MethodSpec(
         "spanning_forest",
         "sparsification",
         "graphslim.sparsification.spanning_forest",
         "SpanningForest",
+        edge_reduction=True,
     ),
-    "g_spar": MethodSpec("g_spar", "sparsification", "graphslim.sparsification.g_spar", "GSpar"),
+    "g_spar": MethodSpec(
+        "g_spar", "sparsification", "graphslim.sparsification.g_spar", "GSpar", edge_reduction=True
+    ),
     "local_degree": MethodSpec(
-        "local_degree", "sparsification", "graphslim.sparsification.local_degree", "LocalDegree"
+        "local_degree",
+        "sparsification",
+        "graphslim.sparsification.local_degree",
+        "LocalDegree",
+        edge_reduction=True,
     ),
     "rank_degree": MethodSpec(
-        "rank_degree", "sparsification", "graphslim.sparsification.rank_degree", "RankDegree"
+        "rank_degree",
+        "sparsification",
+        "graphslim.sparsification.rank_degree",
+        "RankDegree",
+        edge_reduction=True,
     ),
-    "scan": MethodSpec("scan", "sparsification", "graphslim.sparsification.scan", "Scan"),
+    "scan": MethodSpec(
+        "scan", "sparsification", "graphslim.sparsification.scan", "Scan", edge_reduction=True
+    ),
     "t_spanner": MethodSpec(
-        "t_spanner", "sparsification", "graphslim.sparsification.t_spanner", "TSpanner"
+        "t_spanner",
+        "sparsification",
+        "graphslim.sparsification.t_spanner",
+        "TSpanner",
+        edge_reduction=True,
     ),
+    # Remaining concrete sparsifiers from NetworKit's Python module.
+    **{
+        name: MethodSpec(
+            name, "sparsification", "graphslim.sparsification.networkit_sparsifiers",
+            class_name, edge_reduction=True,
+        )
+        for name, class_name in (
+            ("simmelian_parametric", "SimmelianParametric"),
+            ("simmelian_non_parametric", "SimmelianNonParametric"),
+            ("quadrilateral_simmelian", "QuadrilateralSimmelian"),
+            ("simmelian_multiscale", "SimmelianMultiscale"),
+            ("degree_multiscale", "DegreeMultiscale"),
+            ("local_similarity", "LocalSimilarity"),
+            ("multiscale", "Multiscale"),
+            ("random_node_edge", "RandomNodeEdge"),
+            ("forest_fire", "ForestFire"),
+            ("triangle", "Triangle"),
+            ("algebraic_distance", "AlgebraicDistance"),
+        )
+    },
     # Coarsening methods.
-    "nope": MethodSpec("nope", "coarsening", "graphslim.coarsening.nope", "NOPE"),
     "vng": MethodSpec("vng", "coarsening", "graphslim.coarsening.vng", "VNG"),
     "clustering": MethodSpec(
         "clustering",
@@ -141,7 +184,6 @@ _METHODS: Dict[str, MethodSpec] = {
     "doscondx": MethodSpec(
         "doscondx", "condensation", "graphslim.condensation.doscondx", "DosCondX"
     ),
-    "gcondx": MethodSpec("gcondx", "condensation", "graphslim.condensation.gcondx", "GCondX"),
     "sfgc": MethodSpec("sfgc", "condensation", "graphslim.condensation.sfgc", "SFGC"),
     "sgdd": MethodSpec("sgdd", "condensation", "graphslim.condensation.sgdd", "SGDD"),
     "gcsntk": MethodSpec("gcsntk", "condensation", "graphslim.condensation.gcsntk", "GCSNTK"),
@@ -158,6 +200,7 @@ _ALIASES = {
     "algebraic_JC": "algebraic_jc",
     "affinity_GS": "affinity_gs",
     "tspanner": "t_spanner",
+    "jaccard_similarity": "g_spar",
 }
 
 
@@ -169,7 +212,8 @@ def get_method_spec(method: str) -> MethodSpec:
     :param method: Reduction method name.
     :returns: Immutable ``MethodSpec`` describing the canonical method.
     """
-    key = _ALIASES.get(method, normalize_method_name(method))
+    key = normalize_method_name(method)
+    key = _ALIASES.get(method, _ALIASES.get(key, key))
     try:
         return _METHODS[key]
     except KeyError as exc:

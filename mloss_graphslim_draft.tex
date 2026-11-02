@@ -42,7 +42,7 @@
 GraphSlim is an open-source Python library for graph reduction built on PyTorch
 and PyTorch Geometric. It brings sparsification, coarsening, and condensation
 into a common workflow for constructing and evaluating reduced graphs. The
-development version described here registers 40 methods and connects dataset
+development version described here registers 49 methods and connects dataset
 loading, reduction, checkpoint storage, and downstream training through shared
 interfaces. Users can change the reducer or downstream model while reusing the
 surrounding experiment code, or use individual components in their own workflows.
@@ -113,8 +113,9 @@ to assess models trained on the reduced representation.}
 \end{figure}
 
 % Breadth: counts are taken from the local registry, excluding aliases.
-The method registry contains 40 canonical entries
-(Table~\ref{tab:methods}); aliases are not counted as additional methods.
+The method registry contains 49 canonical entries
+(Table~\ref{tab:methods}): 5 node sparsifiers, 18 edge sparsifiers, 10 coarsening
+methods, and 16 condensation methods. Aliases are not counted as additional methods.
 It imports implementation classes when they are requested, so method discovery
 does not load PyTorch or optional algorithm dependencies. Each entry specifies
 the implementation class and reduction family. To add a reducer, a developer
@@ -132,19 +133,20 @@ available implementations, not verified dataset--method combinations.}
 \toprule
 Family & Count & Examples \\
 \midrule
-Sparsification & 12 & KCenter, Herding, RandomEdge, TSpanner \\
-Coarsening & 11 & VariationNeighborhoods, HeavyEdge, Clustering, NOPE \\
-Condensation & 17 & GCond, DosCond, GEOM, CGC, ClustGDD, GCGP \\
+Node sparsification & 5 & Random, KCenter, Herding, Cent-D, Cent-P \\
+Edge sparsification & 18 & All 15 NetworKit Python sparsifiers, SpanningForest, \\
+ & & RankDegree, TSpanner \\
+Coarsening & 10 & VariationNeighborhoods, HeavyEdge, Clustering \\
+Condensation & 16 & GCond, DosCond, GEOM, CGC, ClustGDD, GCGP \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 % Scope: extensions are adaptations, with explicit mathematical boundaries.
-CGC, ClustGDD, GCGP, and NOPE use the same interfaces as the existing methods.
+CGC, ClustGDD, and GCGP use the same interfaces as the existing methods.
 Their documentation gives source references, parameter profiles, and adaptation
 details. For example, GCGP saves continuous training targets and uses a
-compatible downstream regression loss; NOPE retains a mapping to coarse nodes
-and reports the achieved node budget. These distinctions matter when comparing
+compatible downstream regression loss. These distinctions matter when comparing
 outputs with those of the original implementations. The adapters do not by
 themselves establish reproduction of the original papers' accuracy or runtime.
 

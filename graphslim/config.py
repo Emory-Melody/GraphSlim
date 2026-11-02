@@ -100,6 +100,8 @@ PARAMETER_CATEGORIES = {
         "outer_loop",
         "inner_loop",
         "reduction_rate",
+        "edge_reduction",
+        "sparsifier_options",
         "seed",
         "nlayers",
         "verbose",
@@ -156,7 +158,6 @@ CATEGORY_ORDER = [
 ]
 
 COARSENING_METHODS = {
-    "nope",
     "variation_neighborhoods",
     "variation_edges",
     "variation_cliques",
@@ -332,6 +333,19 @@ def setting_config(args):
     #     args.eval_interval = max(args.epochs // 10, 1)
     args.checkpoints = list(range(-1, args.epochs + 1, args.eval_interval))
     return args
+
+
+def _json_object_option(ctx, param, value):
+    """Read a JSON object without importing a reduction backend."""
+    if value is None:
+        return None
+    try:
+        result = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise click.BadParameter("must be a JSON object", ctx=ctx, param=param) from exc
+    if not isinstance(result, dict):
+        raise click.BadParameter("must be a JSON object", ctx=ctx, param=param)
+    return result
 
 
 # recommend hyperparameters here
@@ -515,9 +529,19 @@ def method_config(args):
     "-R",
     default=-1.0,
     show_default=True,
-    help="-1 means use representative reduction rate; reduction rate of training set, defined as (number of nodes in small graph)/(number of nodes in original graph)",
+    help="-1 means use representative reduction rate; reduction rate of training set, defined as (number of nodes in small graph)/(number of nodes in original graph). Edge sparsifiers instead use the fraction of edges retained",
+)
+@click.option(
+    "--edge_reduction/--node_reduction",
+    default=None,
+    show_default=False,
+    help="edge sparsification: keep every node and apply the reduction rate to edges (default: derived from the method)",
 )
 @click.option("--seed", "-S", default=1, help="Random seed", show_default=True)
+@click.option(
+    "--sparsifier_options", default=None, callback=_json_object_option,
+    help='NetworKit constructor options as JSON, e.g. {"maxRank": 20}',
+)
 @click.option(
     "--nlayers", default=2, help="number of GNN layers of condensed model", show_default=True
 )
@@ -676,7 +700,16 @@ def cli(ctx, **kwargs):
         for key in ctx.params
         if ctx.get_parameter_source(key) == click.core.ParameterSource.COMMANDLINE
     }
-    args.method = get_method_spec(args.method).name
+    spec = get_method_spec(args.method)
+    args.method = spec.name
+    if args.edge_reduction is None:
+        args.edge_reduction = spec.edge_reduction
+    elif args.edge_reduction != spec.edge_reduction:
+        raise click.BadParameter(
+            f"{spec.name} is {'an edge' if spec.edge_reduction else 'a node'} reduction method; "
+            "--edge_reduction cannot change what a method reduces",
+            param_hint="--edge_reduction",
+        )
     # CUDA indices refer to the devices already visible to this process.
     args.device = f"cuda:{args.gpu_id}" if args.gpu_id >= 0 else "cpu"
     # for benchmark, we need unified settings and reduce flexibility of args

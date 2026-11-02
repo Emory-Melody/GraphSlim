@@ -5,6 +5,11 @@ Welcome to GraphSlim's documentation!
 
 A comprehensive package for node sparsification, :edge-sparsification:`edge sparsification`, coarsening and condensation based on PyG.
 
+GraphSlim provides **49 graph reduction methods**: 5 node sparsifiers,
+**18 edge sparsifiers**, 10 coarsening methods, and 16 condensation methods.
+The sparsification family contains 23 methods in total. Counts refer to
+canonical registry entries; aliases are not counted separately.
+
 .. toctree::
    :maxdepth: 1
    :caption: Installation

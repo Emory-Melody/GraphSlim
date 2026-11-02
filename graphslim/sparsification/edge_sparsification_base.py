@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import numpy as np
 import torch
 from torch_sparse import matmul
@@ -7,12 +9,11 @@ from graphslim.evaluation.utils import verbose_time_memory
 from graphslim.sparsification.coreset_base import CoreSet
 from graphslim.utils import normalize_adj_tensor, to_tensor
 from graphslim.dataset import *
-from graphslim.dataset.convertor import networkit_to_pyg, pyg_to_networkit
+from graphslim.dataset.convertor import csr2ei, networkit_to_pyg, pyg_to_networkit
 
 
 class EdgeSparsifier:
     """Base for pruning graph connectivity while retaining every input node.
-
     """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize EdgeSparsifier and its configuration.
@@ -26,7 +27,6 @@ class EdgeSparsifier:
 
     @verbose_time_memory
     def reduce(self, data, verbose=False, save=True):
-        # differ from vertex sparsification, edge sparsification is conducted on the whole graph
         """Keep every node of the evaluated graph and drop edges.
 
         Edge sparsification does not select nodes, so ``reduction_rate`` is a fraction of
@@ -44,15 +44,33 @@ class EdgeSparsifier:
             ``reduction_metadata`` populated.
         :raises ValueError: If ``args.edge_reduction`` is disabled.
         """
-        graph = pyg_to_networkit(data)
-
         args = self.args
+        if not getattr(args, "edge_reduction", True):
+            raise ValueError(f"{type(self).__name__} is an edge sparsifier; it requires edge_reduction=True")
+        if getattr(args, "setting", "trans") == "ind":
+            adjacency = data.adj_train
+            num_nodes = adjacency.shape[0]
+            edge_index = csr2ei(adjacency)
+        else:
+            edge_index = data.edge_index
+            num_nodes = data.num_nodes
+        graph = pyg_to_networkit(SimpleNamespace(edge_index=edge_index, num_nodes=num_nodes, edge_attr=None))
+
         # TODO: support edge weight
         new_edge_list, new_edge_attr = self.edge_cutter(graph)
 
-        data.adj_syn = ei2csr(new_edge_list, graph.numberOfNodes())
+        data.adj_syn = ei2csr(new_edge_list, num_nodes)
+        data.reduced_edges = int(graph.numberOfEdges() and data.adj_syn.nnz // 2)
+        data.reduction_metadata = dict(
+            edge_reduction=True,
+            original_edges=int(graph.numberOfEdges()),
+            reduced_edges=data.reduced_edges,
+            nodes=int(num_nodes),
+            graph="train" if getattr(args, "setting", "trans") == "ind" else "full",
+        )
+        data.reduction_metadata.update(getattr(self, "sparsifier_metadata", {}))
         if verbose:
-            print("selected edges:", data.adj_syn.sum())
+            print("selected edges:", data.reduced_edges, "of", graph.numberOfEdges())
 
         data.adj_syn = to_tensor(data.adj_syn, device="cpu")
         if save:

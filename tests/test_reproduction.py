@@ -4,7 +4,7 @@ from benchmark.render_results import read_results, render_results
 from benchmark.reproduce import plan, main, PERFORMANCE_METHODS, RATES, SUITES
 
 
-@pytest.mark.parametrize("method", ("cgc", "clustgdd", "gcgp", "nope"))
+@pytest.mark.parametrize("method", ("cgc", "clustgdd", "gcgp"))
 @pytest.mark.parametrize("suite", SUITES)
 def test_new_methods_are_respected_by_every_suite(method, suite):
     dataset = "ogbn-arxiv" if suite == "scalability" else "cora"

@@ -15,10 +15,13 @@
 
 </div>
 
-GraphSlim 将 稀疏化、粗化、凝聚、**7 种下游 GNN 骨干网络**和
+GraphSlim 将 **49 种图缩减方法**、**7 种下游 GNN 骨干网络**和
 **仅使用验证集选参的超参数优化（HPO）** 整合到统一流程中。
 加载图、选择缩减方法、评估缩减图均使用共享接口。
 本仓库包含可运行示例、回归测试和基准复现命令。
+
+49 种方法包括 **5 种节点稀疏化、18 种边稀疏化、10 种粗化和 16 种凝聚方法**。
+其中节点与边稀疏化合计 23 种；别名不重复计数。
 
 GPU 运算使用 PyTorch 原生算子。请安装与显卡和 CUDA 运行时匹配的
 Torch 与 PyG 扩展 wheel。
@@ -32,7 +35,7 @@ Torch 与 PyG 扩展 wheel。
 
 [![Figure 1：GraphSlim 的数据层、含 HPO 的缩减层和评估层](figures/figure1.png)](figures/figure1.pdf)
 
-Figure 1 展示软件包论文中包含 38 种方法的开发版框架。数据、缩减和评估三层均可独立调用。
+Figure 1 展示软件包论文中包含 49 种方法的开发版框架。数据、缩减和评估三层均可独立调用。
 中间的缩减层包含稀疏化、粗化、凝聚及可选 HPO；
 实线表示图数据流，虚线表示使用节点选取或粗化结果初始化凝聚。
 [矢量 PDF](figures/figure1.pdf) · [可编辑源文件](figures/figure1_architecture.tex)。
@@ -448,15 +451,33 @@ print(list_methods("condensation"))
 
 | 类别 | 规范方法名 |
 | --- | --- |
-| 节点/边稀疏化 | `random`, `kcenter`, `herding`, `cent_d`, `cent_p`, `random_edge`, `spanning_forest`, `g_spar`, `local_degree`, `rank_degree`, `scan`, `t_spanner` |
-| 粗化/聚类 | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron`, `nope` |
-| 图凝聚 | `gcond`, `gcondx`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
+| 节点稀疏化 / 核心集（5） | `random`, `kcenter`, `herding`, `cent_d`, `cent_p` |
+| 边稀疏化（18） | `random_edge`, `spanning_forest`, `g_spar`, `local_degree`, `rank_degree`, `scan`, `t_spanner`, `simmelian_parametric`, `simmelian_non_parametric`, `quadrilateral_simmelian`, `simmelian_multiscale`, `degree_multiscale`, `local_similarity`, `multiscale`, `random_node_edge`, `forest_fire`, `triangle`, `algebraic_distance` |
+| 粗化/聚类（10） | `averaging`, `clustering`, `vng`, `variation_neighborhoods`, `variation_edges`, `variation_cliques`, `heavy_edge`, `algebraic_jc`, `affinity_gs`, `kron` |
+| 图凝聚（16） | `gcond`, `doscond`, `doscondx`, `gcdm`, `gcdmx`, `sfgc`, `geom`, `msgc`, `sgdd`, `gcsntk`, `gdem`, `simgc`, `gecc`, `cgc`, `clustgdd`, `gcgp` |
+
+节点稀疏化选择已有节点，`-R` 按带标签训练节点数设定缩减节点预算。全部 18 个边稀疏化方法均保留输入节点：此时 `args.edge_reduction` 为 `True`，`--reduction_rate` 表示保留的边比例；`t_spanner` 与 `spanning_forest` 不使用该比例（`--ts` 设定 spanner 的拉伸因子）。该标志由方法自动决定，`--edge_reduction` / `--node_reduction` 只用于断言；归纳式设置下输入为训练子图，使邻接矩阵与评估所用特征一致。
+
+```bash
+# 选择节点：预算为带标签训练节点的 10%。
+python -m graphslim.train_all -D cora -M kcenter -R 0.1 -G -1 --run_reduction 1
+# 保留节点并稀疏化边：目标为保留输入边的 10%。
+python -m graphslim.train_all -D cora -M random_edge -R 0.1 -G -1 --run_reduction 1
+```
+
+NetworKit 的 15 个具体 Python sparsifier 已全部接入，另保留 `spanning_forest`、`rank_degree`、`t_spanner`。现有 `g_spar` 对应 Jaccard similarity 后端，Python 注册表也接受 `jaccard_similarity` 别名。构造参数可通过 `--sparsifier_options` 的 JSON 对象或 `--config` 中的同名对象设置：
+
+```bash
+python -m graphslim.train_all -D cora -M simmelian_parametric -R 0.1 -G -1 --run_reduction 1 --sparsifier_options '{"maxRank": 20}'
+```
+
+原生阈值方法以请求比例为目标；分数并列时实际保留边数可能偏多或偏少。`triangle` 使用 NetworKit 的三角形计数，以端点顺序打破并列，精确保留 `floor(R × 边数)` 条边，因为上游没有按大小选参的实现。现有缩减流程使用无向、无权连通性。[后端映射与默认参数](docs/source/graphslim.sparsification.rst)。上方固定的复现快照不包含新增的 11 个方法。
 
 各方法的参数设置见对应配置文件，其中包括 GECC 的演化图工作流。
 
-CGC 和 NOPE 在缩减阶段无需训练 GNN。ClustGDD 使用线性预训练和细化；
+CGC 在缩减阶段无需训练 GNN。ClustGDD 使用线性预训练和细化；
 GCGP 通过高斯过程优化缩减后的特征和目标值。
-[方法介绍、来源与验证](docs/lightweight_methods.md)。
+[方法配置](graphslim/configs)。
 
 ```bash
 python -m examples.train_lightweight -D cora -M cgc -G -1 --save_path ./checkpoints
@@ -464,8 +485,17 @@ python -m graphslim.train_all -D cora -M gcgp -G -1 --save_path ./checkpoints
 ```
 
 通过 `--config method_overrides.json` 设置方法专属选项；显式命令行选项优先。
-可从 `graphslim.condensation` 导入 `CGC`、`ClustGDD`、`GCGP`，
-从 `graphslim.coarsening` 导入 `NOPE`。
+可从 `graphslim.condensation` 导入 `CGC`、`ClustGDD`、`GCGP`。
+
+## 搜索方法自身的参数
+
+GC4NC 全部采用各方法作者的设置。遇到新数据集或新方法时，`--hpo` 会对约简方法自身的参数做网格搜索，只按验证集选参：
+
+```bash
+python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./checkpoints
+```
+
+它会打印搜索空间（来自 `--hpo_space`，否则是 `graphslim/configs/hpo/<method>.json`，再否则在 `save_path/hpo/` 下生成一个单点模板供你扩展）、试验数和预计时间，然后询问是否开始（`--hpo_yes` 跳过询问）。每个试验执行一次约简，用 `--hpo_eval_runs` 次 GCN 训练的平均验证准确率打分，不计算测试分数。完成的试验逐条追加到 `trials.jsonl`，中断后可续跑；最优参数写入 `best.json`，可直接用 `--config` 复用。
 
 ## 复现基准
 
@@ -601,7 +631,7 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --profile smoke
-python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp nope --dry-run
+python -m benchmark.reproduce robustness --datasets cora --methods cgc clustgdd gcgp --dry-run
 ```
 
 <!-- lightweight-checks:start -->

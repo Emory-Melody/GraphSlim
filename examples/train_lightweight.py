@@ -1,4 +1,4 @@
-"""CGC example; select ClustGDD, GCGP or NOPE with the common -M option."""
+"""CGC example; select ClustGDD or GCGP with the common -M option."""
 
 from pathlib import Path
 import sys

@@ -111,7 +111,6 @@ def main():
                             "cgc",
                             "clustgdd",
                             "gcgp",
-                            "nope",
                             "--setting",
                             setting,
                             "--noise",

@@ -28,7 +28,7 @@ from benchmark import rerun_nr as nr
 from benchmark.reproduce import RATES
 
 ROOT = Path(__file__).resolve().parents[1]
-METHODS = ("cgc", "clustgdd", "gcgp", "nope", "random")
+METHODS = ("cgc", "clustgdd", "gcgp", "random")
 OPTIONAL_METHODS = ("gecc", "clustering", "vng")
 STAGES = (
     ("cora", "citeseer", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp"),
