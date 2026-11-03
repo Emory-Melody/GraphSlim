@@ -85,15 +85,46 @@ def test_frozen_snapshot_is_complete():
         assert len(cell["result_sha256"]) == len(cell["job_ids"])
 
 
-@pytest.mark.parametrize("name, language", [("README.md", "en"), ("README_zh-CN.md", "zh")])
-def test_readme_table_matches_snapshot(name, language):
-    snapshot = json.loads(SNAPSHOT.read_text())
-    readme = (ROOT / name).read_text()
-    table = readme.split("<!-- tradeoff-table:start -->")[1].split("<!-- tradeoff-table:end -->")[0]
-    assert table.strip() == markdown_table(snapshot, language)
+@pytest.mark.parametrize(
+    "language, header, whole_label",
+    [
+        (
+            "en",
+            "| Dataset | Method | Budget | Reduced nodes | Test accuracy (%) | Reduction time (s) |",
+            "Full graph",
+        ),
+        (
+            "zh",
+            "| 数据集 | 方法 | 预算 | 缩减后节点数 | 测试准确率（%） | 图缩减耗时（s） |",
+            "原图",
+        ),
+    ],
+)
+def test_markdown_table_formats_snapshot(language, header, whole_label):
+    # The historical table remains exportable independently of the current README.
+    cell = dict(
+        dataset="ogbn-arxiv",
+        test_accuracy_mean=0.75,
+        test_accuracy_population_std=0.0125,
+        median_reduction_seconds=1.234,
+    )
+    snapshot = {
+        "cells": [
+            dict(cell, method="whole", training_node_rate=None, actual_nodes=[1000]),
+            dict(cell, method="cgc", training_node_rate="0.001", actual_nodes=[20, 10, 20]),
+        ]
+    }
+    assert markdown_table(snapshot, language).splitlines() == [
+        header,
+        "| --- | --- | ---: | ---: | ---: | ---: |",
+        f"| ogbn-arxiv | {whole_label} | — | 1,000 | 75.00 ± 1.25 | — |",
+        "| ogbn-arxiv | CGC | 0.1% | 10/20 | 75.00 ± 1.25 | 1.23 |",
+    ]
+
+
+def test_frozen_snapshot_figures_exist():
     for dataset in DATASETS:
         for mode in ("light", "dark"):
-            assert f"./figures/tradeoff_{dataset}_{mode}.png" in readme
             assert (ROOT / "figures" / f"tradeoff_{dataset}_{mode}.png").exists()
 
 

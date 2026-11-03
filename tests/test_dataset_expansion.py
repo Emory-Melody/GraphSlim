@@ -86,7 +86,15 @@ def test_heterophilous_selects_official_column_without_resampling(tmp_path, monk
 
 def test_expansion_roster_order_unique_and_rates():
     jobs = runner.plan()
-    assert len(jobs) == 564
+    # Twelve datasets: one full graph, four reducers x three rates x three
+    # seeds, and one GCGP parity job per dataset.
+    assert len(jobs) == 456
+    assert {job["method"] for job in jobs if job["kind"] == "reduction"} == {
+        "cgc",
+        "clustgdd",
+        "gcgp",
+        "random",
+    }
     assert len({job["id"] for job in jobs}) == len(jobs)
     assert [job["stage"] for job in jobs] == sorted(job["stage"] for job in jobs)
     assert len([job for job in jobs if job["kind"] == "parity"]) == 12
@@ -165,7 +173,7 @@ def test_export_never_publishes_partial_or_duplicate_seed(tmp_path):
 @pytest.mark.parametrize("dataset", ["photo", "computers"])
 def test_amazon_expansion_rates_and_stage(dataset):
     jobs = runner.plan([dataset])
-    assert len(jobs) == 47
+    assert len(jobs) == 38
     assert {job["dataset"] for job in jobs} == {dataset}
     assert {job["stage"] for job in jobs} == {4}
     assert {job["rate"] for job in jobs if job["kind"] == "reduction"} == {"0.005", "0.01", "0.02"}
@@ -184,7 +192,7 @@ def test_new_defaults_preserve_frozen_three_stage_roster(tmp_path, monkeypatch):
     runner.main(["--run-dir", str(tmp_path), "--initialize-only"])
     assert [path.read_bytes() for path in paths] == before
     manifest = json.loads(paths[0].read_text())
-    assert len(manifest["jobs"]) == 470
+    assert len(manifest["jobs"]) == 380
     assert len(manifest["stage_order"]) == 3
     with pytest.raises(RuntimeError, match="Frozen roster/protocol differs"):
         runner.main(
