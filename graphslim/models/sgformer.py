@@ -57,9 +57,8 @@ def normalize_adj(adj):
 
 
 class GraphConvLayer(nn.Module):
-    """SGFormer graph propagation layer with optional initial-feature concatenation.
+    """SGFormer graph propagation layer with optional initial-feature concatenation."""
 
-    """
     def __init__(self, in_channels, out_channels, use_weight=True, use_init=False):
         """Initialize GraphConvLayer and its configuration.
 
@@ -79,13 +78,10 @@ class GraphConvLayer(nn.Module):
         self.W = nn.Linear(in_channels_, out_channels)
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         self.W.reset_parameters()
 
     def forward(self, x, adj, x0):
-
         # N = x.shape[0]
         # row, col = edge_index
         # d = degree(col, N).float()
@@ -114,9 +110,8 @@ class GraphConvLayer(nn.Module):
 
 
 class GraphConv(nn.Module):
-    """SGFormer graph branch with configurable normalization and residual connections.
+    """SGFormer graph branch with configurable normalization and residual connections."""
 
-    """
     def __init__(
         self,
         in_channels,
@@ -162,9 +157,7 @@ class GraphConv(nn.Module):
         self.use_act = use_act
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         for conv in self.convs:
             conv.reset_parameters()
         for bn in self.bns:
@@ -225,9 +218,7 @@ class TransConvLayer(nn.Module):
         self.use_weight = use_weight
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         self.Wk.reset_parameters()
         self.Wq.reset_parameters()
         if self.use_weight:
@@ -287,9 +278,8 @@ class TransConvLayer(nn.Module):
 
 
 class TransConv(nn.Module):
-    """SGFormer transformer branch built from linear attention layers.
+    """SGFormer transformer branch built from linear attention layers."""
 
-    """
     def __init__(
         self,
         in_channels,
@@ -336,9 +326,7 @@ class TransConv(nn.Module):
         self.use_act = use_act
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         for conv in self.convs:
             conv.reset_parameters()
         for bn in self.bns:
@@ -404,9 +392,8 @@ class TransConv(nn.Module):
 
 
 class SGFormer(nn.Module):
-    """Node classifier combining global linear attention and a graph convolution branch.
+    """Node classifier combining global linear attention and a graph convolution branch."""
 
-    """
     def __init__(
         self,
         in_channels,
@@ -546,9 +533,7 @@ class SGFormer(nn.Module):
         return attns
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         self.trans_conv.reset_parameters()
         if self.use_graph:
             self.graph_conv.reset_parameters()
@@ -733,7 +718,6 @@ class SGFormer(nn.Module):
 
     @torch.no_grad()
     def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):
-
         """Convert graph inputs to device tensors and run evaluation-mode prediction.
 
         ``normadj`` and ``output_layer_features`` are accepted for the shared model

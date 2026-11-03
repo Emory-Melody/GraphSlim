@@ -6,9 +6,8 @@ import random
 
 
 class KCenterSample(MBCoreSet):
-    """Choose a classwise k-center sample starting nearest to each class mean.
+    """Choose a classwise k-center sample starting nearest to each class mean."""
 
-    """
     def select(self, embeds):
         """Choose a classwise k-center sample starting nearest to each class mean.
 

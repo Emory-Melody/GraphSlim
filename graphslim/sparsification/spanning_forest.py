@@ -6,9 +6,8 @@ from torch_geometric.utils.convert import from_networkit
 
 
 class SpanningForest(EdgeSparsifier):
-    """Connectivity-preserving spanning forest edge reducer.
+    """Connectivity-preserving spanning forest edge reducer."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize SpanningForest and its configuration.
 

@@ -13,8 +13,8 @@ from graphslim.dataset.convertor import csr2ei, networkit_to_pyg, pyg_to_network
 
 
 class EdgeSparsifier:
-    """Base for pruning graph connectivity while retaining every input node.
-    """
+    """Base for pruning graph connectivity while retaining every input node."""
+
     def __init__(self, setting, data, args, **kwargs):
         """Initialize EdgeSparsifier and its configuration.
 
@@ -46,7 +46,9 @@ class EdgeSparsifier:
         """
         args = self.args
         if not getattr(args, "edge_reduction", True):
-            raise ValueError(f"{type(self).__name__} is an edge sparsifier; it requires edge_reduction=True")
+            raise ValueError(
+                f"{type(self).__name__} is an edge sparsifier; it requires edge_reduction=True"
+            )
         if getattr(args, "setting", "trans") == "ind":
             adjacency = data.adj_train
             num_nodes = adjacency.shape[0]
@@ -54,7 +56,9 @@ class EdgeSparsifier:
         else:
             edge_index = data.edge_index
             num_nodes = data.num_nodes
-        graph = pyg_to_networkit(SimpleNamespace(edge_index=edge_index, num_nodes=num_nodes, edge_attr=None))
+        graph = pyg_to_networkit(
+            SimpleNamespace(edge_index=edge_index, num_nodes=num_nodes, edge_attr=None)
+        )
 
         # TODO: support edge weight
         new_edge_list, new_edge_attr = self.edge_cutter(graph)

@@ -25,9 +25,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class VariationCliques(Coarsen):
-    """Multilevel graph coarsening using local variation over cliques.
+    """Multilevel graph coarsening using local variation over cliques."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize VariationCliques and its configuration.
 

@@ -10,6 +10,7 @@ def lazy_exports(namespace, exports):
     :param exports: Mapping from exported names to ``(module_path, attribute_name)`` pairs.
     :returns: Tuple ``(export_names, getattr_hook, dir_hook)``.
     """
+
     def get_attribute(name):
         """Import a declared export on first attribute access and cache it in the package namespace.
 

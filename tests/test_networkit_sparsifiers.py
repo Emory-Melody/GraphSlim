@@ -54,7 +54,8 @@ def edges(edge_index):
 
 def test_every_concrete_upstream_sparsifier_is_reachable():
     upstream = {
-        name for name, cls in inspect.getmembers(nk.sparsification, inspect.isclass)
+        name
+        for name, cls in inspect.getmembers(nk.sparsification, inspect.isclass)
         if issubclass(cls, nk.sparsification.Sparsifier)
         and name not in ("Sparsifier", "LocalSparsifier")
     }
@@ -63,11 +64,14 @@ def test_every_concrete_upstream_sparsifier_is_reachable():
         cls = get_method_spec(method).load_class()
         assert cls.networkit_class == backend
         import graphslim.sparsification as api
+
         assert getattr(api, cls.__name__) is cls
     assert get_method_spec("Jaccard-Similarity") is get_method_spec("g_spar")
 
 
-@pytest.mark.parametrize("method,backend,options", [item for item in BACKENDS if item[0] != "triangle"])
+@pytest.mark.parametrize(
+    "method,backend,options", [item for item in BACKENDS if item[0] != "triangle"]
+)
 def test_matches_native_size_parameterization(tmp_path, method, backend, options):
     nk.setSeed(4, False)
     graph = nk.generators.ErdosRenyiGenerator(36, 0.3).generate()
@@ -80,7 +84,9 @@ def test_matches_native_size_parameterization(tmp_path, method, backend, options
     assert edges(actual) == {tuple(sorted(uv)) for uv in expected.iterEdges()}
 
 
-@pytest.mark.parametrize("method", ["random_edge", "random_node_edge", "forest_fire", "algebraic_distance"])
+@pytest.mark.parametrize(
+    "method", ["random_edge", "random_node_edge", "forest_fire", "algebraic_distance"]
+)
 def test_seed_controls_native_randomness(method):
     graph = nk.generators.ErdosRenyiGenerator(40, 0.3).generate()
     args = SimpleNamespace(reduction_rate=0.5, seed=19)
@@ -108,7 +114,9 @@ def test_roundtrip_and_actual_gcn_fit(tmp_path, method, backend, options, settin
     assert dense.count_nonzero().item() // 2 == reduced.reduced_edges
     assert reduced.reduction_metadata["networkit_class"] == backend
     torch.testing.assert_close(adjacency, reduced.adj_syn)
-    torch.testing.assert_close(features, graph.feat_full if setting == "trans" else graph.feat_train)
+    torch.testing.assert_close(
+        features, graph.feat_full if setting == "trans" else graph.feat_train
+    )
     # The shared loader returns training targets, including when the adjacency
     # spans the full transductive graph; Evaluator indexes its training nodes.
     torch.testing.assert_close(labels, graph.labels_train)
@@ -158,7 +166,9 @@ def test_constructor_options_cli_config_and_local_composition(tmp_path):
     common = ["-M", "simmelian_parametric", "-G", "-1", "--save_path", str(tmp_path)]
     args = get_args([*common, "--config", str(config)])
     assert create_reducer(args.method, "trans", None, args).sparsifier.maxRank == 3
-    args = get_args([*common, "--config", str(config), "--sparsifier_options", '{"maxRank": 7, "local": true}'])
+    args = get_args(
+        [*common, "--config", str(config), "--sparsifier_options", '{"maxRank": 7, "local": true}']
+    )
     reducer = create_reducer(args.method, "trans", None, args)
     assert isinstance(reducer.sparsifier, nk.sparsification.LocalSparsifier)
     assert reducer.sparsifier.sparsifier.maxRank == 7
@@ -168,19 +178,22 @@ def test_constructor_options_cli_config_and_local_composition(tmp_path):
     assert edges(actual) <= {tuple(sorted(uv)) for uv in graph.iterEdges()}
 
 
-@pytest.mark.parametrize("method,options", [
-    ("simmelian_parametric", {"maxRank": -1}),
-    ("simmelian_parametric", {"unknown": 1}),
-    ("forest_fire", {"burnProbability": 0}),
-    ("forest_fire", {"targetBurntRatio": 2}),
-    ("algebraic_distance", {"numberSystems": 0}),
-    ("algebraic_distance", {"omega": float("nan")}),
-    ("algebraic_distance", {"norm": 1}),
-    ("random_node_edge", {"above": "false"}),
-    ("degree_multiscale", {"degsToAttrValue": "unknown"}),
-    ("triangle", {"local": "false"}),
-    ("triangle", []),
-])
+@pytest.mark.parametrize(
+    "method,options",
+    [
+        ("simmelian_parametric", {"maxRank": -1}),
+        ("simmelian_parametric", {"unknown": 1}),
+        ("forest_fire", {"burnProbability": 0}),
+        ("forest_fire", {"targetBurntRatio": 2}),
+        ("algebraic_distance", {"numberSystems": 0}),
+        ("algebraic_distance", {"omega": float("nan")}),
+        ("algebraic_distance", {"norm": 1}),
+        ("random_node_edge", {"above": "false"}),
+        ("degree_multiscale", {"degsToAttrValue": "unknown"}),
+        ("triangle", {"local": "false"}),
+        ("triangle", []),
+    ],
+)
 def test_invalid_options_fail_before_native_code(method, options):
     with pytest.raises(ValueError):
         create_reducer(method, "trans", None, SimpleNamespace(sparsifier_options=options))

@@ -9,11 +9,9 @@ from graphslim.acceleration import CUDAGraphStep
 
 
 class BaseGNN(nn.Module):
-    """Shared graph model training, validation selection, and prediction interface.
+    """Shared graph model training, validation selection, and prediction interface."""
 
-    """
     def __init__(self, nfeat, nhid, nclass, args, mode):
-
         """Initialize BaseGNN and its configuration.
 
         :param nfeat: Number of input features per node.
@@ -59,9 +57,7 @@ class BaseGNN(nn.Module):
         self.metric = args.metric
 
     def initialize(self):
-        """Reset model layers and enabled batch normalization statistics.
-
-        """
+        """Reset model layers and enabled batch normalization statistics."""
         for layer in self.layers:
             layer.reset_parameters()
         if self.with_bn:
@@ -69,7 +65,6 @@ class BaseGNN(nn.Module):
                 bn.reset_parameters()
 
     def forward(self, x, adj, output_layer_features=False):
-
         """Compute node predictions from features and one adjacency or a list of layer adjacencies.
 
         :param x: Node feature matrix with one row per node.
@@ -325,7 +320,6 @@ class BaseGNN(nn.Module):
 
     @torch.no_grad()
     def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):
-
         """Switch to evaluation mode, prepare graph tensors, and compute node predictions.
 
         :param features: Node feature matrix with one row per node. Defaults to ``None``.

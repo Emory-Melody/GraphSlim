@@ -48,9 +48,7 @@ class NullTracker:
         return None
 
     def finish(self) -> None:
-        """Close a disabled tracker without external side effects.
-
-        """
+        """Close a disabled tracker without external side effects."""
         return None
 
 
@@ -101,9 +99,7 @@ class WandbTracker:
         self.log({f"{name}/{key}": value for key, value in summary.items()}, step=step)
 
     def finish(self) -> None:
-        """Finish the active Weights & Biases run.
-
-        """
+        """Finish the active Weights & Biases run."""
         self._wandb.finish()
 
 

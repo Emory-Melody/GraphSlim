@@ -5,9 +5,8 @@ import torch.nn.functional as F
 
 
 class PGE(nn.Module):
-    """Parameterized adjacency estimator from pairs of synthetic node features.
+    """Parameterized adjacency estimator from pairs of synthetic node features."""
 
-    """
     def __init__(self, nfeat, nnodes, nhid=128, nlayers=3, device=None, args=None):
         """Initialize PGE and its configuration.
 
@@ -97,9 +96,8 @@ class PGE(nn.Module):
         return adj_syn
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
+        """Reset trainable layers and normalization state using their initialization rules."""
 
-        """
         def weight_reset(m):
             """Reset linear and batch normalization submodule parameters.
 

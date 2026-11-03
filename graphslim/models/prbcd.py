@@ -14,9 +14,8 @@ from torch_sparse import coalesce
 
 
 class PRBCD:
-    """Projected randomized block coordinate descent structural graph attack.
+    """Projected randomized block coordinate descent structural graph attack."""
 
-    """
     def __init__(
         self,
         data,
@@ -547,6 +546,7 @@ def bisection(edge_weights, a, b, n_perturbations, epsilon=1e-5, iter_max=1e5):
     :param iter_max: Maximum number of optimization iterations. Defaults to ``100000.0``.
     :returns: Scalar projection shift found by bisection.
     """
+
     def func(x):
         """Evaluate excess clamped perturbation mass for a proposed shift.
 

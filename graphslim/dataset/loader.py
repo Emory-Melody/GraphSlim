@@ -172,9 +172,8 @@ def get_dataset(name="cora", args=None, load_path="./data"):
 
 
 class TransAndInd:
-    """Shared graph wrapper exposing full-graph and split-local learning views.
+    """Shared graph wrapper exposing full-graph and split-local learning views."""
 
-    """
     def __init__(self, data, dataset, norm=True):
         """Initialize TransAndInd and its configuration.
 
@@ -341,18 +340,15 @@ class TransAndInd:
         return out
 
     def reset(self):
-        """Clear cached class masks and neighbor samplers.
-
-        """
+        """Clear cached class masks and neighbor samplers."""
         self.samplers = None
         self.class_dict2 = None
         self.labels_syn, self.feat_syn, self.adj_syn = None, None, None
 
 
 class LargeDataLoader(nn.Module):
-    """Partitioned feature and adjacency loader for large-graph kernel condensation.
+    """Partitioned feature and adjacency loader for large-graph kernel condensation."""
 
-    """
     def __init__(self, name="Flickr", split="train", batch_size=200, split_method="kmeans"):
         """Load a graph and prepare partitioned, filtered split features.
 
@@ -479,9 +475,7 @@ class LargeDataLoader(nn.Module):
         return self.k, self.n_split, self.n_classes, self.dim, self.n
 
     def split_batch(self):
-        """Assign split nodes to k-means partitions using the configured partition count.
-
-        """
+        """Assign split nodes to k-means partitions using the configured partition count."""
         if self.split_method == "kmeans":
             kmeans = KMeans(n_clusters=self.k.item(), n_init=10)
             from graphslim.reduction.cluster_ops import fitted_labels
@@ -523,9 +517,8 @@ class LargeDataLoader(nn.Module):
 
 
 class OgbDataLoader(nn.Module):
-    """OGB-backed specialization of the large-graph partition loader.
+    """OGB-backed specialization of the large-graph partition loader."""
 
-    """
     def __init__(
         self, dataset_name="ogbn-arxiv", split="train", batch_size=5000, split_method="kmeans"
     ):

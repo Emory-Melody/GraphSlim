@@ -7,9 +7,8 @@ from numpy.linalg import norm
 
 class CentP(MFCoreSet):
     # select nodes with topk PR value in each class
-    """Choose the highest-PageRank training nodes within each class.
+    """Choose the highest-PageRank training nodes within each class."""
 
-    """
     def select(self, embedds=None):
         """Choose the highest-PageRank training nodes within each class.
 

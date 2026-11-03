@@ -5,11 +5,9 @@ from graphslim.sparsification.model_based_coreset_base import MBCoreSet
 
 
 class Herding(MBCoreSet):
-    """Choose classwise representatives by greedily matching the class embedding mean.
+    """Choose classwise representatives by greedily matching the class embedding mean."""
 
-    """
     def select(self, embeds):
-
         """Choose classwise representatives by greedily matching the class embedding mean.
 
         :param embeds: Node embeddings indexed in the current graph node ordering.

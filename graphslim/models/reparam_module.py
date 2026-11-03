@@ -7,9 +7,8 @@ from contextlib import contextmanager
 
 
 class ReparamModule(nn.Module):
-    """Module wrapper exposing all trainable parameters as a differentiable flat tensor.
+    """Module wrapper exposing all trainable parameters as a differentiable flat tensor."""
 
-    """
     def _get_module_from_name(self, mn):
         """Resolve a dotted submodule path relative to the wrapper.
 
@@ -116,9 +115,7 @@ class ReparamModule(nn.Module):
         return self
 
     def clear_views(self):
-        """Remove temporary tensor views of flattened parameters from wrapped submodules.
-
-        """
+        """Remove temporary tensor views of flattened parameters from wrapped submodules."""
         for mn, n in self._param_infos:
             setattr(self._get_module_from_name(mn), n, None)
 

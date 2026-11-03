@@ -25,9 +25,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class VariationEdges(Coarsen):
-    """Multilevel graph coarsening using local variation over edges.
+    """Multilevel graph coarsening using local variation over edges."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize VariationEdges and its configuration.
 

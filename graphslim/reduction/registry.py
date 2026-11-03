@@ -120,8 +120,11 @@ _METHODS: Dict[str, MethodSpec] = {
     # Remaining concrete sparsifiers from NetworKit's Python module.
     **{
         name: MethodSpec(
-            name, "sparsification", "graphslim.sparsification.networkit_sparsifiers",
-            class_name, edge_reduction=True,
+            name,
+            "sparsification",
+            "graphslim.sparsification.networkit_sparsifiers",
+            class_name,
+            edge_reduction=True,
         )
         for name, class_name in (
             ("simmelian_parametric", "SimmelianParametric"),

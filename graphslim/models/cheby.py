@@ -6,11 +6,9 @@ from graphslim.models.layers import ChebConvolution
 
 
 class Cheby(BaseGNN):
-    """Graph classifier using Chebyshev polynomial convolutions.
+    """Graph classifier using Chebyshev polynomial convolutions."""
 
-    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
-
         """Initialize Cheby and its configuration.
 
         :param nfeat: Number of input features per node.

@@ -7,9 +7,8 @@ import copy
 
 
 class TSpanner(EdgeSparsifier):
-    """Edge reducer constructing a random spanning subgraph with bounded stretch.
+    """Edge reducer constructing a random spanning subgraph with bounded stretch."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize TSpanner and its configuration.
 

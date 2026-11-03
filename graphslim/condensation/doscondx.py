@@ -26,7 +26,6 @@ class DosCondX(GCondBase):
 
     @verbose_time_memory
     def reduce(self, data, verbose=True):
-
         """Optimize structure-free synthetic features by one-step gradient matching.
 
         :param data: Graph data containing features, adjacency, labels, and split indices.

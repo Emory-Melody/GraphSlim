@@ -85,7 +85,6 @@ def getsize_mb(elements):
 
 
 def inference_via_confidence(confidence_mtx1, confidence_mtx2, label_vec1, label_vec2):
-
     # ----------------First step: obtain confidence lists for both training dataset and test dataset--------------
     """Scan true-label prediction confidence thresholds for membership inference.
 

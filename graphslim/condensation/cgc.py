@@ -77,9 +77,8 @@ def reconstruct_features(adjacency, embeddings, alpha=3.0, ridge=1e-8):
 
 
 class CGC(LightweightReducer):
-    """Construct classwise clusters from propagated features and optionally reconstruct their graph.
+    """Construct classwise clusters from propagated features and optionally reconstruct their graph."""
 
-    """
     def reduce(self, data, verbose=True, save=True):
         """Construct classwise clusters from propagated features and optionally reconstruct their graph.
 

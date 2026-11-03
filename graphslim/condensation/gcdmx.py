@@ -10,9 +10,8 @@ import torch.nn.functional as F
 
 
 class GCDMX(GCondBase):
-    """Match classwise representation distributions on a structure-free synthetic graph.
+    """Match classwise representation distributions on a structure-free synthetic graph."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize GCDMX and its configuration.
 

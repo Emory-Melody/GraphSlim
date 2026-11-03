@@ -8,9 +8,8 @@ import random
 
 
 class RankDegree(EdgeSparsifier):
-    """Edge sparsifier based on local degree ranking.
+    """Edge sparsifier based on local degree ranking."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize RankDegree and its configuration.
 

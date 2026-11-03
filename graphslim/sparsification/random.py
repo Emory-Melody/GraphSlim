@@ -4,9 +4,8 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
 class Random(MFCoreSet):
-    """Sample training nodes uniformly without replacement within each class.
+    """Sample training nodes uniformly without replacement within each class."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize Random and its configuration.
 

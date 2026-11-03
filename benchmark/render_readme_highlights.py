@@ -52,9 +52,11 @@ def coverage_table(data, language):
     lines = [header, "| --- | " + " | ".join("---:" for _ in THRESHOLDS) + " |"]
     cells = []
     for threshold in THRESHOLDS:
-        count = sum(p["credited_by_policy"] or
-                    (p["complete_result"] and p[METRIC] is not None and p[METRIC] < threshold)
-                    for p in data["pairs"])
+        count = sum(
+            p["credited_by_policy"]
+            or (p["complete_result"] and p[METRIC] is not None and p[METRIC] < threshold)
+            for p in data["pairs"]
+        )
         cells.append(f"{count}/{data['total_pairs']} ({100 * count / data['total_pairs']:.2f}%)")
     lines.append("| " + " | ".join([label, *cells]) + " |")
     return "\n".join(lines)
@@ -86,7 +88,8 @@ def coverage_context(text, language):
         text = text.replace(
             "**121/123 (98.37%)** meet a mean one-sided relative shortfall below 5%.",
             "**111/123 (90.24%)** meet a mean two-sided relative error below 5%;\n"
-            "**116/123 (94.31%)** meet a tolerance below 10%.")
+            "**116/123 (94.31%)** meet a tolerance below 10%.",
+        )
         text = text.replace(
             "Shortfall is `100 * max(0, reference - reproduced) / reference`; a score above\n"
             "the reference contributes zero shortfall. Compute shortfall per declared\n"
@@ -95,21 +98,30 @@ def coverage_context(text, language):
             "Two-sided relative error is `100 * abs(reproduced - reference) / abs(reference)`.\n"
             "Deviations above and below the reference both count. Compute it per declared\n"
             "matched rate, average within a method–dataset pair, then apply the strict `<`\n"
-            "threshold. The displayed 1%, 2%, 5% and 10% cutoffs are relative percentages, not percentage-point gaps.")
-        text = text.replace("the <5% shortfall rate is **114/116 (98.28%)**.",
-                            "the <5% error rate is **104/116 (89.66%)**, and the <10% rate is **109/116 (93.97%)**.")
+            "threshold. The displayed 1%, 2%, 5% and 10% cutoffs are relative percentages, not percentage-point gaps.",
+        )
+        text = text.replace(
+            "the <5% shortfall rate is **114/116 (98.28%)**.",
+            "the <5% error rate is **104/116 (89.66%)**, and the <10% rate is **109/116 (93.97%)**.",
+        )
     else:
-        text = text.replace("**121/123（98.37%）** 的平均单边相对短缺低于 5%。",
-                            "**111/123（90.24%）** 的平均双边相对误差低于 5%；\n"
-                            "**116/123（94.31%）** 的平均双边相对误差低于 10%。")
-        text = text.replace("单边短缺为 `100 * max(0, 参照值 - 复现值) / 参照值`，高于参照值的结果短缺记为 0。\n"
-                            "先在每个声明且匹配的压缩率上计算，再在方法与数据集组合内平均，最后按严格 `<` 判断。\n"
-                            "这里的阈值是相对百分比，并非百分点差。",
-                            "双边相对误差为 `100 * abs(复现值 - 参照值) / abs(参照值)`，高于和低于参照值的偏差均计入。\n"
-                            "先在每个声明且匹配的压缩率上计算，再在方法与数据集组合内平均，最后按严格 `<` 判断。\n"
-                            "图中展示 1%、2%、5%、10% 四档相对容差，并非百分点差。")
-        text = text.replace("单边短缺低于 5% 的比例为 **114/116（98.28%）**。",
-                            "双边误差低于 5% 的比例为 **104/116（89.66%）**，低于 10% 的比例为 **109/116（93.97%）**。")
+        text = text.replace(
+            "**121/123（98.37%）** 的平均单边相对短缺低于 5%。",
+            "**111/123（90.24%）** 的平均双边相对误差低于 5%；\n"
+            "**116/123（94.31%）** 的平均双边相对误差低于 10%。",
+        )
+        text = text.replace(
+            "单边短缺为 `100 * max(0, 参照值 - 复现值) / 参照值`，高于参照值的结果短缺记为 0。\n"
+            "先在每个声明且匹配的压缩率上计算，再在方法与数据集组合内平均，最后按严格 `<` 判断。\n"
+            "这里的阈值是相对百分比，并非百分点差。",
+            "双边相对误差为 `100 * abs(复现值 - 参照值) / abs(参照值)`，高于和低于参照值的偏差均计入。\n"
+            "先在每个声明且匹配的压缩率上计算，再在方法与数据集组合内平均，最后按严格 `<` 判断。\n"
+            "图中展示 1%、2%、5%、10% 四档相对容差，并非百分点差。",
+        )
+        text = text.replace(
+            "单边短缺低于 5% 的比例为 **114/116（98.28%）**。",
+            "双边误差低于 5% 的比例为 **104/116（89.66%）**，低于 10% 的比例为 **109/116（93.97%）**。",
+        )
     return text
 
 

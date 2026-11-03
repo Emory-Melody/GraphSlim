@@ -10,9 +10,8 @@ import torch.nn.functional as F
 
 
 class GCDM(GCondBase):
-    """Match classwise real and synthetic representation distributions with a learned graph.
+    """Match classwise real and synthetic representation distributions with a learned graph."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize GCDM and its configuration.
 

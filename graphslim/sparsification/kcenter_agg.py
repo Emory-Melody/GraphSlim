@@ -5,9 +5,8 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
 class KCenterAgg(MFCoreSet):
-    """Choose classwise representatives by farthest-first coverage of propagated features.
+    """Choose classwise representatives by farthest-first coverage of propagated features."""
 
-    """
     def select(self, embeds):
         """Choose classwise representatives by farthest-first coverage of propagated features.
 

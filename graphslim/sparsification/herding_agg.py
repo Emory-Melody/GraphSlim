@@ -5,11 +5,9 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 
 class HerdingAgg(MFCoreSet):
-    """Choose classwise representatives by herding on propagated feature embeddings.
+    """Choose classwise representatives by herding on propagated feature embeddings."""
 
-    """
     def select(self, embeds):
-
         """Choose classwise representatives by herding on propagated feature embeddings.
 
         :param embeds: Node embeddings indexed in the current graph node ordering.

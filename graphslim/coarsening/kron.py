@@ -25,9 +25,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class Kron(Coarsen):
-    """Multilevel graph coarsening using Kron reduction.
+    """Multilevel graph coarsening using Kron reduction."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize Kron and its configuration.
 

@@ -6,11 +6,9 @@ from graphslim.models.layers import SageConvolution
 
 
 class GraphSage(BaseGNN):
-    """GraphSAGE classifier with neighborhood aggregation layers.
+    """GraphSAGE classifier with neighborhood aggregation layers."""
 
-    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
-
         """Initialize GraphSage and its configuration.
 
         :param nfeat: Number of input features per node.

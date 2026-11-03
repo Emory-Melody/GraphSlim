@@ -80,7 +80,6 @@ class MSGC(GCondBase):
         return n_each_y
 
     def reduce(self, data, verbose=True):
-
         """Match real gradients with batches of synthetic graphs sharing trainable node features.
 
         :param data: Graph data containing features, adjacency, labels, and split indices.
@@ -210,9 +209,7 @@ class MSGC(GCondBase):
     #         return x_syn
 
     def reset_adj_batch(self):
-        """Resample class-aware candidate edge indices for all synthetic graph batches.
-
-        """
+        """Resample class-aware candidate edge indices for all synthetic graph batches."""
         rows = []
         cols = []
         batch = []
@@ -277,9 +274,8 @@ class MSGC(GCondBase):
 
 
 class FixLenList:
-    """Fixed-capacity history that discards the oldest element on overflow.
+    """Fixed-capacity history that discards the oldest element on overflow."""
 
-    """
     def __init__(self, lenth):
         """Initialize FixLenList and its configuration.
 

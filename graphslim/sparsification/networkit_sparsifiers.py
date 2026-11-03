@@ -52,7 +52,9 @@ class NetworkitSparsifier(EdgeSparsifier):
         allowed = inspect.signature(constructor).parameters
         unknown = options.keys() - allowed.keys()
         if unknown:
-            raise ValueError(f"Unknown {self.networkit_class} options: {', '.join(sorted(unknown))}")
+            raise ValueError(
+                f"Unknown {self.networkit_class} options: {', '.join(sorted(unknown))}"
+            )
         for key in ("maxRank", "numberSystems", "numberIterations"):
             if key in options:
                 value = options[key]
@@ -63,8 +65,10 @@ class NetworkitSparsifier(EdgeSparsifier):
                 value = options[key]
                 inclusive = key == "targetBurntRatio"
                 valid = (
-                    not isinstance(value, bool) and isinstance(value, Real)
-                    and math.isfinite(value) and value > 0
+                    not isinstance(value, bool)
+                    and isinstance(value, Real)
+                    and math.isfinite(value)
+                    and value > 0
                     and (value <= 1 if inclusive else value < 1)
                 )
                 if not valid:
@@ -72,14 +76,20 @@ class NetworkitSparsifier(EdgeSparsifier):
                     raise ValueError(f"{key} must be in {interval}")
         if "above" in options and not isinstance(options["above"], bool):
             raise ValueError("above must be a boolean")
-        if "norm" in options and (isinstance(options["norm"], bool) or options["norm"] not in (0, 2)):
+        if "norm" in options and (
+            isinstance(options["norm"], bool) or options["norm"] not in (0, 2)
+        ):
             raise ValueError("norm must be 0 (maximum) or 2 (Euclidean)")
         self.options = options.copy()
         if "degsToAttrValue" in options:
             mapper = options["degsToAttrValue"]
             if not callable(mapper):
-                mappers = {"max": max, "min": min, "sum": lambda u, v: u + v,
-                           "product": lambda u, v: u * v}
+                mappers = {
+                    "max": max,
+                    "min": min,
+                    "sum": lambda u, v: u + v,
+                    "product": lambda u, v: u * v,
+                }
                 if not isinstance(mapper, str) or mapper not in mappers:
                     raise ValueError("degsToAttrValue must be max, min, sum, product, or callable")
                 options["degsToAttrValue"] = mappers[mapper]
@@ -90,7 +100,12 @@ class NetworkitSparsifier(EdgeSparsifier):
     def edge_cutter(self, G):
         """Return selected input edges, retaining the original node numbering."""
         rate = self.args.reduction_rate
-        if isinstance(rate, bool) or not isinstance(rate, Real) or not math.isfinite(rate) or not 0 <= rate <= 1:
+        if (
+            isinstance(rate, bool)
+            or not isinstance(rate, Real)
+            or not math.isfinite(rate)
+            or not 0 <= rate <= 1
+        ):
             raise ValueError("An edge reduction rate must be between 0 and 1")
         if G.isDirected():
             raise ValueError("NetworKit sparsifiers require an undirected input graph")
@@ -103,7 +118,9 @@ class NetworkitSparsifier(EdgeSparsifier):
             "networkit_class": self.networkit_class,
             "networkit_version": nk.__version__,
             "requested_edge_fraction": float(rate),
-            "budget_selection": "triangle_top_k_endpoint_ties" if triangle_budget else "native_parameterization",
+            "budget_selection": "triangle_top_k_endpoint_ties"
+            if triangle_budget
+            else "native_parameterization",
             "local_filter": self.local,
             "networkit_seed": None if seed is None else int(seed),
         }
@@ -113,9 +130,11 @@ class NetworkitSparsifier(EdgeSparsifier):
             sparse_graph = G
         elif triangle_budget:
             scores = self.sparsifier.scores(G)
-            ranked = sorted(G.iterEdges(), key=lambda uv: (-scores[G.edgeId(*uv)], min(uv), max(uv)))
+            ranked = sorted(
+                G.iterEdges(), key=lambda uv: (-scores[G.edgeId(*uv)], min(uv), max(uv))
+            )
             sparse_graph = nk.Graph(G.upperNodeIdBound(), weighted=G.isWeighted())
-            for u, v in ranked[:int(rate * G.numberOfEdges())]:
+            for u, v in ranked[: int(rate * G.numberOfEdges())]:
                 sparse_graph.addEdge(u, v, G.weight(u, v))
         else:
             sparse_graph = self.sparsifier.getSparsifiedGraphOfSize(G, rate)

@@ -10,9 +10,8 @@ from graphslim.reduction import get_method_spec, list_methods
 
 
 class Obj(object):
-    """Attribute-access container for JSON configuration mappings.
+    """Attribute-access container for JSON configuration mappings."""
 
-    """
     def __init__(self, dict_):
         """Initialize Obj and its configuration.
 
@@ -539,7 +538,9 @@ def method_config(args):
 )
 @click.option("--seed", "-S", default=1, help="Random seed", show_default=True)
 @click.option(
-    "--sparsifier_options", default=None, callback=_json_object_option,
+    "--sparsifier_options",
+    default=None,
+    callback=_json_object_option,
     help='NetworKit constructor options as JSON, e.g. {"maxRank": 20}',
 )
 @click.option(

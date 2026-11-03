@@ -4,9 +4,8 @@ import numpy as np
 
 
 class CoreSet:
-    """Base for classwise node selection and per-class synthetic node budgets.
+    """Base for classwise node selection and per-class synthetic node budgets."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize CoreSet and its configuration.
 

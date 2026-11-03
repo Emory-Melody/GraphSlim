@@ -128,7 +128,7 @@ def plot(data, paper=False):
     )
     if paper:
         fig, axes = plt.subplots(2, 1, figsize=(10.4, 8.6))
-        fig.subplots_adjust(left=.12, right=.97, bottom=.25, top=.73, hspace=.78)
+        fig.subplots_adjust(left=0.12, right=0.97, bottom=0.25, top=0.73, hspace=0.78)
     else:
         fig, axes = plt.subplots(1, 2, figsize=(18.5, 7.5))
         fig.subplots_adjust(left=0.065, right=0.985, bottom=0.25, top=0.72, wspace=0.24)
@@ -241,24 +241,38 @@ def plot(data, paper=False):
     fig.text(
         0.065,
         0.105,
-        ("3 reductions per bar; whiskers: observed min–max.\nTime is relative to the author's median (1); both metrics: lower is better."
-         if paper else "3 reductions per bar; whiskers: observed min–max. Time is relative to each author's median (1); lower is better for both metrics."),
+        (
+            "3 reductions per bar; whiskers: observed min–max.\nTime is relative to the author's median (1); both metrics: lower is better."
+            if paper
+            else "3 reductions per bar; whiskers: observed min–max. Time is relative to each author's median (1); lower is better for both metrics."
+        ),
         fontsize=10 if paper else 12.5,
         color="#000000",
     )
     fig.text(
         0.065,
         0.06,
-        ("0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes.\nTiming and GPU peaks exclude downstream GCN evaluation."
-         if paper else "0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes. Timing and GPU peaks exclude downstream GCN evaluation."),
+        (
+            "0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes.\nTiming and GPU peaks exclude downstream GCN evaluation."
+            if paper
+            else "0.1%, 0.5%, 1% of training nodes retain 90, 454, 909 nodes. Timing and GPU peaks exclude downstream GCN evaluation."
+        ),
         fontsize=10 if paper else 12.5,
         color="#000000",
     )
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     if paper:
-        assert not axes[0].yaxis.label.get_window_extent(renderer).overlaps(axes[1].yaxis.label.get_window_extent(renderer))
-        assert not axes[1].xaxis.label.get_window_extent(renderer).overlaps(fig.texts[-2].get_window_extent(renderer))
+        assert (
+            not axes[0]
+            .yaxis.label.get_window_extent(renderer)
+            .overlaps(axes[1].yaxis.label.get_window_extent(renderer))
+        )
+        assert (
+            not axes[1]
+            .xaxis.label.get_window_extent(renderer)
+            .overlaps(fig.texts[-2].get_window_extent(renderer))
+        )
     for ax in axes:
         label_bounds = [item.get_window_extent(renderer) for item in ax.texts]
         whisker_bounds = []
@@ -282,12 +296,12 @@ def plot(data, paper=False):
             assert not any(
                 bounds.overlaps(bar.get_window_extent(renderer)) for bar in ax.patches
             ), f"Label overlaps a bar: {ax.texts[index].get_text()}"
-            assert not any(
-                bounds.overlaps(whisker) for whisker in whisker_bounds
-            ), f"Label overlaps an error bar: {ax.texts[index].get_text()}"
-            assert not any(
-                bounds.overlaps(other) for other in label_bounds[index + 1:]
-            ), f"Labels overlap: {ax.texts[index].get_text()}"
+            assert not any(bounds.overlaps(whisker) for whisker in whisker_bounds), (
+                f"Label overlaps an error bar: {ax.texts[index].get_text()}"
+            )
+            assert not any(bounds.overlaps(other) for other in label_bounds[index + 1 :]), (
+                f"Labels overlap: {ax.texts[index].get_text()}"
+            )
         for item in [
             ax.title,
             ax.xaxis.label,
@@ -304,7 +318,7 @@ def plot(data, paper=False):
                 and bounds.y1 <= fig.bbox.height
             ), item.get_text()
     STEM.parent.mkdir(parents=True, exist_ok=True)
-    for suffix in (["_paper.pdf"] if paper else [".svg", ".png", ".pdf"]):
+    for suffix in ["_paper.pdf"] if paper else [".svg", ".png", ".pdf"]:
         meta = (
             {"Date": None}
             if suffix == ".svg"

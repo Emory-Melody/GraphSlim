@@ -14,9 +14,8 @@ from torch_geometric.utils import dense_to_sparse
 
 
 class GraphConvolution(torch.nn.Module):
-    """Learnable graph convolution for dense, batched, or torch_sparse adjacency.
+    """Learnable graph convolution for dense, batched, or torch_sparse adjacency."""
 
-    """
     def __init__(self, in_features, out_features, with_bias=True, weight_initializer=None):
         """Initialize GraphConvolution and its configuration.
 
@@ -37,9 +36,7 @@ class GraphConvolution(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         if self.weight_initializer == "glorot":
             torch.nn.init.xavier_uniform_(self.weight)
             if self.bias is not None:
@@ -194,9 +191,7 @@ class GATConv(MessagePassing):
         self.edge_weight = None
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         glorot(self.lin_l.weight)
         glorot(self.lin_r.weight)
         glorot(self.att_l)
@@ -339,9 +334,8 @@ class GATConv(MessagePassing):
 
 
 class SageConvolution(torch.nn.Module):
-    """GraphSAGE layer combining self and neighbor transformations.
+    """GraphSAGE layer combining self and neighbor transformations."""
 
-    """
     def __init__(self, in_channels, out_channels):
         """Initialize SageConvolution and its configuration.
 
@@ -359,9 +353,7 @@ class SageConvolution(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         self.lin_r.reset_parameters()
 
     def forward(self, x, adj_t):
@@ -422,9 +414,7 @@ class ChebConvolution(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         for lin in self.lins:
             lin.reset_parameters()
         zeros(self.bias)
@@ -505,9 +495,7 @@ class MyLinear(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
-
-        """
+        """Reset trainable layers and normalization state using their initialization rules."""
         stdv = 1.0 / math.sqrt(self.weight.T.size(1))
         self.weight.data.uniform_(-stdv, stdv)
         if self.bias is not None:

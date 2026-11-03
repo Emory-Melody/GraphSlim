@@ -85,9 +85,8 @@ def graph_statistics(adjacency, features, labels, structure=True):
 
 
 class PropertyEvaluator:
-    """Reporter for original and reduced graph structure, features, and labels.
+    """Reporter for original and reduced graph structure, features, and labels."""
 
-    """
     def __init__(self, args):
         """Initialize PropertyEvaluator and its configuration.
 

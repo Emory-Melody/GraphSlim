@@ -92,9 +92,8 @@ class SimGCTeacher(SGC):
 
 
 class SimGC(GCondBase):
-    """Condense a graph by matching a trained teacher and multihop feature statistics.
+    """Condense a graph by matching a trained teacher and multihop feature statistics."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize SimGC and its configuration.
 

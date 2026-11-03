@@ -73,9 +73,7 @@ class GCondBase:
             print("adj_syn:", (n, n), "feat_syn:", self.feat_syn.shape)
 
     def reset_parameters(self):
-        """Reinitialize synthetic features from Gaussian noise and reset the adjacency estimator.
-
-        """
+        """Reinitialize synthetic features from Gaussian noise and reset the adjacency estimator."""
         self.feat_syn.data.copy_(torch.randn(self.feat_syn.size()))
         self.pge.reset_parameters()
 

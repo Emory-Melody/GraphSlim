@@ -25,9 +25,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class AlgebraicJc(Coarsen):
-    """Multilevel graph coarsening using Jacobi algebraic-distance matching.
+    """Multilevel graph coarsening using Jacobi algebraic-distance matching."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize AlgebraicJc and its configuration.
 

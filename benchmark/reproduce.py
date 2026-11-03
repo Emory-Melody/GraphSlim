@@ -112,7 +112,7 @@ def plan(suite, datasets=None, methods=None, *, whole=True):
             "kcenter",
             "averaging",
             "vng",
-                    "geom",
+            "geom",
             "sfgc",
             "doscond",
             "gcond",

@@ -86,9 +86,7 @@ def main(argv=None, *, default_method=None):
 
 
 def entrypoint():
-    """Invoke the training CLI without returning evaluation data as a process exit code.
-
-    """
+    """Invoke the training CLI without returning evaluation data as a process exit code."""
     main()
 
 

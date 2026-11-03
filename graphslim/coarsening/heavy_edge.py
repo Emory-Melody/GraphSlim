@@ -25,9 +25,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class HeavyEdge(Coarsen):
-    """Multilevel graph coarsening using heavy-edge matching.
+    """Multilevel graph coarsening using heavy-edge matching."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize HeavyEdge and its configuration.
 

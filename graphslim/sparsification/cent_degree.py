@@ -5,9 +5,8 @@ from graphslim.sparsification.model_free_coreset_base import MFCoreSet
 
 class CentD(MFCoreSet):
     # select nodes with topk PR value in each class
-    """Choose the highest-degree training nodes within each class.
+    """Choose the highest-degree training nodes within each class."""
 
-    """
     def select(self, embedds=None):
         """Choose the highest-degree training nodes within each class.
 

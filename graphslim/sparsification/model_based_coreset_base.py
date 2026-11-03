@@ -9,9 +9,8 @@ from graphslim.utils import to_tensor
 
 
 class MBCoreSet(CoreSet):
-    """Node coreset reduction using embeddings from a trained graph model.
+    """Node coreset reduction using embeddings from a trained graph model."""
 
-    """
     def __init__(self, setting, data, args, **kwarg):
         """Initialize MBCoreSet and its configuration.
 
@@ -24,7 +23,6 @@ class MBCoreSet(CoreSet):
 
     @verbose_time_memory
     def reduce(self, data, verbose=False, save=True):
-
         """Train an embedding model, select a coreset, and build its induced graph.
 
         Synthetic tensors are attached to ``data`` and converted to CPU tensors.

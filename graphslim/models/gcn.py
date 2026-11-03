@@ -6,9 +6,8 @@ from graphslim.utils import *
 
 
 class GCN(BaseGNN):
-    """Graph convolutional classifier supporting dense and sparse adjacency.
+    """Graph convolutional classifier supporting dense and sparse adjacency."""
 
-    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
         """Initialize GCN and its configuration.
 

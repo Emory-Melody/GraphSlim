@@ -585,9 +585,7 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Verify that the optimum solution has been reached.
     def verifyOptimum():
-        """Assert primal and dual conditions for the completed weighted matching.
-
-        """
+        """Assert primal and dual conditions for the completed weighted matching."""
         if maxcardinality:
             # Vertices may have negative dual;
             # find a constant non-negative number to add to all vertex duals.
@@ -632,9 +630,7 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Check optimized delta2 against a trivial computation.
     def checkDelta2():
-        """Recompute the delta-2 slack minimum to check cached matching state.
-
-        """
+        """Recompute the delta-2 slack minimum to check cached matching state."""
         for v in range(nvertex):
             if label[inblossom[v]] == 0:
                 bd = None
@@ -670,9 +666,7 @@ def maxWeightMatching(edges, maxcardinality=False):
 
     # Check optimized delta3 against a trivial computation.
     def checkDelta3():
-        """Recompute the delta-3 slack minimum to check cached matching state.
-
-        """
+        """Recompute the delta-3 slack minimum to check cached matching state."""
         bk = -1
         bd = None
         tbk = -1

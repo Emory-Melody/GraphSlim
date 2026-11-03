@@ -9,9 +9,8 @@ from graphslim.utils import normalize_adj_tensor, to_tensor
 
 
 class MFCoreSet(CoreSet):
-    """Node coreset reduction using input features or graph statistics.
+    """Node coreset reduction using input features or graph statistics."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize MFCoreSet and its configuration.
 
@@ -24,7 +23,6 @@ class MFCoreSet(CoreSet):
 
     @verbose_time_memory
     def reduce(self, data, verbose=False, save=True):
-
         """Select a coreset using graph statistics or propagated input features.
 
         Synthetic tensors are attached to ``data`` and converted to CPU tensors.

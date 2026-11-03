@@ -367,11 +367,9 @@ class GDEM(GCondBase):
 
 
 class MLP(nn.Module):
-    """Two-layer feature classifier used for GDEM feature initialization.
+    """Two-layer feature classifier used for GDEM feature initialization."""
 
-    """
     def __init__(self, num_features, num_classes, hidden_dim, dropout):
-
         """Initialize MLP and its configuration.
 
         :param num_features: Number of input features per node.
@@ -387,9 +385,7 @@ class MLP(nn.Module):
         self.reset_parameter()
 
     def reset_parameter(self):
-        """Reset linear weights with Xavier initialization and zero biases.
-
-        """
+        """Reset linear weights with Xavier initialization and zero biases."""
         for lin in self.layers:
             nn.init.xavier_uniform_(lin.weight.data)
             if lin.bias is not None:

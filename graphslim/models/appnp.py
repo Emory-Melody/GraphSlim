@@ -11,11 +11,9 @@ from graphslim.models.layers import MyLinear
 
 
 class APPNP(BaseGNN):
-    """MLP classifier followed by approximate personalized PageRank propagation.
+    """MLP classifier followed by approximate personalized PageRank propagation."""
 
-    """
     def __init__(self, nfeat, nhid, nclass, args, mode="train"):
-
         """Initialize APPNP and its configuration.
 
         :param nfeat: Number of input features per node.
@@ -105,9 +103,8 @@ class APPNP(BaseGNN):
 
 
 class SparseDropout(torch.nn.Module):
-    """Dropout on sparse COO values with retained-value rescaling.
+    """Dropout on sparse COO values with retained-value rescaling."""
 
-    """
     def __init__(self, dprob=0.5):
         """Initialize SparseDropout and its configuration.
 

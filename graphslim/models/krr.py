@@ -3,9 +3,8 @@ import torch.nn as nn
 
 
 class KernelRidgeRegression(nn.Module):
-    """Differentiable kernel ridge predictor with a trace-scaled regularizer.
+    """Differentiable kernel ridge predictor with a trace-scaled regularizer."""
 
-    """
     def __init__(self, kernel, ridge):
         """Initialize KernelRidgeRegression and its configuration.
 

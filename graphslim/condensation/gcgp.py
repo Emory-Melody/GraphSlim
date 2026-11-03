@@ -171,9 +171,8 @@ def gp_predict(cross_kernel, synthetic_kernel, targets, ridge, released_arithmet
 
 
 class GCGP(LightweightReducer):
-    """Optimize synthetic features and soft targets through graph Gaussian-process kernel prediction.
+    """Optimize synthetic features and soft targets through graph Gaussian-process kernel prediction."""
 
-    """
     def reduce(self, data, verbose=True, save=True):
         """Optimize synthetic features and soft targets through graph Gaussian-process kernel prediction.
 

@@ -96,13 +96,10 @@ def get_mgrid(sidelen, dim=2):
 
 
 class Sine(nn.Module):
-    """Elementwise high-frequency sine activation for graphon generation.
+    """Elementwise high-frequency sine activation for graphon generation."""
 
-    """
     def __init__(self):
-        """Initialize Sine and its configuration.
-
-        """
+        """Initialize Sine and its configuration."""
         super().__init__()
 
     def forward(self, input):
@@ -115,9 +112,8 @@ class Sine(nn.Module):
 
 
 class EdgeBlock(nn.Module):
-    """Linear, batch normalization, and ReLU block for edge features.
+    """Linear, batch normalization, and ReLU block for edge features."""
 
-    """
     def __init__(self, in_, out_, dtype=torch.float32) -> None:
         """Initialize EdgeBlock and its configuration.
 
@@ -142,9 +138,8 @@ class EdgeBlock(nn.Module):
 
 
 class GraphonLearner(nn.Module):
-    """Feature-conditioned implicit graphon generator with spectral transport guidance.
+    """Feature-conditioned implicit graphon generator with spectral transport guidance."""
 
-    """
     def __init__(
         self,
         node_feature,
@@ -201,9 +196,8 @@ class GraphonLearner(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        """Reset trainable layers and normalization state using their initialization rules.
+        """Reset trainable layers and normalization state using their initialization rules."""
 
-        """
         def weight_reset(m):
             """Reset linear and batch normalization submodule parameters.
 

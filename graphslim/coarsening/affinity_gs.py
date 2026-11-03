@@ -16,9 +16,8 @@ from graphslim.coarsening.coarsening_base import Coarsen
 
 
 class AffinityGs(Coarsen):
-    """Multilevel graph coarsening using Gauss-Seidel affinity matching.
+    """Multilevel graph coarsening using Gauss-Seidel affinity matching."""
 
-    """
     def __init__(self, setting, data, args):
         """Initialize AffinityGs and its configuration.
 

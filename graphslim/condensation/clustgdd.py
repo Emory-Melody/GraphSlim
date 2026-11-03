@@ -141,9 +141,8 @@ def class_aware_views(adjacency, embeddings, ratio, edge_chunk_size=1_000_000):
 
 
 class ClustGDD(LightweightReducer):
-    """Denoise features, cluster training nodes, and refine cluster centers with a pretrained classifier.
+    """Denoise features, cluster training nodes, and refine cluster centers with a pretrained classifier."""
 
-    """
     def reduce(self, data, verbose=True, save=True):
         """Denoise features, cluster training nodes, and refine cluster centers with a pretrained classifier.
 

@@ -27,11 +27,21 @@ def section(title, rows=()):
 def main(argv=None):
     config_output = StringIO()
     with redirect_stdout(config_output):
-        args = get_args([
-            "-D", "cora", "-M", "gcond", "--init", "kcenter", "-R", "0.5",
-            "--save_path", "./checkpoints/demo",
-            *(sys.argv[1:] if argv is None else argv),
-        ])
+        args = get_args(
+            [
+                "-D",
+                "cora",
+                "-M",
+                "gcond",
+                "--init",
+                "kcenter",
+                "-R",
+                "0.5",
+                "--save_path",
+                "./checkpoints/demo",
+                *(sys.argv[1:] if argv is None else argv),
+            ]
+        )
     if not hasattr(args, "method"):  # Preserve Click's --help output.
         print(config_output.getvalue(), end="")
         return
@@ -39,15 +49,18 @@ def main(argv=None):
     output_dir = Path(args.save_path)
     details_path = output_dir / "demo-details.log"
     print("GraphSlim | Composable API demo", flush=True)
-    section("[1/4] Configuration", [
-        ("Dataset / reducer", f"{args.dataset} / {args.method}"),
-        ("Initializer / model", f"{args.init} / GAT"),
-        ("Device / seed", f"{args.device} / {args.seed}"),
-        ("Training-node budget", f"{100 * args.reduction_rate:g}%"),
-        ("Reduction epochs", args.epochs),
-        ("Outer / inner loops", f"{args.outer_loop} / {args.inner_loop}"),
-        ("Eval epochs / fits", f"{args.eval_epochs} / {args.run_eval}"),
-    ])
+    section(
+        "[1/4] Configuration",
+        [
+            ("Dataset / reducer", f"{args.dataset} / {args.method}"),
+            ("Initializer / model", f"{args.init} / GAT"),
+            ("Device / seed", f"{args.device} / {args.seed}"),
+            ("Training-node budget", f"{100 * args.reduction_rate:g}%"),
+            ("Reduction epochs", args.epochs),
+            ("Outer / inner loops", f"{args.outer_loop} / {args.inner_loop}"),
+            ("Eval epochs / fits", f"{args.eval_epochs} / {args.run_eval}"),
+        ],
+    )
 
     with details_path.open("w", encoding="utf-8") as details:
         details.write(config_output.getvalue())
@@ -64,12 +77,17 @@ def main(argv=None):
             seed_everything(args.seed)
             graph = get_dataset(args.dataset, args, args.load_path)
 
-        section("[2/4] Original graph", [
-            ("Nodes / features", f"{graph.num_nodes:,} / {graph.feat_full.shape[1]:,}"),
-            ("Train / val / test", f"{len(graph.idx_train):,} / "
-             f"{len(graph.idx_val):,} / {len(graph.idx_test):,}"),
-            ("Classes", graph.nclass),
-        ])
+        section(
+            "[2/4] Original graph",
+            [
+                ("Nodes / features", f"{graph.num_nodes:,} / {graph.feat_full.shape[1]:,}"),
+                (
+                    "Train / val / test",
+                    f"{len(graph.idx_train):,} / {len(graph.idx_val):,} / {len(graph.idx_test):,}",
+                ),
+                ("Classes", graph.nclass),
+            ],
+        )
         section("[3/4] Reduced graph")
         with redirect_stdout(details), redirect_stderr(details):
             reducer = create_reducer(args.method, setting=args.setting, data=graph, args=args)
@@ -95,7 +113,8 @@ def main(argv=None):
 
         summary = {
             "config": {
-                key: value for key, value in vars(args).items()
+                key: value
+                for key, value in vars(args).items()
                 if isinstance(value, (str, int, float, bool, type(None)))
             },
             "shapes": shapes,
@@ -106,17 +125,21 @@ def main(argv=None):
             "torch_version": torch.__version__,
             "cuda_version": torch.version.cuda,
             "hardware": torch.cuda.get_device_name(args.device)
-            if args.device.startswith("cuda") else "CPU",
+            if args.device.startswith("cuda")
+            else "CPU",
         }
         (output_dir / "demo-summary.json").write_text(
             json.dumps(summary, indent=2) + "\n", encoding="utf-8"
         )
 
-    section("Saved artifacts", [
-        ("Checkpoints", output_dir / "reduced_graph" / args.method),
-        ("Detailed log", details_path),
-        ("Run summary", output_dir / "demo-summary.json"),
-    ])
+    section(
+        "Saved artifacts",
+        [
+            ("Checkpoints", output_dir / "reduced_graph" / args.method),
+            ("Detailed log", details_path),
+            ("Run summary", output_dir / "demo-summary.json"),
+        ],
+    )
     return float(mean), float(std)
 
 

@@ -755,9 +755,8 @@ def roots_to_embed(data):
 
 
 class myDataset(Dataset):
-    """PyG dataset wrapper around an in-memory sequence of graph samples.
+    """PyG dataset wrapper around an in-memory sequence of graph samples."""
 
-    """
     def __init__(this, dataset_list, dataset_len=0, **kwargs):
         """Initialize myDataset and its configuration.
 

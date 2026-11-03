@@ -53,7 +53,6 @@ def gcn_norm(
     flow="source_to_target",
     dtype=None,
 ):
-
     """Apply symmetric GCN degree normalization to edge indices or torch_sparse adjacency.
 
     The edge-index path returns endpoints and weights. The SparseTensor path

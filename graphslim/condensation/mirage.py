@@ -17,9 +17,8 @@ import time
 
 
 class Mirage(GCondBase):
-    """Mine class-specific frequent computation trees from graph samples.
+    """Mine class-specific frequent computation trees from graph samples."""
 
-    """
     def __init__(self, setting, data, args, **kwargs):
         """Initialize Mirage and its configuration.
 

@@ -71,16 +71,39 @@ EXTRA = {
 }
 NAMES = {**TABLE9, **EXTRA, "whole": "Whole"}
 FAMILY = {
-    **{m: "Coreset / sparsification" for m in ("cent_d", "cent_p", "random", "herding", "kcenter", "t_spanner")},
+    **{
+        m: "Coreset / sparsification"
+        for m in ("cent_d", "cent_p", "random", "herding", "kcenter", "t_spanner")
+    },
     **{m: "Coarsening" for m in ("averaging", "variation_neighborhoods", "vng", "clustering")},
 }
 THREE_SEEDS = ("random", "kcenter", "herding")
 # Rough memory/compute weight used to pack jobs on one device.
-WEIGHT = {"cora": 1, "citeseer": 1, "pubmed": 1, "flickr": 2, "ogbn-arxiv": 2, "yelp": 2, "reddit": 3}
+WEIGHT = {
+    "cora": 1,
+    "citeseer": 1,
+    "pubmed": 1,
+    "flickr": 2,
+    "ogbn-arxiv": 2,
+    "yelp": 2,
+    "reddit": 3,
+}
 SMALL = ("cora", "citeseer", "pubmed")
 # Expected relative cost, used to start long large-graph jobs first.
-COST = {"geom": 9, "sfgc": 9, "gcond": 8, "doscond": 7, "doscondx": 6, "sgdd": 7, "msgc": 6,
-        "gcsntk": 5, "gcondx": 5, "gdem": 5, "gcdmx": 3, "gcdm": 3}
+COST = {
+    "geom": 9,
+    "sfgc": 9,
+    "gcond": 8,
+    "doscond": 7,
+    "doscondx": 6,
+    "sgdd": 7,
+    "msgc": 6,
+    "gcsntk": 5,
+    "gcondx": 5,
+    "gdem": 5,
+    "gcdmx": 3,
+    "gcdm": 3,
+}
 # Paper Table 9 percentage labels for each CLI rate.
 LABELS = {
     "citeseer": ("0.36", "0.90", "1.80"),
@@ -92,8 +115,13 @@ LABELS = {
     "yelp": ("0.05", "0.10", "0.20"),
 }
 CSV_NAMES = {
-    "citeseer": "Citeseer", "cora": "Cora", "pubmed": "Pubmed", "ogbn-arxiv": "Arxiv",
-    "flickr": "Flickr", "reddit": "Reddit", "yelp": "Yelp",
+    "citeseer": "Citeseer",
+    "cora": "Cora",
+    "pubmed": "Pubmed",
+    "ogbn-arxiv": "Arxiv",
+    "flickr": "Flickr",
+    "reddit": "Reddit",
+    "yelp": "Yelp",
 }
 
 
@@ -104,7 +132,9 @@ def default_methods():
 def plan_jobs(datasets, methods):
     jobs = []
     for dataset in datasets:
-        jobs.append(dict(id=f"{dataset}__whole", dataset=dataset, method="whole", rate=None, seed=1))
+        jobs.append(
+            dict(id=f"{dataset}__whole", dataset=dataset, method="whole", rate=None, seed=1)
+        )
         for method in methods:
             for rate in RATES[dataset]:
                 for seed in (1, 2, 3) if method in THREE_SEEDS else (1,):
@@ -137,7 +167,11 @@ def science_files():
     files = set(nr.source_files())
     files.update(
         ROOT / name
-        for name in ("benchmark/__init__.py", "benchmark/reproduce_table9.py", "benchmark/rerun_nr.py")
+        for name in (
+            "benchmark/__init__.py",
+            "benchmark/reproduce_table9.py",
+            "benchmark/rerun_nr.py",
+        )
     )
     return sorted(files)
 
@@ -342,7 +376,11 @@ def manage(options, manifest):
                     process.wait()
                     nr.write_json(
                         job_dir(folder, item["job"]) / "error.json",
-                        dict(error=f"Timeout after {options.timeout} s", kind="TIMEOUT", utc=nr.utcnow()),
+                        dict(
+                            error=f"Timeout after {options.timeout} s",
+                            kind="TIMEOUT",
+                            utc=nr.utcnow(),
+                        ),
                     )
                 if process.poll() is None:
                     continue
@@ -380,9 +418,7 @@ def manage(options, manifest):
                 weight = WEIGHT[job["dataset"]]
                 if (job["dataset"], job["method"]) in exclusive:
                     continue
-                device = next(
-                    (d for d in options.devices if used[d] + weight <= capacity[d]), None
-                )
+                device = next((d for d in options.devices if used[d] + weight <= capacity[d]), None)
                 if device is None:
                     continue
                 path = job_dir(folder, job)
@@ -402,11 +438,23 @@ def manage(options, manifest):
                     DGLBACKEND="pytorch",
                 )
                 command = [
-                    sys.executable, "-B", "-u", "-m", "benchmark.reproduce_table9",
-                    "job", "--run-dir", str(folder), "--job-id", job["id"],
+                    sys.executable,
+                    "-B",
+                    "-u",
+                    "-m",
+                    "benchmark.reproduce_table9",
+                    "job",
+                    "--run-dir",
+                    str(folder),
+                    "--job-id",
+                    job["id"],
                 ]
                 process = subprocess.Popen(
-                    command, cwd=frozen, env=env, stdout=log, stderr=subprocess.STDOUT,
+                    command,
+                    cwd=frozen,
+                    env=env,
+                    stdout=log,
+                    stderr=subprocess.STDOUT,
                     start_new_session=True,
                 )
                 nr.write_json(
@@ -423,8 +471,12 @@ def manage(options, manifest):
             summary = export(folder, manifest)
             nr.write_json(
                 folder / "heartbeat.json",
-                dict(utc=nr.utcnow(), pid=os.getpid(), counts=summary["counts"],
-                     active={k: v["device"] for k, v in active.items()}),
+                dict(
+                    utc=nr.utcnow(),
+                    pid=os.getpid(),
+                    counts=summary["counts"],
+                    active={k: v["device"] for k, v in active.items()},
+                ),
             )
             if not active and not pending:
                 print(f"Queue finished: {summary['counts']}", flush=True)
@@ -462,9 +514,13 @@ def export(folder, manifest):
         groups.setdefault((job["dataset"], job["method"], job["rate"]), []).append(job)
     for (dataset, method, rate), jobs in groups.items():
         states = [state(folder, job) for job in jobs]
-        cell = dict(dataset=dataset, method=method, rate=rate,
-                    label=None if rate is None else LABELS[dataset][RATES[dataset].index(rate)],
-                    paper=paper_value(paper, dataset, rate, method))
+        cell = dict(
+            dataset=dataset,
+            method=method,
+            rate=rate,
+            label=None if rate is None else LABELS[dataset][RATES[dataset].index(rate)],
+            paper=paper_value(paper, dataset, rate, method),
+        )
         if all(s == "complete" for s in states):
             records = [nr.read_json(job_dir(folder, job) / "result.json") for job in jobs]
             scores = [100 * e["test"] for r in records for e in r["evaluations"]]
@@ -512,7 +568,10 @@ def render(cells, manifest, show_paper=False):
         metric = "F1-macro" if dataset == "yelp" else "test accuracy"
         lines += [f"### {CSV_NAMES[dataset]} — {metric} (%)", ""]
         header = ["Family", "Method", *[f"{label}%" for label in LABELS[dataset]]]
-        lines += ["| " + " | ".join(header) + " |", "| --- | --- | " + " | ".join(["---:"] * 3) + " |"]
+        lines += [
+            "| " + " | ".join(header) + " |",
+            "| --- | --- | " + " | ".join(["---:"] * 3) + " |",
+        ]
         for method in [*manifest["methods"], "whole"]:
             values = []
             for rate in RATES[dataset]:

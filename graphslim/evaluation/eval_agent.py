@@ -54,9 +54,7 @@ class Evaluator:
         self.metric = args.metric
 
     def reset_parameters(self):
-        """Compatibility hook; the evaluator itself has no trainable parameters to reset.
-
-        """
+        """Compatibility hook; the evaluator itself has no trainable parameters to reset."""
         pass
 
     def grid_search(self, data, model_type, param_grid, reduced=True):

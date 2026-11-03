@@ -4,9 +4,8 @@ import numpy as np
 
 
 class KCenter(MBCoreSet):
-    """Choose classwise representatives by greedy farthest-first coverage of embeddings.
+    """Choose classwise representatives by greedy farthest-first coverage of embeddings."""
 
-    """
     def select(self, embeds):
         """Choose classwise representatives by greedy farthest-first coverage of embeddings.
 

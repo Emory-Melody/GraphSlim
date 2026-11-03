@@ -5,9 +5,8 @@ import torch.nn as nn
 
 
 class StructureBasedNeuralTangentKernel(nn.Module):
-    """Graph neural tangent kernel with sparse or separable aggregation.
+    """Graph neural tangent kernel with sparse or separable aggregation."""
 
-    """
     def __init__(self, K=2, L=2, scale="add"):
         """Configure graph aggregation and dense ReLU kernel recurrences.
 
