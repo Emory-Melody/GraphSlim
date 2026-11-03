@@ -315,7 +315,7 @@ Whole graph: 93.99 ± 0.05.
 
 Whole graph: 47.43 ± 0.22.
 
-¹ Archived DosCondX measurements use the historical GCondX settings and reference row. The Reddit configuration differs from current DosCondX defaults; raw archived names and configurations are preserved.
+¹ Archived DosCondX measurements use the archived experimental settings and corresponding reference row. The Reddit configuration differs from current DosCondX defaults; raw archived names and configurations are preserved.
 ² Published GC4NC values (mean ± standard error). The paper obtained GEOM and SFGC scores from the authors' implementations; their expert-trajectory training is too slow to rerun for the full matrix.
 ³ GC4NC Table 9 reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
 
