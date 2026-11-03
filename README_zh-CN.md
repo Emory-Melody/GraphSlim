@@ -137,8 +137,8 @@ python benchmark/results/reproducibility_20261103/verify.py --check
 每个缩减图上训练两层、256 个隐藏单元的 GCN，每次 300 轮，共 10 次；缩减图按验证集准确率选取。
 与论文一致，Random、K-Center 和 Herding 使用三个缩减种子，其余方法使用一个。
 单元格为测试准确率（%）的均值 ± 标准差，Yelp 为宏平均 F1。
-比例沿用表 9：Citeseer、Cora、Pubmed 和 Arxiv 为占完整图节点的百分比，
-Flickr、Reddit 和 Yelp 为占训练图节点的百分比。
+节点缩减结果的列标题表示近似节点保留比例：Citeseer、Cora、Pubmed 和 Arxiv 以完整图节点数为分母，
+Flickr、Reddit 和 Yelp 以训练图节点数为分母。标签经过舍入，实际节点数取决于整数预算分配。
 
 与论文数值平均相差不超过 3 个百分点的行才会列出。
 GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
@@ -318,7 +318,7 @@ GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
 
 ¹ 这些历史测量实际运行 DosCondX，采用归档实验配置及对应的论文参考行；其中 Reddit 配置与当前 DosCondX 默认值不同，原始记录和配置均保留。
 ² GC4NC 论文数值（均值 ± 标准误）。论文中 GEOM 和 SFGC 的得分来自原作者实现，其专家轨迹训练太慢，未对完整矩阵重跑。
-³ GC4NC Table 9 未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。
+³ GC4NC 论文未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。
 
 与论文平均相差超过 3 个百分点的行未列出：VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); GDEM (Citeseer, Pubmed); Cent-P (Cora); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit)。 运行失败：GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp)。
 
@@ -517,7 +517,7 @@ python -m benchmark.reproduce performance --datasets cora --methods clustering -
 bash benchmark/scripts/performance.sh --dry-run
 ```
 
-性能实验矩阵覆盖论文的全部七个数据集和表 9 中的全部 19 种方法，另外加入聚类及四种新的轻量方法扩展，
+性能实验矩阵覆盖论文的全部七个数据集和已配置的 19 种基准方法，另外加入聚类及四种新的轻量方法扩展，
 最后运行完整图基线。表中保留论文报告的内存不足（OOM）和缺失单元格；
 重新运行也可能因资源限制或方法专属要求而失败。
 GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓冲区的默认配置有所不同，
@@ -536,7 +536,7 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 
 对于边稀疏化，`-R` 表示保留的输入边比例；`t_spanner` 和 `spanning_forest` 不使用该参数。
 
-| 数据集 | 命令行 `-D` | 设置 | R (`-R`) | 表 9 比例标签（%） |
+| 数据集 | 命令行 `-D` | 设置 | R (`-R`) | 节点保留比例（约，%） |
 | --- | --- | --- | --- | --- |
 | Citeseer | `citeseer` | 直推式 | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
 | Cora | `cora` | 直推式 | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
@@ -558,9 +558,14 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 | OGBN-Proteins | `ogbn-proteins` | 直推式 | 0.1 | — |
 | OGBN-Papers100M | `ogbn-papers100m` | 直推式 | 0.1 | — |
 
-表 9 比例标签对应 GC4NC 原始 7 个数据集：直推式数据集以完整图为分母，归纳式数据集以训练图为分母，均以百分比表示。
-横线表示没有对应的表 9 标签。论文表 8 中的 Pubmed 百分比存在不一致；复现结果使用表 9 的比例标签。
-各类别的整数节点预算可能与论文中四舍五入后的百分比略有差异。
+对于节点缩减，目标节点数约为 `R × 有标签训练节点数`。最后一列把同一节点预算换算成百分比：
+`节点保留比例 = 100 × 缩减后节点数 / 参照节点数`。Citeseer、Cora、Pubmed 和 Arxiv 的参照节点数为
+**完整图节点数**；Flickr、Reddit 和 Yelp 则为**训练图节点数**。
+
+例如，Cora 有 140 个有标签训练节点、共 2,708 个节点。`-R 0.1` 的目标是保留 14 个节点，
+即有标签训练节点的 10%，约占完整图的 0.5%。百分比标签经过舍入；逐类取整及每类最小预算
+可能改变最终节点数，实际数量以保存后的缩减图为准。横线表示此处未提供该数据集的百分比标签。
+这一列用于节点预算；边稀疏化按上文单独说明的边保留比例解释。
 
 原始 7 个数据集通过 `benchmark.reproduce performance` 运行；Roman-empire、Amazon-ratings、
 OGBN-Products、Photo 和 Computers 通过[扩展实验入口](benchmark/expand_datasets.py)运行。

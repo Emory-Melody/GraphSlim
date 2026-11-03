@@ -373,7 +373,8 @@ def readme_section(snapshot, language="en"):
             "² Published GC4NC values (mean ± standard error). The paper obtained GEOM and "
             "SFGC scores from the authors' implementations; their expert-trajectory "
             "training is too slow to rerun for the full matrix.\n"
-            "³ GC4NC Table 9 reports no value for these cells; GraphSlim measurements "
+            "³ The published GC4NC benchmark reports no value for these cells; "
+            "GraphSlim measurements "
             "under the same protocol are shown without a published comparison."
         )
         extra = []
@@ -390,7 +391,7 @@ def readme_section(snapshot, language="en"):
             "¹ 这些历史测量实际运行 DosCondX，采用归档实验配置及对应的论文参考行；其中 Reddit 配置与当前 DosCondX 默认值不同，原始记录和配置均保留。\n"
             "² GC4NC 论文数值（均值 ± 标准误）。论文中 GEOM 和 SFGC 的得分来自原作者实现，"
             "其专家轨迹训练太慢，未对完整矩阵重跑。\n"
-            "³ GC4NC Table 9 未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。"
+            "³ GC4NC 论文未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。"
         )
         extra = []
         if outside:

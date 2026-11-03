@@ -146,9 +146,10 @@ with this package. A two-layer GCN with 256 hidden units trains on each reduced
 graph for 300 epochs, ten times, and reduced graphs are selected on validation
 accuracy. Random, K-Center and Herding use three reduction seeds and the other
 methods use one, as in the paper. Cells show mean ± standard deviation of test
-accuracy in percent; Yelp shows macro-F1. Rates follow Table 9: percentages of the
+accuracy in percent; Yelp shows macro-F1. For node reduction, column headings label
+the retained-node budget as a percentage of the
 whole graph for Citeseer, Cora, Pubmed and Arxiv, and of the training graph for
-Flickr, Reddit and Yelp.
+Flickr, Reddit and Yelp. These are approximate budget labels; actual node counts depend on integer allocation.
 
 A row is listed when it is on average within 3 points of the published values.
 GECC, CGC and ClustGDD are compared with their own papers at the rates those
@@ -329,7 +330,7 @@ Whole graph: 47.43 ± 0.22.
 
 ¹ Archived DosCondX measurements use the archived experimental settings and corresponding reference row. The Reddit configuration differs from current DosCondX defaults; raw archived names and configurations are preserved.
 ² Published GC4NC values (mean ± standard error). The paper obtained GEOM and SFGC scores from the authors' implementations; their expert-trajectory training is too slow to rerun for the full matrix.
-³ GC4NC Table 9 reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
+³ The published GC4NC benchmark reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
 
 Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); GDEM (Citeseer, Pubmed); Cent-P (Cora); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
 
@@ -554,8 +555,9 @@ python -m benchmark.reproduce performance --datasets cora --methods clustering -
 bash benchmark/scripts/performance.sh --dry-run
 ```
 
-The performance matrix covers all seven published datasets and all 19 methods in
-Table 9, plus clustering and the four new lightweight extensions, followed by whole-graph baselines. Published OOM or missing
+The performance matrix covers all seven published datasets and the benchmark's
+19 retained methods, plus clustering and the four new lightweight extensions,
+followed by whole-graph baselines. Published OOM or missing
 cells remain visible in the table; reruns may also fail for resource or method-specific
 requirements. GEOM/SFGC paper performance used the authors' implementations; the local
 expert-buffer defaults differ, so this package runner alone does not establish exact
@@ -577,7 +579,7 @@ is the fraction of **labeled training nodes** retained.
 For edge sparsification, `-R` is the fraction of input edges kept;
 `t_spanner` and `spanning_forest` do not use it.
 
-| Dataset | CLI `-D` | Setting | R (`-R`) | Table 9 rate labels (%) |
+| Dataset | CLI `-D` | Setting | R (`-R`) | Retained nodes (approx. %) |
 | --- | --- | --- | --- | --- |
 | Citeseer | `citeseer` | Transductive | 0.1, 0.25, 0.5 | 0.36, 0.90, 1.80 |
 | Cora | `cora` | Transductive | 0.1, 0.25, 0.5 | 0.50, 1.30, 2.60 |
@@ -599,11 +601,19 @@ For edge sparsification, `-R` is the fraction of input edges kept;
 | OGBN-Proteins | `ogbn-proteins` | Transductive | 0.1 | — |
 | OGBN-Papers100M | `ogbn-papers100m` | Transductive | 0.1 | — |
 
-Table 9 labels apply to the original seven GC4NC datasets: percentages of the
-whole graph for transductive datasets and of the training graph for inductive
-datasets. A dash indicates no corresponding Table 9 label. The paper's Table 8
-has inconsistent Pubmed percentages; the reproduced results use Table 9's labels.
-Per-class integer node budgets can differ from rounded paper percentages.
+For node reduction, the target node count is approximately `R × N_train`, where
+`N_train` is the number of labeled training nodes. The final column expresses the
+same budget as a percentage: `100 × N_reduced / N_reference`. For Citeseer, Cora,
+Pubmed and Arxiv, `N_reference` is the number of nodes in the **whole graph**;
+for Flickr, Reddit and Yelp, it is the number of nodes in the **training graph**.
+
+For example, Cora has 140 labeled training nodes and 2,708 nodes in total.
+`-R 0.1` targets 14 retained nodes: 10% of the labeled training nodes, or about
+0.5% of the whole graph. The percentage labels are rounded; per-class integer
+allocation and minimum class budgets can change the final node count. Use the
+saved reduced graph for the actual count. A dash means no percentage label is
+provided here for that dataset. This column describes node budgets; edge
+sparsification uses the separate edge-retention definition above.
 
 Use `benchmark.reproduce performance` for the original seven datasets and the
 [dataset expansion runner](benchmark/expand_datasets.py) for Roman-empire,
