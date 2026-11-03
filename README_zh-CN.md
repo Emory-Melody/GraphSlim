@@ -90,36 +90,27 @@ Figure 1 展示软件包论文中包含 49 种方法的开发版框架。数据�
 
 <!-- implementation-comparison:start -->
 
-在**完整 ogbn-arxiv（169,343 个节点，对称化后存储 2,315,598 条边）**上实测。作者实现与 GraphSlim 共用同一份冻结输入、一张 RTX PRO 6000 Blackwell GPU 和 4 个 CPU 线程。实测 GraphSlim / 作者实现缩减耗时比：**CGC 0.19–0.22×**，**ClustGDD 0.43–0.61×**，**越低越好**。
+在**完整 ogbn-arxiv（169,343 个节点，对称化后存储 2,315,598 条边）**上测量完整缩减流程。三种方法使用相同的冻结输入、官方划分、同一张 RTX PRO 6000 Blackwell GPU 和 4 个 CPU 线程。GraphSlim / 作者实现缩减耗时比：**GECC 0.84–1.47×**, **CGC 0.19–0.22×**, **ClustGDD 0.43–0.61×**，**越低越好**。
 
-[![完整 ogbn-arxiv 上 CGC 和 ClustGDD 在三档缩减预算下的耗时与峰值 GPU 显存实测](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
+[![GECC、CGC、ClustGDD 在完整 ogbn-arxiv 上的配对缩减比较：上排时间，下排峰值已分配 GPU 显存](figures/clustering_arxiv_comparison.svg)](figures/clustering_arxiv_comparison.pdf)
 
-[矢量 PDF](figures/arxiv_clustering_comparison.pdf) · [高清 PNG](figures/arxiv_clustering_comparison.png) · [原始实测记录](benchmark/results/arxiv_clustering_comparison_20261101.json)
+[矢量 PDF](figures/clustering_arxiv_comparison.pdf) · [高清 PNG](figures/clustering_arxiv_comparison.png) · [经核对的绘图数据](benchmark/results/clustering_arxiv_figure.json)
 
-每根柱汇总 **3 个独立进程缩减**，误差线为实测最小值至最大值。左图为耗时除以同组作者实现的耗时中位数（作者为 1），柱顶标注实测秒数；右图为峰值 GPU 显存（GiB）。**两项均越低越好。**0.1%、0.5%、1% 均以 **90,941 个有标签训练节点**为分母，分别保留 90、454、909 个节点。显存为缩减阶段的 PyTorch 峰值已分配显存。
+三列依次为 GECC、CGC、ClustGDD。**上排：耗时 / 同组作者实现中位数（作者为 1），标注实测秒数；下排：峰值已分配 GPU 显存（GiB）。两项均越低越好。**每根柱为 3 个独立进程缩减的中位数，误差线为实测最小值至最大值，包含全部 **54 次缩减、9 个方法×预算组合**。0.1%、0.5%、1% 均以 **90,941 个有标签训练节点**为分母，分别保留 90、454、909 个节点。GECC 为另行冻结的补测批次，图中保留耗时更长的结果。
 
 <details>
 <summary>实测口径与冻结源码</summary>
 
-- 从已完成对称化、训练集拟合标准化的共同 CPU 图开始计时，覆盖缩减内部的预处理和设备间传输，起止均同步 CUDA；不含导入、共同输入准备、保存与下游评估。
-- GPU 峰值在上下文预热后、输入传入 GPU 前重置。原始记录同时保留进程 RSS 和缓存保留显存峰值。
-- 使用 ogbn-arxiv 官方划分，特征标准化仅在训练节点上拟合。种子 1–3 交替执行两种实现，保留全部 3 档预算和 36 次缩减记录。
-- CGC 沿用分档参数，双方聚类上限均为 10 次初始化、300 轮（作者 FAISS 与 GraphSlim sklearn 各自保留收敛规则）。ClustGDD 双方均使用 600 轮预训练、100 轮优化，以及初始化 3 次的 MiniBatchKMeans。CGC 双方重构求解均使用 float64，关闭 TF32。
-- 另行使用共享 GCN 检查效果：每个缩减图训练 1 次、每次 300 轮（每种实现 3 个图），按验证集选检查点。**6/6** 组的实现间准确率均值的双边相对差距低于 5%。此处参照为固定版本的作者实现，与上方采用论文数值参照的覆盖率各有独立统计范围。
-- [实测 GraphSlim 源码与运行器](benchmark/results/arxiv_clustering_source_20261101.zip) · [作者固定版本、适配说明及逐种子结果](benchmark/results/arxiv_clustering_comparison_20261101.json)。
-- 运行前需安装 `faiss-cpu==1.8.0.post1`（NumPy 1.x），并在 `runs/reference` 准备固定版本的 CGC / ClustGDD；版本与提交均记录于快照中。
-- 先执行 `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`，再用实测开发版本建任务：`python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`，随后执行 `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`；GPU 可显式指定。
-- 执行 `python -m benchmark.plot_arxiv_efficiency` 重新生成图，加 `--check` 核验原始记录与图文件哈希。
-
+- 从共同的标准化 CPU 图开始计时，包含缩减器构造、内部预处理和设备传输，起止同步 CUDA；不含导入、共同输入准备、保存和 GCN 评估。GPU 峰值在预热后、输入传入 GPU 前重置。
+- 种子 1–3 交替执行两种实现。GECC 与既有 CGC/ClustGDD 批次的输入张量及 GPU UUID 一致，使用 4 个 CPU 线程并关闭 TF32。
+- GECC：完整直推式传播，深度 2，权重 (0.6, 0.5, 0)，硬聚类，单次初始化，最多 300 轮。双方均采用作者的均匀随机中心初始化；此处不测量 GraphSlim 原生初始化。全部 9 个预算×种子组合的缩减特征、邻接和标签逐元素一致。作者的稠密诊断分配与 GraphSlim 的稀疏诊断分配均计入缩减显存。
+- CGC：双方均为 10 次初始化、最多 300 轮，保留 FAISS/sklearn 各自收敛规则，重构采用 Float64。ClustGDD：双方均为 600 轮预训练、100 轮优化、3 次 MiniBatchKMeans 初始化。
+- 计时之外，每个缩减图训练一次 300 轮 GCN，按验证集选择检查点。**9/9** 个方法×预算组合的实现间准确率均值双边相对差距低于 5%。参照为固定作者版本，与论文数值参照的复现覆盖率各有独立统计范围。
+- [CGC/ClustGDD 原始记录](benchmark/results/arxiv_clustering_comparison_20261101.json) · [实测源码归档](benchmark/results/arxiv_clustering_source_20261101.zip)。
+- [GECC 原始记录及作者固定版本](benchmark/results/gecc_arxiv_comparison_20261102.json) · [实测源码归档](benchmark/results/gecc_arxiv_source_20261102.zip) · [运行器](benchmark/compare_gecc_arxiv.py)。在 runs/reference/GECC 准备固定作者版本；共同运行环境使用 faiss-cpu==1.8.0.post1 与 NumPy 1.x。
+- 执行 `python -m benchmark.plot_clustering_arxiv` 重新生成，加 `--check` 核验全部原始记录和图文件哈希。
+- 历史合成张量算子记录单独保留：[CPU](benchmark/results/gecc_operator_cpu_20261029.json)、[CUDA](benchmark/results/gecc_operator_gpu_20261029.json)，其算子耗时不进入此图。
 </details>
-
-**GECC：已归档的算子测试。**
-
-[![GECC 已归档算子的时间与额外 CUDA 显存比较，越低越好](figures/gecc_operator_comparison.svg)](figures/gecc_operator_comparison.pdf)
-
-硬聚类分支的距离计算在 CPU/CUDA 上分别耗时为参考算子的 0.42×/0.75×（加速 2.35×/1.33×）。流式加权传播在 CPU/CUDA 上的耗时分别为 1.04×/0.99×，时间收益有限；两个算子的 CUDA 额外分配显存均减少。图中保留全部四组配对，包括 CPU 传播略慢的结果。测试归档于 2026 年 10 月 29 日，使用固定张量，预热一次后计时三次，误差线为最小值–最大值，输出逐位一致。该证据限于算子；尚无匹配作者代码的完整 GECC 流程加速测量。
-
-[矢量 PDF](figures/gecc_operator_comparison.pdf) · [CPU 原始记录](benchmark/results/gecc_operator_cpu_20261029.json) · [CUDA 原始记录](benchmark/results/gecc_operator_gpu_20261029.json) · [绘图脚本](benchmark/plot_gecc_efficiency.py)
 
 <!-- implementation-comparison:end -->
 

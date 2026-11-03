@@ -103,36 +103,27 @@ assignments and streamline sparse and segmented aggregation.
 
 <!-- implementation-comparison:start -->
 
-Measured on **full ogbn-arxiv: 169,343 nodes and 2,315,598 stored edges after symmetrization**. Both implementations use the same saved inputs, one RTX PRO 6000 Blackwell GPU and four CPU threads. Observed GraphSlim/author reduction-time ratios: **CGC 0.19–0.22×**, **ClustGDD 0.43–0.61×**; **lower is better**.
+Measured complete reductions on **full ogbn-arxiv: 169,343 nodes and 2,315,598 stored edges after symmetrization**. All three methods share identical saved input tensors, official splits, the same RTX PRO 6000 Blackwell GPU and four CPU threads. GraphSlim/author reduction-time ratios: **GECC 0.84–1.47×**, **CGC 0.19–0.22×**, **ClustGDD 0.43–0.61×**; **lower is better**.
 
-[![Measured ogbn-arxiv reduction time and peak GPU memory for CGC and ClustGDD at three reduction rates](figures/arxiv_clustering_comparison.svg)](figures/arxiv_clustering_comparison.pdf)
+[![Matched GECC, CGC and ClustGDD ogbn-arxiv reductions: time above, peak allocated GPU memory below](figures/clustering_arxiv_comparison.svg)](figures/clustering_arxiv_comparison.pdf)
 
-[Vector PDF](figures/arxiv_clustering_comparison.pdf) · [High-resolution PNG](figures/arxiv_clustering_comparison.png) · [Raw measurements](benchmark/results/arxiv_clustering_comparison_20261101.json)
+[Vector PDF](figures/clustering_arxiv_comparison.pdf) · [High-resolution PNG](figures/clustering_arxiv_comparison.png) · [Reviewed chart data](benchmark/results/clustering_arxiv_figure.json)
 
-Each bar summarizes **three fresh-process reductions**; whiskers show their observed minimum–maximum. Left: reduction time divided by the matched author's median (1), with measured seconds above the bars. Right: peak GPU memory in GiB. **Lower is better for both metrics.** The 0.1%, 0.5% and 1% budgets refer to the **90,941 labeled training nodes**, retaining 90, 454 and 909 nodes. GPU memory is PyTorch peak allocated memory during reduction.
+Columns show GECC, CGC and ClustGDD. **Top: time / matched author median (1), with measured seconds. Bottom: peak allocated GPU memory (GiB). Both metrics: lower is better.** Each bar is the median of three fresh-process reductions; whiskers show observed min–max. All **54 reductions / nine method–budget pairs** are included. Budgets of 0.1%, 0.5% and 1% of the **90,941 labeled training nodes** retain 90, 454 and 909 nodes. GECC adds a separately frozen measurement cohort. Slower results are retained.
 
 <details>
-<summary>Measurement protocol and frozen source</summary>
+<summary>Measurement protocol and frozen sources</summary>
 
-- Timing starts from the common CPU graph after symmetrization and training-fitted standardization. It includes reducer-internal preprocessing and device transfers, with CUDA synchronization; imports, shared input preparation, saving and downstream evaluation are excluded.
-- GPU peaks are reset after context warmup, before input transfers. Process RSS and allocator-reserved peaks are also retained in the raw records.
-- Inputs use the official ogbn-arxiv splits and feature standardization fitted on training nodes. Seeds 1–3 alternate implementation order. All three declared rates and all 36 reduction records are included.
-- CGC retains its rate-specific settings and matched caps of 10 initializations / 300 iterations (author FAISS versus GraphSlim sklearn, retaining their convergence rules). ClustGDD uses matched 600 pretraining / 100 refinement updates and MiniBatchKMeans with three initializations. Both CGC reconstruction solves use float64; TF32 is disabled.
-- A separate shared-GCN check uses one 300-epoch fit per reduced graph (three graphs per implementation); validation selects the checkpoint. **6/6** pairs have two-sided relative difference between mean accuracies below 5%. The reference is the matched pinned author implementation; these checks have their own scope from the paper-reference coverage above.
-- [Measured GraphSlim source and harness](benchmark/results/arxiv_clustering_source_20261101.zip) · [Pinned author versions, adapters and per-seed results](benchmark/results/arxiv_clustering_comparison_20261101.json).
-- Runner prerequisites: `faiss-cpu==1.8.0.post1` with NumPy 1.x, and the pinned CGC / ClustGDD checkouts under `runs/reference`; versions and commits are recorded in the snapshot.
-- Extract the archive with `unzip benchmark/results/arxiv_clustering_source_20261101.zip -d runs/arxiv_measured_source`. Plan using the measured development source: `python -m benchmark.compare_arxiv plan --package-source runs/arxiv_measured_source/source/graphslim --run-dir runs/arxiv_NEW`; then run with `python -m benchmark.compare_arxiv run --run-dir runs/arxiv_NEW`. GPU selection is explicit.
-- Regenerate with `python -m benchmark.plot_arxiv_efficiency`; append `--check` to validate source records and figure hashes.
-
+- Timing includes reducer construction, internal preprocessing and transfers from the common standardized CPU graph, with CUDA synchronization; imports, shared input preparation, saving and GCN evaluation are excluded. GPU peaks reset after warmup, before input transfers.
+- Seeds 1–3 alternate implementation order. GECC is measured on the same input tensors and GPU UUID as the existing CGC/ClustGDD cohort, with four CPU threads and TF32 disabled.
+- GECC: full transductive propagation, depth two, weights (0.6, 0.5, 0), hard clustering, one restart, maximum 300 iterations. Both implementations use the author's uniform sampled centroid initialization; GraphSlim's native initializer is not measured. Reduced features, adjacency and labels match exactly in all nine rate–seed pairs. The author's dense diagnostic assignments and GraphSlim's sparse diagnostic assignments are included in reduction memory.
+- CGC: matched ten initializations / 300 iterations with native FAISS/sklearn convergence rules and Float64 reconstruction. ClustGDD: matched 600 pretraining / 100 refinement updates and three MiniBatchKMeans initializations.
+- Outside timing, each reduced graph receives one 300-epoch GCN fit with validation selection. **9/9** method–budget pairs have two-sided relative differences between implementation mean accuracies below 5%. These comparisons use pinned author implementations and have a separate scope from paper-reference reproduction coverage.
+- [CGC/ClustGDD records](benchmark/results/arxiv_clustering_comparison_20261101.json) · [measured source archive](benchmark/results/arxiv_clustering_source_20261101.zip).
+- [GECC records and pinned author commit](benchmark/results/gecc_arxiv_comparison_20261102.json) · [measured source archive](benchmark/results/gecc_arxiv_source_20261102.zip) · [runner](benchmark/compare_gecc_arxiv.py). GECC requires the pinned author checkout under runs/reference/GECC; the common runtime uses faiss-cpu==1.8.0.post1 with NumPy 1.x.
+- Regenerate with `python -m benchmark.plot_clustering_arxiv`; append `--check` to verify all source records and figure hashes.
+- Historical synthetic-tensor operator reports remain available separately: [CPU](benchmark/results/gecc_operator_cpu_20261029.json), [CUDA](benchmark/results/gecc_operator_gpu_20261029.json). Their operator timings are excluded from this figure.
 </details>
-
-**GECC: archived operator checks.**
-
-[![Archived GECC operator time and additional CUDA memory, lower is better](figures/gecc_operator_comparison.svg)](figures/gecc_operator_comparison.pdf)
-
-The hard-clustering distance kernel takes 0.42× the reference time on CPU and 0.75× on CUDA (2.35× and 1.33× speedups). Streamed weighted propagation takes 1.04× / 0.99× time on CPU / CUDA, so its timing benefit is limited; both its additional CUDA memory and the distance kernel's memory decrease. All four operator pairs are shown, including the slightly slower CPU propagation case. These are fixed-tensor checks recorded on 29 October 2026, with one warmup and three timed calls; whiskers show min–max. Outputs matched exactly. The reports establish operator behavior; a matched author-code end-to-end GECC speedup has not been measured.
-
-[Vector PDF](figures/gecc_operator_comparison.pdf) · [CPU report](benchmark/results/gecc_operator_cpu_20261029.json) · [CUDA report](benchmark/results/gecc_operator_gpu_20261029.json) · [Renderer](benchmark/plot_gecc_efficiency.py)
 
 <!-- implementation-comparison:end -->
 

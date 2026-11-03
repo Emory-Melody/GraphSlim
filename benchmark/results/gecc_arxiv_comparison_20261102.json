@@ -1,0 +1,2182 @@
+{
+  "data": {
+    "nodes": 169343,
+    "edges": 2315598,
+    "features": 128,
+    "classes": 40,
+    "train": 90941,
+    "val": 29799,
+    "test": 48603,
+    "raw_sha256": {
+      "feats.npy": "e2e4dda733eff8130a8e3ff0167ce091ee145eb6f0e6eedb8e04fef36100e40b",
+      "adj_full.npz": "920dae5bad3f63b07f5b8883493b298f026778d7358c14b955985bacbbd13771",
+      "role.json": "ef30aec176315e5dd6b5f4bdc2a40741542723c55348b9141a70aeed2c00babb",
+      "class_map.json": "7db3b1c89beeaa51c10d43b5888b60fb8b23a73ced4ca6df0a413240a3820b77"
+    }
+  },
+  "protocol": {
+    "threads": 4,
+    "device": "cuda:0",
+    "rates_denominator": "labeled training nodes",
+    "preprocessing": "full undirected ogbn-arxiv; StandardScaler fitted on official training nodes, shared saved tensors",
+    "precision": "float32; TF32 disabled",
+    "adapters": [
+      "shared CPU inputs, official splits, node budgets and output contract instead of repository loaders",
+      "author GECC and GCondBase definitions loaded verbatim against shared runtime dependencies",
+      "training-index alias supplied to both reducers",
+      "GraphSlim initialization harmonized to author uniform sampling",
+      "author dense diagnostic assignments retained; GraphSlim diagnostic assignments remain sparse and use graph node IDs"
+    ],
+    "timing": "wall time with CUDA synchronization around entire in-memory reduction, including preprocessing/transfers; excludes imports, data loading, graph serialization, and downstream evaluation",
+    "memory": "fresh process; process RSS sampled every5ms; PyTorch peak GPU allocated/reserved reset after context warmup, before input transfers; excludes downstream evaluation",
+    "quality": "one shared GCN fit per reduced graph, seed0, 300 epochs, hidden256, validation selection every10; outside timing/memory; descriptive quality shortfall retained",
+    "timeout_seconds": 1800,
+    "max_rss_gib": 96,
+    "gecc": "full transductive graph; depth2; hop weights [0.6,0.5,0.0]; hard clustering; one restart, max300, epsilon1e-8; balance_alpha1",
+    "initialization": "Author uniform sampled centers on both sides; GraphSlim initializer replaced only in this measured adapter. Native package defaults are not benchmarked."
+  },
+  "references": {
+    "gecc": {
+      "commit": "d731be00cc3beb7585e8fa7b60ca21a6c3cb4e3f",
+      "url": "https://github.com/Emory-Melody/GECC"
+    }
+  },
+  "manifest_sha256": "345e29ccad32a6b3ee1188cc25f750475859d5029efdbfdad5277d5854b95699",
+  "cells": [
+    {
+      "method": "gecc",
+      "rate": "0.001",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          2.241354175028391,
+          2.016306655947119,
+          2.914998948108405
+        ],
+        "median": 2.241354175028391,
+        "minimum": 2.016306655947119,
+        "maximum": 2.914998948108405
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          850356736,
+          850356736,
+          850356736
+        ],
+        "median": 850356736,
+        "minimum": 850356736,
+        "maximum": 850356736
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2072567808,
+          2063532032,
+          2046259200
+        ],
+        "median": 2063532032,
+        "minimum": 2046259200,
+        "maximum": 2072567808
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 62.05789844195048,
+      "author_over_graphslim_time": 0.6783196548866431,
+      "author_over_graphslim_gpu_memory": 1.8817006822760056,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "gecc",
+      "rate": "0.001",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          3.3042742590187117,
+          2.0475058370502666,
+          3.432934175012633
+        ],
+        "median": 3.3042742590187117,
+        "minimum": 2.0475058370502666,
+        "maximum": 3.432934175012633
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          451908608,
+          451908608,
+          451908608
+        ],
+        "median": 451908608,
+        "minimum": 451908608,
+        "maximum": 451908608
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2170929152,
+          2121580544,
+          2144739328
+        ],
+        "median": 2144739328,
+        "minimum": 2121580544,
+        "maximum": 2170929152
+      },
+      "synthetic_nodes": 90,
+      "accuracy_mean": 62.05789844195048,
+      "author_over_graphslim_time": 0.6783196548866431,
+      "author_over_graphslim_gpu_memory": 1.8817006822760056,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "gecc",
+      "rate": "0.005",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          5.456345105078071,
+          12.18426193506457,
+          11.075817185919732
+        ],
+        "median": 11.075817185919732,
+        "minimum": 5.456345105078071,
+        "maximum": 12.18426193506457
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          2177604096,
+          2177604096,
+          2177604096
+        ],
+        "median": 2177604096,
+        "minimum": 2177604096,
+        "maximum": 2177604096
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2069217280,
+          2046455808,
+          2042339328
+        ],
+        "median": 2046455808,
+        "minimum": 2042339328,
+        "maximum": 2069217280
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 65.12218117713928,
+      "author_over_graphslim_time": 1.1929496309226322,
+      "author_over_graphslim_gpu_memory": 4.437743113522537,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "gecc",
+      "rate": "0.005",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          6.056226448970847,
+          9.284396338975057,
+          11.646393393049948
+        ],
+        "median": 9.284396338975057,
+        "minimum": 6.056226448970847,
+        "maximum": 11.646393393049948
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          490700800,
+          490700800,
+          490700800
+        ],
+        "median": 490700800,
+        "minimum": 490700800,
+        "maximum": 490700800
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2145722368,
+          2106097664,
+          2115481600
+        ],
+        "median": 2115481600,
+        "minimum": 2106097664,
+        "maximum": 2145722368
+      },
+      "synthetic_nodes": 454,
+      "accuracy_mean": 65.12218117713928,
+      "author_over_graphslim_time": 1.1929496309226322,
+      "author_over_graphslim_gpu_memory": 4.437743113522537,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "gecc",
+      "rate": "0.01",
+      "backend": "author",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          9.873201405978762,
+          18.863783690030687,
+          14.098523651948199
+        ],
+        "median": 14.098523651948199,
+        "minimum": 9.873201405978762,
+        "maximum": 18.863783690030687
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          3573137408,
+          3573137408,
+          3573137408
+        ],
+        "median": 3573137408,
+        "minimum": 3573137408,
+        "maximum": 3573137408
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2097033216,
+          2034188288,
+          2032742400
+        ],
+        "median": 2034188288,
+        "minimum": 2032742400,
+        "maximum": 2097033216
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 66.43005609512329,
+      "author_over_graphslim_time": 1.1609023482668517,
+      "author_over_graphslim_gpu_memory": 4.894555156098991,
+      "relative_accuracy_shortfall_percent": 0.0
+    },
+    {
+      "method": "gecc",
+      "rate": "0.01",
+      "backend": "graphslim",
+      "status": "complete",
+      "completed_seeds": 3,
+      "expected_seeds": 3,
+      "reduction_seconds": {
+        "values": [
+          12.006637323996983,
+          12.144452694919892,
+          14.50954804790672
+        ],
+        "median": 12.144452694919892,
+        "minimum": 12.006637323996983,
+        "maximum": 14.50954804790672
+      },
+      "peak_cuda_allocated_bytes": {
+        "values": [
+          730022912,
+          730022912,
+          730022912
+        ],
+        "median": 730022912,
+        "minimum": 730022912,
+        "maximum": 730022912
+      },
+      "peak_sampled_rss_bytes": {
+        "values": [
+          2116485120,
+          2131275776,
+          2147397632
+        ],
+        "median": 2131275776,
+        "minimum": 2116485120,
+        "maximum": 2147397632
+      },
+      "synthetic_nodes": 909,
+      "accuracy_mean": 66.43005609512329,
+      "author_over_graphslim_time": 1.1609023482668517,
+      "author_over_graphslim_gpu_memory": 4.894555156098991,
+      "relative_accuracy_shortfall_percent": 0.0
+    }
+  ],
+  "records": [
+    {
+      "id": "gecc__r0.001__s1__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1478344704,
+        "peak_sampled_rss_bytes": 2072567808,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 850356736,
+        "peak_cuda_reserved_bytes": 1140850688,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 2.241354175028391,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "69cf31a58a7b4af7b7c79ede7861d0df62ba880dce2a0d77b7076467673a715b",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6321017146110535,
+          "test_accuracy": 0.6120404005050659,
+          "selected_epoch": 130
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.001__s1__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1483767808,
+        "peak_sampled_rss_bytes": 2170929152,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 451908608,
+        "peak_cuda_reserved_bytes": 618659840,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 3.3042742590187117,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "69cf31a58a7b4af7b7c79ede7861d0df62ba880dce2a0d77b7076467673a715b",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6321017146110535,
+          "test_accuracy": 0.6120404005050659,
+          "selected_epoch": 130
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.001__s2__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1483706368,
+        "peak_sampled_rss_bytes": 2121580544,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 451908608,
+        "peak_cuda_reserved_bytes": 618659840,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 2.0475058370502666,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "240c8d8d0a8f5f3e691509b4df1fac056dc101b5e1e3e3125657047518ef0fe2",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6391489505767822,
+          "test_accuracy": 0.622657060623169,
+          "selected_epoch": 140
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.001__s2__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1487044608,
+        "peak_sampled_rss_bytes": 2063532032,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 850356736,
+        "peak_cuda_reserved_bytes": 1140850688,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 2.016306655947119,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "240c8d8d0a8f5f3e691509b4df1fac056dc101b5e1e3e3125657047518ef0fe2",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6391489505767822,
+          "test_accuracy": 0.622657060623169,
+          "selected_epoch": 140
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.001__s3__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1482874880,
+        "peak_sampled_rss_bytes": 2046259200,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 850356736,
+        "peak_cuda_reserved_bytes": 1140850688,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 2.914998948108405,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "14399387a891dff54f1afcfcf42e2a60a53030d2654746b039ffeee0b87647b0",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6401556730270386,
+          "test_accuracy": 0.6270394921302795,
+          "selected_epoch": 90
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.001__s3__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.001",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1469259776,
+        "peak_sampled_rss_bytes": 2144739328,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 451908608,
+        "peak_cuda_reserved_bytes": 618659840,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 3.432934175012633,
+      "synthetic_nodes": 90,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "14399387a891dff54f1afcfcf42e2a60a53030d2654746b039ffeee0b87647b0",
+        "ac9d43df02b33428db094eb61d163888ab8a08c5bba7868aae01772c2af9067b",
+        "11960229ca61b0b8499c0658d797ef60c8dc42ae52566fda3a5ac44bffbb982e"
+      ],
+      "settings": {
+        "reduction_rate": 0.001,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6401556730270386,
+          "test_accuracy": 0.6270394921302795,
+          "selected_epoch": 90
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s1__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1467506688,
+        "peak_sampled_rss_bytes": 2069217280,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 2177604096,
+        "peak_cuda_reserved_bytes": 3045064704,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 5.456345105078071,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "976d9cd8d898146f8176b05172dc66a533f2d4dad678504d7a013f4d50353d75",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6626396775245667,
+          "test_accuracy": 0.6495278477668762,
+          "selected_epoch": 180
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s1__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1466535936,
+        "peak_sampled_rss_bytes": 2145722368,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 490700800,
+        "peak_cuda_reserved_bytes": 629145600,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 6.056226448970847,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "976d9cd8d898146f8176b05172dc66a533f2d4dad678504d7a013f4d50353d75",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6626396775245667,
+          "test_accuracy": 0.6495278477668762,
+          "selected_epoch": 180
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s2__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1466585088,
+        "peak_sampled_rss_bytes": 2106097664,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 490700800,
+        "peak_cuda_reserved_bytes": 629145600,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.284396338975057,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "97b25c4f550ac9a6f2ecb0ef53bd6111fd682d08463730aa7e640117e8702320",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.664015531539917,
+          "test_accuracy": 0.6495072245597839,
+          "selected_epoch": 160
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s2__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1465716736,
+        "peak_sampled_rss_bytes": 2046455808,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 2177604096,
+        "peak_cuda_reserved_bytes": 3045064704,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 12.18426193506457,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "97b25c4f550ac9a6f2ecb0ef53bd6111fd682d08463730aa7e640117e8702320",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.664015531539917,
+          "test_accuracy": 0.6495072245597839,
+          "selected_epoch": 160
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s3__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1467629568,
+        "peak_sampled_rss_bytes": 2042339328,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 2177604096,
+        "peak_cuda_reserved_bytes": 3045064704,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 11.075817185919732,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "8592125b7ecb4ef3272c134b249ae3cfe07c37ecb4c2e66e6d076dbdc3672fc2",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6671364307403564,
+          "test_accuracy": 0.6546303629875183,
+          "selected_epoch": 300
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.005__s3__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.005",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1464201216,
+        "peak_sampled_rss_bytes": 2115481600,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 490700800,
+        "peak_cuda_reserved_bytes": 629145600,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 11.646393393049948,
+      "synthetic_nodes": 454,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "8592125b7ecb4ef3272c134b249ae3cfe07c37ecb4c2e66e6d076dbdc3672fc2",
+        "332540afef5265a0ecf6598fb3b8bc2435b624889428c8aadcbf338a770dc34b",
+        "9ea5e3532a8202858c686ae07b2fa6edce684190c8e187479ba3f465b4bf193c"
+      ],
+      "settings": {
+        "reduction_rate": 0.005,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6671364307403564,
+          "test_accuracy": 0.6546303629875183,
+          "selected_epoch": 300
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s1__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1471717376,
+        "peak_sampled_rss_bytes": 2097033216,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3573137408,
+        "peak_cuda_reserved_bytes": 5339348992,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 9.873201405978762,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "99e5f00d572ad3c421facfed6dd24589aa51c5dfe4292140d3a6c72b6bcd5c8e",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6755260229110718,
+          "test_accuracy": 0.6655967831611633,
+          "selected_epoch": 270
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s1__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 1,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1468203008,
+        "peak_sampled_rss_bytes": 2116485120,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 730022912,
+        "peak_cuda_reserved_bytes": 876609536,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 12.006637323996983,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "99e5f00d572ad3c421facfed6dd24589aa51c5dfe4292140d3a6c72b6bcd5c8e",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 1,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6755260229110718,
+          "test_accuracy": 0.6655967831611633,
+          "selected_epoch": 270
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s2__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1463996416,
+        "peak_sampled_rss_bytes": 2131275776,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 730022912,
+        "peak_cuda_reserved_bytes": 876609536,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 12.144452694919892,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "ab5920f55a3859c0a4220dab69cacf590a58bc8056d02a93281b9a09524861dd",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6758280396461487,
+          "test_accuracy": 0.6621196269989014,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s2__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 2,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1465503744,
+        "peak_sampled_rss_bytes": 2034188288,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3573137408,
+        "peak_cuda_reserved_bytes": 5339348992,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 18.863783690030687,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "ab5920f55a3859c0a4220dab69cacf590a58bc8056d02a93281b9a09524861dd",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 2,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6758280396461487,
+          "test_accuracy": 0.6621196269989014,
+          "selected_epoch": 190
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s3__author",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "author",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1465782272,
+        "peak_sampled_rss_bytes": 2032742400,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 3573137408,
+        "peak_cuda_reserved_bytes": 5339348992,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 14.098523651948199,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "d494a5bbd5c29d02c5e709e6ce2daf7bb48cf932a8569edee65c5071118d4667",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6769018769264221,
+          "test_accuracy": 0.665185272693634,
+          "selected_epoch": 260
+        }
+      ]
+    },
+    {
+      "id": "gecc__r0.01__s3__graphslim",
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "rate": "0.01",
+      "seed": 3,
+      "backend": "graphslim",
+      "status": "complete",
+      "memory": {
+        "rss_baseline_bytes": 1464459264,
+        "peak_sampled_rss_bytes": 2147397632,
+        "rss_sample_interval_seconds": 0.005,
+        "peak_cuda_allocated_bytes": 730022912,
+        "peak_cuda_reserved_bytes": 876609536,
+        "gpu_allocated_baseline_bytes": 33554432
+      },
+      "reduction_seconds": 14.50954804790672,
+      "synthetic_nodes": 909,
+      "input_sha256": {
+        "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+        "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+        "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+        "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+        "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+        "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+        "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+      },
+      "output_sha256": [
+        "d494a5bbd5c29d02c5e709e6ce2daf7bb48cf932a8569edee65c5071118d4667",
+        "b09106aa5e9afc88e1c7a722762b02ea33eb7d4e7f9d8a26e28b1e6326d12d5c",
+        "628262b5bcc8ea039a3b795e77e7eeeaff90b5844b34e76b325a9c2b7657a708"
+      ],
+      "settings": {
+        "reduction_rate": 0.01,
+        "epochs": 100,
+        "seed": 3,
+        "clustgdd_pre_epochs": 600,
+        "clustgdd_hidden": 256,
+        "clustgdd_post_steps": 2
+      },
+      "environment": {
+        "torch": "2.8.0+cu128",
+        "numpy": "1.26.4",
+        "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition",
+        "gpu_uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952",
+        "threads": 4,
+        "tf32": false
+      },
+      "evaluations": [
+        {
+          "seed": 0,
+          "validation_accuracy": 0.6769018769264221,
+          "test_accuracy": 0.665185272693634,
+          "selected_epoch": 260
+        }
+      ]
+    }
+  ],
+  "exported_utc": "2026-11-03T03:38:16Z",
+  "execution_environment": {
+    "python": "3.11.15",
+    "torch": "2.8.0+cu128",
+    "cuda_runtime": "12.8",
+    "numpy": "1.26.4",
+    "sklearn": "1.9.1",
+    "psutil": "7.2.2"
+  },
+  "source_run": "runs/gecc_arxiv_comparison_20261102_v2",
+  "source_manifest": {
+    "schema_version": 1,
+    "created_utc": "2026-11-03T03:29:40Z",
+    "methods": [
+      "gecc"
+    ],
+    "rates": [
+      "0.001",
+      "0.005",
+      "0.01"
+    ],
+    "seeds": [
+      1,
+      2,
+      3
+    ],
+    "jobs": [
+      {
+        "id": "gecc__r0.001__s1__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.001__s1__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.001__s2__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.001__s2__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.001__s3__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.001__s3__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.001",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.005__s1__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.005__s1__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.005__s2__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.005__s2__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.005__s3__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.005__s3__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.005",
+        "seed": 3,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.01__s1__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.01__s1__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 1,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.01__s2__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "graphslim"
+      },
+      {
+        "id": "gecc__r0.01__s2__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 2,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.01__s3__author",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "author"
+      },
+      {
+        "id": "gecc__r0.01__s3__graphslim",
+        "method": "gecc",
+        "dataset": "ogbn-arxiv",
+        "rate": "0.01",
+        "seed": 3,
+        "backend": "graphslim"
+      }
+    ],
+    "references": {
+      "gecc": {
+        "commit": "d731be00cc3beb7585e8fa7b60ca21a6c3cb4e3f",
+        "url": "https://github.com/Emory-Melody/GECC"
+      }
+    },
+    "files": {
+      "inputs.pt": "a3d423d5cb7dcdf3d5d07f0792af8061b875681f38fac72a66c28ce3fb0d4d04",
+      "references/GECC/.gitattributes": "fc0d0d617d87fc9604958bcff8807842d624c805565fccb4ac898a6ede3a13db",
+      "references/GECC/.gitignore": "8f2751996816834a728e426acc733822a2bf785df230ede64a0794845c71a862",
+      "references/GECC/README.md": "b6fb3978b1c2d89002f82c21576c3b70777918639e16c1bffda91f187a6cbaf5",
+      "references/GECC/analyze_fraud_yelp_homophily.py": "12def91de17da1ccab948d27f5ffcfc4d3011f983e761bfdf4f0d76a27c62059",
+      "references/GECC/analyze_yelp_homophily.py": "ba5565090b76d4016b098098516db8c1556f932e54dd13ac86f060a3892164c0",
+      "references/GECC/checkpoints/evolve_dataset/ogbn-arxiv/node_year.csv": "13452b823775699dad58fb0060bbf410e2606dfcf7ab5860676545e75c9a16c1",
+      "references/GECC/figs/pipeline.png": "e562abc0f9142fb71cfdd699e78161ce0577044e081634c121433c524d329407",
+      "references/GECC/fraud_yelp_example.py": "1fc917c729ed4d56c751403e021bf4bc1c3e30c290c90f1f17e0e0b3c1fa1509",
+      "references/GECC/graphslim/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "references/GECC/graphslim/coarsening/__init__.py": "a577a7673a957e9d39d2715b4adbe4e61d14cc45683cc396147b5ea096a2efeb",
+      "references/GECC/graphslim/coarsening/affinity_gs.py": "5705a11b165aec5bbc0f6d49f4579aa808627ef39fa2fbf720b8dfbd64b98dfd",
+      "references/GECC/graphslim/coarsening/algebraic_jc.py": "676858af672df6bf2a7b93899bd38cabe25aa964ebc66b34d38a5fee41356572",
+      "references/GECC/graphslim/coarsening/averaging.py": "25ea3a1f9b8bc48534568871f3871066c1c60e3a3ec7f1460838ced313377299",
+      "references/GECC/graphslim/coarsening/clustering.py": "6133b141877c712b50626ac183189279fcd13ef860984b08047a3bb9203352b3",
+      "references/GECC/graphslim/coarsening/clusteringagg.py": "d0f4afd5575e3d9d915e8693fcec8265b07889cce1cd06fdb8ab562f6c7783a5",
+      "references/GECC/graphslim/coarsening/coarsening_base.py": "148eed6127f4f8788478d72a2756bbf7885a1cef1a5af3bc7dd415851e74cf38",
+      "references/GECC/graphslim/coarsening/heavy_edge.py": "71a1be1c42df1ebdaf704b83999809d82251fc3c03e32a444370b3994ccae4d5",
+      "references/GECC/graphslim/coarsening/kron.py": "e267ae540a5a4604e1eaba9257ef5913f73c7766481f505b049f56c172aa4e58",
+      "references/GECC/graphslim/coarsening/utils.py": "e2197a54cbc6cf2e599e28b209007fc9841338f465833dd1243fff6c7477842e",
+      "references/GECC/graphslim/coarsening/variation_cliques.py": "a08e9fb26a0a108b82417e8995fb24bfc93548fbd1dc294212c8e4a364dee58a",
+      "references/GECC/graphslim/coarsening/variation_edges.py": "854644c40ce5dc934556f3463a5f40e53728d681dd410bb470137b3f509c8e0f",
+      "references/GECC/graphslim/coarsening/variation_neighborhoods.py": "e8ea2c4e202f9fd79071c5e2c0d99019d807ae16288832e34d40feb5b2bcfb0e",
+      "references/GECC/graphslim/coarsening/vng.py": "74322ae30e09d0900df6bea5d7592b4c656663017cc2685e36d53fecdf6f9e67",
+      "references/GECC/graphslim/condensation/__init__.py": "d8cd7b16f02ddd325894271a5d168ab4ae83f6e88dfee7012d9715f7200ca885",
+      "references/GECC/graphslim/condensation/doscond.py": "cde6c18a031e0201f3195d045556ed87643b811ed224fd7fc9c0fbabde9abbbe",
+      "references/GECC/graphslim/condensation/doscondx.py": "228cd5f6e444e5177b63744cff09b03a633cf239ad12e8ea0c947ea704c3809a",
+      "references/GECC/graphslim/condensation/gcdm.py": "4642ba7aff2e2df423f3e71f968b8d430746ecf0933929cdeaaf3082dfe16ab0",
+      "references/GECC/graphslim/condensation/gcdmx.py": "590a60c6d2f6e1bd5fb149cc02f35d506a012003eb48d3b33085896733138247",
+      "references/GECC/graphslim/condensation/gcond.py": "5f0cc49a8e7edc267603292e9bb0720e39a149dee01f23b223d805bd00f7f0f7",
+      "references/GECC/graphslim/condensation/gcond_base.py": "ac01b093ad45b2155e63d5af69e9534689d91d813eb1e876fe936b57d0963526",
+      "references/GECC/graphslim/condensation/gcondx.py": "cac032c2fc82802620c70345577aa963ff012379736d5ef82650146e3f4ac4b9",
+      "references/GECC/graphslim/condensation/gcsntk.py": "4e9b825a96c0e1946519deff0fc179fe0480f58fc5d4dc2a8b0557e3638a118e",
+      "references/GECC/graphslim/condensation/gdem.py": "d810dfe4cc5f49277c9dd16bb4a5664c3c507680a3397bddb54b9e77b0f69153",
+      "references/GECC/graphslim/condensation/gecc.py": "107b8041c70dbbdddbccbbaa4438b9079ea5004ad9079d87edf07864ca2f4ef4",
+      "references/GECC/graphslim/condensation/geom.py": "ae0d588fedb07342f2fe952495b79e65bb4975e078c9da157a4b20b844d6f08e",
+      "references/GECC/graphslim/condensation/mirage.py": "a538b4a3b75b32ec5a1b62c8f9de319c0ad85b143d6db8ef17900b347a20c1aa",
+      "references/GECC/graphslim/condensation/msgc.py": "36acbfea59ab4eb1aacf591a6c8efe75f0d972fd11d9779d5151c95be39968f0",
+      "references/GECC/graphslim/condensation/sfgc.py": "86c7c4c5d4e4f4de1a42eebe90b2ba05830c6d52520c20ad4782b271d323699c",
+      "references/GECC/graphslim/condensation/sgdd.py": "dbd49b037d77af83f88000810aa3a01feb549d663fdfd52a43cf18f17019d929",
+      "references/GECC/graphslim/condensation/simgc.py": "0ed8d17ab26303262a8c634224c46a3001d8d3b7d944a1783f620b65431c5e5e",
+      "references/GECC/graphslim/condensation/utils.py": "0666c97b5ccf30a6eb57a118e68222de3b7ececb2ae2d961738ea9a095d8eee8",
+      "references/GECC/graphslim/config.py": "dd30411a9b9a857388eba1fdcc6d86e428456f076adfe92dae655daa6a53909a",
+      "references/GECC/graphslim/configs/doscond/amazon.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "references/GECC/graphslim/configs/doscond/citeseer.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "references/GECC/graphslim/configs/doscond/cora.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "references/GECC/graphslim/configs/doscond/flickr.json": "44175bbbdd00587dadceec7bafdb22ebf1dfcd916a79af7b4d5a4f228e02e1f7",
+      "references/GECC/graphslim/configs/doscond/ogbn-arxiv.json": "c6c4f297d3d5c03bf5ba8844c75cfcca2d7d48e41a20c84de3f88240af84267a",
+      "references/GECC/graphslim/configs/doscond/pubmed.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "references/GECC/graphslim/configs/doscond/reddit.json": "b9dba5930006d82078c62f426b32f15da9d7e1c505016632bafd9dc4c022d32e",
+      "references/GECC/graphslim/configs/doscond/yelp.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "references/GECC/graphslim/configs/doscondx/amazon.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/doscondx/citeseer.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "references/GECC/graphslim/configs/doscondx/cora.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/doscondx/flickr.json": "bfc902ac3226a1b336cf5d658fbee55e63f9f51866df6701a8514a963cfbb8f0",
+      "references/GECC/graphslim/configs/doscondx/ogbn-arxiv.json": "516eaacd0c6fcdddf308bfa0046588e81b6c1649b6d93b372e0a27c17d918b4d",
+      "references/GECC/graphslim/configs/doscondx/pubmed.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "references/GECC/graphslim/configs/doscondx/reddit.json": "5c1be4b2fff996386fe87a85fdd7a6b6592e973a78cffb099056a1890b94a821",
+      "references/GECC/graphslim/configs/doscondx/yelp.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/gcdm/amazon.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "references/GECC/graphslim/configs/gcdm/citeseer.json": "d91c40c4e982f388d6acdc36dd28962084fc052bdcfd60a288f0987020a26688",
+      "references/GECC/graphslim/configs/gcdm/cora.json": "6b0dbabd5b77a186c820f2de190926b3d35874922d0aaecb0c40a8ba2c576b3f",
+      "references/GECC/graphslim/configs/gcdm/flickr.json": "40ded01a18b203e4f4d512aa58979cf0ad3a71060df02ceb12a27f3c4cc84349",
+      "references/GECC/graphslim/configs/gcdm/ogbn-arxiv.json": "38d6d29ba35f059f1a701011a0fc3827382ef3f115e3b93a33f3235319200113",
+      "references/GECC/graphslim/configs/gcdm/pubmed.json": "98a5a10e4e15d0b1b253b5b4fbd0dde8c34ebb8cc39327d96f27cdf7522aaba1",
+      "references/GECC/graphslim/configs/gcdm/reddit.json": "7fdf9ad38d640297bc04bc7674a376b60dff467e38a52001e22c79518d944378",
+      "references/GECC/graphslim/configs/gcdm/yelp.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "references/GECC/graphslim/configs/gcond/amazon.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "references/GECC/graphslim/configs/gcond/citeseer.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "references/GECC/graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "references/GECC/graphslim/configs/gcond/flickr.json": "065280d6246101c83026a2be15a71c54e173b1e44b3b960e198be3e0bdf1fcdc",
+      "references/GECC/graphslim/configs/gcond/ogbn-arxiv.json": "15b7f6848ec5a1e7412c87fd10cef78d4641926af183e7146b42698e9a613681",
+      "references/GECC/graphslim/configs/gcond/pubmed.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "references/GECC/graphslim/configs/gcond/reddit.json": "69ec5eb71263dba4e5d95184e8d6d4a109d9219770fa35d8a1a95f8732507f39",
+      "references/GECC/graphslim/configs/gcond/yelp.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "references/GECC/graphslim/configs/gcondx/amazon.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/gcondx/citeseer.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "references/GECC/graphslim/configs/gcondx/cora.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/gcondx/flickr.json": "bfc902ac3226a1b336cf5d658fbee55e63f9f51866df6701a8514a963cfbb8f0",
+      "references/GECC/graphslim/configs/gcondx/ogbn-arxiv.json": "516eaacd0c6fcdddf308bfa0046588e81b6c1649b6d93b372e0a27c17d918b4d",
+      "references/GECC/graphslim/configs/gcondx/pubmed.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "references/GECC/graphslim/configs/gcondx/reddit.json": "5baa88c659a1417d1fb28b85d817b921e1b66f8e589df38f96e7833aa0e0d371",
+      "references/GECC/graphslim/configs/gcondx/yelp.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "references/GECC/graphslim/configs/gcsntk/amazon.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "references/GECC/graphslim/configs/gcsntk/citeseer.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "references/GECC/graphslim/configs/gcsntk/cora.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "references/GECC/graphslim/configs/gcsntk/flickr.json": "b1a823dcee6eeb0331425ee6c0d2e91deab502c60362c3130d9cb6e2adb2312a",
+      "references/GECC/graphslim/configs/gcsntk/ogbn-arxiv.json": "59c416f2dc0eed25a61a05cbe88362a97c17396318a6a501717a174d5714f282",
+      "references/GECC/graphslim/configs/gcsntk/pubmed.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "references/GECC/graphslim/configs/gcsntk/reddit.json": "912cda1dc5b413644bdc5d56bf8884702a2f317c581c92ac385a5a01011153dc",
+      "references/GECC/graphslim/configs/gcsntk/yelp.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "references/GECC/graphslim/configs/gdem/amazon.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "references/GECC/graphslim/configs/gdem/citeseer.json": "f945e92b5ae4649b3665f0c6160e87f5fb117cc9925b256623b9ced565ea5005",
+      "references/GECC/graphslim/configs/gdem/cora.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "references/GECC/graphslim/configs/gdem/flickr.json": "7f574d75f7b85534e02f27ef3f62fde1e2c4d4a05a03cf6959a76cbebba3a950",
+      "references/GECC/graphslim/configs/gdem/ogbn-arxiv.json": "06301e27340c26ca1f096636e9a86d4a517dde1026e6cca39cc360599a74dfd4",
+      "references/GECC/graphslim/configs/gdem/pubmed.json": "943e42e77c8fa69f725a9341b6ea2e1f49380558462e7fc6e58b8450aa552685",
+      "references/GECC/graphslim/configs/gdem/reddit.json": "22f50218d6bee1b98547c769b28bdeba6d849f62e5f526079b43cb4b765f3068",
+      "references/GECC/graphslim/configs/gdem/yelp.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "references/GECC/graphslim/configs/geom/amazon.json": "3ad42cd2baeda66f4b7ca45e8af578114603833034a18710ebea08da4ecf7b2f",
+      "references/GECC/graphslim/configs/geom/citeseer.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "references/GECC/graphslim/configs/geom/cora.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "references/GECC/graphslim/configs/geom/flickr.json": "01ad1ee21aebfa7ec612446571eafb4f6baa2e31883268839968b855883c562c",
+      "references/GECC/graphslim/configs/geom/ogbn-arxiv.json": "d5d0aa09fc1262cf0dcedf26a9bbbf0c2fde947a39160416d42f56446621d22d",
+      "references/GECC/graphslim/configs/geom/pubmed.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "references/GECC/graphslim/configs/geom/reddit.json": "d47ed3a02afc2b433dc3ec8d5ef826a5afd7ec73ed4b3f948f98176b3f74a647",
+      "references/GECC/graphslim/configs/geom/yelp.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "references/GECC/graphslim/configs/msgc/amazon.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "references/GECC/graphslim/configs/msgc/citeseer.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "references/GECC/graphslim/configs/msgc/cora.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "references/GECC/graphslim/configs/msgc/flickr.json": "15261f59c9616fea1caf4507e42683ce154d7d5746f41e769ed1c4769e1442bc",
+      "references/GECC/graphslim/configs/msgc/ogbn-arxiv.json": "3bd5b050a9da42bebfa0cac9e38775589cf15dcf3ce5a767f9462f5dc50bc2bc",
+      "references/GECC/graphslim/configs/msgc/pubmed.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "references/GECC/graphslim/configs/msgc/reddit.json": "fcaa227fc15f03e42d0c73ef05e50b19da82df067bf46376652c96e1ac9d72ad",
+      "references/GECC/graphslim/configs/msgc/yelp.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "references/GECC/graphslim/configs/sfgc/amazon.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "references/GECC/graphslim/configs/sfgc/citeseer.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "references/GECC/graphslim/configs/sfgc/cora.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "references/GECC/graphslim/configs/sfgc/flickr.json": "5c72b5b3af9d326f226be805187652b727f7fd8a7b14628fe1f0135d7fbc5827",
+      "references/GECC/graphslim/configs/sfgc/ogbn-arxiv.json": "e4e1bad9718ab037be9ed2d68f1aff06af634efc94a9fa34044d14b3d81ddc62",
+      "references/GECC/graphslim/configs/sfgc/pubmed.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "references/GECC/graphslim/configs/sfgc/reddit.json": "f4f4789cabf9042b1d2e1806a51782d13f1409abf0eb65c254bd259a161724c7",
+      "references/GECC/graphslim/configs/sfgc/yelp.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "references/GECC/graphslim/configs/sgdd/amazon.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "references/GECC/graphslim/configs/sgdd/citeseer.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "references/GECC/graphslim/configs/sgdd/cora.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "references/GECC/graphslim/configs/sgdd/flickr.json": "543c15bef1ff5a425b48334a600117221753a90e85a9c5a8f9856d60ef20ceb5",
+      "references/GECC/graphslim/configs/sgdd/ogbn-arxiv.json": "d897422fa19c87032a9d63f69a9885662d3701e79828141908475171fa821f9f",
+      "references/GECC/graphslim/configs/sgdd/pubmed.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "references/GECC/graphslim/configs/sgdd/reddit.json": "21a55b0b675821179617da5ada4ac853bf3da3195041b9f92fd6e808cfc4eae1",
+      "references/GECC/graphslim/configs/sgdd/yelp.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "references/GECC/graphslim/configs/simgc/amazon.json": "c72c174f3a836b130e19718b009ab70da5856a11f1e16d7fa3fa8cbbe0686b86",
+      "references/GECC/graphslim/configs/simgc/citeseer.json": "e33f2e22611fbc6e78db8589c9caae51c328eefce4b8a37299865a276d0f2b45",
+      "references/GECC/graphslim/configs/simgc/cora.json": "c72c174f3a836b130e19718b009ab70da5856a11f1e16d7fa3fa8cbbe0686b86",
+      "references/GECC/graphslim/configs/simgc/flickr.json": "44175bbbdd00587dadceec7bafdb22ebf1dfcd916a79af7b4d5a4f228e02e1f7",
+      "references/GECC/graphslim/configs/simgc/ogbn-arxiv.json": "754cf689d9fee3a8b903c329990fa53b586ec6252a8635fc919cfe4bbe23d69d",
+      "references/GECC/graphslim/configs/simgc/pubmed.json": "e33f2e22611fbc6e78db8589c9caae51c328eefce4b8a37299865a276d0f2b45",
+      "references/GECC/graphslim/configs/simgc/reddit.json": "b9dba5930006d82078c62f426b32f15da9d7e1c505016632bafd9dc4c022d32e",
+      "references/GECC/graphslim/configs/simgc/yelp.json": "c72c174f3a836b130e19718b009ab70da5856a11f1e16d7fa3fa8cbbe0686b86",
+      "references/GECC/graphslim/dataset/__init__.py": "793238f99e66a5c69b64b9c38144ec914908a9fcbf9fdfd48e7a421428aae45f",
+      "references/GECC/graphslim/dataset/attack.py": "e21bc656a33f870cdcf693a6a9d89f95816f84eac99a794b45a3f80119d32b9d",
+      "references/GECC/graphslim/dataset/convertor.py": "0400a60aeb44568c3c27c02796700628520d28bf7d7499672a9fb61e53159acb",
+      "references/GECC/graphslim/dataset/create_sample_yelp.py": "401edf301c35ab7cc0d604aafe35289b399fc7118b9f0769ded92595bf4f8e7d",
+      "references/GECC/graphslim/dataset/loader.py": "ee711a38194c842a086d0f9b2a6ecf9c68550b48d764e34618b93c633109e1f5",
+      "references/GECC/graphslim/dataset/split_tool.py": "50af6d4a9e2b13ba4577e443176d090d008c554e18119189a2419d36fa03ff47",
+      "references/GECC/graphslim/dataset/utils.py": "3553a382fe69223bcac65ace3e11a1e8f026b7b43813ce7d661c0effd8bb19b5",
+      "references/GECC/graphslim/dataset/yelp_processor.py": "85e3dd71f335b4948f94478fed8391c14950aafdd365c0f1ec6ed955f901cffd",
+      "references/GECC/graphslim/evaluation/__init__.py": "c0e226e965d0a9d83f7cdbb0c109c4b226613174648edfea630b8966cec54930",
+      "references/GECC/graphslim/evaluation/eval_agent.py": "0c0c2470d8a98496d1a7889c3498861f4249e9a6e7d2f85b025388a8b313d2b7",
+      "references/GECC/graphslim/evaluation/graph_property.py": "bcc30a7cd908d0ea36c2f9814208d260b45f58e693e3e43336cf6e310f12c03d",
+      "references/GECC/graphslim/evaluation/nas_eval.py": "dcf45c4d7a1bb6315d1b0d87207535918a453a70dd2c416ef7c7aa45d6a841a7",
+      "references/GECC/graphslim/evaluation/utils.py": "b3eeb206f5b5ff05c5223b6cca16f7e1bbcc83440f6f64754a39a5fa1c726846",
+      "references/GECC/graphslim/gecc_tuning_results/gecc_ogbn_arxiv_tuning_results.csv": "9cdb84e307d50688f7d5e387847235f57cb015b6bf542c10e3fca4a03cea58bf",
+      "references/GECC/graphslim/gecc_tuning_results/job_queue.txt": "c41c6d00f76710b3642c9544551c6065488be9a97c07a783144b9680da988c68",
+      "references/GECC/graphslim/models/__init__.py": "acf02ceb9a6e3690e69ec5aa12a034b3e52f8323983f88655b13bb320e30dc5f",
+      "references/GECC/graphslim/models/appnp.py": "80ca37008a7a961cc308556970df3260b1956b6cb6dc263e289d2e736f57d454",
+      "references/GECC/graphslim/models/base.py": "bd8b5e1888cc5613e892ad282590dc3852dc4924d30aa03e1a3a730f7051eac2",
+      "references/GECC/graphslim/models/cheby.py": "7c0d6f140f5d030960f4cb19cf8f929e7f0d7e4d0c0590e7d8117e9ec80e87ec",
+      "references/GECC/graphslim/models/gat.py": "c24136ae50499d88eabc6bc691bedd2250cdf24248d142403f81d3e7371ecd1f",
+      "references/GECC/graphslim/models/gcn.py": "ade6fe11ae5b70e1d86a581e211ac7f002f4bedcec5452352517b797fafb2a44",
+      "references/GECC/graphslim/models/gntk.py": "437bcb0ca188f282a709acc192002395c88138e51b847b7811ebbab33a3fb790",
+      "references/GECC/graphslim/models/graphsage.py": "176081c7aef81d163db9a93691dbcbd5a10f40edae117da2f84867ffbfad5063",
+      "references/GECC/graphslim/models/ignr.py": "5368b1b59c1073200715133cd5a61dece6736aba7f625f0c0f9d35c6dd32cd38",
+      "references/GECC/graphslim/models/krr.py": "0b612df67407ee90550a23c233dbe6c2a4621a660828c111794e7353b19e2b7a",
+      "references/GECC/graphslim/models/layers.py": "6df27af73359b91b9ef7bd99f8b25b511fd514703f0bf983f6a198f794452ba8",
+      "references/GECC/graphslim/models/parametrized_adj.py": "040bab22b4dbf4c1dc20be1f7abef72f9fba0ca641f8a0d999ec3c0647aa085e",
+      "references/GECC/graphslim/models/prbcd.py": "b0af390ea4ee9260e15eec60f9fe2a5052d2d6d74da86d5bdba355c32048bb4a",
+      "references/GECC/graphslim/models/random_attack.py": "12a9fc4d440b8e649f26ea413410332a82780a35026f2b434413aa36e79ebf8d",
+      "references/GECC/graphslim/models/reparam_module.py": "484b0afc19c5650fc925c1f38951d378f81867f1807e2f03203acda1f2e6d7c9",
+      "references/GECC/graphslim/models/sgc.py": "ef2e6ffa1a0c053e4df72941a3ef0668a3e3db8f994d918766569f6f7f2462b1",
+      "references/GECC/graphslim/models/sgformer.py": "447f9b615e94ba24db8f972d472dfd20424919e722c4eaa43d7d0e91d4ea7471",
+      "references/GECC/graphslim/models/sntk.py": "714ae6e0cdb79f097e62100fe99e0e801f71a1d7f6320915aaef5ca2f93deb79",
+      "references/GECC/graphslim/results/depth_analysis_results.csv": "941c1855e1b0456dab635cd7ba96a97c86d7952002b49669037d01bba7a6903b",
+      "references/GECC/graphslim/run_eval.py": "334fa4a2114a5ae30bb7c1988a701a540b7e73d42375ae5ae1a060d9f7b42c5f",
+      "references/GECC/graphslim/scripts/run_citeseer_evolve.sh": "b8d8dff63af981bee618daac99e4b77d2c768baecd5bd1e4735cb8d0da1e2e05",
+      "references/GECC/graphslim/scripts/run_cora_evolve.sh": "0262078f3a796a76017aeb74da9e820cee8d1c4d18e156a615cc84326042b200",
+      "references/GECC/graphslim/scripts/run_flickr_evolve.sh": "f342c7b93daab93300bdd85cb4d5f9ca65dac954866bf4ab45f1d98e7085d220",
+      "references/GECC/graphslim/scripts/run_ogbn-arxiv_evolve.sh": "2f7fb693990d273636ab808d6a83b2ddaf8891d424e215d1cd45308b5d8a9dd8",
+      "references/GECC/graphslim/scripts/run_ogbn-arxiv_real_evolve.sh": "d4ce1ca0e8aa340a1c8de2726a4db2fe773855df19b870d491e0f6633bffd282",
+      "references/GECC/graphslim/scripts/run_ogbn-products_evolve.sh": "c395aec0a81fd6b8b6d8de2567d6833e23ef8cf04669824f866470813d408791",
+      "references/GECC/graphslim/scripts/run_pubmed_evolve.sh": "5afbf44ade3602ca0e5593f5a6992ff8b7ac34ea1eac397f468491999ec8802c",
+      "references/GECC/graphslim/scripts/run_reddit_evolve.sh": "10a6d11e56bd7493f64629dac914c76cab9cd6f051c47128284f66298989229a",
+      "references/GECC/graphslim/sparsification/__init__.py": "eafff308748064b3bbdb6ddad7f52a4d0b16b88f1d54b5f2e3847d9a4b1adf3a",
+      "references/GECC/graphslim/sparsification/cent_degree.py": "ea6658b1ebdd702769658c9d5e8f01815954a975592aeab0c1c1aa54b1cb6efb",
+      "references/GECC/graphslim/sparsification/cent_pagerank.py": "02fca8ffa9af226925afe1bcfdf9f97271adbf4a820c6b5590d74787c80d299f",
+      "references/GECC/graphslim/sparsification/coreset_base.py": "cd9a82b17972cc188a9366a34dade3e2a4593440024454fa77b2fdbbc00d5f43",
+      "references/GECC/graphslim/sparsification/edge_sparsification_base.py": "81be20dc9720b16b392d74ceaea6ffd586e54c9f5be8bc2e0c7a66a4f3de7ccc",
+      "references/GECC/graphslim/sparsification/herding.py": "78cd8e98e8bd9e23127ab7cd334a9611ca05128ed047af7b491c17af781aea3e",
+      "references/GECC/graphslim/sparsification/herding_agg.py": "6fed6e11e43b0406dd65b6f874d776868549445420db851f1db719db0fedcc47",
+      "references/GECC/graphslim/sparsification/kcenter.py": "4585b0e790f914370ffeebec3ea59ab8cd5c4743bd85a04c99356d21729118ea",
+      "references/GECC/graphslim/sparsification/kcenter_agg.py": "aed4eb03e270cc1b9071c700583a53eda411f9f0c6296df7a8ae100224939f8c",
+      "references/GECC/graphslim/sparsification/kcenter_sample.py": "9acf3b9b9b9292c18c4c04e6d219a729deeb9bb3666af36caf3b5e2a2bc4a0cb",
+      "references/GECC/graphslim/sparsification/model_based_coreset_base.py": "9270a34193b679418218b814b8ccae9a5be5403e9ff4eaec20f124b41a6e669d",
+      "references/GECC/graphslim/sparsification/model_free_coreset_base.py": "83b48fc8cd3973b430a8a63debbccfe17a275601e723ebefc602b6a0dd417dcb",
+      "references/GECC/graphslim/sparsification/random.py": "c33f81b7501d29b25ec93b04fb1fccc8cce59d403aa1666840d8dac3edd4e2a0",
+      "references/GECC/graphslim/sparsification/random_edge.py": "6f676523922607bb1aa7e09afd4c4b112a79ed4d4a48334ed0ad1938785739f1",
+      "references/GECC/graphslim/sparsification/rank_degree.py": "cac572915ae0df32684be0a1e78694154dabee26bdcbe923cd72b0fd64b8628d",
+      "references/GECC/graphslim/sparsification/spanning_forest.py": "7426c882c086cff45616639a98e379f13c70749f2691fe12c70f9b53dc4c7098",
+      "references/GECC/graphslim/sparsification/utils.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "references/GECC/graphslim/split.py": "aec07b8519e53aa45a8eee49958545ef67680594fb001101c8660228efd85fa8",
+      "references/GECC/graphslim/test_yelp_temporal.py": "414d31a0ec1f043f14ea4af4f7a5dda50ab767e6d58734ba010cf9eadb6e2bfc",
+      "references/GECC/graphslim/train_all.py": "fdec0f697fe31f4f139d48486de6f82a6b4d9b7170b189f936e692298086d53d",
+      "references/GECC/graphslim/train_flip.py": "195036c5a22dd702876c9dd70ca23a8a351a9905294f74005ea1e7b88dd18db7",
+      "references/GECC/graphslim/train_split.py": "2da74091ba1b64be7ed54470a9859c18c1385ddb0d661015d2c574df09c27485",
+      "references/GECC/graphslim/utils.py": "c02edcf4683c0a6bad3959b9cefb4c599df1a890c0166cb69ceb530710a5ead7",
+      "references/GECC/load_fraud_yelp_dataset.py": "2eaf340415d34e4cafe996f688a9d4dc3cfcc140d567735c0edac35e8f37574a",
+      "references/GECC/requirements.txt": "48fdc679dc9ea446c8b28be7987047b29ce7c1e62046d9bf4d862d5091d52fb5",
+      "references/GECC/run_mia_dp_eval.py": "ed656b94c5960137c2c33dae1ad203c3790050c2fac85dca4a985bb4c3678ff9",
+      "references/GECC/simple_fraud_yelp_homophily.py": "a856d305d293ce821d9af86d04049482070251c9cc0b9b66a3e8737d32977ac5",
+      "references/GECC/test_dp_defense.py": "6893dae238223dc9e7ddffa919fc037ea9e5a2ebe095502a406389fe3062aee2",
+      "references/GECC/test_dp_effectiveness.py": "8403ea21ef16a8fb2f215b0795a9295a7703b8d9115561bf5b39a3180011a01a",
+      "runner.py": "65263eb99b2be190000b28f9dd22611e7999fd115373f2bcd70b30320f36f841",
+      "source/benchmark/__init__.py": "fbffd754b77fad4c6003019e19402d40b244e53c45094b5e11a801a83bc6a21a",
+      "source/benchmark/compare_arxiv.py": "c2b6f4f8869d18cb4e3c10cd6e943f978fb76db979603499dc3dc1ade45bb079",
+      "source/benchmark/compare_implementations.py": "5838776f1e2dd09c13463d2428bac8541a665f784eb1e0e0bf930fb6140cecbf",
+      "source/graphslim/.gitignore": "a7b0e2a34684d358e3963bc763025decbbe2dd81d1953284eb89afa121924af5",
+      "source/graphslim/THIRD_PARTY_NOTICES.md": "2e98ea18ac3d34a28135d2cc0166d28cf268720583fe4c4f4c11aa30de46aebe",
+      "source/graphslim/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source/graphslim/_lazy.py": "c744dc1a221b1d9fc2123517bee16fc02295e08caf56c0ef67d5c4f5b334253d",
+      "source/graphslim/coarsening/__init__.py": "25828def679401f63354dd0c178df43b161dd2ee83249459d9d1a237cb8c1242",
+      "source/graphslim/coarsening/affinity_gs.py": "46205c2883a47e09970e941f770ab5bf08dad21e7eb0759fd3fe9a992cc356c5",
+      "source/graphslim/coarsening/algebraic_jc.py": "1baa145630f7a80fb59d24dce919ef800e9e73801c5ca03e196389bc246b6bc9",
+      "source/graphslim/coarsening/averaging.py": "8382a051c9237628974e6613f589fd5eb8c128f53a7be41e408960639f9534a2",
+      "source/graphslim/coarsening/clustering.py": "41c626fa4c7dc03bf497700db55f8555572ab1b212b15d19ee7cb5609b291294",
+      "source/graphslim/coarsening/clusteringagg.py": "4bda09d6f73994e3597e07a8babe314b76369f47e0ef22a8c39f3afb8aa9a9e6",
+      "source/graphslim/coarsening/coarsening_base.py": "5d02b579bd7c735c15323895affdecefee3b654bebb452bd7b93cd33baaa0250",
+      "source/graphslim/coarsening/heavy_edge.py": "0fffd00496364dcc7145f64c869d8b98c09810de9248ee8079dc169ba8a2bce7",
+      "source/graphslim/coarsening/kron.py": "28a47d4ec737d7c06a5b5cc6ad74f81bb5a2e8163b76b2d7b1d3a341b9e0d853",
+      "source/graphslim/coarsening/labels.py": "c2a1a828d7f95be7a4958840ef9bfbac1227d2eb89b6f8fa5ff705cc87d33f05",
+      "source/graphslim/coarsening/utils.py": "e118b3c2600928811d3e7a2272afdb498fa13905b7db9c150e71650b34d8aff6",
+      "source/graphslim/coarsening/variation_cliques.py": "cc88cd7d834eb928a9865a4d71d378f2137b4777b030d222f2b54f32cd08df92",
+      "source/graphslim/coarsening/variation_edges.py": "c563e2a049ac269e0cdd389f75fda9306275e93b261ff2a93f13540aa3f1b22f",
+      "source/graphslim/coarsening/variation_neighborhoods.py": "8b97375cdbebde125a06107a85d87fed461d3058ce90710586f14699ccc3286e",
+      "source/graphslim/coarsening/vng.py": "2bef963b58a439ea7e0166663752bb719c395b2c9890fdaa23be87afd408f60a",
+      "source/graphslim/compat.py": "84e4d35a7ef0a7331398911d8af5f241abd96f427cbe83736a5488622d213b9a",
+      "source/graphslim/condensation/__init__.py": "d589e2c03df23a98c80b376ee1887c766167c0ce13e34882f3976e296b845b42",
+      "source/graphslim/condensation/cgc.py": "c885afc1f453c909d12ff989fb34c96247786196b856ee9abc78ba4fcbd5ab66",
+      "source/graphslim/condensation/clustgdd.py": "3980185a428394dde360db733c9ba8bb6e24381dffbcf4cd04919d189b242f50",
+      "source/graphslim/condensation/doscond.py": "1ce00cb408fafb42c0c61023cb6cfa0c89d28e37364bdc0fedbef2edd9886aac",
+      "source/graphslim/condensation/doscondx.py": "20d54ac5960197a6874edb4c4c8e9597f43951624aaa2894a1193dc0d09b4fe6",
+      "source/graphslim/condensation/gcdm.py": "1f5109da61dd84763f2ce6f0f84bcb210207f57565e3ec50707883592c0daf75",
+      "source/graphslim/condensation/gcdmx.py": "9b4199bb79e7e5e473aea94be4da899df8ea1a9d31d6782e6b9960216a232b4a",
+      "source/graphslim/condensation/gcgp.py": "fc72e4d29d407a27bbf76a6753f8fd8925e52caf6058ea936efd1d9b8f83d396",
+      "source/graphslim/condensation/gcond.py": "de69368eb28056c4145eb4819cf06bd3e06df7e81b3606ef6774b01d039aa486",
+      "source/graphslim/condensation/gcond_base.py": "30f1d7f7cb72ef2b3f33eaba49d35e05ea56f6a955b6b18b2f1b18edd25d57bc",
+      "source/graphslim/condensation/gcsntk.py": "50304c96a48c6489eb9287e1e6f93f0faee743e805cded81ec99d2d694ae7b19",
+      "source/graphslim/condensation/gdem.py": "5c2cfe7e2a315a447595a2eebd415b12dcf79ffa0fa59413c7ff2418d00999d5",
+      "source/graphslim/condensation/gecc.py": "0e9ba7dade0c202809eca0061afa9d8b4a7e4461d79c1af95fa369286757984b",
+      "source/graphslim/condensation/geom.py": "4bec1f1a10ccabbfb1df5565c6b1b81c293e87a5ad7b90cfb96e995c878534f8",
+      "source/graphslim/condensation/mirage.py": "42bb2b2630fa4cb8fb2b47a6b06cd687169595bed0a3e94a861fc797ade6a469",
+      "source/graphslim/condensation/msgc.py": "fda3a9f642a8a403eee62d999e30d74fdaf6d7fa8b40208e47e11151ae6c1749",
+      "source/graphslim/condensation/sfgc.py": "72cd18ab78b9ad1c0e62b4f2dad861293b049f624596a6f80cc1d664ebadc438",
+      "source/graphslim/condensation/sgdd.py": "8546044f4732c45733aca04d0f821dce379247e26af16628c80839fe90d1d88b",
+      "source/graphslim/condensation/simgc.py": "95c414d3dad86c469ff042f552a536a1a5f63467b006f8ff0e2c6b27acbac16b",
+      "source/graphslim/condensation/utils.py": "4a42d7aeacc3393f388da860f6131cf020d13eb7d4fb4f5ef9fe36a485848ff8",
+      "source/graphslim/config.py": "c6aae74e7a006bf99c1f9e763e35a47308c1afb7cfb5f559b295bcab12d1125a",
+      "source/graphslim/configs/cgc/citeseer.json": "8d67e0da11fddbf586bf6ceeaf45f011ce963cfce8daa89ba2ffa38ea55a2004",
+      "source/graphslim/configs/cgc/cora.json": "cb36e8a3ae8840018435b50b1b37675fa1494e79c4197e0248a70ff215419d24",
+      "source/graphslim/configs/cgc/default.json": "1731ea3f68509e005f4bfa2c1efd30f948201cec418cc7b38f3af62f602d9d24",
+      "source/graphslim/configs/cgc/flickr.json": "f301d354dd670841d741c34694b596768ff16ec1c400fbd427824527ae9a76a6",
+      "source/graphslim/configs/cgc/ogbn-arxiv.json": "ee39323180e200815389b6254597eed4f0f8dfe03e53a885d099fe0faaaf2d89",
+      "source/graphslim/configs/cgc/reddit.json": "78574e1e2e63ad700b5276e2f1da3fe9b2ea6d8fc27b408c22b0c2d1922c4b86",
+      "source/graphslim/configs/clustgdd/citeseer.json": "94595b347328ee026250c885894deed0b3f0e1dfdc2f0ad311194eac08f8b1bc",
+      "source/graphslim/configs/clustgdd/cora.json": "fd941a766a9ef0656bf408ad42b28f468f7f241b8a15ace7058de1a1b2b4db0a",
+      "source/graphslim/configs/clustgdd/default.json": "94727686549460309b088fda3c534d1b7a6237afeb4da892fc5d970e3ea9ed63",
+      "source/graphslim/configs/clustgdd/flickr.json": "1929ac600f4f9196482dc402123faf63dd8b8436bbc98e94c3f9ec294b0af39e",
+      "source/graphslim/configs/clustgdd/ogbn-arxiv.json": "a68c43dbab264f79e25b0f79b699fff0261905f4999b7501529c1127ee693412",
+      "source/graphslim/configs/clustgdd/reddit.json": "a726a6771fac5eb6d068f37a5c98640cc6ecd0a3c382101cc60c138644fb35ef",
+      "source/graphslim/configs/doscond/amazon.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscond/citeseer.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "source/graphslim/configs/doscond/cora.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscond/flickr.json": "44175bbbdd00587dadceec7bafdb22ebf1dfcd916a79af7b4d5a4f228e02e1f7",
+      "source/graphslim/configs/doscond/ogbn-arxiv.json": "c6c4f297d3d5c03bf5ba8844c75cfcca2d7d48e41a20c84de3f88240af84267a",
+      "source/graphslim/configs/doscond/pubmed.json": "77c63a737f219abcdc0400d349bbdd74c7fabe5e9199dd6274c886fe2e053c21",
+      "source/graphslim/configs/doscond/reddit.json": "b9dba5930006d82078c62f426b32f15da9d7e1c505016632bafd9dc4c022d32e",
+      "source/graphslim/configs/doscond/yelp.json": "7aa8cf3bbc22d80bd4f9a42263c10603619fa44e5705c8c1db308860e83e09bf",
+      "source/graphslim/configs/doscondx/amazon.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/doscondx/citeseer.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "source/graphslim/configs/doscondx/cora.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/doscondx/flickr.json": "bfc902ac3226a1b336cf5d658fbee55e63f9f51866df6701a8514a963cfbb8f0",
+      "source/graphslim/configs/doscondx/ogbn-arxiv.json": "516eaacd0c6fcdddf308bfa0046588e81b6c1649b6d93b372e0a27c17d918b4d",
+      "source/graphslim/configs/doscondx/pubmed.json": "422bfe85284be97b58a6fa1890b1aee36123e2c6585849f5c672af6d8c6fd993",
+      "source/graphslim/configs/doscondx/reddit.json": "5c1be4b2fff996386fe87a85fdd7a6b6592e973a78cffb099056a1890b94a821",
+      "source/graphslim/configs/doscondx/yelp.json": "39c3513e49c42c4c0658f57ba60c4f1c303f00a727035448a55c3c1df0c4700f",
+      "source/graphslim/configs/gcdm/amazon.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdm/citeseer.json": "d91c40c4e982f388d6acdc36dd28962084fc052bdcfd60a288f0987020a26688",
+      "source/graphslim/configs/gcdm/cora.json": "6b0dbabd5b77a186c820f2de190926b3d35874922d0aaecb0c40a8ba2c576b3f",
+      "source/graphslim/configs/gcdm/flickr.json": "40ded01a18b203e4f4d512aa58979cf0ad3a71060df02ceb12a27f3c4cc84349",
+      "source/graphslim/configs/gcdm/ogbn-arxiv.json": "38d6d29ba35f059f1a701011a0fc3827382ef3f115e3b93a33f3235319200113",
+      "source/graphslim/configs/gcdm/pubmed.json": "98a5a10e4e15d0b1b253b5b4fbd0dde8c34ebb8cc39327d96f27cdf7522aaba1",
+      "source/graphslim/configs/gcdm/reddit.json": "7fdf9ad38d640297bc04bc7674a376b60dff467e38a52001e22c79518d944378",
+      "source/graphslim/configs/gcdm/yelp.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdmx/amazon.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcdmx/citeseer.json": "d91c40c4e982f388d6acdc36dd28962084fc052bdcfd60a288f0987020a26688",
+      "source/graphslim/configs/gcdmx/cora.json": "6b0dbabd5b77a186c820f2de190926b3d35874922d0aaecb0c40a8ba2c576b3f",
+      "source/graphslim/configs/gcdmx/flickr.json": "40ded01a18b203e4f4d512aa58979cf0ad3a71060df02ceb12a27f3c4cc84349",
+      "source/graphslim/configs/gcdmx/ogbn-arxiv.json": "38d6d29ba35f059f1a701011a0fc3827382ef3f115e3b93a33f3235319200113",
+      "source/graphslim/configs/gcdmx/pubmed.json": "98a5a10e4e15d0b1b253b5b4fbd0dde8c34ebb8cc39327d96f27cdf7522aaba1",
+      "source/graphslim/configs/gcdmx/reddit.json": "7fdf9ad38d640297bc04bc7674a376b60dff467e38a52001e22c79518d944378",
+      "source/graphslim/configs/gcdmx/yelp.json": "2c62d888b07b9020f4161b80ba6b222990cbf17e0cfbbc520b0cf8f67a559f37",
+      "source/graphslim/configs/gcgp/citeseer.json": "ef1908e300dab1ebbaded2b19818101f9fe70d585a7a92e07ceeaab9203c58d2",
+      "source/graphslim/configs/gcgp/cora.json": "b41dc9b99f877b930c82221c34ca0c5db91d85e68cf2ea54542cf8d11e3b8909",
+      "source/graphslim/configs/gcgp/default.json": "c90e19f6c2ad89699c4d24c67cb1eab5d6b4ff679d5035f2f0615940d27d05cb",
+      "source/graphslim/configs/gcgp/ogbn-arxiv.json": "80cbbbaaa5349f8c7db1fc0207b500346e2daf1702bbf6c0a0fba3a31ecfed9b",
+      "source/graphslim/configs/gcgp/pubmed.json": "e0356900b2764aa1f617b3d2a4e7fdbf99a440ef91eda71d13d571ff3ee316ca",
+      "source/graphslim/configs/gcgp/reddit.json": "df407ab8d5a3e2269ef0c5a0a25fb35a0d74259da613e325449e41033e462072",
+      "source/graphslim/configs/gcond/amazon.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/citeseer.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/flickr.json": "065280d6246101c83026a2be15a71c54e173b1e44b3b960e198be3e0bdf1fcdc",
+      "source/graphslim/configs/gcond/ogbn-arxiv.json": "15b7f6848ec5a1e7412c87fd10cef78d4641926af183e7146b42698e9a613681",
+      "source/graphslim/configs/gcond/pubmed.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcond/reddit.json": "69ec5eb71263dba4e5d95184e8d6d4a109d9219770fa35d8a1a95f8732507f39",
+      "source/graphslim/configs/gcond/yelp.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+      "source/graphslim/configs/gcsntk/amazon.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/citeseer.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/cora.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/default.json": "cf3fc87bfe47daac43679efbf6a1b2d6ab03bc40a5dfbbcea827ebbfecd29cdc",
+      "source/graphslim/configs/gcsntk/flickr.json": "b1a823dcee6eeb0331425ee6c0d2e91deab502c60362c3130d9cb6e2adb2312a",
+      "source/graphslim/configs/gcsntk/ogbn-arxiv.json": "59c416f2dc0eed25a61a05cbe88362a97c17396318a6a501717a174d5714f282",
+      "source/graphslim/configs/gcsntk/pubmed.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gcsntk/reddit.json": "912cda1dc5b413644bdc5d56bf8884702a2f317c581c92ac385a5a01011153dc",
+      "source/graphslim/configs/gcsntk/yelp.json": "7e784062ce68c63df1e7ef1a985e697466e2cf1a9ca6ecb13a2d98a120913e05",
+      "source/graphslim/configs/gdem/amazon.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem/citeseer.json": "f945e92b5ae4649b3665f0c6160e87f5fb117cc9925b256623b9ced565ea5005",
+      "source/graphslim/configs/gdem/cora.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem/flickr.json": "7f574d75f7b85534e02f27ef3f62fde1e2c4d4a05a03cf6959a76cbebba3a950",
+      "source/graphslim/configs/gdem/ogbn-arxiv.json": "06301e27340c26ca1f096636e9a86d4a517dde1026e6cca39cc360599a74dfd4",
+      "source/graphslim/configs/gdem/pubmed.json": "943e42e77c8fa69f725a9341b6ea2e1f49380558462e7fc6e58b8450aa552685",
+      "source/graphslim/configs/gdem/reddit.json": "22f50218d6bee1b98547c769b28bdeba6d849f62e5f526079b43cb4b765f3068",
+      "source/graphslim/configs/gdem/yelp.json": "30ed7ecca3556914146e0dbf8146dda208186cbb3fae465ebe2a1e3bfea9b329",
+      "source/graphslim/configs/gdem_author_init/README.md": "a6290bfcf741d53472fdd280937750085f1e5e554d1c7a1c321f59edafa05228",
+      "source/graphslim/configs/gdem_author_init/flickr.json": "a368d62de2e1fa42f50e2886c02b3faf0a27291bbb526efe241841e2a60df6c4",
+      "source/graphslim/configs/gdem_author_init/ogbn-arxiv.json": "87cf77370ae239eadb39fad47fc2eef08f971ce37b6986636ed01802579fb95a",
+      "source/graphslim/configs/gdem_author_init/reddit.json": "fd2d314764ff34d1f4be1f106912b74da394698025e63ff3541d8331d344b926",
+      "source/graphslim/configs/gdem_author_init/yelp.json": "fb9eeb5c00190f926b05b1b23abfd2b849a92aed47f5a50f084a54272f05ad29",
+      "source/graphslim/configs/gecc/citeseer.json": "076e72f47caf425ce6155b50993f20791c985a300b15a4c8c8c930f627006ae8",
+      "source/graphslim/configs/gecc/cora.json": "cb17054baf6b9b1ed9f66cc47773fd1d8c6ca1f1a6587185403b48111740309f",
+      "source/graphslim/configs/gecc/flickr.json": "e7e5c13534831702addb25aadec42795919bc0fcfc8c5bc895f5cadf30cd5744",
+      "source/graphslim/configs/gecc/ogbn-arxiv.json": "36abb1fb77da77556f78fb627e931ae929306dbf2e3cc637300de9ccd3ca5376",
+      "source/graphslim/configs/gecc/ogbn-products.json": "9055a1ac12a73d383b22b1f1421150e33c9c332d94b6987f1a09e641f7aca736",
+      "source/graphslim/configs/gecc/pubmed.json": "dcbefd0043621be4aac443dbe98b2edd5558a5700e7b2c69d45109da8adedd43",
+      "source/graphslim/configs/gecc/reddit.json": "3ccbfb624f94776f313d83da09c30a5a059c03f32e813b3be31279bc49edc2e9",
+      "source/graphslim/configs/geom/amazon.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/geom/citeseer.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "source/graphslim/configs/geom/cora.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/geom/flickr.json": "01ad1ee21aebfa7ec612446571eafb4f6baa2e31883268839968b855883c562c",
+      "source/graphslim/configs/geom/ogbn-arxiv.json": "cef2b658eefc5ac0e040cb1cc608100dfabf619f5989d05c079c3467560da2bc",
+      "source/graphslim/configs/geom/pubmed.json": "8e191cfd69d4e24f4fbfc82d5e88440200d7fdd1b2b880f5a2a2466625789936",
+      "source/graphslim/configs/geom/reddit.json": "d47ed3a02afc2b433dc3ec8d5ef826a5afd7ec73ed4b3f948f98176b3f74a647",
+      "source/graphslim/configs/geom/yelp.json": "d2cf0d9001e71dc9598e1805ecaa1bdbdf795b0d014ac360609584bf9c2ab885",
+      "source/graphslim/configs/hpo/README.md": "fcb40aeafbb603c03657778f4d0722e84cf76887642de1cf996a9affd1c41ead",
+      "source/graphslim/configs/hpo/gdem.json": "46988cff7736f61fe2d3301ec74e223a1715f13a0890abb247e4254b5435e3bd",
+      "source/graphslim/configs/msgc/amazon.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/msgc/citeseer.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "source/graphslim/configs/msgc/cora.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/msgc/flickr.json": "15261f59c9616fea1caf4507e42683ce154d7d5746f41e769ed1c4769e1442bc",
+      "source/graphslim/configs/msgc/ogbn-arxiv.json": "3bd5b050a9da42bebfa0cac9e38775589cf15dcf3ce5a767f9462f5dc50bc2bc",
+      "source/graphslim/configs/msgc/pubmed.json": "e6848e760c1ac9767838c37271703cbc69066462737a9d2d265b8e2fcdec208a",
+      "source/graphslim/configs/msgc/reddit.json": "fcaa227fc15f03e42d0c73ef05e50b19da82df067bf46376652c96e1ac9d72ad",
+      "source/graphslim/configs/msgc/yelp.json": "ca72c8c67535c21039e082a45cd9faaa94605465b43dca5e02eb4b303dbfc6d1",
+      "source/graphslim/configs/sfgc/amazon.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sfgc/citeseer.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "source/graphslim/configs/sfgc/cora.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sfgc/flickr.json": "5c72b5b3af9d326f226be805187652b727f7fd8a7b14628fe1f0135d7fbc5827",
+      "source/graphslim/configs/sfgc/ogbn-arxiv.json": "e4e1bad9718ab037be9ed2d68f1aff06af634efc94a9fa34044d14b3d81ddc62",
+      "source/graphslim/configs/sfgc/pubmed.json": "34e592540b92063cf848ef54c6e3f18dde662d5c45f724ec90e1a7e5d2a7ceda",
+      "source/graphslim/configs/sfgc/reddit.json": "f4f4789cabf9042b1d2e1806a51782d13f1409abf0eb65c254bd259a161724c7",
+      "source/graphslim/configs/sfgc/yelp.json": "b4cf60438c46f48b1747ae15cf85896b4a8c6848e6f9284f4871613e150c3cee",
+      "source/graphslim/configs/sgdd/amazon.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/sgdd/citeseer.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "source/graphslim/configs/sgdd/cora.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/sgdd/flickr.json": "543c15bef1ff5a425b48334a600117221753a90e85a9c5a8f9856d60ef20ceb5",
+      "source/graphslim/configs/sgdd/ogbn-arxiv.json": "d897422fa19c87032a9d63f69a9885662d3701e79828141908475171fa821f9f",
+      "source/graphslim/configs/sgdd/pubmed.json": "50df161172e2d0db36276e3b275e05870bbc6e71f2e8aef5b9dad57a88ec4a5e",
+      "source/graphslim/configs/sgdd/reddit.json": "21a55b0b675821179617da5ada4ac853bf3da3195041b9f92fd6e808cfc4eae1",
+      "source/graphslim/configs/sgdd/yelp.json": "729535b3b64c2eea993b7009a4957eaeece45d00d5c8300e27bd1a17d9f60474",
+      "source/graphslim/configs/simgc/amazon.json": "c72c174f3a836b130e19718b009ab70da5856a11f1e16d7fa3fa8cbbe0686b86",
+      "source/graphslim/configs/simgc/citeseer.json": "1488b18a947e948d51938213bb2e9b7ddc434db0048130fb6a9f171222da4f42",
+      "source/graphslim/configs/simgc/cora.json": "cd4f4674f0093e3dab46c75e1c046d1c0904d468daae5e4243738199df65ed81",
+      "source/graphslim/configs/simgc/flickr.json": "499bfa1d2d9213f432fad7679ae70905271ec243d6b7f632a844072defa78755",
+      "source/graphslim/configs/simgc/ogbn-arxiv.json": "3b565fbb409cb0f607eaadf9ec64f6e0db301e23fd0212d69b18d4390a950046",
+      "source/graphslim/configs/simgc/pubmed.json": "3b565fbb409cb0f607eaadf9ec64f6e0db301e23fd0212d69b18d4390a950046",
+      "source/graphslim/configs/simgc/reddit.json": "ae708e86ac85c4da73c1cef0b1c9c803226790a0ef7aa7cd0826e25ef8a7f02f",
+      "source/graphslim/configs/simgc/yelp.json": "ae708e86ac85c4da73c1cef0b1c9c803226790a0ef7aa7cd0826e25ef8a7f02f",
+      "source/graphslim/dataset/__init__.py": "4b44442e75c6996a8a0e24d89e6f9c0d784142b451e12447d8eb9deb30f32a09",
+      "source/graphslim/dataset/attack.py": "92ad86dfd945dc3c83282bbb1c0311c313f13b7db7dd277910de60c5faed83d8",
+      "source/graphslim/dataset/convertor.py": "b6d0460db0060c3d7dec5b57daef04db857534fe1a44c4f5e2dc3ccc08aa3d4e",
+      "source/graphslim/dataset/loader.py": "8d773a3f909d5c1949b6275db9e7816b1d389233176e65405976557ea9c3cecc",
+      "source/graphslim/dataset/noise.py": "6632bceb1100bebfef9a6aee2251ee76329160ae772ab1bd588aadbe711a8139",
+      "source/graphslim/dataset/utils.py": "5ae428ee86e56ce131d2b9333cdf74c16fe83b39e20b9ad3593982eeb8906a22",
+      "source/graphslim/doctor.py": "73f51c3fbb1050cf66324c9baf616d0a38531702c56c7f50587fee988b21e9da",
+      "source/graphslim/evaluation/__init__.py": "861560effead077ed080b6d70b1176dc3dee77de28a80ea21fcf36c2fdc0798c",
+      "source/graphslim/evaluation/eval_agent.py": "36df50df0c500a77d971b3e794b1b98bae43bf00152d41428626742042613fab",
+      "source/graphslim/evaluation/graph_cache.py": "2f3c84b60fb913f1a7ce43108f6722af413557fb2a37a50fa4604e3ca4a022d9",
+      "source/graphslim/evaluation/graph_property.py": "81300dc9a177b438a3c126a5d82674103e6acb6bc05aecd6f8fb14b671938700",
+      "source/graphslim/evaluation/nas_eval.py": "34bd88f315c6d016e5558a9bd03a631b617ced7a564a7ca0dcbc1a5c03bb27a3",
+      "source/graphslim/evaluation/scripts/run_cross.sh": "887ec9ad5d8b180ca3b377347abc6e9aebe92707c9482cf728acc130b0dc5305",
+      "source/graphslim/evaluation/scripts/run_main.sh": "66c3f856ed74e1fc637c46f34fd0c1c8f158c641f65072d6173f6d039c1d4f8f",
+      "source/graphslim/evaluation/scripts/script_cross.sh": "e278a138c233ef3f1991a025305eff74c279687cc593288806dd38e7023c6c66",
+      "source/graphslim/evaluation/utils.py": "88f76e2cdcbf7b6666ffb384d49f60331309b25726b2ebcb53fd2feddba4ab9d",
+      "source/graphslim/hpo.py": "944419303583188c7a283435b7bbd55cda15c164833a9daa668ab7c18724ff44",
+      "source/graphslim/layers/__init__.py": "9aaa3084e62f2dda5b7316d83f88d4606b36d4018f0a53d056ea51960a9a7809",
+      "source/graphslim/models/__init__.py": "3f5b8ecd5048806e1af733cd5e784ee084b99277f85926f3bac8e08e1f8614ee",
+      "source/graphslim/models/appnp.py": "82df8fe747e43173f63086f62acb2c76f27b6e642cf79a9fd4bab95e2c07c65e",
+      "source/graphslim/models/base.py": "1ec387b03833903b163c1500f1a38eda906c4f9aa9f3de7d97855b2ed2f3cff1",
+      "source/graphslim/models/cheby.py": "8a6727ca93e2f5bae6772cf03e62c1bfa9f32f49b7169bd0c8eb3cd600ba94aa",
+      "source/graphslim/models/gat.py": "7bc0891cbc706fd9ba4fbf9d1a62daa86afaf4ef779b63ace1d189e00a7e4262",
+      "source/graphslim/models/gcn.py": "f721ab1a6b7d20758c44cd05a47a16e92c84692ca519956aad5afffe9e4d26e4",
+      "source/graphslim/models/gin.py": "c0506a532696ea971126a9b0f43c44aedc4ebe72dbaabc3fcec4f6c24fae1bb7",
+      "source/graphslim/models/gntk.py": "52688a1ff7a2b041ba4ab8a964cd4b7fbbeb2affb3090b23b649c6381d91bae3",
+      "source/graphslim/models/graphsage.py": "4b0ba510fb0bd630ce00b1744ae4ea046ab215981e53f06b9a5d41367f0fe29a",
+      "source/graphslim/models/ignr.py": "f1cb5e76588f6786715e3289280b9fc2825d49de06c90f795654216314a741f6",
+      "source/graphslim/models/krr.py": "013ec9938886d6ab405af1dab484f2400d412d4daa2d97e2f5fd2ee78c212408",
+      "source/graphslim/models/layers.py": "387bc1bec202a889558c2cc04d93dd01fbe0f7de2e184d74bc5995d0b1f16f9b",
+      "source/graphslim/models/parametrized_adj.py": "5e39cedb1c01a1cc2434a88365ebc9997a6de1515520f4073de2954195ba28ee",
+      "source/graphslim/models/prbcd.py": "cbabff22f851e59c2b86fa0b4bdd4c5c114834f993f4444fd08099e0e9329bd2",
+      "source/graphslim/models/random_attack.py": "54736708412e1114b9515ee05736432cbbf062eb38a1cbba46e0709e43778918",
+      "source/graphslim/models/reparam_module.py": "fbb99e14bd8d3ea9de257883cb408962cc108b4f32fd3374119eec78842b70cb",
+      "source/graphslim/models/sgc.py": "4262f4b2cdc59f2ed4882fe88df254ea414cce05b6c13a81d15607f30c50ddf2",
+      "source/graphslim/models/sgformer.py": "83aa36953a68af9f6098a41323e0f57b51c42d29a1bcfc3c06d3a63f68e5abd9",
+      "source/graphslim/models/sntk.py": "2867099007a7c837d0087f617dbfe920f3166eafb94362d15bcfdad5996403ed",
+      "source/graphslim/reduction/__init__.py": "bb2651c0e199bac6a9a61876b053acb11419a9c077eaf41fe5648ba0a8ad662c",
+      "source/graphslim/reduction/cluster_ops.py": "552d4eafc3130c7e758ba40fec3b4c855d9df65b18fd6f65973ebc5584972bdf",
+      "source/graphslim/reduction/lightweight.py": "476e84eb0fee356346119cc96316129f19cd80b1b02de4e237942174587f6bf3",
+      "source/graphslim/reduction/registry.py": "a4efd4603a5fe996ec5f21f33d9e6b10a2a9075fd3cab1be283757e2afd6dafd",
+      "source/graphslim/requirements.txt": "13db6c4c3b32d06c9e85b662e16650b6093036900a1dd40b3d81d49418f0b2ac",
+      "source/graphslim/requirements_torch1+.txt": "27bae61a0eb90e1acd49666228fc9f8ba5def1815b861fba4b55b6549d37c5b1",
+      "source/graphslim/run_eval.py": "08a2f378fcea8ca7e74b456bf46975de8c02486f3ce161b1b4cee7162c3b8f1a",
+      "source/graphslim/scripts/all.sh": "92aa93a73f67108fdf5ed65e723af5ae425622de3d5911405bba50d1d64bcd8d",
+      "source/graphslim/scripts/common.sh": "6e23369eb35b82110ce2421f67b28332fa48171950821edfdb917b43462eb724",
+      "source/graphslim/scripts/main.sh": "6496bcd06de4d0fe2e0f403e2bb7c1aa82008acadf1303a809595f114d5f046a",
+      "source/graphslim/scripts/nas.sh": "ea396b0bf0b8ef8c2dffda1a30df36538b7edf3a713eaf0b0efa8edaed6e0d2f",
+      "source/graphslim/scripts/requirement.txt": "d13eb2609aa83314921df5210e6620c9495e34eba15f840470c60ddc4cbf3bf3",
+      "source/graphslim/scripts/run_cross.sh": "9ca9ab7b7fae4c1372f1c8e77d78edcdea213134d746cfd3d0170fcbb0d7a203",
+      "source/graphslim/scripts/run_main.sh": "91546e606b66a804eeae9585683ec506def971aa9cf0e136338c200a3cf867aa",
+      "source/graphslim/scripts/script_cross.sh": "f09e3bfdf993258436d76916a9f4a66e79f28db0746bac0e093a6014678fe5e2",
+      "source/graphslim/scripts/script_robust.sh": "7cca879e4f68528dd0300bc8db1365789bba52f7bd3b263dfdc95e0226be9ca6",
+      "source/graphslim/scripts/sogb.sh": "e5eccb19a4334dee44fe5788d7ad65c3002b07f164a9ca3b6717ec3be7837832",
+      "source/graphslim/scripts/sub_all.sh": "8221fba832b6dc26e544a05b11421f5ec51eff840837436082152768eb1d8825",
+      "source/graphslim/scripts/sub_eval.sh": "71f5b63c19818660d01b445ef4739e77c78515541c5d762ac575f89f649b5ecd",
+      "source/graphslim/scripts/sub_flickr.sh": "4b76abb68e139e61d0eb61c8db9b9d7c0b74c09aaa54fe05860ba7ebc8e39622",
+      "source/graphslim/scripts/sub_grid.sh": "ede42d15211faea0e5377921eb4eb184f15f0dc1b55fc0c71c5d690974af7ff3",
+      "source/graphslim/scripts/sub_pub.sh": "c734fbb03a0f47856cd07af903ca20bf7e063bbd2e7177cbc93580fc580bfce7",
+      "source/graphslim/scripts/sub_reddit.sh": "73a41e10ca00b42cd4d07a31865a3ff4d259f86d6fbb4c40385fef27160ae167",
+      "source/graphslim/scripts/submit_IPC.sh": "f7db9b8472aa4d5315d8a640d4f4b261060cbfe2b9db8bac62984e14a7fcbd72",
+      "source/graphslim/scripts/submit_main.sh": "8cb8226fd3572a154953bc65465ed811999195d10311f0fc689d0e8d94b8b09b",
+      "source/graphslim/scripts/submit_nas.sh": "5351d2739d60d0b5b479c294674efff8ee967f23f5251da4343f357ed0160abf",
+      "source/graphslim/scripts/submit_robust.sh": "6af36e4129ba9b783becb4603987f6d84dbc6e981f8e2dc6103f8f9f1c2cc9be",
+      "source/graphslim/scripts/submit_transferbility.sh": "cae48e6230195954e00ac27800dd5a67cab547e832febbfc60f2fd036eae733b",
+      "source/graphslim/scripts/transferbility.sh": "df78b7f18a99ef29fc25af195c03773c53c6846bb83840230d409e36030da93a",
+      "source/graphslim/sparsification/__init__.py": "81a22f6d24b1df2ce61641547107ed949f75a079867fb401549fe2ab969e57f0",
+      "source/graphslim/sparsification/cent_degree.py": "810a80ae275a3895df0d15f85d7f2fed6d93ffa6c3669247fa25fbd75862d1d2",
+      "source/graphslim/sparsification/cent_pagerank.py": "64d950248a7f4ee373c7c31a37887080a473748ef0862ce073effee1c480bc71",
+      "source/graphslim/sparsification/coreset_base.py": "4f368057acf2f44c986246d8f095dcd9b01910e1a9ef20c30d52ddede48fb8ac",
+      "source/graphslim/sparsification/edge_sparsification_base.py": "19db8bd05b2e53f413d2cae897cdf621248afbcece86ba490cd6f1eae7e92762",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy": "a82c648ac9a41256a0a9683f154a32cada8dee6a502af4f7545f80e216400116",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy": "415819ef8df951fcbd6430a54ecd91545a84ebe9b81c9e0ffefdc48945c70896",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy": "c973145ec28a1193ebc88593680a5d7df15560fe9b85f6ac383b076c4753cb03",
+      "source/graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy": "85dc935fbc8c30015e45921a0e3bba5009de01d53342a49813068a14bdf6c101",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy": "43b834311096a69673aa061ee256575bab2401d1e317ba34cbd16c1c6c0785aa",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy": "e558f33c716d9371cac913a9a724ad4422ef7416647ee3ad798a93bdbcc84cf8",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy": "106b799a50d7d7781dd5b973b3fde7d62aa8fdf654455a53fb470a0c731cbc41",
+      "source/graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy": "0f1a2b6484dc00c499269e498a98a7c5be24db1c2db55ea018c5adb3f259aa7b",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy": "48de5e2ba2e5b3c8f9485d86e9cd7d50cb0c1c71866d5b100de181f1e22609e8",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy": "dc3b4ca322fc7ad12c6637727e88ae1892f61ea7f60c05a5e5faf778e235ef3e",
+      "source/graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy": "acf5455f7b7dc5092baef027eb0463658c555df9c5e71b1651b7535644d20203",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy": "4b30d7a67fdf99d0bf251a434b9d1132da82c5e3550a3fec0882dd7b0da6af71",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy": "a6ed87c1663b879a0fff4b87efa94dafe9717ad797a44487a167b78ab561982a",
+      "source/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy": "ccd09195f7a7d2292bb93cc0a292bd2a1a79da7a87c299a6fbc46715a56a2066",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy": "baee69778120f3689203692f0d4882c5dc8a970035e0910d0d4018b88c5ce314",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy": "2ee458251759dd38fb69e3931de785d5a0c0d6d4464aa2791ad756e855e34daa",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy": "2ea40dd9a09d29a80f88b525ee43aca908f482177ca726f1cba19524c9ff07aa",
+      "source/graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy": "8c2cfd76960e633d8b1673fe885ecae39e8824f480d824a1c54f3753c1f7c97f",
+      "source/graphslim/sparsification/g_spar.py": "2351eb5639953cf5f794318c8776036956b2c472af57fe23c5915ac005297c28",
+      "source/graphslim/sparsification/herding.py": "b74910b90b960ab526d00b6cd95c120593fe807e03943fb28fd3cca90836bc2f",
+      "source/graphslim/sparsification/herding_agg.py": "37d15c7a1d5dd718a78a2eac4f95f8cdbc9e5461e6fc53a6d01e43b6f270310e",
+      "source/graphslim/sparsification/kcenter.py": "7d9d8b3359dd7325d480e0d2bcebdb2b85ccba072063c4717556fdd8b151e321",
+      "source/graphslim/sparsification/kcenter_agg.py": "42b9e2dc85800220fdbf5cff2425fce105ffc1341297cafe43bf66ddc1b18830",
+      "source/graphslim/sparsification/kcenter_sample.py": "7b3e8605325443fbf6daad66bfa862703c2f55e5e24cb7836106c5a4997d2fcd",
+      "source/graphslim/sparsification/local_degree.py": "398225ab57f3a71fb3e39a279b3500da8c3ee9710acdb2b72128cdf49acf27f0",
+      "source/graphslim/sparsification/model_based_coreset_base.py": "1acd253f97984358ed831b9c38723d07045c17b54b44c647a8558553020ec509",
+      "source/graphslim/sparsification/model_free_coreset_base.py": "1aba7b6723e85d6722e5508b072d073d3fa0c4f9cac4d8dd330d751c3b6df001",
+      "source/graphslim/sparsification/networkit_sparsifiers.py": "9fcb82da1bf293599a2d213d77457bea1a81ef993e01f6b74564df657c6b46c8",
+      "source/graphslim/sparsification/random.py": "fd1bda702f80f065a2522adaa852c0aa3c8a8dd2a3952c33194028f5e4a8e47d",
+      "source/graphslim/sparsification/random_edge.py": "a572e657b228789ea96d8ac1dd6eed8415fa92a168872f6a262b2da4465f90a9",
+      "source/graphslim/sparsification/rank_degree.py": "dac94fe94c6331f7bfec6020d0443cb1a6e5b4c3e7e934ee6aad0b060415c6d8",
+      "source/graphslim/sparsification/scan.py": "8e75a58b90bc95f537e7012e1e37ec9690f26f90a0b7389058ab6563b6de1176",
+      "source/graphslim/sparsification/spanning_forest.py": "804ef7292ad10d18e0d176316f5d6f2ac266d64d6b366a0e2df87e5e019ee621",
+      "source/graphslim/sparsification/t_spanner.py": "2eb8499a90b5885f3fc724a8b3d5ae57a941fac61a12b9174c453eb477605f9d",
+      "source/graphslim/sparsification/utils.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source/graphslim/tracking.py": "e3639e792674fa1eea286e279f185d52152e0a8641d13e5f9d92ef760ee8db36",
+      "source/graphslim/train_all.py": "73e84ae97bc2369cf4530217d74be5ddda96899269e67e866fe58b5df40e865f",
+      "source/graphslim/utils.py": "4d513551730d2e64097c74216344b5e43b22122856ec4fe401a6ce52f42d4d2a",
+      "source/graphslim/visualization.py": "697f184d4f55790ea8d7ac5e83853e2623f01daa0e5eb95ae36738526503529f",
+      "source/pyproject.toml": "a150bc0321fb4e759b262e05f9570f9e6b10b7e0ba161d76ffa3b58c283eb5a3"
+    },
+    "input_sha256": {
+      "x": "e7d60fda1095c512a5206e6415f49ebc4e21761c68c9dfb6ef129477069a5e61",
+      "y": "32135eb09ea9429084c5f84b79ebf8fc4c044ac74e630e941210450c3cfe25b6",
+      "edge_index": "5f187d4da87b0a3a208345342fc92142280907a4a83c5a831d84e97305cd3b04",
+      "edge_weight": "76e876d68260e0ba7bc5f297d57686e9a6586f42c7828bb7472aa6b65ab7508a",
+      "idx_train": "f537262ebef28fadc8b27b320e0707fcb3fb5eaeabb365ac8d41850ee14ae683",
+      "idx_val": "885303bdd89d5e3270982a9750439a1df049c968262c1b2d65f03557bb950b69",
+      "idx_test": "fd7d97cf32b0587be3d055323f67f0fd16370baa434fa2cec5a87733142487fb"
+    },
+    "data": {
+      "nodes": 169343,
+      "edges": 2315598,
+      "features": 128,
+      "classes": 40,
+      "train": 90941,
+      "val": 29799,
+      "test": 48603,
+      "raw_sha256": {
+        "feats.npy": "e2e4dda733eff8130a8e3ff0167ce091ee145eb6f0e6eedb8e04fef36100e40b",
+        "adj_full.npz": "920dae5bad3f63b07f5b8883493b298f026778d7358c14b955985bacbbd13771",
+        "role.json": "ef30aec176315e5dd6b5f4bdc2a40741542723c55348b9141a70aeed2c00babb",
+        "class_map.json": "7db3b1c89beeaa51c10d43b5888b60fb8b23a73ced4ca6df0a413240a3820b77"
+      }
+    },
+    "gpu": {
+      "index": 2,
+      "uuid": "GPU-63b110a5-9b61-48c4-cc62-ec3b3010f952"
+    },
+    "protocol": {
+      "threads": 4,
+      "device": "cuda:0",
+      "rates_denominator": "labeled training nodes",
+      "preprocessing": "full undirected ogbn-arxiv; StandardScaler fitted on official training nodes, shared saved tensors",
+      "precision": "float32; TF32 disabled",
+      "adapters": [
+        "shared CPU inputs, official splits, node budgets and output contract instead of repository loaders",
+        "author GECC and GCondBase definitions loaded verbatim against shared runtime dependencies",
+        "training-index alias supplied to both reducers",
+        "GraphSlim initialization harmonized to author uniform sampling",
+        "author dense diagnostic assignments retained; GraphSlim diagnostic assignments remain sparse and use graph node IDs"
+      ],
+      "timing": "wall time with CUDA synchronization around entire in-memory reduction, including preprocessing/transfers; excludes imports, data loading, graph serialization, and downstream evaluation",
+      "memory": "fresh process; process RSS sampled every5ms; PyTorch peak GPU allocated/reserved reset after context warmup, before input transfers; excludes downstream evaluation",
+      "quality": "one shared GCN fit per reduced graph, seed0, 300 epochs, hidden256, validation selection every10; outside timing/memory; descriptive quality shortfall retained",
+      "timeout_seconds": 1800,
+      "max_rss_gib": 96,
+      "gecc": "full transductive graph; depth2; hop weights [0.6,0.5,0.0]; hard clustering; one restart, max300, epsilon1e-8; balance_alpha1",
+      "initialization": "Author uniform sampled centers on both sides; GraphSlim initializer replaced only in this measured adapter. Native package defaults are not benchmarked."
+    },
+    "paired_existing_cohort": {
+      "path": "benchmark/results/arxiv_clustering_comparison_20261101.json",
+      "sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
+      "same_input_tensors": true,
+      "same_gpu_uuid": true
+    }
+  },
+  "source_archive": {
+    "path": "benchmark/results/gecc_arxiv_source_20261102.zip",
+    "sha256": "c582af64cbebfdc194348768dadd829ecb257de133d86f2711f6e296f18faee6"
+  },
+  "result_sha256": {
+    "gecc__r0.001__s1__author": "16c3cc390feacf7f88d8e1905687e7b1c5fc24d6577803c59e883bf9c9e37760",
+    "gecc__r0.001__s1__graphslim": "199bb3475c870a633d1062be878312c4b569e8c2335b251820d8ea72f1ce5cf1",
+    "gecc__r0.001__s2__graphslim": "421abda4d46249a383b736b689892cb952b5f0e409f30af85c53a92f713baa87",
+    "gecc__r0.001__s2__author": "0a2ca3b81b7254765b2bf56f6ecaddb411666f414f3fdd593f2b75011572ce26",
+    "gecc__r0.001__s3__author": "a50b80f64038549af1b88790755e78de7bcd146218fda252c095ddd718f84f23",
+    "gecc__r0.001__s3__graphslim": "840d974b57468a212fc85420356c564cf85961996e4de6ccbfd03d2ef852b5b6",
+    "gecc__r0.005__s1__author": "849edfc04553be63bd493704ebea5472c1700488309cffa1aadb19f02e26182e",
+    "gecc__r0.005__s1__graphslim": "eed78afc3754f6ef9a8932d7d127500116318e82cd24c0b7ac2aed50506f70e1",
+    "gecc__r0.005__s2__graphslim": "2b170802a392f76ab77853129a2ac3e511ff9f75d50b0082093b0d65f5118bda",
+    "gecc__r0.005__s2__author": "5fec973387dd50bd63c6e8244c48ac3d60fc307ebc97e6551c6b83c1e547e777",
+    "gecc__r0.005__s3__author": "77efc8a88c73ffe803025a63384b373deff4cacf50f7643cc903be4d6f502bdb",
+    "gecc__r0.005__s3__graphslim": "12853ea6e2aa2be7833d2f71a190358456dddc37b987ce655cf196b1e060e3ba",
+    "gecc__r0.01__s1__author": "09b8a1a183e4ac9fff9f57e98a0466c61f1eed5c6b2fe5a2389ba018610ed12e",
+    "gecc__r0.01__s1__graphslim": "f749799fc0d0cfdd290f6ce852a64ee117b9e93af7591485391409b99882b828",
+    "gecc__r0.01__s2__graphslim": "638c61aef32da14747434036c5759e28c9ce6aed6f7d05df8137ba63c011b9f0",
+    "gecc__r0.01__s2__author": "bb369b7dcc9182d2eecc0bb4e565b7e78378a29aabc358165e900f76bd79ec62",
+    "gecc__r0.01__s3__author": "c16b86b7c4caf33903d7da95d06c24dc899e548d76ecaa264cd2b2a7e27f049d",
+    "gecc__r0.01__s3__graphslim": "eb49e180c8f389b003b2bc534ab40d83a60d58c80e99d23d1e8e481842998d8d"
+  },
+  "paired_output_parity": [
+    {
+      "rate": "0.001",
+      "seed": 1,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.001",
+      "seed": 2,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.001",
+      "seed": 3,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.005",
+      "seed": 1,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.005",
+      "seed": 2,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.005",
+      "seed": 3,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.01",
+      "seed": 1,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.01",
+      "seed": 2,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rate": "0.01",
+      "seed": 3,
+      "exact": true,
+      "max_abs": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "parity_scope": "Reduced features, adjacency and labels; diagnostic assignments differ in storage and indexing."
+}
