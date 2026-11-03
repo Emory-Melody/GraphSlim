@@ -1,0 +1,22 @@
+{
+  "created_utc": "2026-11-01T07:32:41.196079+00:00",
+  "goal": "Strict absolute relative reproduction error <5% for as many of the fixed 123 pairs as honestly possible (111 for >90%)",
+  "denominator": 123,
+  "required_passes_for_90pct": 111,
+  "baseline_passes": 108,
+  "baseline_sha256": {
+    "pairs.csv": "060960a465c4e45299be990c2ca901fc1c2c40011a5db23cfae1aaecf4c597f7",
+    "summary.json": "f6b6b2400a848584e279d58dfd44512a3084d830297dd202116737205ae9d953",
+    "remaining_work.csv": "0a7b4d0a1d82f6f5057adc2a0061f8324e456eb81aa9bd4609679ddac074d8ac"
+  },
+  "formula": "mean_r(100 * abs(reproduced_percent-reference_percent)/reference_percent)",
+  "reference_source": "benchmark/results/table9_reproduction.json cells[].paper (GC4NC v3 Table 9, unchanged)",
+  "reference_sha256": "92106f8c808b0c8878d7b0243868ac10944e7b45a6afa37003ca87813dffcce7",
+  "clustering_policy_credits": 7,
+  "geom_exempt": true,
+  "geom_in_denominator": false,
+  "stage_selection": "Stages were chosen from code-provenance evidence (diagnosis.json, specs/) before any new test metric existed. Scope rules are outcome-independent: every pair sharing the cited provenance is declared, including currently passing pairs.",
+  "replacement": "Every complete predeclared stage replaces its predecessors for all its pairs, including regressions; a stage with any incomplete or failed job is not adopted for any pair; no closest-test choice.",
+  "reference_frozen_sha256": "55c717e6045cf1ad351c858d06c8edb68b1bacd76b35c74f1018d853792f8a1b",
+  "reference_pin_note": "2026-11-01: pin moved from the snapshot file hash to the frozen per-cell reference copy, so later snapshot additions (extra cells without references) cannot alter any of the 424 references."
+}

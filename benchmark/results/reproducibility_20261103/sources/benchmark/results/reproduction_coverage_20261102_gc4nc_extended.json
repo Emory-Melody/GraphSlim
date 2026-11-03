@@ -1,0 +1,3087 @@
+{
+  "as_of_utc": "2026-11-03T03:37:16.511688+00:00",
+  "scope": "124 unique method x dataset pairs: 116 legacy numerical comparisons and 8 newly documented GC4NC pairs, across 19 methods and 7 datasets.",
+  "unit": "Equal weight per unique method x dataset pair; average its matched node-budget settings or saved edge graphs before thresholding.",
+  "formulas": {
+    "mean_shortfall_percent": "mean_r(100 * max(0, reference_r - reproduced_r) / reference_r)",
+    "mean_relative_gap_percent": "mean_r(100 * abs(reproduced_r - reference_r) / reference_r)",
+    "mean_absolute_gap_pp": "mean_r(abs(reproduced_percent_r - reference_percent_r))"
+  },
+  "threshold_rule": "strict <; only pairs with published numerical references enter either numerator or denominator; no completion credits",
+  "total_pairs": 124,
+  "method_count": 19,
+  "datasets": [
+    "citeseer",
+    "cora",
+    "flickr",
+    "ogbn-arxiv",
+    "pubmed",
+    "reddit",
+    "yelp"
+  ],
+  "complete_pairs": 124,
+  "numeric_reference_pairs": 124,
+  "exclusions": "Clustering, published-only GEOM/SFGC rows, whole-graph baselines and other undeclared/unreferenced cells remain excluded. The eight newly documented GC4NC cells are now included.",
+  "protocol_scope": "Cumulative frozen reruns with method-specific provenance replay, validation-selected HPO, and historical baselines; not a single uniform new run of the current checkout. Per-pair evaluation_profile identifies adopted reruns; historical_frozen denotes inherited results. The eight added pairs share their underlying archived observations with the revised GC4NC tables and are not independent replication runs.",
+  "reference_corrections": {
+    "decision_utc": "2026-11-01",
+    "decided_by": "user",
+    "rule": "Where GC4NC v3 main-text Table 1 and Appendix Table 9 disagree, Table 1 is authoritative; the Table 9 Pubmed 0.02% K-Center cell (79.18) is a transcription error and belongs to TSpanner (absent from Table 1).",
+    "evidence": [
+      "arXiv 2406.16715v3 Table 1, Pubmed 0.02%: Herding 62.91, K-Center 62.91, Averaging 75.60 (checked live 2026-11-01)",
+      "Table 9 Pubmed 0.02%: K-Center 79.18\u00b10.2 (above Whole 78.6), TSpanner 62.91\u00b11.5 (duplicate of Herding), Averaging 74.09\u00b10.6",
+      "output/reproduction_90pct_20261031/reference_discrepancies.json recorded the two Table 1/Table 9 conflicts on 2026-10-31 without acting on them"
+    ],
+    "corrections": [
+      {
+        "method": "kcenter",
+        "dataset": "pubmed",
+        "rate": "0.05",
+        "table9": 79.18,
+        "corrected": 62.91,
+        "source": "Table 1"
+      },
+      {
+        "method": "t_spanner",
+        "dataset": "pubmed",
+        "rate": "0.05",
+        "table9": 62.91,
+        "corrected": 79.18,
+        "source": "Table 9 K-Center cell, inferred swap"
+      },
+      {
+        "method": "averaging",
+        "dataset": "pubmed",
+        "rate": "0.05",
+        "table9": 74.09,
+        "corrected": 75.6,
+        "source": "Table 1"
+      }
+    ]
+  },
+  "thresholds": {
+    "mean_shortfall_percent": {
+      "1": {
+        "count": 72,
+        "denominator": 124,
+        "percent": 58.064516129032256
+      },
+      "2": {
+        "count": 94,
+        "denominator": 124,
+        "percent": 75.80645161290323
+      },
+      "5": {
+        "count": 122,
+        "denominator": 124,
+        "percent": 98.38709677419355
+      },
+      "10": {
+        "count": 124,
+        "denominator": 124,
+        "percent": 100.0
+      }
+    },
+    "mean_relative_gap_percent": {
+      "1": {
+        "count": 43,
+        "denominator": 124,
+        "percent": 34.67741935483871
+      },
+      "2": {
+        "count": 70,
+        "denominator": 124,
+        "percent": 56.45161290322581
+      },
+      "5": {
+        "count": 112,
+        "denominator": 124,
+        "percent": 90.3225806451613
+      },
+      "10": {
+        "count": 117,
+        "denominator": 124,
+        "percent": 94.35483870967742
+      }
+    },
+    "mean_absolute_gap_pp": {
+      "1": {
+        "count": 56,
+        "denominator": 124,
+        "percent": 45.16129032258065
+      },
+      "2": {
+        "count": 89,
+        "denominator": 124,
+        "percent": 71.7741935483871
+      },
+      "5": {
+        "count": 118,
+        "denominator": 124,
+        "percent": 95.16129032258064
+      },
+      "10": {
+        "count": 121,
+        "denominator": 124,
+        "percent": 97.58064516129032
+      }
+    }
+  },
+  "provenance": {
+    "directory": "output/reproduction_round4_20261031",
+    "sha256": {
+      "output/reproduction_round4_20261031/summary.json": "4e86b85515b229a2ab4b5143f07a1be4af00177bfb9076820340fdd1cd922b23",
+      "output/reproduction_round4_20261031/pairs.csv": "acd342dfdfc4bd88d3e4b9962e148c39a456c972e330175f6e85ed7c7723c046",
+      "output/reproduction_round4_20261031/metric_contract.json": "be998030af7bc97e5bfa8b60dd53482d0b69950e771a49a2c58adc1358711cbe",
+      "output/reproduction_round4_20261031/reference_corrections.json": "bbbd05099b67e5e5a7af6130819e72cb5fadc77ad37a06ec4bcd6d58bf4bebe5",
+      "output/reproduction_round4_20261031/independent_audit.json": "eff55b5e267ea72f9c7ce42208cd57f766ae9879fcbfe7a0616d9fe4a8f4aa83"
+    }
+  },
+  "verification_limits": {
+    "stage_final_gcn_fits_verified": 360,
+    "stage_checkpoint_files_hash_verified": 108,
+    "stage_checkpoint_finiteness_verified": false
+  },
+  "pairs": [
+    {
+      "method": "cent_d",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 1.6446851410352488,
+      "mean_absolute_gap_pp": 0.7566666666666629
+    },
+    {
+      "method": "cent_d",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.3835007863908892,
+      "mean_relative_gap_percent": 0.5891692087635988,
+      "mean_absolute_gap_pp": 0.37333333333333485
+    },
+    {
+      "method": "cent_d",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.09265693768821072,
+      "mean_relative_gap_percent": 0.09859236029030304,
+      "mean_absolute_gap_pp": 0.07000000000000266
+    },
+    {
+      "method": "cent_d",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_remaining_full_grid_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 10.991431635822261,
+      "mean_absolute_gap_pp": 3.9456054153035773
+    },
+    {
+      "method": "cent_d",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.02718981789479434,
+      "mean_relative_gap_percent": 0.036651635632594486,
+      "mean_absolute_gap_pp": 0.015487832205444363
+    },
+    {
+      "method": "cent_d",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.10632402019252159,
+      "mean_relative_gap_percent": 1.6913285402601594,
+      "mean_absolute_gap_pp": 0.8867331718894936
+    },
+    {
+      "method": "cent_d",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.232313144775272,
+      "mean_relative_gap_percent": 4.301917497306326,
+      "mean_absolute_gap_pp": 2.16999488867841
+    },
+    {
+      "method": "cent_p",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.517382800176663,
+      "mean_relative_gap_percent": 4.472007270326137,
+      "mean_absolute_gap_pp": 2.0433333333333317
+    },
+    {
+      "method": "cent_p",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_hpo_20261031_v2",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.468604246512914,
+      "mean_relative_gap_percent": 4.468604246512914,
+      "mean_absolute_gap_pp": 2.749999999999993
+    },
+    {
+      "method": "cent_p",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.0413144105136103,
+      "mean_relative_gap_percent": 1.0413144105136103,
+      "mean_absolute_gap_pp": 0.6600000000000014
+    },
+    {
+      "method": "cent_p",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.8564646516056278,
+      "mean_relative_gap_percent": 3.338089613899212,
+      "mean_absolute_gap_pp": 1.4682001111042524
+    },
+    {
+      "method": "cent_p",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.439179530488292,
+      "mean_relative_gap_percent": 4.439179530488292,
+      "mean_absolute_gap_pp": 1.9349858826692976
+    },
+    {
+      "method": "cent_p",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 1.2414462852770112,
+      "mean_absolute_gap_pp": 0.6470660594450687
+    },
+    {
+      "method": "cent_p",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 2.2757791860091827,
+      "mean_absolute_gap_pp": 1.0517270096475357
+    },
+    {
+      "method": "random",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 1.9482751691306408,
+      "mean_absolute_gap_pp": 0.7933333333333366
+    },
+    {
+      "method": "random",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/random_author_budget_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.6024411965006055,
+      "mean_relative_gap_percent": 11.225324340925491,
+      "mean_absolute_gap_pp": 4.133333333333337
+    },
+    {
+      "method": "random",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 3.1556407154659842,
+      "mean_absolute_gap_pp": 1.8577777777777769
+    },
+    {
+      "method": "random",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.603922696577222,
+      "mean_relative_gap_percent": 4.603922696577222,
+      "mean_absolute_gap_pp": 2.406608416947288
+    },
+    {
+      "method": "random",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.2996434284145386,
+      "mean_relative_gap_percent": 2.2996434284145386,
+      "mean_absolute_gap_pp": 1.003591528605644
+    },
+    {
+      "method": "random",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/random_author_budget_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.030352419574508,
+      "mean_relative_gap_percent": 10.699015676031767,
+      "mean_absolute_gap_pp": 5.28076854495729
+    },
+    {
+      "method": "random",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.06599130332662216,
+      "mean_relative_gap_percent": 1.1285676805662341,
+      "mean_absolute_gap_pp": 0.5242718334408801
+    },
+    {
+      "method": "herding",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 3.539058391254132,
+      "mean_absolute_gap_pp": 1.8411111111111158
+    },
+    {
+      "method": "herding",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_hpo_20261031_v2",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.27379169283792965,
+      "mean_relative_gap_percent": 3.78947463555929,
+      "mean_absolute_gap_pp": 2.0144444444444454
+    },
+    {
+      "method": "herding",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.13953040800615477,
+      "mean_relative_gap_percent": 0.27519650882040136,
+      "mean_absolute_gap_pp": 0.19111111111110782
+    },
+    {
+      "method": "herding",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.9757487305613073,
+      "mean_relative_gap_percent": 1.9757487305613073,
+      "mean_absolute_gap_pp": 1.0510478548420679
+    },
+    {
+      "method": "herding",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.5833817345579364,
+      "mean_relative_gap_percent": 3.5833817345579364,
+      "mean_absolute_gap_pp": 1.555253887868055
+    },
+    {
+      "method": "herding",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.2295471276355894,
+      "mean_relative_gap_percent": 4.360597976852299,
+      "mean_absolute_gap_pp": 2.5868600779910245
+    },
+    {
+      "method": "herding",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.0479539412711585,
+      "mean_relative_gap_percent": 4.081468196167051,
+      "mean_absolute_gap_pp": 2.1133055249817736
+    },
+    {
+      "method": "kcenter",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/kcenter_released_indices_v2_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 7.398588127142045,
+      "mean_absolute_gap_pp": 3.3299999999999983
+    },
+    {
+      "method": "kcenter",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 4.802365513257733,
+      "mean_absolute_gap_pp": 2.581111111111113
+    },
+    {
+      "method": "kcenter",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_kcenter_author_full_grid_20261031",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 3.5421268906028134,
+      "mean_absolute_gap_pp": 2.331111111111113
+    },
+    {
+      "method": "kcenter",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.227942386716643,
+      "mean_relative_gap_percent": 1.4931146948304663,
+      "mean_absolute_gap_pp": 0.773393549095052
+    },
+    {
+      "method": "kcenter",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.6650732908737074,
+      "mean_relative_gap_percent": 3.6650732908737074,
+      "mean_absolute_gap_pp": 1.5821867670565741
+    },
+    {
+      "method": "kcenter",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/kcenter_released_indices_v2_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.042741122682590414,
+      "mean_relative_gap_percent": 2.28282823874295,
+      "mean_absolute_gap_pp": 1.062462018529897
+    },
+    {
+      "method": "kcenter",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 2.8864087783190815,
+      "mean_absolute_gap_pp": 1.340708313079477
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.3202685076305178,
+      "mean_relative_gap_percent": 0.46924429906441323,
+      "mean_absolute_gap_pp": 0.3366666666666731
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.09071416790367758,
+      "mean_relative_gap_percent": 0.9420171547886299,
+      "mean_absolute_gap_pp": 0.7533333333333351
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_remaining_full_grid_20261031",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.4028607646650848,
+      "mean_relative_gap_percent": 1.7047700217982258,
+      "mean_absolute_gap_pp": 1.3500000000000039
+    },
+    {
+      "method": "averaging",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.03345280764635277,
+      "mean_relative_gap_percent": 0.14849249022706365,
+      "mean_absolute_gap_pp": 0.1033333333333341
+    },
+    {
+      "method": "averaging",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.06585765307376018,
+      "mean_relative_gap_percent": 0.09665666750529538,
+      "mean_absolute_gap_pp": 0.07333333333333296
+    },
+    {
+      "method": "averaging",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.0,
+      "mean_absolute_gap_pp": 0.0
+    },
+    {
+      "method": "averaging",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.00401163062240035,
+      "mean_absolute_gap_pp": 0.002396559883131033
+    },
+    {
+      "method": "averaging",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.002357929117471887,
+      "mean_relative_gap_percent": 0.003984758097361663,
+      "mean_absolute_gap_pp": 0.0015056992186899265
+    },
+    {
+      "method": "averaging",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.09823923483128125,
+      "mean_absolute_gap_pp": 0.08674642474187522
+    },
+    {
+      "method": "averaging",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.346742594636334,
+      "mean_relative_gap_percent": 1.522486726235122,
+      "mean_absolute_gap_pp": 0.8330387906981519
+    },
+    {
+      "method": "variation_neighborhoods",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vn_v1_transductive_replay_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 36.7365688668327,
+      "mean_absolute_gap_pp": 14.020000000000001
+    },
+    {
+      "method": "variation_neighborhoods",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vn_v1_transductive_replay_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.0528634361233475,
+      "mean_relative_gap_percent": 52.67519684161942,
+      "mean_absolute_gap_pp": 16.993333333333336
+    },
+    {
+      "method": "variation_neighborhoods",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vn_full_graph_common_gcn_20261031",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.5520282186948837,
+      "mean_relative_gap_percent": 5.967478937506952,
+      "mean_absolute_gap_pp": 4.433333333333333
+    },
+    {
+      "method": "variation_neighborhoods",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vn_v1_flickr_skip_small_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.9852399101021048,
+      "mean_relative_gap_percent": 4.346903307505219,
+      "mean_absolute_gap_pp": 1.4534010068868664
+    },
+    {
+      "method": "variation_neighborhoods",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.0920485769342843,
+      "mean_relative_gap_percent": 1.0920485769342843,
+      "mean_absolute_gap_pp": 0.5707421020838245
+    },
+    {
+      "method": "vng",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vng_v1_era_replay_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 2.820190697341893,
+      "mean_absolute_gap_pp": 1.860000000000004
+    },
+    {
+      "method": "vng",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vng_v1_era_replay_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.0179924242424268,
+      "mean_relative_gap_percent": 1.756632889670101,
+      "mean_absolute_gap_pp": 1.2700000000000007
+    },
+    {
+      "method": "vng",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.8508903210445748,
+      "mean_relative_gap_percent": 1.8508903210445748,
+      "mean_absolute_gap_pp": 1.4100000000000013
+    },
+    {
+      "method": "vng",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vng_v1_era_replay_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.012602930518263694,
+      "mean_relative_gap_percent": 1.186391468919273,
+      "mean_absolute_gap_pp": 0.7176710628287708
+    },
+    {
+      "method": "vng",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vng_v1_era_replay_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.2426776657956808,
+      "mean_relative_gap_percent": 1.5301413022801988,
+      "mean_absolute_gap_pp": 0.6762943874273594
+    },
+    {
+      "method": "vng",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/vng_v1_era_replay_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 10.124493503879894,
+      "mean_absolute_gap_pp": 7.544272840086269
+    },
+    {
+      "method": "vng",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.764004415794977,
+      "mean_relative_gap_percent": 4.764004415794977,
+      "mean_absolute_gap_pp": 2.318348193336464
+    },
+    {
+      "method": "gcsntk",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/gcsntk_june2024_evaluator_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 9.397681002101532,
+      "mean_relative_gap_percent": 9.397681002101532,
+      "mean_absolute_gap_pp": 5.966666666666666
+    },
+    {
+      "method": "gcsntk",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/gcsntk_june2024_evaluator_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.09544586855740748,
+      "mean_relative_gap_percent": 1.8526618792359453,
+      "mean_absolute_gap_pp": 1.3233333333333377
+    },
+    {
+      "method": "gcsntk",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_gcsntk_released_gcn_20261031",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.8203367196070009,
+      "mean_relative_gap_percent": 52.90773294800867,
+      "mean_absolute_gap_pp": 17.216666666666658
+    },
+    {
+      "method": "gcsntk",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/gcsntk_june2024_evaluator_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.3448164381648133,
+      "mean_relative_gap_percent": 1.9035520623292326,
+      "mean_absolute_gap_pp": 1.1110862841114084
+    },
+    {
+      "method": "gcsntk",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/gcsntk_june2024_evaluator_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 5.7519626313480865,
+      "mean_relative_gap_percent": 8.341963340982922,
+      "mean_absolute_gap_pp": 2.844060114432542
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.6471036110673947,
+      "mean_relative_gap_percent": 0.6471036110673947,
+      "mean_absolute_gap_pp": 0.46000000000000324
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.8738680791607628,
+      "mean_absolute_gap_pp": 0.6966666666666678
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.41293927016544596,
+      "mean_relative_gap_percent": 0.41293927016544596,
+      "mean_absolute_gap_pp": 0.3166666666666676
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.013640269694904105,
+      "mean_relative_gap_percent": 0.019472432644258436,
+      "mean_absolute_gap_pp": 0.011729179954594807
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.43018254736289796,
+      "mean_relative_gap_percent": 0.5750740175385322,
+      "mean_absolute_gap_pp": 0.254463616128118
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.32153555190013705,
+      "mean_relative_gap_percent": 0.6598994927237511,
+      "mean_absolute_gap_pp": 0.590489271213599
+    },
+    {
+      "method": "gcdmx",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.3479540432920472,
+      "mean_relative_gap_percent": 3.9385305638442145,
+      "mean_absolute_gap_pp": 2.097129468208879
+    },
+    {
+      "method": "gcond",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 3.8842087423793723,
+      "mean_absolute_gap_pp": 2.703333333333333
+    },
+    {
+      "method": "gcond",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.3726445005727893,
+      "mean_absolute_gap_pp": 0.3000000000000019
+    },
+    {
+      "method": "gcond",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.5385079802760799,
+      "mean_absolute_gap_pp": 0.4133333333333411
+    },
+    {
+      "method": "gcond",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_gcond_full_class_hpo_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.2606066373746286,
+      "mean_relative_gap_percent": 1.0882675765037215,
+      "mean_absolute_gap_pp": 0.6881957903833064
+    },
+    {
+      "method": "gcond",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.13777698819850562,
+      "mean_relative_gap_percent": 0.14527253354160077,
+      "mean_absolute_gap_pp": 0.06806928696275823
+    },
+    {
+      "method": "gcond",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.4981918800433542,
+      "mean_relative_gap_percent": 1.4981918800433542,
+      "mean_absolute_gap_pp": 1.3305286683292934
+    },
+    {
+      "method": "gcond",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.301484424944379,
+      "mean_relative_gap_percent": 2.301484424944379,
+      "mean_absolute_gap_pp": 1.2054820935493211
+    },
+    {
+      "method": "doscond",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.24937655860349414,
+      "mean_relative_gap_percent": 0.8790547409048332,
+      "mean_absolute_gap_pp": 0.6200000000000045
+    },
+    {
+      "method": "doscond",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.8865425519605552,
+      "mean_relative_gap_percent": 1.8865425519605552,
+      "mean_absolute_gap_pp": 1.5266666666666613
+    },
+    {
+      "method": "doscond",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.05734273754229108,
+      "mean_relative_gap_percent": 0.41124695244878845,
+      "mean_absolute_gap_pp": 0.2633333333333354
+    },
+    {
+      "method": "doscond",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.8549412545243236,
+      "mean_relative_gap_percent": 4.06687658713515,
+      "mean_absolute_gap_pp": 2.472110157809188
+    },
+    {
+      "method": "doscond",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.09891932853899495,
+      "mean_relative_gap_percent": 0.586803396836552,
+      "mean_absolute_gap_pp": 0.2689793692765055
+    },
+    {
+      "method": "doscond",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.391854890200011,
+      "mean_relative_gap_percent": 2.391854890200011,
+      "mean_absolute_gap_pp": 2.087941591065165
+    },
+    {
+      "method": "doscond",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.366158376493569,
+      "mean_relative_gap_percent": 4.144684027586238,
+      "mean_absolute_gap_pp": 2.1339165029873706
+    },
+    {
+      "method": "msgc",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_hpo_input_views_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.7939206488949244,
+      "mean_relative_gap_percent": 3.7939206488949244,
+      "mean_absolute_gap_pp": 2.323333333333333
+    },
+    {
+      "method": "msgc",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.5779932015459811,
+      "mean_relative_gap_percent": 0.5779932015459811,
+      "mean_absolute_gap_pp": 0.46666666666666856
+    },
+    {
+      "method": "msgc",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.11500127779197376,
+      "mean_relative_gap_percent": 0.21487864026375889,
+      "mean_absolute_gap_pp": 0.16666666666666666
+    },
+    {
+      "method": "msgc",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.4484043754486821,
+      "mean_relative_gap_percent": 2.860117396340517,
+      "mean_absolute_gap_pp": 1.715954845037004
+    },
+    {
+      "method": "msgc",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.6604611419820235,
+      "mean_relative_gap_percent": 0.8815152046529282,
+      "mean_absolute_gap_pp": 0.4088375984104952
+    },
+    {
+      "method": "msgc",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_hpo_input_views_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.3140450949716964,
+      "mean_relative_gap_percent": 3.4478567780181497,
+      "mean_absolute_gap_pp": 3.0233922482861666
+    },
+    {
+      "method": "msgc",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_remaining_full_grid_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 6.801880655225488,
+      "mean_absolute_gap_pp": 3.505863188140007
+    },
+    {
+      "method": "sgdd",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 1.4957765908109302,
+      "mean_absolute_gap_pp": 1.0499999999999972
+    },
+    {
+      "method": "sgdd",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.5758473181967775,
+      "mean_relative_gap_percent": 0.9787427175705536,
+      "mean_absolute_gap_pp": 0.7900000000000015
+    },
+    {
+      "method": "sgdd",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.03842705264505752,
+      "mean_relative_gap_percent": 0.1914300522185593,
+      "mean_absolute_gap_pp": 0.14666666666666117
+    },
+    {
+      "method": "sgdd",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_sgdd_full_class_hpo_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.9323429380421742,
+      "mean_relative_gap_percent": 3.7689032191006504,
+      "mean_absolute_gap_pp": 2.2529657291388006
+    },
+    {
+      "method": "sgdd",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_sgdd_full_grid_20261031",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.4190833503670284,
+      "mean_relative_gap_percent": 3.4190833503670284,
+      "mean_absolute_gap_pp": 1.588717489057198
+    },
+    {
+      "method": "sgdd",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_sgdd_full_class_hpo_20261031",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.9052846147143088,
+      "mean_relative_gap_percent": 1.9052846147143088,
+      "mean_absolute_gap_pp": 1.6897055457163173
+    },
+    {
+      "method": "sgdd",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.0439246225567755,
+      "mean_relative_gap_percent": 3.0934222371713638,
+      "mean_absolute_gap_pp": 1.644531687662936
+    },
+    {
+      "method": "gdem",
+      "dataset": "citeseer",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_gdem_full_grid_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.3977607542722393,
+      "mean_relative_gap_percent": 2.247159801348422,
+      "mean_absolute_gap_pp": 1.5799999999999983
+    },
+    {
+      "method": "gdem",
+      "dataset": "cora",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_gdem_operator_20261031",
+      "declared_rates": [
+        "0.1",
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 3.175455894356302,
+      "mean_relative_gap_percent": 3.3950249900060907,
+      "mean_absolute_gap_pp": 2.490000000000002
+    },
+    {
+      "method": "gdem",
+      "dataset": "pubmed",
+      "reference_source": "GC4NC_Table9",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "runs/coverage_gdem_author_gcn_20261031",
+      "declared_rates": [
+        "0.05",
+        "0.1",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.037331877868403,
+      "mean_relative_gap_percent": 4.037331877868403,
+      "mean_absolute_gap_pp": 3.143333333333331
+    },
+    {
+      "method": "gecc",
+      "dataset": "citeseer",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.38225255972696404,
+      "mean_relative_gap_percent": 0.38225255972696404,
+      "mean_absolute_gap_pp": 0.28000000000000114
+    },
+    {
+      "method": "gecc",
+      "dataset": "cora",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.45788649234845313,
+      "mean_relative_gap_percent": 0.45788649234845313,
+      "mean_absolute_gap_pp": 0.37999999999998124
+    },
+    {
+      "method": "gecc",
+      "dataset": "pubmed",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.37387836490529835,
+      "mean_absolute_gap_pp": 0.30000000000001137
+    },
+    {
+      "method": "gecc",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.39897929070626603,
+      "mean_relative_gap_percent": 0.39897929070626603,
+      "mean_absolute_gap_pp": 0.26615908483015005
+    },
+    {
+      "method": "gecc",
+      "dataset": "flickr",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.7180163232210022,
+      "mean_relative_gap_percent": 1.7180163232210022,
+      "mean_absolute_gap_pp": 0.8011110115179534
+    },
+    {
+      "method": "gecc",
+      "dataset": "reddit",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.40700393501998755,
+      "mean_relative_gap_percent": 0.40700393501998755,
+      "mean_absolute_gap_pp": 0.37187949542776266
+    },
+    {
+      "method": "cgc",
+      "dataset": "citeseer",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.4151647932939686,
+      "mean_relative_gap_percent": 1.4151647932939686,
+      "mean_absolute_gap_pp": 1.0250000000000057
+    },
+    {
+      "method": "cgc",
+      "dataset": "cora",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.7760177837592388,
+      "mean_relative_gap_percent": 1.7760177837592388,
+      "mean_absolute_gap_pp": 1.4649999999999963
+    },
+    {
+      "method": "cgc",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.473088306252292,
+      "mean_relative_gap_percent": 4.473088306252292,
+      "mean_absolute_gap_pp": 2.9396889080920965
+    },
+    {
+      "method": "cgc",
+      "dataset": "flickr",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.5377868357731015,
+      "mean_relative_gap_percent": 2.5377868357731015,
+      "mean_absolute_gap_pp": 1.192454324086107
+    },
+    {
+      "method": "cgc",
+      "dataset": "reddit",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.1008179075061195,
+      "mean_relative_gap_percent": 1.1008179075061195,
+      "mean_absolute_gap_pp": 1.0030746617510573
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "citeseer",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 1.528911564625857,
+      "mean_relative_gap_percent": 1.528911564625857,
+      "mean_absolute_gap_pp": 1.1350000000000051
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "cora",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.25",
+        "0.5"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 4.341817443678265,
+      "mean_relative_gap_percent": 4.341817443678265,
+      "mean_absolute_gap_pp": 3.529999999999994
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.555431816995551,
+      "mean_relative_gap_percent": 2.555431816995551,
+      "mean_absolute_gap_pp": 1.6946601375772445
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "flickr",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 0.9446354601809069,
+      "mean_relative_gap_percent": 0.9446354601809069,
+      "mean_absolute_gap_pp": 0.44371293267004336
+    },
+    {
+      "method": "clustgdd",
+      "dataset": "reddit",
+      "reference_source": "own_paper",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_gap",
+      "evaluation_profile": "historical_frozen",
+      "declared_rates": [
+        "0.0005",
+        "0.001"
+      ],
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "mean_shortfall_percent": 2.228839277364017,
+      "mean_relative_gap_percent": 2.228839277364017,
+      "mean_absolute_gap_pp": 2.011820941916355
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "graph_1",
+        "graph_2",
+        "graph_3"
+      ],
+      "settings_kind": "saved_edge_graph_index",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.002136524881967907,
+      "mean_relative_gap_percent": 0.0027062051906494747,
+      "mean_absolute_gap_pp": 0.0018766331296452183,
+      "reference_table": "edge_sparsification",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "graph_1",
+          "archive_rate_label": "0.001",
+          "reference_percent": 69.35,
+          "reproduced_percent": 69.34818838343311,
+          "shortfall_percent": 0.002612280557870065,
+          "relative_gap_percent": 0.002612280557870065,
+          "absolute_gap_pp": 0.0018116165668828899,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__t_spanner__r0.001__s1/result.json",
+          "result_sha256": "713746e42f50b3dd05226919006b1ed457c90ae453c162b7a4c3c350a61611de",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_ogbn-arxiv_0.001_1.pt": "b390d1e66efd760021bd1aa32fd56a30a21538e76a9a1a5de46823a25bba6c0e"
+          }
+        },
+        {
+          "setting": "graph_2",
+          "archive_rate_label": "0.005",
+          "reference_percent": 69.44,
+          "reproduced_percent": 69.44118675801904,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.0017090409260447032,
+          "absolute_gap_pp": 0.0011867580190454419,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__t_spanner__r0.005__s1/result.json",
+          "result_sha256": "f23a0cb5542f3e3e06794f206d7663f2fdc8f6b2792f0a96a090365417ead2c5",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_ogbn-arxiv_0.005_1.pt": "1bc0aff7d31cb0e6e6beb3076f2246db12ebbcb4f5dbb3790deeca207e32a940"
+          }
+        },
+        {
+          "setting": "graph_3",
+          "archive_rate_label": "0.01",
+          "reference_percent": 69.3,
+          "reproduced_percent": 69.29736847519699,
+          "shortfall_percent": 0.003797294088033656,
+          "relative_gap_percent": 0.003797294088033656,
+          "absolute_gap_pp": 0.0026315248030073235,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__t_spanner__r0.01__s1/result.json",
+          "result_sha256": "afaa692183723ebc550e66045e27e4a4a553ffb2e216c4bf819d4b1420477381",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_ogbn-arxiv_0.01_1.pt": "a2c010388f6f754fd3ea4759133cbe1c33ab92fc67aad36000d0e0ad99593a8c"
+          }
+        }
+      ]
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "graph_1",
+        "graph_2",
+        "graph_3"
+      ],
+      "settings_kind": "saved_edge_graph_index",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.0021471181829683106,
+      "mean_relative_gap_percent": 0.003181257437553608,
+      "mean_absolute_gap_pp": 0.0015009187469203766,
+      "reference_table": "edge_sparsification",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "graph_1",
+          "archive_rate_label": "0.001",
+          "reference_percent": 47.18,
+          "reproduced_percent": 47.18146372070094,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.0031024177637558924,
+          "absolute_gap_pp": 0.00146372070094003,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__t_spanner__r0.001__s1/result.json",
+          "result_sha256": "273425105932f47badd1cf39673617e7ee541aade64463f0d9946a5c38c212c4",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_flickr_0.001_1.pt": "eaea4f00dfcd4e6db99000231260dca3e359ed5ad20ffb5d0b63e35923cddfa7"
+          }
+        },
+        {
+          "setting": "graph_2",
+          "archive_rate_label": "0.005",
+          "reference_percent": 47.19,
+          "reproduced_percent": 47.18997893604625,
+          "shortfall_percent": 4.4636477528462334e-05,
+          "relative_gap_percent": 4.4636477528462334e-05,
+          "absolute_gap_pp": 2.1063953745681374e-05,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__t_spanner__r0.005__s1/result.json",
+          "result_sha256": "2ddd90029c7ce2a411c6365935a0275f616b300b3158095792eee18b7bb4941f",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_flickr_0.005_1.pt": "29b10dc7f0635053ed51592a7a2269017ab4465f08873c74868215214ad72873"
+          }
+        },
+        {
+          "setting": "graph_3",
+          "archive_rate_label": "0.01",
+          "reference_percent": 47.18,
+          "reproduced_percent": 47.176982028413924,
+          "shortfall_percent": 0.00639671807137647,
+          "relative_gap_percent": 0.00639671807137647,
+          "absolute_gap_pp": 0.0030179715860754186,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__t_spanner__r0.01__s1/result.json",
+          "result_sha256": "1ef9fb95d5c78c1df81dd4caba771917a689ce0dc6ed30b7efc54df21e16ccdf",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_flickr_0.01_1.pt": "8ea5d566123927930d9ab92432b0ff3365d6208cc52ec6458b0dfc25f938995c"
+          }
+        }
+      ]
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "graph_1",
+        "graph_2",
+        "graph_3"
+      ],
+      "settings_kind": "saved_edge_graph_index",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.001683445146428956,
+      "mean_relative_gap_percent": 0.0041484567046232625,
+      "mean_absolute_gap_pp": 0.003899471090709502,
+      "reference_table": "edge_sparsification",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "graph_1",
+          "archive_rate_label": "0.0005",
+          "reference_percent": 94.01,
+          "reproduced_percent": 94.01254201756606,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.002703986348321559,
+          "absolute_gap_pp": 0.0025420175660570976,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__t_spanner__r0.0005__s1/result.json",
+          "result_sha256": "b8eb2d20532a7a7b50f72ab42d37978288b68ed03c23270c185afb5882041657",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_reddit_0.0005_1.pt": "08f2f10a24671b08b2f33a75674d5909f5eda7c6fa65355afa0d81a26a0f07de"
+          }
+        },
+        {
+          "setting": "graph_2",
+          "archive_rate_label": "0.001",
+          "reference_percent": 93.99,
+          "reproduced_percent": 93.98525318972061,
+          "shortfall_percent": 0.005050335439286868,
+          "relative_gap_percent": 0.005050335439286868,
+          "absolute_gap_pp": 0.004746810279385727,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__t_spanner__r0.001__s1/result.json",
+          "result_sha256": "cd6e75763a2b4e921674b306a288bf0a21dfda0fd8c87770396e1c71b96ad805",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_reddit_0.001_1.pt": "2b5d8a77af2baf02b805b2e12f49ca4ab04931791ee9debcdc109f5e4c764799"
+          }
+        },
+        {
+          "setting": "graph_3",
+          "archive_rate_label": "0.002",
+          "reference_percent": 94.0,
+          "reproduced_percent": 94.00440958542669,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.004691048326261362,
+          "absolute_gap_pp": 0.00440958542668568,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__t_spanner__r0.002__s1/result.json",
+          "result_sha256": "112a6ac99250627e0364ba9f2b1bc2a83c0546c824e9a43dfa2473d1056bb569",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/t_spanner/adj_reddit_0.002_1.pt": "f708122efc3e2162af9414eb1111f31f703b138a67318586dd8ecaab2050780c"
+          }
+        }
+      ]
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_yelp_AP_epoch_HPO12",
+      "declared_rates": [
+        "graph_1",
+        "graph_2",
+        "graph_3"
+      ],
+      "settings_kind": "saved_edge_graph_index",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "AP",
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.010237664475388751,
+      "mean_absolute_gap_pp": 0.002482598001867823,
+      "reference_table": "edge_sparsification",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "graph_1",
+          "archive_rate_label": "0.0005",
+          "reference_percent": 24.11,
+          "reproduced_percent": 24.110823341004934,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.003414935731791681,
+          "absolute_gap_pp": 0.0008233410049349743,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.0005__s1.json",
+          "result_sha256": "ee9d440543c84aa7c0e88d3b6f02c63be90e0387f3b6b3ce0aefc530bcb5bec7",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        },
+        {
+          "setting": "graph_2",
+          "archive_rate_label": "0.001",
+          "reference_percent": 24.36,
+          "reproduced_percent": 24.36427434579407,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.01754657550931646,
+          "absolute_gap_pp": 0.0042743457940694896,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.001__s1.json",
+          "result_sha256": "4dbc7edc7a951f3a4088e047e694814b864c07f323a0e6a306fce3c27ba98b64",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        },
+        {
+          "setting": "graph_3",
+          "archive_rate_label": "0.002",
+          "reference_percent": 24.1,
+          "reproduced_percent": 24.1023501072066,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.009751482185058115,
+          "absolute_gap_pp": 0.002350107206599006,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.002__s1.json",
+          "result_sha256": "062474b909c97f9804bb648ae752ff8dc9ebff6328c5e19609355849b01621e1",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        }
+      ]
+    },
+    {
+      "method": "gdem",
+      "dataset": "ogbn-arxiv",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "settings_kind": "node_budget",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.002253913431224298,
+      "mean_relative_gap_percent": 0.00226915406946735,
+      "mean_absolute_gap_pp": 0.0014438066237308551,
+      "reference_table": "main_full",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "0.001",
+          "archive_rate_label": "0.001",
+          "reference_percent": 56.25,
+          "reproduced_percent": 56.250025718577035,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 4.5721914729155185e-05,
+          "absolute_gap_pp": 2.5718577035149792e-05,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__gdem__r0.001__s1/result.json",
+          "result_sha256": "9822a2d59951dd584ac7c688eb1c7bdab8898cb0db7d29b53883b6776bfe41f5",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_ogbn-arxiv_0.001_1.pt": "b09a92698a8902bae2528b2a935268c8f38a59c15d750b5406deddac63d2313f",
+            "checkpoints/reduced_graph/gdem/feat_ogbn-arxiv_0.001_1.pt": "bc27fd772458d1e6cf781f8f0810b8689119f14849435f38c6ba50468ddf3187",
+            "checkpoints/reduced_graph/gdem/label_ogbn-arxiv_0.001_1.pt": "d5afaee6404ede27251176bb2119ab88990460e59f2bf8dadd9f08b0f58e11fa"
+          }
+        },
+        {
+          "setting": "0.005",
+          "archive_rate_label": "0.005",
+          "reference_percent": 61.41,
+          "reproduced_percent": 61.409995267781824,
+          "shortfall_percent": 7.70594068209729e-06,
+          "relative_gap_percent": 7.70594068209729e-06,
+          "absolute_gap_pp": 4.732218172875946e-06,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__gdem__r0.005__s1/result.json",
+          "result_sha256": "1a4dc5d930f27fad2fffe8ab9cca92882b8649de37dd4dae2ac85532116d73ea",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_ogbn-arxiv_0.005_1.pt": "f457b132cc6b8608a912987b4155c05b1eb868c42068713cf06fa75ea23ebc4a",
+            "checkpoints/reduced_graph/gdem/feat_ogbn-arxiv_0.005_1.pt": "2ac033b917dbb6893322ee24be5b4268f0c7d567db8cddf9990355c2d241f1ed",
+            "checkpoints/reduced_graph/gdem/label_ogbn-arxiv_0.005_1.pt": "bf0946bc019760833fbd591b9bbc17d8d179c1200c1d24396164c313de818a0f"
+          }
+        },
+        {
+          "setting": "0.01",
+          "archive_rate_label": "0.01",
+          "reference_percent": 63.68,
+          "reproduced_percent": 63.675699030924015,
+          "shortfall_percent": 0.006754034352990797,
+          "relative_gap_percent": 0.006754034352990797,
+          "absolute_gap_pp": 0.00430096907598454,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/ogbn-arxiv__gdem__r0.01__s1/result.json",
+          "result_sha256": "e77e717b6266677b86230cf1d1a8e29e5603bd79af549049e0c77ff6a2d512c3",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_ogbn-arxiv_0.01_1.pt": "a1c69bb554851835690179c60316d8bdbfcf70e957fb4202e17f93a1ddc030ca",
+            "checkpoints/reduced_graph/gdem/feat_ogbn-arxiv_0.01_1.pt": "f3494f321f160e30f156b44d168404e06dcd4fbe196a1cf9989359110e06a5b6",
+            "checkpoints/reduced_graph/gdem/label_ogbn-arxiv_0.01_1.pt": "7064187f56b1680e60b43409c885cbf2e06456a5343586cc40bbf85dbededfa6"
+          }
+        }
+      ]
+    },
+    {
+      "method": "gdem",
+      "dataset": "flickr",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "0.001",
+        "0.005",
+        "0.01"
+      ],
+      "settings_kind": "node_budget",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.003285479834282691,
+      "mean_relative_gap_percent": 0.004640870216889929,
+      "mean_absolute_gap_pp": 0.002068599769939302,
+      "reference_table": "main_full",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "0.001",
+          "archive_rate_label": "0.001",
+          "reference_percent": 44.61,
+          "reproduced_percent": 44.60762784027249,
+          "shortfall_percent": 0.005317551507525307,
+          "relative_gap_percent": 0.005317551507525307,
+          "absolute_gap_pp": 0.0023721597275070394,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__gdem__r0.001__s1/result.json",
+          "result_sha256": "517f12269089db1ed63f891f5aaa64ad2bdbbf209a8ce1ffd00308d04bb24036",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_flickr_0.001_1.pt": "266946b4b75b3536927dfa5e09d9dd9cc2b153c93000b942956538c80934748d",
+            "checkpoints/reduced_graph/gdem/feat_flickr_0.001_1.pt": "1eebac6796cb9f0efaad767cbc76553b2b432723195122a43e99f217fa6d3b51",
+            "checkpoints/reduced_graph/gdem/label_flickr_0.001_1.pt": "e6b48a337cd66313b7cbc376bad02a4e85f98d12bc58437ae51ea0fb50c0dc7b"
+          }
+        },
+        {
+          "setting": "0.005",
+          "archive_rate_label": "0.005",
+          "reference_percent": 43.88,
+          "reproduced_percent": 43.878008335947655,
+          "shortfall_percent": 0.004538887995322767,
+          "relative_gap_percent": 0.004538887995322767,
+          "absolute_gap_pp": 0.0019916640523476303,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__gdem__r0.005__s1/result.json",
+          "result_sha256": "a5084d96890766a7aecbf6c3b8cc8383e345a1a27afe0f998fa15e95789080ae",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_flickr_0.005_1.pt": "f0f87de7a79b559cc42911608daf4303cb09f9c08982a2ae2da57e25f06113e5",
+            "checkpoints/reduced_graph/gdem/feat_flickr_0.005_1.pt": "72ebb7757078b0407140aef0c8553fa9ceaf933ec1602d9522b1fb44aabb1ab5",
+            "checkpoints/reduced_graph/gdem/label_flickr_0.005_1.pt": "8dba9f840b542f26e2e874d84543cdfd26f2d737a16100be1ef486ead51f4370"
+          }
+        },
+        {
+          "setting": "0.01",
+          "archive_rate_label": "0.01",
+          "reference_percent": 45.3,
+          "reproduced_percent": 45.30184197552996,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.004066171147821713,
+          "absolute_gap_pp": 0.0018419755299632357,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/flickr__gdem__r0.01__s1/result.json",
+          "result_sha256": "eeb6262444d17dfe0ad1da939572e282b12438a52aaba07082b6cd3c77e171b8",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_flickr_0.01_1.pt": "cacfab6cdd860233a8d4c57601decfff1f769bc06b707d25a7587a3a607d0942",
+            "checkpoints/reduced_graph/gdem/feat_flickr_0.01_1.pt": "6a6be450c9f4c217a6a8a11f2e0eb11c4027346a1226ff2d18915545441155bf",
+            "checkpoints/reduced_graph/gdem/label_flickr_0.01_1.pt": "3642634c661e0238c0c08fb773a89347c50136dab55c156001ed35efba14da79"
+          }
+        }
+      ]
+    },
+    {
+      "method": "gdem",
+      "dataset": "reddit",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "settings_kind": "node_budget",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "accuracy",
+      "mean_shortfall_percent": 0.0017859651051471406,
+      "mean_relative_gap_percent": 0.00404023935441868,
+      "mean_absolute_gap_pp": 0.003573330441805448,
+      "reference_table": "main_full",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "0.0005",
+          "archive_rate_label": "0.0005",
+          "reference_percent": 87.95,
+          "reproduced_percent": 87.95496439801931,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.005644568526789123,
+          "absolute_gap_pp": 0.004964398019311034,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__gdem__r0.0005__s1/result.json",
+          "result_sha256": "5f7c1bbe4b1aaeb03af3543a10cdd5f968472c7b8bb03d77e6a2d12052461364",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_reddit_0.0005_1.pt": "24737606089c86f7ba71a1bccd86c53f11dcc3d3dd0b222003d8680b73c1e955",
+            "checkpoints/reduced_graph/gdem/feat_reddit_0.0005_1.pt": "9565628c3a9a58808400efe63f565ad478a4b3ef6dc2a392815493f1638f8897",
+            "checkpoints/reduced_graph/gdem/label_reddit_0.0005_1.pt": "5865f7cea2db2fe7d7237351a7c0bebc7c0b2aa409cc43de4b0716df3d606f48"
+          }
+        },
+        {
+          "setting": "0.001",
+          "archive_rate_label": "0.001",
+          "reference_percent": 88.48,
+          "reproduced_percent": 88.4752593342249,
+          "shortfall_percent": 0.005357895315441422,
+          "relative_gap_percent": 0.005357895315441422,
+          "absolute_gap_pp": 0.0047406657751025705,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__gdem__r0.001__s1/result.json",
+          "result_sha256": "04b742615e178fd461c279519ca8364f494a047c7a87f35e4e8c421c01ae243d",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_reddit_0.001_1.pt": "3a1fa5ec160bfc113f394c31186c73ef592f158ae1950ee3ea0499c8dc07b154",
+            "checkpoints/reduced_graph/gdem/feat_reddit_0.001_1.pt": "ac24808fbfff7d46bfdf0b8d11287902e54ada8fc8953586abb5f15bf518f871",
+            "checkpoints/reduced_graph/gdem/label_reddit_0.001_1.pt": "9a1750d77efeab9e1dc92fb1a8094e389fab258a7414c10d07ccdab599e70b27"
+          }
+        },
+        {
+          "setting": "0.002",
+          "archive_rate_label": "0.002",
+          "reference_percent": 90.76,
+          "reproduced_percent": 90.76101492753101,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.0011182542210254965,
+          "absolute_gap_pp": 0.0010149275310027406,
+          "score_metric": "accuracy",
+          "result_path": "runs/table9_extra_cells_20261101/jobs/reddit__gdem__r0.002__s1/result.json",
+          "result_sha256": "a22ae0695c4641153e91d1b6c738420c246205f2efb37bb5014e090bcceafae8",
+          "source_sha256": "86cdab27794815b0202f6d09f37633f861ceaa65e5f175737003b2be35c2a1a8",
+          "n_evaluations": 10,
+          "selection": "validation accuracy only",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {
+            "checkpoints/reduced_graph/gdem/adj_reddit_0.002_1.pt": "926e44840b47017ebedf44df3480ab870570c70ac289ee8358dcf16fa44819b3",
+            "checkpoints/reduced_graph/gdem/feat_reddit_0.002_1.pt": "c2e8c8bf6eb729b53ce758fc4f4b6430f4fcf7e7d5d37b64e34894aecc14bf58",
+            "checkpoints/reduced_graph/gdem/label_reddit_0.002_1.pt": "6df20b4926eebe6e5dfb99f63d25eb49f92a50597b115a137e6f46f34afb5fd1"
+          }
+        }
+      ]
+    },
+    {
+      "method": "gdem",
+      "dataset": "yelp",
+      "reference_source": "GC4NC_updated_manuscript_20261101",
+      "reference_status": "numeric_reference",
+      "decision_basis": "measured_shortfall",
+      "evaluation_profile": "gc4nc_yelp_AP_epoch_HPO12",
+      "declared_rates": [
+        "0.0005",
+        "0.001",
+        "0.002"
+      ],
+      "settings_kind": "node_budget",
+      "complete_result": true,
+      "at_least_one_rate_complete": true,
+      "credited_by_policy": false,
+      "score_metric": "AP",
+      "mean_shortfall_percent": 0.0,
+      "mean_relative_gap_percent": 0.011703523196730618,
+      "mean_absolute_gap_pp": 0.0021239682379411797,
+      "reference_table": "main_full",
+      "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "comparison_provenance": "shared_archived_observations",
+      "independent_replication": false,
+      "settings": [
+        {
+          "setting": "0.0005",
+          "archive_rate_label": "0.0005",
+          "reference_percent": 18.05,
+          "reproduced_percent": 18.05286295074535,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.015861222965925095,
+          "absolute_gap_pp": 0.0028629507453494796,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.0005__s1.json",
+          "result_sha256": "cd599f2891bdf9c9d5fbed43f4f09369f366c7c313f0f373ebae363f3cdd696b",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        },
+        {
+          "setting": "0.001",
+          "archive_rate_label": "0.001",
+          "reference_percent": 18.18,
+          "reproduced_percent": 18.181942207264697,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.010683208276664,
+          "absolute_gap_pp": 0.0019422072646975153,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.001__s1.json",
+          "result_sha256": "d4bab42bb769b4840e149fbaa5f32b9056d260c75148ad377045e7ae35963aa0",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        },
+        {
+          "setting": "0.002",
+          "archive_rate_label": "0.002",
+          "reference_percent": 18.29,
+          "reproduced_percent": 18.291566746703776,
+          "shortfall_percent": 0.0,
+          "relative_gap_percent": 0.00856613834760276,
+          "absolute_gap_pp": 0.0015667467037765448,
+          "score_metric": "AP",
+          "result_path": "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.002__s1.json",
+          "result_sha256": "e3efffc3cc561526d392bba6b5551c8f4bc60bf721f90e23feda299f738cca1a",
+          "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+          "n_evaluations": 10,
+          "selection": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+          "same_observations_used_in_updated_GC4NC_table": true,
+          "checkpoint_sha256": {}
+        }
+      ]
+    }
+  ],
+  "roster_revision": {
+    "basis": "User requested removal of Clustering without a published numerical comparison.",
+    "parent_snapshot": "benchmark/results/reproduction_coverage_20261101.json",
+    "parent_snapshot_sha256": "6d190cbf571ef2bf685c392fb0126ff5b1d37c5edf7279d65ed29744b2fc1cb3",
+    "removed_pairs": [
+      {
+        "method": "clustering",
+        "dataset": "citeseer",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "cora",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "pubmed",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "ogbn-arxiv",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "flickr",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "reddit",
+        "reason": "no published numerical reference"
+      },
+      {
+        "method": "clustering",
+        "dataset": "yelp",
+        "reason": "no published numerical reference"
+      }
+    ],
+    "raw_observations_changed": false
+  },
+  "reference_source_counts": {
+    "GC4NC_Table9": 100,
+    "own_paper": 16,
+    "GC4NC_updated_manuscript_20261101": 8
+  },
+  "cohort_expansion": {
+    "parent": "benchmark/results/reproduction_coverage_20261102.json",
+    "parent_sha256": "909b07b1da8954afcef7860682a62391e051107b40417a6fab7168f774da708c",
+    "added_unique_pairs": [
+      "t_spanner/ogbn-arxiv",
+      "t_spanner/flickr",
+      "t_spanner/reddit",
+      "t_spanner/yelp",
+      "gdem/ogbn-arxiv",
+      "gdem/flickr",
+      "gdem/reddit",
+      "gdem/yelp"
+    ],
+    "existing_116_records_unchanged": true,
+    "historical_Yelp_metric": "macro-F1 for the existing 13 Yelp pairs",
+    "new_Yelp_metric": "AP for the added TSpanner/Yelp and GDEM/Yelp pairs; matched within each pair",
+    "shared_observation_pairs": 8,
+    "independent_replication_pairs_added": 0,
+    "reference_manuscript_commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+    "reference_files_sha256": {
+      "682522352d97d4347ec4cdf8/8appendix.tex": "47de3a4e4b4667c3f3736c2778c2faad1323ccdb154830ec8e548a4d469c4715",
+      "682522352d97d4347ec4cdf8/tables/edge_sparsification.tex": "3e69f023265386a410bee9e148b34030cb32043231c40fd7c35a739e8714c2f6"
+    },
+    "raw_result_files_verified": 24,
+    "final_evaluations_verified": 240,
+    "checkpoint_files_hash_verified": 36
+  }
+}

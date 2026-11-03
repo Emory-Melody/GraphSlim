@@ -1,0 +1,26 @@
+{
+  "artifact_id": "graphslim-reproducibility-20261103",
+  "files_sha256": {
+    ".gitattributes": "f87727fac269bc12beb763a7ce6afd7bec48aaecc17389eddfef9ec715429a28",
+    "README.md": "1c51da31505fd135ad3369e9fb84a1b26a01313fc1f3e67b5fc02af308947b0a",
+    "cohorts.json": "6e8295f8c29dc36411ec41bb9849171dd011fc749d0baf5c4b87bd0d1100c7e3",
+    "pairs.csv": "75bf17ef0d69c93464039ae4f9970ac51c365988b61cedd594211ffde902fa9e",
+    "reference_corrections.json": "bbbd05099b67e5e5a7af6130819e72cb5fadc77ad37a06ec4bcd6d58bf4bebe5",
+    "reference_validation.json": "ac993663023be2bf89cabc505baa0108e302440c4b582b5f2e4d76302c7cbb55",
+    "settings.json": "4525cc1c0ab4da74d19e735015d98ec0f34c3670b378ddcd6871fe517ac81649",
+    "sources/benchmark/results/reproduction_coverage_20261101.json": "6d190cbf571ef2bf685c392fb0126ff5b1d37c5edf7279d65ed29744b2fc1cb3",
+    "sources/benchmark/results/reproduction_coverage_20261102.json": "909b07b1da8954afcef7860682a62391e051107b40417a6fab7168f774da708c",
+    "sources/benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json": "a2ea70a7e9abf20e8ff0dddb24387b01d70ee93b2fbb0a52624ef5e9fa67d4ee",
+    "sources/output/reproduction_90pct_20261031/rate_cells.csv": "a9e81c35cd44c62afda0776b0f652bd8be9c1c68548ed5d7d679cbe8e614e020",
+    "sources/output/reproduction_alignment_20261031/rate_cells.csv": "8bfbd77d7947cee109fed04472c8a034cf4cd7ef1b4259f5f99d790e857d42f8",
+    "sources/output/reproduction_alignment_round2_20261031/rate_cells.csv": "359670bd5291e0a1a1470912de0f0c1e596cb658e9f21476ac5f21bb2271674c",
+    "sources/output/reproduction_followup_20261031/rate_cells.csv": "3ce507dd0089e4a19e9ba30504d8c0a9f8b496fcc5d2ec7560c9945918d9a62b",
+    "sources/output/reproduction_rates_20261031/matched_rate_cells.csv": "2a2096973d3c273c7deede3cb1b85af0fc468675d0acabd1bf91baeabe731c65",
+    "sources/output/reproduction_rates_with_clustering_20261031/vn_repair_rate_cells.csv": "998d6026f95bb0681cabc1b32c818b4eca38f3b6a79e25251df7ce07bf295d4b",
+    "sources/output/reproduction_round4_20261031/metric_contract.json": "be998030af7bc97e5bfa8b60dd53482d0b69950e771a49a2c58adc1358711cbe",
+    "sources/output/reproduction_round4_20261031/rate_cells.csv": "b06f3acb2088bc17019da56e3eed896f64c7fee793ad59cdac5111c8601ae15b",
+    "sources/output/reproduction_round4_20261031/reference_corrections.json": "bbbd05099b67e5e5a7af6130819e72cb5fadc77ad37a06ec4bcd6d58bf4bebe5",
+    "summary.json": "92cc9b0eba0088350e85f6af113dc6525f2fa472a5acad33b5b5661c9c6217fe",
+    "verify.py": "b99ae01e2c0305f3ac804716cc1478ab31e8d54973e5387901bf73ef61d2cf7d"
+  }
+}

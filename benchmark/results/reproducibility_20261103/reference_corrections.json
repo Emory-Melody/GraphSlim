@@ -1,0 +1,36 @@
+{
+  "decision_utc": "2026-11-01",
+  "decided_by": "user",
+  "rule": "Where GC4NC v3 main-text Table 1 and Appendix Table 9 disagree, Table 1 is authoritative; the Table 9 Pubmed 0.02% K-Center cell (79.18) is a transcription error and belongs to TSpanner (absent from Table 1).",
+  "evidence": [
+    "arXiv 2406.16715v3 Table 1, Pubmed 0.02%: Herding 62.91, K-Center 62.91, Averaging 75.60 (checked live 2026-11-01)",
+    "Table 9 Pubmed 0.02%: K-Center 79.18\u00b10.2 (above Whole 78.6), TSpanner 62.91\u00b11.5 (duplicate of Herding), Averaging 74.09\u00b10.6",
+    "output/reproduction_90pct_20261031/reference_discrepancies.json recorded the two Table 1/Table 9 conflicts on 2026-10-31 without acting on them"
+  ],
+  "corrections": [
+    {
+      "method": "kcenter",
+      "dataset": "pubmed",
+      "rate": "0.05",
+      "table9": 79.18,
+      "corrected": 62.91,
+      "source": "Table 1"
+    },
+    {
+      "method": "t_spanner",
+      "dataset": "pubmed",
+      "rate": "0.05",
+      "table9": 62.91,
+      "corrected": 79.18,
+      "source": "Table 9 K-Center cell, inferred swap"
+    },
+    {
+      "method": "averaging",
+      "dataset": "pubmed",
+      "rate": "0.05",
+      "table9": 74.09,
+      "corrected": 75.6,
+      "source": "Table 1"
+    }
+  ]
+}

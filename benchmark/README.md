@@ -252,3 +252,25 @@ Set `PYTHON`, `GRAPHSLIM_LOAD_PATH`, and `GRAPHSLIM_SAVE_PATH` to customize
 single-job adapters. Set planner data/checkpoint paths with GraphSlim flags after
 `--`. The historical `sub_grid.sh` is a custom GCDM sweep, not Table 10's full
 paper-matched tuning protocol.
+
+## Package-paper reproducibility cohort
+
+The package manuscript and both READMEs use the fixed 124-pair numerical-reference
+cohort, with one-sided shortfall and two-sided relative error reported together.
+The previous 123-pair cohort included seven no-reference Clustering completion
+credits. The transition is 123 − 7 + 8 = 124; the eight additions share observations
+with the updated GC4NC reference tables and are not independent replications.
+
+The [fixed artifact](results/reproducibility_20261103/README.md) contains all 355
+matched-setting scores, reference versions/corrections, per-pair aggregates,
+historical rosters, both formulas, sensitivity results and SHA-256 hashes.
+This offline calculation check requires only Python's standard library:
+
+```bash
+python benchmark/results/reproducibility_20261103/verify.py --check
+python -m benchmark.plot_reproduction_coverage --check
+python -m benchmark.render_readme_highlights --coverage-only --check
+```
+
+The calculation check reproduces reported statistics from fixed scores; training
+reproduction uses the separate commands above and the original archived profiles.
