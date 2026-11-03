@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/arxiv_clustering_comparison_20261101.json",
   "source_sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
-  "renderer_sha256": "182e534236ef84fe38a49b970c2e0ef1abaa41c24a0f209b20cdec17a013d29c",
+  "renderer_sha256": "e05f33646afce2e020d3274d17b7f5062546799b009eeda6ee65b2ffadc837e6",
   "source_archive": {
     "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
     "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",
@@ -632,9 +632,9 @@
     }
   ],
   "assets_sha256": {
-    ".svg": "0b1c8c61eb567220a594c5709cbe632f545f4881cef5ec7bcbe6b96f139287d8",
-    ".png": "89ac27fbfc805756f54406cf7fcc63e6b4bf617d5a4975cccb9d65dbce115b44",
-    ".pdf": "34b093d16dc329f5e011a20d48994e251e59d15d94a21ec243b6fc12f177b458",
-    "_paper.pdf": "b998c44efd22f1e881cd7d7e9a549788400f59c04dfc6bd9023f822710e21beb"
+    ".svg": "ff6aa42f4262e38f0c3e8ad0e8d8ba2ea07bfb07f46eb78917bd2d1b514bbe0c",
+    ".png": "acade3b78fb0a4b13ccef131c7b5529e1441b676d3957949d22e4546986f3715",
+    ".pdf": "652cec47b893b315f8626237c4f041d7f96ed3f233524d8ba1de4ce1370129c5",
+    "_paper.pdf": "e739f3eece1029ebe75cc17dcf7ab4805811443388cf52465530aac5f6cf414e"
   }
 }

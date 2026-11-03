@@ -100,6 +100,7 @@ def plot(data, paper=False):
     import matplotlib.pyplot as plt
     from matplotlib.patches import Patch
     from matplotlib.ticker import MaxNLocator
+    from matplotlib.transforms import Bbox
     import numpy as np
 
     blue, gray, ink = "#4F6BFF", "#FFFFFF", "#000000"
@@ -129,7 +130,7 @@ def plot(data, paper=False):
         fig, axes = plt.subplots(2, 1, figsize=(10.4, 8.6))
         fig.subplots_adjust(left=.12, right=.97, bottom=.25, top=.73, hspace=.78)
     else:
-        fig, axes = plt.subplots(1, 2, figsize=(17, 7.5))
+        fig, axes = plt.subplots(1, 2, figsize=(18.5, 7.5))
         fig.subplots_adjust(left=0.065, right=0.985, bottom=0.25, top=0.72, wspace=0.24)
     fig.text(0.065, 0.94, "GraphSlim on ogbn-arxiv", fontsize=24 if paper else 27, weight="bold")
     fig.text(0.985, 0.94, "Lower is better ↓", fontsize=16, ha="right", color="#000000")
@@ -195,9 +196,10 @@ def plot(data, paper=False):
         ax.spines[["top", "right"]].set_visible(False)
         ax.tick_params(axis="both", length=0, pad=7)
         ax.yaxis.set_major_locator(MaxNLocator(5))
+        # Leave room for the two-line labels beside the neighboring open bars.
         for offset, backend, color, hatch in [
-            (-0.18, "author", gray, None),
-            (0.18, "graphslim", blue, "//"),
+            (-0.25, "author", gray, None),
+            (0.25, "graphslim", blue, "//"),
         ]:
             summaries = [p["implementations"][backend][field] for p in data["pairs"]]
             transformed_values = [transformed(p, backend) for p in data["pairs"]]
@@ -207,7 +209,7 @@ def plot(data, paper=False):
             ax.bar(
                 positions + offset,
                 medians,
-                0.33,
+                0.24,
                 color=color,
                 edgecolor="black",
                 linewidth=0.8,
@@ -222,15 +224,11 @@ def plot(data, paper=False):
                 )
                 if field == "reduction_seconds" and backend == "graphslim":
                     label += f"\n({value:.2f}×)"
-                padding = (
-                    0.10
-                    if field == "peak_cuda_allocated_bytes" and backend == "graphslim"
-                    else 0.022
-                )
-                ax.text(
-                    x,
-                    high + maximum * padding,
+                ax.annotate(
                     label,
+                    xy=(x, high),
+                    xytext=(0, 5),
+                    textcoords="offset points",
                     ha="center",
                     va="bottom",
                     fontsize=11 if paper else 12,
@@ -262,6 +260,34 @@ def plot(data, paper=False):
         assert not axes[0].yaxis.label.get_window_extent(renderer).overlaps(axes[1].yaxis.label.get_window_extent(renderer))
         assert not axes[1].xaxis.label.get_window_extent(renderer).overlaps(fig.texts[-2].get_window_extent(renderer))
     for ax in axes:
+        label_bounds = [item.get_window_extent(renderer) for item in ax.texts]
+        whisker_bounds = []
+        for container in ax.containers:
+            if not hasattr(container, "errorbar"):
+                continue
+            _, caps, collections = container.errorbar.lines
+            for cap in caps:
+                width = cap.get_markersize() * fig.dpi / 72
+                height = cap.get_markeredgewidth() * fig.dpi / 72
+                whisker_bounds.extend(
+                    Bbox.from_bounds(x - width / 2, y - height / 2, width, height)
+                    for x, y in cap.get_transform().transform(cap.get_xydata())
+                )
+            whisker_bounds.extend(
+                Bbox(collection.get_transform().transform(segment)).padded(fig.dpi / 144)
+                for collection in collections
+                for segment in collection.get_segments()
+            )
+        for index, bounds in enumerate(label_bounds):
+            assert not any(
+                bounds.overlaps(bar.get_window_extent(renderer)) for bar in ax.patches
+            ), f"Label overlaps a bar: {ax.texts[index].get_text()}"
+            assert not any(
+                bounds.overlaps(whisker) for whisker in whisker_bounds
+            ), f"Label overlaps an error bar: {ax.texts[index].get_text()}"
+            assert not any(
+                bounds.overlaps(other) for other in label_bounds[index + 1:]
+            ), f"Labels overlap: {ax.texts[index].get_text()}"
         for item in [
             ax.title,
             ax.xaxis.label,
