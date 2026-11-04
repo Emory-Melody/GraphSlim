@@ -700,9 +700,6 @@ CGC, ClustGDD, GCGP and Random at all three rates.
 Package regression tests cover eight downstream architectures, transductive and inductive
 settings, noise, saved-graph reloads and validation-based model selection.
 [Integration runner](benchmark/lightweight_downstream.py) · [Regression checks](tests/test_lightweight_methods.py).
-The seven-model roster used by the benchmark runner follows the GC4NC experiment
-protocol. This benchmark setting and the package's supported-architecture count
-describe separate scopes.
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run

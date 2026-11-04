@@ -648,7 +648,6 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 
 包内回归测试覆盖八种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
 [集成实验入口](benchmark/lightweight_downstream.py) · [回归测试](tests/test_lightweight_methods.py)。
-基准运行器采用 GC4NC 实验协议中的七模型设定。该实验设定与软件支持的架构数量分别描述不同范围。
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
