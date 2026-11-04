@@ -15,13 +15,17 @@
 
 </div>
 
-GraphSlim 将 **49 种图缩减方法**、**7 种下游 GNN 骨干网络**和
+GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
 **仅使用验证集选参的超参数优化（HPO）** 整合到统一流程中。
 加载图、选择缩减方法、评估缩减图均使用共享接口。
 本仓库包含可运行示例、回归测试和基准复现命令。
 
 49 种方法包括 **5 种节点稀疏化、18 种边稀疏化、10 种粗化和 16 种凝聚方法**。
 其中节点与边稀疏化合计 23 种；别名不重复计数。
+
+8 种骨干网络为 **GCN、SGC、APPNP、ChebNet、GraphSAGE、GAT、GIN 和 SGFormer**。
+它们共用 [`DOWNSTREAM_MODELS` 注册表](graphslim/models/__init__.py)和 `--eval_model` 选项；
+ChebNet 和 GraphSAGE 的命令行名称分别为 `Cheby` 和 `GraphSage`。
 
 GPU 运算使用 PyTorch 原生算子。请安装与显卡和 CUDA 运行时匹配的
 Torch 与 PyG 扩展 wheel。
@@ -638,7 +642,7 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 [数据集扩展实验](docs/dataset_expansion.md) 在每个比例下使用 3 个缩减种子和 10 个 GCN 种子。
 [Products 完整结果](docs/products.md) 包含 CGC、ClustGDD、GCGP 和 Random 的全部三个缩减比例。
 
-方法测试覆盖七种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
+方法测试覆盖八种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
 [方法配置与测试说明](docs/lightweight_methods.md)。
 
 ```bash

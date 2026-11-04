@@ -2,7 +2,7 @@
 
 from graphslim._lazy import lazy_exports
 
-DOWNSTREAM_MODELS = ("GCN", "SGC", "APPNP", "Cheby", "GraphSage", "GAT", "SGFormer")
+DOWNSTREAM_MODELS = ("GCN", "SGC", "APPNP", "Cheby", "GraphSage", "GAT", "SGFormer", "GIN")
 
 
 def get_model_class(name):
@@ -26,6 +26,7 @@ __all__, __getattr__, __dir__ = lazy_exports(
         "Cheby": (".cheby", "Cheby"),
         "GAT": (".gat", "GAT"),
         "GCN": (".gcn", "GCN"),
+        "GIN": (".gin", "GIN"),
         "GraphSage": (".graphsage", "GraphSage"),
         "IGNR": (".ignr", "GraphonLearner"),
         "KernelRidgeRegression": (".krr", "KernelRidgeRegression"),

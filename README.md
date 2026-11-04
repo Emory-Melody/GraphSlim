@@ -15,7 +15,7 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
-GraphSlim brings **49 graph reduction methods**, **7 downstream GNN backbones**,
+GraphSlim brings **49 graph reduction methods**, **8 downstream GNN backbones**,
 and **validation-only hyperparameter optimization (HPO)** into a shared workflow.
 Load a graph, choose a reducer, and evaluate its output through the same interfaces.
 The repository includes runnable examples, regression tests, and benchmark
@@ -24,6 +24,10 @@ reproduction commands.
 The 49 methods comprise **5 node sparsifiers, 18 edge sparsifiers, 10 coarsening
 methods, and 16 condensation methods**. Node and edge sparsification together
 account for 23 methods; aliases are not counted as additional methods.
+
+The eight backbones are **GCN, SGC, APPNP, ChebNet, GraphSAGE, GAT, GIN, and SGFormer**.
+They share the [`DOWNSTREAM_MODELS` registry](graphslim/models/__init__.py) and the
+`--eval_model` option; the CLI names for ChebNet and GraphSAGE are `Cheby` and `GraphSage`.
 
 GPU execution uses native PyTorch operations. Install matching Torch and PyG
 extension wheels for your GPU and CUDA runtime.
@@ -686,7 +690,7 @@ The [dataset expansion](docs/dataset_expansion.md) uses three reduction seeds an
 ten GCN seeds per rate. [Completed Products results](docs/products.md) include
 CGC, ClustGDD, GCGP and Random at all three rates.
 
-Method checks cover seven downstream architectures, transductive and inductive
+Method checks cover eight downstream architectures, transductive and inductive
 settings, noise, saved-graph reloads and validation-based model selection.
 [Method settings and checks](docs/lightweight_methods.md).
 

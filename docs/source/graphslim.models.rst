@@ -6,6 +6,8 @@ Model selection
 
 .. autofunction:: graphslim.models.get_model_class
 
+.. autodata:: graphslim.models.DOWNSTREAM_MODELS
+
 graphslim.models.base module
 --------------------------------
 
@@ -43,6 +45,14 @@ graphslim.models.gat module
 -------------------------------
 
 .. automodule:: graphslim.models.gat
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+graphslim.models.gin module
+-------------------------------
+
+.. automodule:: graphslim.models.gin
    :members:
    :undoc-members:
    :show-inheritance:

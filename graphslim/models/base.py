@@ -11,6 +11,8 @@ from graphslim.acceleration import CUDAGraphStep
 class BaseGNN(nn.Module):
     """Shared graph model training, validation selection, and prediction interface."""
 
+    normalize_adjacency = True
+
     def __init__(self, nfeat, nhid, nclass, args, mode):
         """Initialize BaseGNN and its configuration.
 
@@ -126,6 +128,7 @@ class BaseGNN(nn.Module):
         :returns: Best validation score as a float; ``final_output=True`` returns ``None`` before restoring validation-selected weights.
         """
         args = self.args
+        normadj = normadj and self.normalize_adjacency
 
         self.initialize()
         # data for training
@@ -154,7 +157,9 @@ class BaseGNN(nn.Module):
                 label2=data.labels_val,
                 device=self.device,
             )
-        if self.__class__.__name__ == "GAT":
+        if not normadj:
+            pass
+        elif self.__class__.__name__ == "GAT":
             # gat must use SparseTensor
             if len(adj.shape) == 3:
                 adj = [normalize_adj_tensor(a.to_sparse(), sparse=True) for a in adj]
@@ -329,6 +334,7 @@ class BaseGNN(nn.Module):
         :returns: Output of ``forward``, including intermediate features when requested.
         """
         self.eval()
+        normadj = normadj and self.normalize_adjacency
         features, adj = to_tensor(features, adj, device=self.device)
         if normadj:
             adj = normalize_adj_tensor(adj, sparse=is_sparse_tensor(adj))

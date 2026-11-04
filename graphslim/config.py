@@ -6,6 +6,7 @@ from pathlib import Path
 
 import click
 from pprint import pformat
+from graphslim.models import DOWNSTREAM_MODELS
 from graphslim.reduction import get_method_spec, list_methods
 
 
@@ -123,6 +124,8 @@ PARAMETER_CATEGORIES = {
         "final_eval_model",
         "eval_wd",
         "eval_loss",
+        "gin_eps",
+        "gin_train_eps",
         "activation",
         "alpha",
     },
@@ -595,8 +598,21 @@ def method_config(args):
     "--eval_model",
     "--em",
     default="GCN",
-    type=click.Choice(["GCN", "GAT", "SGC", "APPNP", "Cheby", "GraphSage", "GAT", "SGFormer"]),
+    type=click.Choice(DOWNSTREAM_MODELS),
     show_default=True,
+)
+@click.option(
+    "--gin_eps",
+    default=0.0,
+    type=float,
+    show_default=True,
+    help="initial epsilon offset in GIN's (1 + epsilon) self-feature weight",
+)
+@click.option(
+    "--gin_train_eps/--no_gin_train_eps",
+    default=False,
+    show_default=True,
+    help="learn GIN epsilon instead of keeping it fixed",
 )
 @click.option("--eval_wd", "--ewd", default=0.0, show_default=True)
 @click.option(

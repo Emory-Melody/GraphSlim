@@ -122,7 +122,7 @@ def quick_args(tmp_path, method, setting):
 @pytest.mark.parametrize("setting", ["trans", "ind"])
 @pytest.mark.parametrize("noise", NOISE_TYPES)
 def test_every_model_on_clean_and_training_noise(tmp_path, method, setting, noise):
-    """3 methods x 2 settings x 7 conditions x 7 actual GNN fits = 392 fits."""
+    """Fit every registered backbone across reduction, split, and noise cases."""
     args = quick_args(tmp_path, method, setting)
     source = tiny_graph()
     original_features = source.feat_full.clone()

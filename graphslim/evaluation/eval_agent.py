@@ -176,6 +176,12 @@ class Evaluator:
                     "weight_decay": [0, 5e-4],
                     "dropout": [0.0, 0.5],
                 },
+                "GIN": {
+                    "hidden": [64, 256],
+                    "lr": [0.01, 0.001],
+                    "weight_decay": [0, 5e-4],
+                    "dropout": [0.0, 0.5],
+                },
                 "GAT": {
                     "hidden": [16, 64],
                     "lr": [0.01, 0.001],
