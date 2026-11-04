@@ -697,11 +697,12 @@ The [dataset expansion runner](benchmark/expand_datasets.py) uses three reductio
 ten GCN seeds per rate. [Archived Products results](benchmark/results/products_20261028.json) include
 CGC, ClustGDD, GCGP and Random at all three rates.
 
-Method checks cover eight downstream architectures, transductive and inductive
+Package regression tests cover eight downstream architectures, transductive and inductive
 settings, noise, saved-graph reloads and validation-based model selection.
 [Integration runner](benchmark/lightweight_downstream.py) · [Regression checks](tests/test_lightweight_methods.py).
-The standalone integration runner keeps its fixed seven-model experiment roster;
-the package and regression tests support all eight registered backbones, including GIN.
+The seven-model roster used by the benchmark runner follows the GC4NC experiment
+protocol. This benchmark setting and the package's supported-architecture count
+describe separate scopes.
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run

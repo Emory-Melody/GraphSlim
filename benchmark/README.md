@@ -93,10 +93,11 @@ python -m benchmark.lightweight_downstream --run-dir runs/lightweight_NEW --prof
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_full_NEW --profile full --conditions clean
 ```
 
-The standalone integration runner uses a fixed roster of three methods × eight training conditions ×
+The integration runner follows GC4NC's seven-model experiment protocol:
+three methods × eight training conditions ×
 seven downstream models: GCN, SGC, APPNP, Cheby, GraphSage, GAT and SGFormer.
-The package supports eight architectures, including GIN; its regression tests exercise
-the full registry. Historical integration batches retain their recorded model rosters.
+The experiment protocol and the package's supported-architecture count are separate
+specifications. Historical integration batches retain their recorded GC4NC rosters.
 Conditions include clean, edge addition/deletion, column/entry feature masking,
 Gaussian feature noise, training-label corruption and the legacy `metattack`
 entrypoint (actually PRBCD). Clean jobs also evaluate five inference corruptions

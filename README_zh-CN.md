@@ -646,9 +646,9 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 [数据集扩展入口](benchmark/expand_datasets.py) 在每个比例下使用 3 个缩减种子和 10 个 GCN 种子。
 [Products 历史结果](benchmark/results/products_20261028.json) 包含 CGC、ClustGDD、GCGP 和 Random 的全部三个缩减比例。
 
-方法测试覆盖八种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
+包内回归测试覆盖八种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
 [集成实验入口](benchmark/lightweight_downstream.py) · [回归测试](tests/test_lightweight_methods.py)。
-独立集成脚本保留固定的七模型实验名单；软件包和回归测试支持包括 GIN 在内的全部八种注册骨干。
+基准运行器采用 GC4NC 实验协议中的七模型设定。该实验设定与软件支持的架构数量分别描述不同范围。
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
