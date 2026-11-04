@@ -8,7 +8,6 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 [Documentation](https://graphslim.readthedocs.io/en/latest/) ·
 [GC4NC benchmark paper](https://arxiv.org/abs/2406.16715) ·
-[Web interface](https://graphslim-vis.streamlit.app/) ·
 [Paper collection](https://github.com/Emory-Melody/awesome-graph-reduction)
 
 <img src="./figures/logo.png" width="300" alt="GraphSlim logo">
@@ -344,7 +343,9 @@ Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cor
 
 ## Install
 
-Use Python 3.10 or 3.11. Install PyTorch first for your CPU/CUDA environment, then
+Use Python 3.10 or 3.11. For the manuscript, check out the immutable Git commit
+identified in the cover letter before following these source-installation instructions.
+Install PyTorch first for your CPU/CUDA environment, then
 install matching PyG extension wheels. For example, a CPU development environment:
 
 ```bash
@@ -377,7 +378,8 @@ Use `graphslim-doctor` to check PyTorch, sparse operations and optional DGL.
 python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
-To use a published package instead of this checkout: `pip install graphslim`.
+The published PyPI distribution is installed with `pip install graphslim`.
+Use the reviewed Git source snapshot for the manuscript's 49-method, eight-backbone feature set.
 
 ## Quick start
 
@@ -533,7 +535,8 @@ options take precedence. Public imports include `CGC`, `ClustGDD`, `GCGP` from
 
 ## Search a method's settings
 
-GC4NC reports every method with its authors' settings. For a new dataset or method, `--hpo`
+The fixed reproduction artifact records the settings adopted for each historical pair.
+For a new dataset or method, `--hpo`
 grid-searches the reduction settings themselves with validation-only selection:
 
 ```bash
@@ -543,8 +546,8 @@ python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./
 It prints the search space (from `--hpo_space`, else `graphslim/configs/hpo/<method>.json`,
 else a one-point template written under `save_path/hpo/` for you to widen), the number of
 trials and a time estimate, then asks for confirmation (`--hpo_yes` skips it). Every trial
-reduces the graph and scores it by the mean validation accuracy of `--hpo_eval_runs` GCN
-fits; no test score is computed. Finished trials are appended to `trials.jsonl`, so an
+reduces the graph and scores it by the mean validation accuracy of `--hpo_eval_runs` downstream
+fits (`--eval_model`, GCN by default); no test score is computed. Finished trials are appended to `trials.jsonl`, so an
 interrupted search resumes, and the winner lands in `best.json` for `--config`.
 
 ## Reproduce the benchmark
@@ -576,9 +579,9 @@ NAS, and graph-property suites require saved reduced graphs. See
 
 ### Reduction rates
 
-Node reduction rates for all **19 datasets** recognized by the
-[dataset loader](graphslim/dataset/loader.py) are listed below. **R** (CLI `-R`)
-is the fraction of **labeled training nodes** retained.
+Node-selection and condensation budgets for the **19 datasets** recognized by the
+[dataset loader](graphslim/dataset/loader.py) are listed below. For these methods, **R**
+(CLI `-R`) is the fraction of **labeled training nodes** used to set the node budget.
 
 For edge sparsification, `-R` is the fraction of input edges kept;
 `t_spanner` and `spanning_forest` do not use it.
@@ -605,7 +608,7 @@ For edge sparsification, `-R` is the fraction of input edges kept;
 | OGBN-Proteins | `ogbn-proteins` | Transductive | 0.1 | — |
 | OGBN-Papers100M | `ogbn-papers100m` | Transductive | 0.1 | — |
 
-For node reduction, the target node count is approximately `R × N_train`, where
+For node selection and condensation, the target node count is approximately `R × N_train`, where
 `N_train` is the number of labeled training nodes. The final column expresses the
 same budget as a percentage: `100 × N_reduced / N_reference`. For Citeseer, Cora,
 Pubmed and Arxiv, `N_reference` is the number of nodes in the **whole graph**;
@@ -618,6 +621,10 @@ allocation and minimum class budgets can change the final node count. Use the
 saved reduced graph for the actual count. A dash means no percentage label is
 provided here for that dataset. This column describes node budgets; edge
 sparsification uses the separate edge-retention definition above.
+
+Multilevel coarseners apply `-R` to their working graph before extracting labeled
+training clusters. Their output node count can differ from the node-selection budget;
+read the saved graph dimensions for the actual retained count.
 
 Use `benchmark.reproduce performance` for the original seven datasets and the
 [dataset expansion runner](benchmark/expand_datasets.py) for Roman-empire,
@@ -686,13 +693,15 @@ not absent from this local coverage table. Raw artifacts live in the listed run 
 
 ## Lightweight methods: downstream validation
 
-The [dataset expansion](docs/dataset_expansion.md) uses three reduction seeds and
-ten GCN seeds per rate. [Completed Products results](docs/products.md) include
+The [dataset expansion runner](benchmark/expand_datasets.py) uses three reduction seeds and
+ten GCN seeds per rate. [Archived Products results](benchmark/results/products_20261028.json) include
 CGC, ClustGDD, GCGP and Random at all three rates.
 
 Method checks cover eight downstream architectures, transductive and inductive
 settings, noise, saved-graph reloads and validation-based model selection.
-[Method settings and checks](docs/lightweight_methods.md).
+[Integration runner](benchmark/lightweight_downstream.py) · [Regression checks](tests/test_lightweight_methods.py).
+The standalone integration runner keeps its fixed seven-model experiment roster;
+the package and regression tests support all eight registered backbones, including GIN.
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
@@ -729,14 +738,6 @@ examples/        small entry points using the package pipeline
 tests/           regression tests
 benchmark/       reproduction planner, research scripts and published results
 docs/            Sphinx documentation
-interface/       Streamlit application and example artifacts
-```
-
-## Web interface
-
-```bash
-pip install -e ".[viz]"
-python -m streamlit run interface/vis_graphslim.py
 ```
 
 ## Citation and acknowledgements

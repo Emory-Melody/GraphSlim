@@ -22,14 +22,15 @@ python -m benchmark.reproduce performance --datasets cora --methods clustering -
 
 For paired kernel and fixed-budget replay timing, use
 `python -m benchmark.benchmark_kernels --device cpu --output runs/sgnk.json`.
-The [efficiency protocol](../docs/efficiency.md) distinguishes these measurements
-from end-to-end author-code reproduction and retains accuracy/precision failures.
+The [historical efficiency records](../efficiency.md) distinguish these measurements
+from end-to-end author-code reproduction and retain accuracy/precision failures.
 Check the environment first with `python -m graphslim.doctor --device cpu --dgl`;
-see the [tested compatibility profiles](../docs/compatibility.md).
+see the [GPU setup and checks](../README.md#gpu-setup-and-checks).
 
-The optional [CUDA Graph backend](../docs/cuda_graph.md) has a separate integration
+The optional [CUDA Graph backend](../graphslim/acceleration.py) has a separate integration
 verifier: `python -m benchmark.verify_cuda_graph --device cpu --steps 20 --output runs/cuda_graph_cpu.json`.
-It exercises all 40 method tags and seven downstream models with explicit common
+It enumerates the registered method tags and the shared `DOWNSTREAM_MODELS` registry
+(49 methods and eight backbones in this source checkout) with explicit common
 synthetic graphs; these are not reducer reproductions or new scientific scores.
 `python -m benchmark.cuda_graph_queue --run-dir runs/cuda_graph_validation --gpus 3 4 5`
 freezes source and waits for idle GPU leases before running the GPU/noise matrix.
@@ -92,8 +93,10 @@ python -m benchmark.lightweight_downstream --run-dir runs/lightweight_NEW --prof
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_full_NEW --profile full --conditions clean
 ```
 
-The default integration roster is three methods × eight training conditions ×
+The standalone integration runner uses a fixed roster of three methods × eight training conditions ×
 seven downstream models: GCN, SGC, APPNP, Cheby, GraphSage, GAT and SGFormer.
+The package supports eight architectures, including GIN; its regression tests exercise
+the full registry. Historical integration batches retain their recorded model rosters.
 Conditions include clean, edge addition/deletion, column/entry feature masking,
 Gaussian feature noise, training-label corruption and the legacy `metattack`
 entrypoint (actually PRBCD). Clean jobs also evaluate five inference corruptions
@@ -109,7 +112,7 @@ complete matrix, with raw data in `scores.csv` and `jobs/*/result.json`. Smoke i
 and 300 downstream steps, not a paper-specific HPO/repeated benchmark. Use a new
 run directory whenever source or protocol changes.
 
-See [method documentation](../docs/lightweight_methods.md) for primary sources,
+See the [integration runner](lightweight_downstream.py) and [regression tests](../tests/test_lightweight_methods.py) for
 costs, soft-target handling, reduction budgets,
 undefined property metrics, perturbation contracts and algorithmic adaptations.
 The [README integration table](../README.md#lightweight-methods-downstream-validation)
@@ -174,7 +177,7 @@ candidates each). They retain the author's no-activation GCN profile and
 3,001-update downstream budget; graph selection separately uses hidden 2048,
 3,000 updates and the released validation cadence. These are explicit local
 search extensions, not GC4NC's original 300-epoch replay. See
-[the citation correction](../docs/simgc.md). Other datasets retain the existing
+[the implementation](../graphslim/condensation/simgc.py). Other datasets retain the existing
 300-epoch local protocol.
 Each training epoch explicitly restores training mode after validation, keeping
 dropout active. GECC's inductive propagation now includes the requested second hop.

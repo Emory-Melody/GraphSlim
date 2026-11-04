@@ -8,7 +8,6 @@
 
 [文档](https://graphslim.readthedocs.io/en/latest/) ·
 [GC4NC 基准论文](https://arxiv.org/abs/2406.16715) ·
-[Web 界面](https://graphslim-vis.streamlit.app/) ·
 [论文合集](https://github.com/Emory-Melody/awesome-graph-reduction)
 
 <img src="./figures/logo.png" width="300" alt="GraphSlim 标志">
@@ -29,7 +28,7 @@ ChebNet 和 GraphSAGE 的命令行名称分别为 `Cheby` 和 `GraphSage`。
 
 GPU 运算使用 PyTorch 原生算子。请安装与显卡和 CUDA 运行时匹配的
 Torch 与 PyG 扩展 wheel。
-[GPU 配置与检查](README_zh-CN.md#gpu-setup-and-checks)。
+[GPU 配置与检查](README_zh-CN.md#gpu-配置与检查)。
 
 [快速开始](#快速开始) · [软件框架](#软件框架) ·
 [复现覆盖率](#复现覆盖率) · [聚类加速](#聚类加速) ·
@@ -332,7 +331,8 @@ GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
 
 ## 安装
 
-请使用 Python 3.10 或 3.11。先安装适合 CPU/CUDA 环境的 PyTorch，再安装匹配的 PyG 扩展 wheel。
+请使用 Python 3.10 或 3.11。复现论文时，请先检出投稿信指定的固定 Git 提交，
+再按下列源码安装步骤配置环境。先安装适合 CPU/CUDA 环境的 PyTorch，再安装匹配的 PyG 扩展 wheel。
 以下为 CPU 开发环境示例：
 
 ```bash
@@ -365,7 +365,8 @@ Yelp/Amazon 欺诈检测数据集需要安装 `.[dgl]`，GECC 的模糊聚类需
 python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
-如需使用已发布的软件包，可运行：`pip install graphslim`。
+PyPI 发行版可通过 `pip install graphslim` 安装。
+论文所述 49 种方法和 8 种骨干以投稿信指定的 Git 源码快照为准。
 
 ## 快速开始
 
@@ -501,13 +502,13 @@ python -m graphslim.train_all -D cora -M gcgp -G -1 --save_path ./checkpoints
 
 ## 搜索方法自身的参数
 
-GC4NC 全部采用各方法作者的设置。遇到新数据集或新方法时，`--hpo` 会对约简方法自身的参数做网格搜索，只按验证集选参：
+固定复现产物记录了各历史方法–数据集对实际采用的设置。遇到新数据集或新方法时，`--hpo` 会对约简方法自身的参数做网格搜索，只按验证集选参：
 
 ```bash
 python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./checkpoints
 ```
 
-它会打印搜索空间（来自 `--hpo_space`，否则是 `graphslim/configs/hpo/<method>.json`，再否则在 `save_path/hpo/` 下生成一个单点模板供你扩展）、试验数和预计时间，然后询问是否开始（`--hpo_yes` 跳过询问）。每个试验执行一次约简，用 `--hpo_eval_runs` 次 GCN 训练的平均验证准确率打分，不计算测试分数。完成的试验逐条追加到 `trials.jsonl`，中断后可续跑；最优参数写入 `best.json`，可直接用 `--config` 复用。
+它会打印搜索空间（来自 `--hpo_space`，否则是 `graphslim/configs/hpo/<method>.json`，再否则在 `save_path/hpo/` 下生成一个单点模板供你扩展）、试验数和预计时间，然后询问是否开始（`--hpo_yes` 跳过询问）。每个试验执行一次约简，用 `--hpo_eval_runs` 次下游模型训练的平均验证准确率（`--eval_model`，默认 GCN）打分，不计算测试分数。完成的试验逐条追加到 `trials.jsonl`，中断后可续跑；最优参数写入 `best.json`，可直接用 `--config` 复用。
 
 ## 复现基准
 
@@ -535,8 +536,8 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 
 ### 缩减比例
 
-下表统一列出[数据集加载器](graphslim/dataset/loader.py)识别的 **19 个数据集**的节点缩减比例。
-**R**（命令行 `-R`）以**有标签训练节点数**为分母，表示保留的节点比例。
+下表列出[数据集加载器](graphslim/dataset/loader.py)识别的 **19 个数据集**的节点选择与凝聚预算。
+对于这些方法，**R**（命令行 `-R`）以**有标签训练节点数**为分母确定节点预算。
 
 对于边稀疏化，`-R` 表示保留的输入边比例；`t_spanner` 和 `spanning_forest` 不使用该参数。
 
@@ -562,7 +563,7 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 | OGBN-Proteins | `ogbn-proteins` | 直推式 | 0.1 | — |
 | OGBN-Papers100M | `ogbn-papers100m` | 直推式 | 0.1 | — |
 
-对于节点缩减，目标节点数约为 `R × 有标签训练节点数`。最后一列把同一节点预算换算成百分比：
+对于节点选择和凝聚，目标节点数约为 `R × 有标签训练节点数`。最后一列把同一节点预算换算成百分比：
 `节点保留比例 = 100 × 缩减后节点数 / 参照节点数`。Citeseer、Cora、Pubmed 和 Arxiv 的参照节点数为
 **完整图节点数**；Flickr、Reddit 和 Yelp 则为**训练图节点数**。
 
@@ -570,6 +571,9 @@ GEOM/SFGC 的论文性能结果来自原作者实现，而本地专家轨迹缓�
 即有标签训练节点的 10%，约占完整图的 0.5%。百分比标签经过舍入；逐类取整及每类最小预算
 可能改变最终节点数，实际数量以保存后的缩减图为准。横线表示此处未提供该数据集的百分比标签。
 这一列用于节点预算；边稀疏化按上文单独说明的边保留比例解释。
+
+多层粗化方法先按工作图的节点数应用 `-R`，再提取有标签训练簇；输出节点数可与节点选择的预算不同，
+实际保留数量应读取保存后的缩减图维度。
 
 原始 7 个数据集通过 `benchmark.reproduce performance` 运行；Roman-empire、Amazon-ratings、
 OGBN-Products、Photo 和 Computers 通过[扩展实验入口](benchmark/expand_datasets.py)运行。
@@ -639,11 +643,12 @@ SimGC 使用新修复的源码及仅依赖验证集的 GCN HPO
 
 ## 轻量方法：下游验证
 
-[数据集扩展实验](docs/dataset_expansion.md) 在每个比例下使用 3 个缩减种子和 10 个 GCN 种子。
-[Products 完整结果](docs/products.md) 包含 CGC、ClustGDD、GCGP 和 Random 的全部三个缩减比例。
+[数据集扩展入口](benchmark/expand_datasets.py) 在每个比例下使用 3 个缩减种子和 10 个 GCN 种子。
+[Products 历史结果](benchmark/results/products_20261028.json) 包含 CGC、ClustGDD、GCGP 和 Random 的全部三个缩减比例。
 
 方法测试覆盖八种下游架构、直推式与归纳式设置、噪声、缩减图重新加载和基于验证集的模型选择。
-[方法配置与测试说明](docs/lightweight_methods.md)。
+[集成实验入口](benchmark/lightweight_downstream.py) · [回归测试](tests/test_lightweight_methods.py)。
+独立集成脚本保留固定的七模型实验名单；软件包和回归测试支持包括 GIN 在内的全部八种注册骨干。
 
 ```bash
 python -m benchmark.lightweight_downstream --run-dir runs/lightweight_cora --dry-run
@@ -679,14 +684,6 @@ examples/        使用包内流程的小型入口示例
 tests/           回归测试
 benchmark/       复现规划器、研究脚本与论文结果
 docs/            Sphinx 文档
-interface/       Streamlit 应用与示例产物
-```
-
-## Web 界面
-
-```bash
-pip install -e ".[viz]"
-python -m streamlit run interface/vis_graphslim.py
 ```
 
 ## 引用与致谢
