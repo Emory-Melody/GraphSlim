@@ -53,25 +53,20 @@
 \node[title] at (10.67,3.07) {Evaluation layer};
 \node[api] at (10.67,2.76) {Evaluator};
 
-% Data services: one pictogram per row on a shared grid.
-\foreach \yy in {1.875,1.3,.725} {
+% Data services: three evenly spaced rows.
+\foreach \yy in {1.7333,.8667} {
   \draw[gsRule,line width=.4pt] (.2,\yy) -- (3.82,\yy);
 }
-\node[ico,text=gsData] at (.38,2.1625) {\faIcon{database}};
+\node[ico,text=gsData] at (.38,2.1667) {\faIcon{database}};
 % Official wordmarks replace framework names; retain their original colors.
-\node[rowtext] at (.72,2.1625) {\includegraphics[width=.68cm]{\gsLogoPath/pyg.pdf}};
-\node[rowtext] at (1.49,2.1625) {OGB};
-\node[rowtext] at (2.17,2.1625) {\includegraphics[width=.75cm]{\gsLogoPath/dgl.png}};
-\node[rowtext,font=\sffamily\fontsize{7.4}{9}\selectfont] at (2.98,2.1625) {sources};
-\node[ico,text=gsData] at (.38,1.5875) {\faIcon{file-import}};
-\node[rowtext] at (.72,1.5875) {Custom graph input};
-\node[ico,text=gsData] at (.38,1.0125) {\faIcon{toggle-on}};
-\node[rowtext] at (.72,1.0125) {Transductive / inductive};
-\node[ico,text=gsData] at (.38,.4375) {\faIcon{exchange-alt}};
-\node[rowtext] at (.72,.4375) {\texttt{compat}:};
-\node[rowtext] at (1.86,.4375) {\includegraphics[width=.68cm]{\gsLogoPath/pyg.pdf}};
-\node[inner sep=0pt] at (2.77,.4375) {$\leftrightarrow$};
-\node[rowtext] at (3.03,.4375) {\includegraphics[width=.75cm]{\gsLogoPath/dgl.png}};
+\node[rowtext] at (.72,2.1667) {\includegraphics[width=.68cm]{\gsLogoPath/pyg.pdf}};
+\node[rowtext] at (1.49,2.1667) {OGB};
+\node[rowtext] at (2.17,2.1667) {\includegraphics[width=.75cm]{\gsLogoPath/dgl.png}};
+\node[rowtext,font=\sffamily\fontsize{7.4}{9}\selectfont] at (2.98,2.1667) {sources};
+\node[ico,text=gsData] at (.38,1.3) {\faIcon{file-import}};
+\node[rowtext] at (.72,1.3) {Custom graph input};
+\node[ico,text=gsData] at (.38,.4333) {\faIcon{toggle-on}};
+\node[rowtext] at (.72,.4333) {Transductive / inductive};
 
 % Reduction families share one interface; node-level reducers can seed condensation.
 \foreach \yy/\label/\count in {2.15/Sparsification/23,1.55/Coarsening/10,.95/Condensation/16} {
