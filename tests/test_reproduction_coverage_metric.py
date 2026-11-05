@@ -42,7 +42,8 @@ def test_new_gc4nc_pairs_preserve_the_legacy_roster_and_shared_source_boundary()
     assert source["pairs"][:116] == parent["pairs"]
     added = source["pairs"][116:]
     assert {(p["method"], p["dataset"]) for p in added} == {
-        (method, dataset) for method in ["t_spanner", "gdem"]
+        (method, dataset)
+        for method in ["t_spanner", "gdem"]
         for dataset in ["ogbn-arxiv", "flickr", "reddit", "yelp"]
     }
     assert all(not p["independent_replication"] and not p["credited_by_policy"] for p in added)
@@ -52,8 +53,9 @@ def test_new_gc4nc_pairs_preserve_the_legacy_roster_and_shared_source_boundary()
 
 def frozen_verifier():
     import importlib.util
-    path = SOURCE.parent / 'reproducibility_20261103' / 'verify.py'
-    spec = importlib.util.spec_from_file_location('frozen_reproducibility_verifier', path)
+
+    path = SOURCE.parent / "reproducibility_20261103" / "verify.py"
+    spec = importlib.util.spec_from_file_location("frozen_reproducibility_verifier", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -61,6 +63,7 @@ def frozen_verifier():
 
 def test_shortfall_does_not_imply_two_sided_agreement_or_cancel_other_settings():
     import statistics
+
     verify = frozen_verifier()
     assert verify.errors(80, 88) == (0, 10, 8)
     settings = [verify.errors(80, 72), verify.errors(80, 88)]
@@ -72,10 +75,12 @@ def test_shortfall_does_not_imply_two_sided_agreement_or_cancel_other_settings()
 
 def test_fixed_artifact_recomputes_historical_policy_and_both_current_metrics():
     verify = frozen_verifier()
-    summary = verify.verify(SOURCE.parent / 'reproducibility_20261103')
-    views = summary['cohort_results']
-    assert views['historical_with_policy']['mean_relative_gap_percent']['5']['count'] == 111
-    assert views['numerical_only_116']['mean_relative_gap_percent']['5']['count'] == 104
-    assert views['paper_124']['mean_relative_gap_percent']['5']['count'] == 112
-    assert views['paper_124']['mean_shortfall_percent']['5']['count'] == 122
-    assert summary['uncorrected_table9_sensitivity']['mean_relative_gap_percent']['5']['count'] == 110
+    summary = verify.verify(SOURCE.parent / "reproducibility_20261103")
+    views = summary["cohort_results"]
+    assert views["historical_with_policy"]["mean_relative_gap_percent"]["5"]["count"] == 111
+    assert views["numerical_only_116"]["mean_relative_gap_percent"]["5"]["count"] == 104
+    assert views["paper_124"]["mean_relative_gap_percent"]["5"]["count"] == 112
+    assert views["paper_124"]["mean_shortfall_percent"]["5"]["count"] == 122
+    assert (
+        summary["uncorrected_table9_sensitivity"]["mean_relative_gap_percent"]["5"]["count"] == 110
+    )

@@ -16,3 +16,11 @@ __pycache__/
 data/
 *.egg-info/
 .env
+docs/_build/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+!validation/20261105/coverage.xml
+._*
+__MACOSX/

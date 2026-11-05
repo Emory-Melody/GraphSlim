@@ -33,7 +33,9 @@ def reviewed_data(metric=METRIC):
     assert {p["dataset"] for p in pairs} == set(source["datasets"])
     assert sum(p["complete_result"] for p in pairs) == source["complete_pairs"]
     assert not any(p["credited_by_policy"] for p in pairs)
-    assert all(p["method"] != "clustering" and p["reference_status"] == "numeric_reference" for p in pairs)
+    assert all(
+        p["method"] != "clustering" and p["reference_status"] == "numeric_reference" for p in pairs
+    )
     assert len(pairs) == source["numeric_reference_pairs"]
     assert all(math.isfinite(p[metric]) and p[metric] >= 0 for p in pairs)
     measure = "shortfall" if metric == "mean_shortfall_percent" else "relative error"
@@ -95,7 +97,9 @@ def reviewed_data(metric=METRIC):
         numeric_reference_pairs=len(pairs),
         method_count=source["method_count"],
         dataset_count=len(source["datasets"]),
-        shared_observation_pairs=source.get("cohort_expansion", {}).get("shared_observation_pairs", 0),
+        shared_observation_pairs=source.get("cohort_expansion", {}).get(
+            "shared_observation_pairs", 0
+        ),
         segments=segments,
         columns=columns,
         outside_largest_threshold=keys(outside),
@@ -210,7 +214,12 @@ def plot(data, stem=STEM):
         fontsize=16,
         weight="bold",
     )
-    ax.set_xlabel("Allowed mean relative shortfall" if data["metric"] == "mean_shortfall_percent" else "Allowed mean two-sided relative error", labelpad=14)
+    ax.set_xlabel(
+        "Allowed mean relative shortfall"
+        if data["metric"] == "mean_shortfall_percent"
+        else "Allowed mean two-sided relative error",
+        labelpad=14,
+    )
     ax.set_ylabel("Coverage of fixed roster (%)", labelpad=10)
     ax.set_ylim(0, 116)
     ax.set_xlim(-0.75, positions[-1] + 0.75)

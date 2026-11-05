@@ -1,3 +1,6 @@
+# License: Apache-2.0; PyGSP-derived portions: BSD-3-Clause.
+# Adapted upstream components and full terms: ../THIRD_PARTY_NOTICES.md.
+# GraphSlim modifications are documented in the project Git history.
 # import matplotlib.pylab as plt
 import numbers
 

@@ -1,0 +1,21 @@
+{
+  "checked_at_utc": "2026-11-05T20:37:07.795261+00:00",
+  "test_result": {
+    "passed": 479,
+    "skipped": 31,
+    "failures": 0,
+    "errors": 0
+  },
+  "scope": "Linux CPU; optional pinned author checkouts unavailable; GPU not exercised",
+  "checks": {
+    "ruff_check": "passed",
+    "ruff_format": "passed; immutable verifier excluded from formatting",
+    "docs_strict_html": "passed",
+    "build_sdist_wheel": "passed",
+    "archive_hygiene": "passed; 6 retained upstream license texts in each distribution",
+    "wheel_install": "passed in fresh venv with existing dependencies reused",
+    "doctor_cpu_dgl": "passed",
+    "offline_reproducibility": "355 settings / 124 pairs / 19 methods / 7 datasets; hashes and formulas verified"
+  },
+  "ci": "Coverage artifact generation added; no remote success is claimed by this local record."
+}

@@ -26,6 +26,8 @@ canonical registry entries; aliases are not counted separately.
    :hidden:
 
    source/modules
+   changes_since_gc4nc
+   testing_snapshot
 
 .. toctree::
    :maxdepth: 1

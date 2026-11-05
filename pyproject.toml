@@ -56,7 +56,7 @@ exclude = ["benchmark*", "checkpoints*", "docs*", "examples*", "figures*", "geom
 namespaces = false
 
 [tool.setuptools.package-data]
-graphslim = ["THIRD_PARTY_NOTICES.md", "configs/**/*.json"]
+graphslim = ["THIRD_PARTY_NOTICES.md", "licenses/*.txt", "configs/**/*.json"]
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]
@@ -72,3 +72,7 @@ extend-exclude = ["docs/_build"]
 
 [tool.ruff.lint]
 select = ["E9", "F63", "F7", "F82"]
+
+[tool.ruff.format]
+# This offline evidence artifact is immutable and has a checked SHA-256 manifest.
+exclude = ["benchmark/results/reproducibility_20261103/verify.py"]

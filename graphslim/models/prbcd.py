@@ -1,3 +1,4 @@
+# License: MIT. Modified PRBCD; see ../THIRD_PARTY_NOTICES.md.
 """
 Robustness of Graph Neural Networks at Scale. NeurIPS 2021.
 

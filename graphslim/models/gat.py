@@ -1,3 +1,4 @@
+# License: MIT. Adapted from PyTorch Geometric; see ../THIRD_PARTY_NOTICES.md.
 """
 Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark/citation
 """

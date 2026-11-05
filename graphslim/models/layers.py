@@ -1,3 +1,4 @@
+# License: MIT. PyG and pygcn adaptations; see ../THIRD_PARTY_NOTICES.md.
 import math
 from typing import Union, Tuple, Optional
 

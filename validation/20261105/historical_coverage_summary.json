@@ -1,0 +1,66 @@
+{
+  "measured_at_utc": "2026-10-31T02:35:43.428940+00:00",
+  "scope": "Full graphslim package, Linux CPU; same frozen production source and coverage settings",
+  "method": "Baseline omits only the two added test files; both measurements include the production fixes.",
+  "before": {
+    "modules": 102,
+    "statements_covered": 9302,
+    "statements_total": 10397,
+    "statement_percent": 89.46811580263538,
+    "branches_covered": 2586,
+    "branches_total": 3266,
+    "branch_percent": 79.17942437232088,
+    "combined_percent": 87.00870965380956,
+    "excluded_lines": 0,
+    "tests": {
+      "tests": 862,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 52,
+      "passed": 810
+    },
+    "execution": {
+      "started_utc": "2026-10-31T02:34:22.489406+00:00",
+      "elapsed_seconds": 29.062151552003343,
+      "exit_code": 0,
+      "git_head": "c0541bec3cc7183bed1d51d5795d31de5588a1be"
+    }
+  },
+  "after": {
+    "modules": 102,
+    "statements_covered": 9378,
+    "statements_total": 10397,
+    "statement_percent": 90.19909589304608,
+    "branches_covered": 2622,
+    "branches_total": 3266,
+    "branch_percent": 80.28169014084507,
+    "combined_percent": 87.82844177706214,
+    "excluded_lines": 0,
+    "tests": {
+      "tests": 895,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 52,
+      "passed": 843
+    },
+    "execution": {
+      "started_utc": "2026-10-31T02:34:37.697715+00:00",
+      "elapsed_seconds": 28.265052682021633,
+      "exit_code": 0,
+      "git_head": "c0541bec3cc7183bed1d51d5795d31de5588a1be"
+    }
+  },
+  "added_test_files": [
+    "tests/test_reduced_loading_branches.py",
+    "tests/test_reporting_contracts.py"
+  ],
+  "added_test_cases": 33,
+  "statement_percentage_point_gain": 0.7309800904106964,
+  "branch_percentage_point_gain": 1.102265768524191,
+  "additional_statements_covered": 76,
+  "additional_branches_covered": 36,
+  "production_hashes_identical": true,
+  "statement_coverage_target_percent": 90.0,
+  "statement_coverage_target_achieved": true,
+  "earlier_measurements_superseded_by_verified_pair": true
+}
