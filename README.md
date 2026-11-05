@@ -14,6 +14,9 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
+**Frozen source (2026-11-05):** [commit `1a024c6`](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) contains the described 49-method, eight-backbone feature set. This source is versioned 1.3.0; PyPI still distributes the earlier 1.2.1. Install the pinned source below and see its [version-specific testing record](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/docs/testing_snapshot.md).
+
+
 GraphSlim brings **49 graph reduction methods**, **8 downstream GNN backbones**,
 and **validation-only hyperparameter optimization (HPO)** into a shared workflow.
 Load a graph, choose a reducer, and evaluate its output through the same interfaces.
@@ -351,6 +354,7 @@ install matching PyG extension wheels. For example, a CPU development environmen
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
+git checkout --detach 1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
@@ -379,7 +383,7 @@ python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
 The published PyPI distribution is installed with `pip install graphslim`.
-Use the reviewed Git source snapshot for the manuscript's 49-method, eight-backbone feature set.
+Use [the pinned Git source](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) for the manuscript's 49-method, eight-backbone feature set; PyPI 1.2.1 predates this revision.
 
 ## Quick start
 

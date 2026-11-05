@@ -3,7 +3,7 @@
 The 2026-11-05 reviewed implementation has **49 canonical methods** (5 node,
 18 edge, 10 coarsening, 16 condensation) and **eight downstream GNN architectures**.
 The source fingerprint, environment, raw test log, JUnit results, and full
-coverage data are in [validation/20261105](https://github.com/Emory-Melody/GraphSlim/blob/main/validation/20261105/README.md).
+coverage data are in [validation/20261105](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/validation/20261105/README.md).
 These files are committed with the implementation they describe.
 
 ## Current reviewed implementation

@@ -14,6 +14,9 @@
 
 </div>
 
+**2026-11-05 固定源码：**[提交 `1a024c6`](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) 包含本文描述的 49 种方法和 8 种 GNN。源码版本标为 1.3.0；PyPI 当前仍为较早的 1.2.1。请按下文固定提交安装，并参阅[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/docs/testing_snapshot.md)。
+
+
 GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
 **仅使用验证集选参的超参数优化（HPO）** 整合到统一流程中。
 加载图、选择缩减方法、评估缩减图均使用共享接口。
@@ -338,6 +341,7 @@ GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
+git checkout --detach 1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
