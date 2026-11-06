@@ -87,7 +87,8 @@ def test_sntk_gram_stays_finite_symmetric_psd_and_repeatable(scale, zero_feature
     second = kernel.nodes_gram(features, features, adjacency, adjacency)
     assert torch.isfinite(first).all()
     assert torch.equal(first, second)
-    torch.testing.assert_close(first, first.T)
+    # float32 sparse products sum in different orders for (i, j) and (j, i).
+    torch.testing.assert_close(first, first.T, rtol=1e-5, atol=1e-5 * first.abs().max().item())
     assert torch.linalg.eigvalsh(first.double()).min() > -1e-4 * first.diag().max()
     first.square().mean().backward()
     assert torch.isfinite(features.grad).all()
