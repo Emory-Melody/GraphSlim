@@ -180,7 +180,7 @@ class SimGC(GCondBase):
         )
         for parameter in teacher_model.parameters():
             parameter.requires_grad_(False)
-        args.logger.info(f"Teacher model training finished with val accuracy {teacher_val_acc}")
+        args.logger.info(f"Teacher model training finished with validation score {teacher_val_acc}")
 
         optimizer_feat, optimizer_pge = self.optimizer_feat, self.optimizer_pge
         adj = normalize_adj_tensor(adj, sparse=True)

@@ -27,31 +27,6 @@ from end-to-end author-code reproduction and retain accuracy/precision failures.
 Check the environment first with `python -m graphslim.doctor --device cpu --dgl`;
 see the [GPU setup and checks](../README.md#gpu-setup-and-checks).
 
-The optional [CUDA Graph backend](../graphslim/acceleration.py) has a separate integration
-verifier: `python -m benchmark.verify_cuda_graph --device cpu --steps 20 --output runs/cuda_graph_cpu.json`.
-It enumerates the registered method tags and the shared `DOWNSTREAM_MODELS` registry
-(49 methods and eight backbones in this source checkout) with explicit common
-synthetic graphs; these are not reducer reproductions or new scientific scores.
-`python -m benchmark.cuda_graph_queue --run-dir runs/cuda_graph_validation --gpus 3 4 5`
-freezes source and waits for idle GPU leases before running the GPU/noise matrix.
-For actual reduction pairs, use `python -m benchmark.verify_cuda_reducers --device cuda:0 --dataset toy --output runs/cuda_reducers.json`.
-`--dataset cora` selects a matched real-data package comparison; neither mode is
-an end-to-end author-repository reproduction. Use distinct paths and retain
-negative timings and numerical differences.
-
-Export the integration matrix and a separate frozen reduction-pair artifact
-without rerunning training:
-
-```bash
-python -m benchmark.render_cuda_graph_results \
-  --run-dir runs/cuda_graph_20261012/gpu_validation_v5 \
-  --reducer-results runs/cuda_graph_20261012/reducers_gpu_toy.json \
-  --output benchmark/results/cuda_graph_integration.json
-```
-
-The published JSON keeps full reduction loss histories and hashes alongside the
-method/model coverage summary. These two source snapshots remain distinct.
-
 The planner imports only standard-library modules and the method registry.
 Without `--dry-run`, jobs run serially and stop on failure. Extra GraphSlim flags
 follow `--`. Use `--skip-whole` to omit whole-graph baselines.
@@ -78,7 +53,7 @@ successfully planning them does not establish scientific reproduction.
 
 Transferability, NAS, and graph-property evaluation need saved reduced graphs.
 The performance matrix includes all seven datasets and clustering. Table 9 has no
-clustering, DosCondX, GCDM, SimGC, or GECC scores; their README cells are `NR`.
+clustering, DosCondX, GCDM, SimGC, or GECC scores. The README distinguishes archived package measurements, literature references, and the separate verified Yelp AP evaluations.
 
 ## Lightweight methods and complete downstream integration checks
 

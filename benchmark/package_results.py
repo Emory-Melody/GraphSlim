@@ -53,7 +53,9 @@ def collect_cell(folder, manifest, entry, method, dataset, rate):
         "rate": rate,
         "run": entry["path"],
         "source_sha256": manifest["source_sha256"],
-        "metric": "F1-macro" if dataset == "yelp" else "accuracy",
+        "metric": manifest.get("protocol", {}).get("fraud_metric", "F1-macro")
+        if dataset in ("yelp", "amazon")
+        else "accuracy",
         "status": "pending",
         "value": "PENDING (0/3)",
         "n": 0,
@@ -163,13 +165,21 @@ def collect(catalog=CATALOG, root=ROOT):
 
 def render(cells, sources):
     completed = sum(cell["status"] == "complete" for cell in cells)
+    fraud_metrics = {
+        cell["metric"]
+        for cell in cells
+        if cell["dataset"] == "yelp" and cell["status"] == "complete"
+    }
+    if len(fraud_metrics) > 1:
+        raise RuntimeError("Cannot combine AP and macro-F1 in one Yelp coverage table")
+    fraud_metric = next(iter(fraud_metrics), "unavailable")
     lines = [
         "## Package measurements completing published NR coverage",
         "",
         f"Complete local cells: {completed}/105 (7 datasets × 3 CLI rates × 5 methods).",
         "Only cells with all 3 reduction seeds × 10 downstream test fits are numeric.",
         "Values are test mean ± population standard deviation (%), not the published",
-        "table's reported standard errors. Yelp uses F1-macro; all other rows use accuracy.",
+        f"table's reported standard errors. Yelp uses {fraud_metric}; all other rows use accuracy.",
         "Pending repaired SimGC cells do not fall back to superseded measurements.",
         "",
         "This is an explicitly source-scoped coverage table, not a controlled ranking:",

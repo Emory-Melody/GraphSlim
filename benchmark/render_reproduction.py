@@ -5,8 +5,8 @@
 (English and Simplified Chinese) from that snapshot only.
 ``--check`` verifies that the embedded tables match the snapshot.
 
-A dataset row appears in the README when all three rates completed and the mean
-absolute difference from the published value is at most ``THRESHOLD`` points.
+All eligible archived rows are displayed with source and completion status.
+Yelp uses its separate verified AP snapshot; archived macro-F1 is never relabelled.
 """
 
 import argparse
@@ -62,7 +62,7 @@ TITLES = {
 METHODS = (
     ("Node sparsification", ("cent_d", "cent_p", "random", "herding", "kcenter")),
     ("Edge sparsification", ("t_spanner",)),
-    ("Coarsening", ("averaging", "variation_neighborhoods", "vng")),
+    ("Coarsening", ("averaging", "clustering", "variation_neighborhoods", "vng")),
     (
         "Condensation",
         (
@@ -90,6 +90,7 @@ NAMES = {
     "kcenter": "K-Center",
     "t_spanner": "TSpanner",
     "averaging": "Averaging",
+    "clustering": "Clustering",
     "variation_neighborhoods": "VN",
     "vng": "VNG",
     "geom": "GEOM",
@@ -297,125 +298,187 @@ def fmt(cell):
     return f"{cell['mean']:.2f} ± {cell['std']:.2f}"
 
 
+def readme_yelp_ap(snapshot, language="en"):
+    """Render AP measurements without substituting historical macro-F1 cells."""
+    cells = {(c["method"], c["rate"]): c for c in snapshot.get("cells", [])}
+
+    def values(method):
+        row = [cells.get((method, rate)) for rate in RATES["yelp"]]
+        if any(c is None or c["status"] != "complete" for c in row):
+            return ["NR"] * 3
+        if any(c.get("metric") != "AP" for c in row):
+            raise ValueError(f"Non-AP measurement in Yelp AP table: {method}")
+        return [fmt(c) for c in row]
+
+    title = "#### Yelp — AP (%)" if language == "en" else "#### Yelp — AP（%）"
+    header = ["Family", "Method"] if language == "en" else ["类别", "方法"]
+    lines = [
+        title,
+        "",
+        "| " + " | ".join(header + [f"{r}%" for r in LABELS["yelp"]]) + " |",
+        "| --- | --- | ---: | ---: | ---: |",
+    ]
+    for family, methods in METHODS:
+        if family == "Edge sparsification":
+            continue
+        for method in methods:
+            legacy = any(cells.get((method, r), {}).get("legacy_method") for r in RATES["yelp"])
+            lines.append(
+                "| "
+                + " | ".join(
+                    [
+                        family if language == "en" else ZH[family],
+                        NAMES[method] + ("¹" if legacy else ""),
+                        *values(method),
+                    ]
+                )
+                + " |"
+            )
+    whole = cells.get(("whole", None))
+    if whole and whole["status"] == "complete":
+        if whole.get("metric") != "AP":
+            raise ValueError("Non-AP Whole baseline in Yelp AP table")
+        label = "Whole graph" if language == "en" else "全图训练"
+        lines += ["", f"{label}: {fmt(whole)}."]
+    if language == "en":
+        lines += [
+            "",
+            "TSpanner retains all training nodes; Graphs 1–3 below are saved edge-sparsified graphs, not node-budget levels.",
+            "",
+            "| Edge method | Graph 1 AP (%) | Graph 2 AP (%) | Graph 3 AP (%) |",
+        ]
+    else:
+        lines += [
+            "",
+            "TSpanner 保留全部训练节点；下列 Graph 1–3 为已保存的边稀疏图，不对应节点预算。",
+            "",
+            "| 边稀疏化方法 | Graph 1 AP（%） | Graph 2 AP（%） | Graph 3 AP（%） |",
+        ]
+    lines += [
+        "| --- | ---: | ---: | ---: |",
+        "| " + " | ".join(["TSpanner", *values("t_spanner")]) + " |",
+        "",
+    ]
+    if language == "en":
+        lines += [
+            "AP ranks anomaly label 1 by continuous log-odds. All available rows and Whole use the same twelve-candidate GCN search: three validation seeds select the configuration and validation AP selects the epoch over 300 epochs. Each saved graph receives ten final fits; Random, Herding and K-Center pool three reduction seeds (30 fits). Values are mean ± population standard deviation. Saved graph generation and historical checkpoint selection remain fixed. NR means no complete AP result in this snapshot; historical macro-F1 scores are not substituted. The constant-score AP is 14.53%."
+        ]
+    else:
+        lines += [
+            "AP 使用连续对数几率分数对异常类（标签 1）排序。所有可用行及 Whole 共用 12 组 GCN 候选配置：以 3 个验证种子的平均 AP 选配置，并在 300 轮中按验证 AP 选训练检查点。每个已保存图评估 10 次；Random、Herding 和 K-Center 汇总 3 个缩减种子，共 30 次。数值为均值 ± 总体标准差。图生成及其历史检查点选择保持固定。NR 表示此快照中暂无完整 AP 结果，不以历史宏 F1 分数替代。常数分数的 AP 为 14.53%。"
+        ]
+    source_label = "Frozen AP results and protocol" if language == "en" else "冻结的 AP 结果与协议"
+    lines += [f"[{source_label}](benchmark/results/yelp_ap_20261101.json).", ""]
+    return "\n".join(lines)
+
+
 def readme_tables(snapshot, language="en"):
+    """Show every eligible archived row, with explicit provenance and missingness."""
     cells = index(snapshot)
     lines = []
-    missing = []
     for dataset in DATASETS:
-        if language == "en":
-            metric = "F1-macro" if dataset == "yelp" else "test accuracy"
-            title = f"#### {TITLES[dataset]} — {metric} (%)"
-            header = ["Family", "Method"]
-        else:
-            metric = "宏平均 F1" if dataset == "yelp" else "测试准确率"
-            title = f"#### {TITLES[dataset]} — {metric}（%）"
-            header = ["类别", "方法"]
-        rows = []
+        if dataset == "yelp":
+            ap_path = ROOT / "benchmark/results/yelp_ap_20261101.json"
+            lines += [readme_yelp_ap(read_json(ap_path) if ap_path.exists() else {}, language)]
+            continue
+        title = (
+            f"#### {TITLES[dataset]} — test accuracy (%)"
+            if language == "en"
+            else f"#### {TITLES[dataset]} — 测试准确率（%）"
+        )
+        header = (
+            ["Family", "Method", "Source / status"]
+            if language == "en"
+            else ["类别", "方法", "来源 / 状态"]
+        )
+        rows, edge_rows = [], []
         for family, methods in METHODS:
             for method in methods:
                 if method in EXCLUDED_FROM_REFERENCE:
                     continue
+                row = [cells.get((dataset, method, rate)) for rate in RATES[dataset]]
+                if not any(row):
+                    continue
                 if method in PUBLISHED_ONLY:
-                    texts = [
-                        cells[(dataset, method, rate)]["paper_text"]
-                        for rate in RATES[dataset]
-                        if (dataset, method, rate) in cells
+                    values = [
+                        (c.get("paper_text") or "NR").replace("±", " ± ") if c else "NR"
+                        for c in row
                     ]
-                    if len(texts) == 3 and all(t not in ("", "-", "OOM") for t in texts):
-                        values = [t.replace("±", " ± ") for t in texts]
-                        rows.append(
-                            [
-                                family if language == "en" else ZH[family],
-                                NAMES[method] + "²",
-                                *values,
-                            ]
-                        )
-                    continue
-                status, _ = row_status(cells, dataset, method)
-                if status == "no published value":
-                    values = [fmt(cells[(dataset, method, rate)]) for rate in RATES[dataset]]
-                    rows.append(
-                        [family if language == "en" else ZH[family], NAMES[method] + "³", *values]
+                    source = "Published / SE" if language == "en" else "文献数值 / SE"
+                    name = NAMES[method] + "²"
+                else:
+                    values = [
+                        fmt(c)
+                        if c and c["status"] == "complete"
+                        else (c.get("kind", "FAILED") if c and c["status"] == "failed" else "NR")
+                        for c in row
+                    ]
+                    complete = all(c and c["status"] == "complete" for c in row)
+                    source = (
+                        ("Archived run / SD" if complete else "Archived run / incomplete")
+                        if language == "en"
+                        else ("历史运行 / SD" if complete else "历史运行 / 未完成")
                     )
-                    continue
-                if status != "reproduced":
-                    if (dataset, method, RATES[dataset][0]) in cells:
-                        missing.append((method, dataset, status))
-                    continue
-                values = [fmt(cells[(dataset, method, rate)]) for rate in RATES[dataset]]
-                legacy = any(
-                    cells[(dataset, method, rate)].get("legacy_method") for rate in RATES[dataset]
-                )
-                name = NAMES[method] + ("¹" if legacy else "")
-                rows.append([family if language == "en" else ZH[family], name, *values])
-        whole = cells.get((dataset, "whole", None))
-        lines += [title, ""]
-        lines.append("| " + " | ".join(header + [f"{label}%" for label in LABELS[dataset]]) + " |")
-        lines.append("| --- | --- | ---: | ---: | ---: |")
+                    legacy = any(c and c.get("legacy_method") for c in row)
+                    name = NAMES[method] + ("¹" if legacy else "")
+                if family == "Edge sparsification":
+                    edge_rows.append([name, source, *values])
+                else:
+                    rows.append([family if language == "en" else ZH[family], name, source, *values])
+        lines += [
+            title,
+            "",
+            "| " + " | ".join(header + [f"{label}%" for label in LABELS[dataset]]) + " |",
+            "| --- | --- | --- | ---: | ---: | ---: |",
+        ]
         lines += ["| " + " | ".join(row) + " |" for row in rows]
+        if edge_rows:
+            edge_header = (
+                ["Edge method", "Source / status", "Graph 1", "Graph 2", "Graph 3"]
+                if language == "en"
+                else ["边方法", "来源 / 状态", "Graph 1", "Graph 2", "Graph 3"]
+            )
+            lines += [
+                "",
+                "Saved edge graphs retain the input nodes; Graph 1–3 are not node-budget levels."
+                if language == "en"
+                else "已保存的边稀疏图保留输入节点；Graph 1–3 不表示节点预算。",
+                "",
+                "| " + " | ".join(edge_header) + " |",
+                "| --- | --- | ---: | ---: | ---: |",
+            ]
+            lines += ["| " + " | ".join(row) + " |" for row in edge_rows]
+        whole = cells.get((dataset, "whole", None))
         if whole and whole["status"] == "complete":
-            label = "Whole graph" if language == "en" else "全图训练"
+            label = (
+                "Whole graph (archived run / SD)"
+                if language == "en"
+                else "全图训练（历史运行 / SD）"
+            )
             lines += ["", f"{label}: {fmt(whole)}."]
         lines.append("")
-    return "\n".join(lines).rstrip() + "\n", missing
+    return "\n".join(lines).rstrip() + "\n", []
 
 
 def readme_section(snapshot, language="en"):
-    tables, missing = readme_tables(snapshot, language)
-
-    def listed(selected):
-        names = {}
-        for method, dataset, _ in selected:
-            names.setdefault(NAMES[method], []).append(TITLES[dataset])
-        return "; ".join(f"{m} ({', '.join(d)})" for m, d in names.items())
-
-    outside = listed([m for m in missing if m[2] == "outside limit"])
-    failed = listed([m for m in missing if m[2].startswith("failed")])
-    running = listed([m for m in missing if m[2] in ("incomplete", "not run")])
+    tables, _ = readme_tables(snapshot, language)
     if language == "en":
         note = (
-            "¹ Archived DosCondX measurements use the archived experimental settings and "
-            "corresponding reference row. The Reddit configuration differs from current DosCondX defaults; "
-            "raw archived names and configurations are preserved.\n"
-            "² Published GC4NC values (mean ± standard error). The paper obtained GEOM and "
-            "SFGC scores from the authors' implementations; their expert-trajectory "
-            "training is too slow to rerun for the full matrix.\n"
-            "³ The published GC4NC benchmark reports no value for these cells; "
-            "GraphSlim measurements "
-            "under the same protocol are shown without a published comparison.\n"
-            "CentP and GDEM are not compared with published values: defects fixed after 1.3.1 "
-            "also affected the implementation behind their GC4NC references "
-            "([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md))."
+            "¹ Archived DosCondX measurements retain their original settings and source names; the Reddit configuration differs from current defaults.\n"
+            "² Published GC4NC values use mean ± standard error (SE). These are reference values from the authors' GEOM/SFGC implementations, not package reruns.\n"
+            "Other numeric archived runs use mean ± population standard deviation (SD). Every available row is shown, regardless of its gap from the reference. Failed or incomplete results retain their status.\n"
+            "CentP and GDEM are excluded from historical reference comparisons because defects also affected the reference implementations ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)). Their separately archived Yelp AP scores above describe the saved graphs generated at that time, before the fixes.\n"
+            "This table is one archived campaign, not the 110-pair cumulative reproduction roster. Later replay/HPO campaigns completed several combinations that failed here, including GCSNTK on Arxiv/Flickr, SGDD on Arxiv, and VN on Flickr/Yelp; consult the [pair-level artifact](benchmark/results/reproducibility_20261106/pairs.csv) for the adopted source per pair."
         )
-        extra = []
-        if outside:
-            extra.append(
-                f"Rows more than {THRESHOLD:.0f} points from the paper on average are omitted: {outside}."
-            )
-        if failed:
-            extra.append(f"Runs that failed: {failed}.")
-        if running:
-            extra.append(f"Still running: {running}.")
     else:
         note = (
-            "¹ 这些历史测量实际运行 DosCondX，采用归档实验配置及对应的论文参考行；其中 Reddit 配置与当前 DosCondX 默认值不同，原始记录和配置均保留。\n"
-            "² GC4NC 论文数值（均值 ± 标准误）。论文中 GEOM 和 SFGC 的得分来自原作者实现，"
-            "其专家轨迹训练太慢，未对完整矩阵重跑。\n"
-            "³ GC4NC 论文未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。\n"
-            "CentP 和 GDEM 不与论文数值对照：1.3.1 之后修复的缺陷同样存在于生成其 GC4NC 参照值的实现中"
-            "（[原因与重跑分数](benchmark/results/reproducibility_20261106/README.md)）。"
+            "¹ DosCondX 历史测量保留原设置和来源名；Reddit 配置与当前默认值不同。\n"
+            "² GC4NC 文献值为均值 ± 标准误（SE），来自原作者的 GEOM/SFGC 实现，不属于本包重跑。\n"
+            "其他历史运行数值为均值 ± 总体标准差（SD）。全部已有结果均展示，不按与参考值的差距筛行；失败和未完成结果保留状态。\n"
+            "CentP 和 GDEM 不参与历史参考比较，因为缺陷也存在于参考实现中（[原因及重跑结果](benchmark/results/reproducibility_20261106/README.md)）。上方单独归档的 Yelp AP 仍描述当时生成的图，生成时间早于修复。\n"
+            "此表对应一个历史批次，并非累计的 110 个复现组合。后续 replay/HPO 批次已完成这里曾失败的部分组合，包括 GCSNTK–Arxiv/Flickr、SGDD–Arxiv、VN–Flickr/Yelp；各组合采用的来源见[逐对产物](benchmark/results/reproducibility_20261106/pairs.csv)。"
         )
-        extra = []
-        if outside:
-            extra.append(f"与论文平均相差超过 {THRESHOLD:.0f} 个百分点的行未列出：{outside}。")
-        if failed:
-            extra.append(f"运行失败：{failed}。")
-        if running:
-            extra.append(f"仍在运行：{running}。")
-    parts = [tables.rstrip(), "", note]
-    if extra:
-        parts += ["", " ".join(extra)]
-    return "\n".join(parts) + "\n"
+    return tables + "\n" + note + "\n"
 
 
 def embed(path, section):

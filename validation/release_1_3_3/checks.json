@@ -1,0 +1,41 @@
+{
+  "version": "1.3.3",
+  "checked_at_utc": "2026-11-06T19:16:13.988523+00:00",
+  "pytest": {
+    "tests": 1623,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 22,
+    "passed": 1601
+  },
+  "statement_coverage": {
+    "covered": 10211,
+    "total": 10336,
+    "percent": 98.79
+  },
+  "branch_coverage": {
+    "covered": 3174,
+    "total": 3306,
+    "percent": 96.01
+  },
+  "excluded_statements": 0,
+  "package_python_modules": 104,
+  "package_python_license_headers": 104,
+  "gpu_validation": "not run; CUDA tests skipped in the CPU environment",
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "sphinx_html": "passed",
+    "sphinx_epub": "passed",
+    "sphinx_latex": "passed",
+    "wheel_and_sdist": "passed",
+    "twine": "passed",
+    "cpu_dgl_doctor": "passed",
+    "historical_artifact_110": "passed",
+    "readme_tables": "passed",
+    "readme_coverage": "passed",
+    "custom_reducer_example": "passed",
+    "yelp_ap_raw_records": "passed"
+  },
+  "source_manifest_sha256": "ec917a7892628222f94a1864bf39fb37ea4df826920714fd93ac481b38e41892"
+}

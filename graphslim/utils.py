@@ -8,7 +8,7 @@ import torch
 import torch.nn.functional as F
 import torch.sparse as ts
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import f1_score, roc_auc_score
+from sklearn.metrics import average_precision_score, f1_score, roc_auc_score
 from torch_sparse import SparseTensor, fill_diag, matmul, mul
 from torch_sparse import sum as sparsesum
 from torch_geometric.utils import degree
@@ -762,6 +762,33 @@ def roc_auc(output, labels, is_sigmoid=False):
     roc_auc = roc_auc_score(labels, output)
 
     return roc_auc
+
+
+def average_precision(output, labels):
+    """Compute anomaly-class AP from continuous binary prediction scores.
+
+    Class 1 denotes fraud. Two-column logits or log probabilities are ranked
+    by ``output[:, 1] - output[:, 0]`` (log-odds for log probabilities).
+    One-dimensional or single-column inputs are already positive-class scores.
+    No threshold is applied, and input tensors are detached without mutation.
+
+    :param output: Tensor or array of shape ``(N,)``, ``(N, 1)``, or ``(N, 2)``.
+    :param labels: Binary ground-truth labels with anomaly label 1.
+    :returns: Average precision in ``[0, 1]``. A split without positives returns 0.
+    :raises ValueError: If scores are non-finite, shapes differ, or labels are not binary.
+    """
+    scores = output.detach().cpu().numpy() if torch.is_tensor(output) else np.asarray(output)
+    target = labels.detach().cpu().numpy() if torch.is_tensor(labels) else np.asarray(labels)
+    target = target.reshape(-1)
+    if scores.ndim == 2 and scores.shape[1] in (1, 2):
+        scores = scores[:, 1] - scores[:, 0] if scores.shape[1] == 2 else scores[:, 0]
+    if scores.ndim != 1 or len(scores) != len(target) or not len(target):
+        raise ValueError("AP requires nonempty binary labels and one score per node")
+    if not np.isfinite(scores).all() or not np.isin(target, [0, 1]).all():
+        raise ValueError("AP requires finite scores and labels in {0, 1}")
+    if not np.any(target == 1):
+        return 0.0
+    return float(average_precision_score(target, scores, pos_label=1))
 
 
 def f1_macro(output, labels, is_sigmoid=False):

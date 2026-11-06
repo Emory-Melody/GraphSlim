@@ -83,7 +83,7 @@ def gcgp_args(tmp_path, **options):
     [
         {"gcgp_kernel": "NTK", "gcgp_batch_size": 8},
         {"gcgp_kernel": "SNTK", "gcgp_learn_adj": True, "gcgp_batch_size": 8},
-        {"gcgp_arithmetic": "released", "_cuda_graph_trace": True},
+        {"gcgp_arithmetic": "released", "record_loss": True},
     ],
 )
 def test_gcgp_variants_reduce_to_finite_soft_label_graphs(tmp_path, options):
@@ -98,7 +98,7 @@ def test_gcgp_variants_reduce_to_finite_soft_label_graphs(tmp_path, options):
     assert torch.isfinite(reduced.feat_syn).all()
     _, features, labels = load_reduced(args)
     assert features.shape == (8, 8) and len(labels) == 8
-    if options.get("_cuda_graph_trace"):
+    if options.get("record_loss"):
         trace = args._reduction_loss_trace
         assert len(trace) == 3 and np.isfinite(trace).all()
 

@@ -147,6 +147,7 @@ def initialize(run_dir, datasets=None, methods=None):
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         "protocol": {
+            "fraud_metric": "AP",
             "data_seed": DATA_SEED,
             "reduction_seeds": list(SEEDS),
             "evaluation_seeds": "reduction_seed + [0..9]",
@@ -261,7 +262,7 @@ def export(run_dir, *, update_readme=False):
         "",
         f"Progress: {counts['complete']}/{len(manifest['jobs'])} reduction runs complete; {counts['failed']} failed; {counts['blocked']} require configuration.",
         "",
-        "Each numeric cell requires all 3 reduction seeds × 10 downstream GCN fits, 300 evaluation epochs, 256 hidden units and 2 layers. Values are mean ± population standard deviation over the 30 test scores, in percent (Yelp: F1-macro). Synthetic checkpoints and GCN weights are selected on validation performance only. No incomplete cell is averaged or ranked.",
+        f"Each numeric cell requires all 3 reduction seeds × 10 downstream GCN fits, 300 evaluation epochs, 256 hidden units and 2 layers. Values are mean ± population standard deviation over the 30 test scores, in percent (Yelp: {manifest['protocol'].get('fraud_metric', 'F1-macro')}). Synthetic checkpoints and GCN weights are selected on validation performance only. No incomplete cell is averaged or ranked.",
         "",
         "CLI rates below are fractions of labeled training nodes, not the whole-graph percentages printed in the published tables. Dataset splits are fixed with data seed 1; reduction seeds are 1, 2, 3. Method epochs and hyperparameters come from this repository's JSON configurations. GECC uses its implemented static mode (no evolving splits); its missing Yelp configuration is `CONFIG`, not a score.",
         "",

@@ -302,7 +302,7 @@ class GCondBase:
         Parameters
         ----------
         best_val : float
-            The best validation accuracy observed so far.
+            The best validation metric observed so far.
         loss_avg : float or None, optional
             Average loss printed when ``args.verbose`` is enabled. Defaults to None.
         save : bool, optional
@@ -314,7 +314,7 @@ class GCondBase:
         Returns
         -------
         float
-            The updated best validation accuracy.
+            The updated best validation metric.
         """
         data = self.data
         args = self.args

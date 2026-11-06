@@ -1,0 +1,11 @@
+{
+  "wheel_modules": 104,
+  "wheel_matches_package_source": true,
+  "wheel_import_and_ap_configuration": "passed",
+  "sdist_constraints_and_demo_config": "present",
+  "retired_backend_and_ui": "absent",
+  "sha256": {
+    "graphslim-1.3.3-py3-none-any.whl": "36f8712ee55c48b2afbf057728d70007dc15db0e9ee3f437937ec89f5c7bb80f",
+    "graphslim-1.3.3.tar.gz": "fcecd159cf5a0849b4723b362ed9d0416adca0baa2c9913835b759da15017402"
+  }
+}

@@ -381,7 +381,7 @@ def test_setting_config_assigns_dataset_defaults(dataset, setting, expected_sett
     config.setting_config(args)
     assert args.setting == expected_setting and args.reduction_rate == rate
     assert args.eval_interval == 2 and args.checkpoints[:3] == [-1, 1, 3]
-    assert args.metric.__name__ == ("f1_macro" if dataset == "yelp" else "accuracy")
+    assert args.metric.__name__ == ("average_precision" if dataset == "yelp" else "accuracy")
 
 
 def test_cli_validates_json_options_and_edge_reduction(tmp_path):

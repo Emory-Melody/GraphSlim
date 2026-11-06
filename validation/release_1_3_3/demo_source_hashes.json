@@ -1,0 +1,10 @@
+{
+  "examples/demo.py": "c1b8efc06e91c02ddec792b72e43a50d116b33fcad2fb327a409067dbed6d573",
+  "graphslim/condensation/gcond.py": "c9db2f30b2ff9d893fda23b860eea22ba26009ae66a3cbae490691ab5a8e597b",
+  "graphslim/condensation/gcond_base.py": "f24d55c22686a4bf1426437c4625b49f56d7d702c71671cf231aef5f5d781338",
+  "graphslim/evaluation/eval_agent.py": "601b9f0ebe87a618690c60ad5bf8d9534d35ef52ce51b5d31234ed7d797fe02e",
+  "graphslim/models/gat.py": "899f9c17a2558c39a6cddbc010ea1023bfcb7d987582d5723fbe14022dbbd6ce",
+  "graphslim/models/base.py": "42a57cb2271c0d99b7c9fee0e410ae82da6acda733c9eb3d16c5e7b79762835a",
+  "graphslim/config.py": "04da89e530a2283bb3d58f26ceae8fc8dc687cd09708989fcd33be2f2bc7c5b8",
+  "graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e"
+}

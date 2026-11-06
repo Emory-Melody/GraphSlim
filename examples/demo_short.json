@@ -1,0 +1,8 @@
+{
+  "epochs": 20,
+  "eval_interval": 10,
+  "outer_loop": 2,
+  "inner_loop": 1,
+  "eval_epochs": 100,
+  "run_eval": 3
+}

@@ -3,28 +3,35 @@
 Use Python 3.10 or 3.11. Install PyTorch and matching `torch-scatter` /
 `torch-sparse` wheels for your CPU or CUDA environment before installing GraphSlim.
 
+The following CPU setup uses the same DGL/NumPy constraints as CI:
+
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.2
-pip install -e .
-```
-
-See the repository [README](https://github.com/Emory-Melody/GraphSlim#install)
-for the full CPU setup and optional dependency groups. For a published version,
-use `pip install graphslim`. As checked on 2026-11-05, PyPI provides 1.2.1;
-the pinned source above is versioned 1.3.2 and includes the 49 methods and eight
-GNN architectures described by the package paper. The `uv.lock` environment is consumed by
-`uv sync --locked`; PyG extension wheels must match its Torch version.
-
-Check the installed CPU environment and optional DGL support:
-
-```bash
+git checkout --detach 1.3.3
+uv venv --python 3.11
+source .venv/bin/activate
+uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
+uv pip install torch-scatter torch-sparse --no-deps --no-index -f https://data.pyg.org/whl/torch-2.6.0+cpu.html
+uv pip install -e ".[dev,dgl,fuzzy]" -c constraints/cpu-torch26.txt
 python -m graphslim.doctor --device cpu --dgl
 ```
 
-For GPU execution, install Torch and PyG extension wheels matching your CUDA
-runtime, then check the selected device with `python -m graphslim.doctor --device cuda:0`.
+`constraints/cpu-common.txt` pins DGL 1.1.3 and NumPy 1.26.4; the Torch-specific
+constraint files match Torch 2.6/torchvision 0.21 or Torch 2.8/torchvision 0.23.
+For the latter, use the matching Torch/PyG wheels and `cpu-torch28.txt`.
+The optional `.[viz]` extra enables local graph visualization.
+
+For CUDA, select matching Torch and PyG extension wheels using the
+[README GPU setup](https://github.com/Emory-Melody/GraphSlim/blob/1.3.3/README.md#gpu-setup-and-checks)
+and keep the chosen Torch version constrained. GPU execution uses native PyTorch operations. Check it with
+`python -m graphslim.doctor --device cuda:0 --dgl`.
+
+The source version above includes 49 canonical methods and eight GNN backbones.
+PyPI still distributes the earlier 1.2.1 (checked 2026-11-06), so use the Git tag
+for these features. `uv sync --locked` consumes the separate dependency lock;
+PyG extension wheels must match the Torch runtime it resolves. The versioned CPU
+recipe above and its constraints describe the tested CPU environment.
 
 ## Build the documentation
 

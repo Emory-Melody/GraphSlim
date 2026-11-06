@@ -1,12 +1,32 @@
 # Version-specific software testing record
 
-The Git 1.3.2 release has **49 canonical methods** (5 node,
-18 edge, 10 coarsening, 16 condensation) and **eight downstream GNN architectures**.
-The environment, raw test log, JUnit results, full coverage data and packaging
-checks are in [validation/release_1_3_2](https://github.com/Emory-Melody/GraphSlim/blob/1.3.2/validation/release_1_3_2/README.md).
-These files are committed with the implementation they describe.
+GraphSlim 1.3.3 retains 49 canonical methods and eight downstream GNN architectures.
+It uses anomaly-class AP for Yelp/Amazon validation, HPO and final evaluation.
+The frozen 110-pair comparison artifact retains its historical metric definitions.
 
-## Current reviewed release: 1.3.2
+## Current release: 1.3.3
+
+A fresh CPU test and coverage record is stored in
+[validation/release_1_3_3](https://github.com/Emory-Melody/GraphSlim/tree/1.3.3/validation/release_1_3_3).
+The fresh Linux CPU run reports **1,601 passed, 22 skipped**, zero failures/errors,
+**98.79% statement coverage** and **96.01% branch coverage** across all 104
+package modules. Historical counts below describe their own source revisions.
+
+Use the [versioned CPU setup](installation.md), then run:
+
+```bash
+python -m pip install -e '.[dev,fuzzy,dgl]' -c constraints/cpu-torch26.txt 'coverage==7.16.2'
+python -m coverage run -m pytest -q -ra --junitxml=pytest.xml
+python -m coverage combine
+python -m coverage json -o coverage.json
+python benchmark/results/reproducibility_20261106/verify.py --check
+```
+
+New regression checks cover incompatible HPO resumes and fraud AP ranking and
+configuration. Small synthetic CPU checks verify reducer behavior and training;
+they are separate from complete benchmark accuracy and GPU validation.
+
+## Release 1.3.2
 
 On Linux CPU with Python 3.11 and PyTorch 2.6.0+cpu, the repository suite reports
 **1,589 passed, 31 skipped, zero failures/errors**. Skips are CUDA-only checks and

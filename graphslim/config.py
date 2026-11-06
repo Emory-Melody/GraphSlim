@@ -324,10 +324,9 @@ def setting_config(args):
         args.setting = "ind"
     if args.setting is None:
         args.setting = "trans"
-    from graphslim.utils import f1_macro, accuracy
+    from graphslim.utils import average_precision, accuracy
 
-    args.metric = f1_macro if args.dataset in ["yelp", "amazon"] else accuracy
-    # args.metric = 'accuracy'
+    args.metric = average_precision if args.dataset in ["yelp", "amazon"] else accuracy
     method_keys = getattr(args, "_method_config_keys", set())
     if "run_inter_eval" not in method_keys:
         args.run_inter_eval = 3
@@ -399,20 +398,6 @@ def method_config(args):
 @click.option(
     "--gpu_id", "-G", default=0, help="gpu id start from 0, -1 means cpu", show_default=True
 )
-@click.option(
-    "--cuda_graph/--no_cuda_graph",
-    default=False,
-    show_default=True,
-    help="Optional native CUDA graph stages with exact checks and eager fallback",
-)
-@click.option(
-    "--cuda_graph_min_steps",
-    default=64,
-    type=click.IntRange(min=1),
-    show_default=True,
-    help="Keep short stages eager to avoid graph setup overhead",
-)
-@click.option("--cuda_graph_warmup", default=3, type=click.IntRange(min=1), show_default=True)
 @click.option(
     "--setting",
     type=click.Choice(["trans", "ind"]),

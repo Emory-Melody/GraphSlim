@@ -307,7 +307,7 @@ class Evaluator:
                 print(
                     "Test set results:",
                     f"loss= {loss_test.item():.4f}",
-                    f"accuracy= {acc_test:.4f}",
+                    f"{getattr(self.metric, '__name__', 'score')}= {acc_test:.4f}",
                 )
         else:
             output = model.predict(data.feat_full, data.adj_full)
@@ -320,7 +320,7 @@ class Evaluator:
                 print(
                     "Test full set results:",
                     f"loss= {loss_test.item():.4f}",
-                    f"accuracy= {acc_test:.4f}",
+                    f"{getattr(self.metric, '__name__', 'score')}= {acc_test:.4f}",
                 )
         if MIA:
             mia_acc = inference_via_confidence(
@@ -335,7 +335,7 @@ class Evaluator:
 
     def evaluate(self, data, model_type, verbose=True, reduced=True, mode="eval"):
         """
-        Evaluates a model over multiple runs and returns mean and standard deviation of accuracy.
+        Evaluates a model over multiple runs and returns mean and standard deviation of the configured metric.
 
         Parameters
         ----------
@@ -353,9 +353,9 @@ class Evaluator:
         Returns
         -------
         mean_acc : float
-            Mean accuracy over multiple runs.
+            Mean configured-metric score over multiple runs.
         std_acc : float
-            Standard deviation of accuracy over multiple runs.
+            Standard deviation of the configured metric over multiple runs.
         """
 
         args = self.args
@@ -390,7 +390,7 @@ class Evaluator:
 
         res = np.array(res)
 
-        # Log and return mean and standard deviation of accuracy
+        # Log and return mean and standard deviation of the configured metric
         summary_msg = f"Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}"
         if hasattr(args, "logger"):
             args.logger.info(summary_msg)
@@ -400,7 +400,7 @@ class Evaluator:
 
     def MIA_evaluate(self, data, model_type, verbose=True, reduced=True, mode="eval"):
         """
-        Evaluates a model over multiple runs and returns mean and standard deviation of accuracy.
+        Evaluates a model over multiple runs and returns mean and standard deviation of the configured metric.
 
         Parameters
         ----------
@@ -418,9 +418,9 @@ class Evaluator:
         Returns
         -------
         mean_acc : float
-            Mean accuracy over multiple runs.
+            Mean configured-metric score over multiple runs.
         std_acc : float
-            Standard deviation of accuracy over multiple runs.
+            Standard deviation of the configured metric over multiple runs.
         """
 
         args = self.args
@@ -459,7 +459,7 @@ class Evaluator:
         res = np.array(res)
         mia_res = np.array(mia_res)
 
-        # Log and return mean and standard deviation of accuracy
+        # Log and return mean and standard deviation of the configured metric
         args.logger.info(
             f"Seed:{args.seed}, Test Mean Accuracy: {100 * res.mean():.2f} +/- {100 * res.std():.2f}, "
             f"MIA Accuracy: {100 * mia_res.mean():.2f} +/- {100 * mia_res.std():.2f}"

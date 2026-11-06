@@ -14,7 +14,6 @@ from graphslim.utils import *
 from graphslim.models import *
 from torch.nn import Parameter
 from torch import nn
-from graphslim.acceleration import CUDAGraphStep
 
 
 class GDEM(GCondBase):
@@ -113,9 +112,7 @@ class GDEM(GCondBase):
         eigenvals_syn = eigenvals.to(self.device)
         best_val = 0
         bar = trange(args.epochs)
-        class_matrix = (
-            F.one_hot(self.y_syn).float().T if getattr(args, "cuda_graph", False) else None
-        )
+        class_matrix = None
 
         def spectral_loss():
             """Combine spectral covariance, class embedding, and eigenvector orthogonality terms.
@@ -152,18 +149,15 @@ class GDEM(GCondBase):
             loss += args.gamma * orthog_norm
             return eigen_match_loss, class_loss, orthog_norm, loss
 
-        spectral_step = CUDAGraphStep(
-            spectral_loss,
-            [self.x_syn, self.eigenvecs_syn],
-            args,
-            "gdem.spectral_loss",
-            args.epochs,
-            inputs=(co_x_trans_real, embed_mean_real, eigenvals_syn),
-        )
+        if getattr(args, "record_loss", False):
+            args._reduction_loss_trace = []
         for ep in bar:
             optimizer_eigenvec.zero_grad()
             optimizer_feat.zero_grad()
-            eigen_match_loss, class_loss, orthog_norm, loss = spectral_step()
+            eigen_match_loss, class_loss, orthog_norm, loss = spectral_loss()
+            loss.backward()
+            if getattr(args, "record_loss", False):
+                args._reduction_loss_trace.append(float(loss.detach()))
             if verbose and ep in args.checkpoints:
                 print(f"epoch: {ep}")
                 print(f"eigen_match_loss: {eigen_match_loss}")
@@ -293,12 +287,10 @@ class GDEM(GCondBase):
         :param args: Configuration namespace containing the options used by this operation.
         :param data: Graph data containing features, adjacency, labels, and split indices.
         :param verbose: Whether to print progress and diagnostic information.
-        :returns: Trained MLP selected using validation accuracy.
+        :returns: Trained MLP selected using the configured validation metric.
         """
-        x_full, y_full = to_tensor(data.feat_full, label=data.labels_full, device=self.device)
-
         model = MLP(
-            num_features=x_full.shape[1],
+            num_features=data.feat_full.shape[1],
             num_classes=data.nclass,
             hidden_dim=args.hidden,
             dropout=args.dropout,
@@ -306,24 +298,14 @@ class GDEM(GCondBase):
         optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
         best_acc_val = 0
-        y_train, y_val, y_test = to_tensor(
+        y_train, y_val = to_tensor(
             label1=data.labels_train,
             label2=data.labels_val,
-            label=data.labels_test,
             device=self.device,
         )
         feat_train, feat_val = to_tensor(data.feat_train, data.feat_val, device=self.device)
 
         lr = args.lr
-        pretraining_step = CUDAGraphStep(
-            lambda: F.nll_loss(model.forward(feat_train), y_train),
-            model.parameters(),
-            args,
-            "gdem.feature_pretraining",
-            2000,
-            modules=(model,),
-            inputs=(feat_train, y_train),
-        )
         for i in range(2000):
             if i == 1000 // 2 and i > 0:
                 lr = lr * 0.1
@@ -334,7 +316,9 @@ class GDEM(GCondBase):
             model.train()
             optimizer.zero_grad()
 
-            loss_train = pretraining_step()
+            loss_train = F.nll_loss(model.forward(feat_train), y_train)
+
+            loss_train.backward()
             optimizer.step()
 
             with torch.no_grad():
@@ -342,7 +326,7 @@ class GDEM(GCondBase):
                 output = model.forward(feat_val)
                 # loss_val = F.nll_loss(output, y_val)
 
-                acc_val = accuracy(output, y_val)
+                acc_val = getattr(args, "metric", accuracy)(output, y_val)
 
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val

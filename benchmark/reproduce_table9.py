@@ -205,6 +205,7 @@ def initialize(options):
             ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
         ).strip(),
         protocol=dict(
+            fraud_metric="AP",
             source="GC4NC arXiv:2406.16715v3 Appendix A.3",
             eval_model="GCN",
             hidden=256,
@@ -214,7 +215,7 @@ def initialize(options):
             run_inter_eval=3,
             data_seed=DATA_SEED,
             reduction_seeds={"random/kcenter/herding": [1, 2, 3], "others": [1]},
-            checkpoint_selection="validation accuracy only",
+            checkpoint_selection="validation metric only (AP for Yelp/Amazon, accuracy otherwise)",
             uncertainty="population standard deviation over all test scores of a cell",
             rates="CLI fractions of labeled training nodes; Table 9 labels in LABELS",
         ),
@@ -519,7 +520,9 @@ def export(folder, manifest):
             method=method,
             rate=rate,
             label=None if rate is None else LABELS[dataset][RATES[dataset].index(rate)],
-            paper=paper_value(paper, dataset, rate, method),
+            paper=None
+            if dataset == "yelp" and manifest.get("protocol", {}).get("fraud_metric") == "AP"
+            else paper_value(paper, dataset, rate, method),
         )
         if all(s == "complete" for s in states):
             records = [nr.read_json(job_dir(folder, job) / "result.json") for job in jobs]
@@ -565,7 +568,11 @@ def render(cells, manifest, show_paper=False):
     index = {(c["dataset"], c["method"], c["rate"]): c for c in cells}
     lines = []
     for dataset in manifest["datasets"]:
-        metric = "F1-macro" if dataset == "yelp" else "test accuracy"
+        metric = (
+            manifest["protocol"].get("fraud_metric", "F1-macro")
+            if dataset == "yelp"
+            else "test accuracy"
+        )
         lines += [f"### {CSV_NAMES[dataset]} — {metric} (%)", ""]
         header = ["Family", "Method", *[f"{label}%" for label in LABELS[dataset]]]
         lines += [
@@ -577,7 +584,15 @@ def render(cells, manifest, show_paper=False):
             for rate in RATES[dataset]:
                 cell = index.get((dataset, method, None if method == "whole" else rate))
                 text = cell_text(cell)
-                if show_paper and cell and cell.get("paper") is not None:
+                if (
+                    show_paper
+                    and cell
+                    and cell.get("paper") is not None
+                    and not (
+                        dataset == "yelp"
+                        and manifest.get("protocol", {}).get("fraud_metric") == "AP"
+                    )
+                ):
                     text += f" ({cell['paper']:.2f})"
                 values.append(text)
             family = "Baseline" if method == "whole" else FAMILY.get(method, "Condensation")

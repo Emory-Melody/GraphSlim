@@ -52,7 +52,7 @@ def test_mlp_trainer_restores_best_validation_weights():
         setattr(graph, f"feat_{split}", graph.feat_full[index])
     agent = object.__new__(GDEM)
     agent.device = "cpu"
-    args = SimpleNamespace(hidden=8, dropout=0.0, lr=0.05, weight_decay=0.0, cuda_graph=False)
+    args = SimpleNamespace(hidden=8, dropout=0.0, lr=0.05, weight_decay=0.0)
     torch.manual_seed(0)
     model = agent.mlp_trainer(args, graph, verbose=False)
     model.eval()

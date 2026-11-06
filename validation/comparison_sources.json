@@ -1,0 +1,79 @@
+{
+  "networkit": {
+    "repo": "networkit/networkit",
+    "branch": "master",
+    "sha": "f0012b06338ab9a06b66f91e176ba8e42defc524",
+    "files": [
+      "README.md",
+      "networkit/sparsification.pyx"
+    ]
+  },
+  "graph-coarsening": {
+    "repo": "loukasa/graph-coarsening",
+    "branch": "master",
+    "sha": "1d7aad02ef294a37e79e009d52f215b70d3ef1e8",
+    "files": [
+      "README.md",
+      "graph_coarsening/coarsening_utils.py"
+    ]
+  },
+  "GCondenser": {
+    "repo": "superallen13/GCondenser",
+    "branch": "master",
+    "sha": "decfd6a86b91a1f64b54c541534f72b4b7c9b381",
+    "files": [
+      "README.md"
+    ]
+  },
+  "GC-Bench": {
+    "repo": "RingBDStack/GC-Bench",
+    "branch": "main",
+    "sha": "78597b84b20e34e19a89d175db88f558f920be7f",
+    "files": [
+      "README.md"
+    ]
+  },
+  "scope": "Static source coverage audit. Counts describe the pinned commits, not all future releases; graph architecture families exclude MLP and duplicate implementations. Extended evaluations exclude routine prediction tasks and standalone utilities.",
+  "counts": {
+    "NetworKit": {
+      "node": 0,
+      "edge": 15,
+      "coarsening": 0,
+      "condensation": 0,
+      "gnn_architectures": 0,
+      "extended_evaluations": 0
+    },
+    "graph-coarsening": {
+      "node": 0,
+      "edge": 0,
+      "coarsening": 7,
+      "condensation": 0,
+      "gnn_architectures": 0,
+      "extended_evaluations": 0
+    },
+    "GCondenser": {
+      "node": 2,
+      "edge": 0,
+      "coarsening": 0,
+      "condensation": 11,
+      "gnn_architectures": 6,
+      "extended_evaluations": 2
+    },
+    "GC-Bench": {
+      "node": 3,
+      "edge": 0,
+      "coarsening": 0,
+      "condensation": 9,
+      "gnn_architectures": 8,
+      "extended_evaluations": 2
+    },
+    "GraphSlim_1.3.3": {
+      "node": 5,
+      "edge": 18,
+      "coarsening": 10,
+      "condensation": 16,
+      "gnn_architectures": 8,
+      "extended_evaluations": 5
+    }
+  }
+}

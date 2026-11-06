@@ -192,6 +192,7 @@ def initialize(folder, datasets=None, methods=None, readme_section=None):
         "readme_section": readme_section or "paper-hpo",
         "gecc_grid": gecc_grid(),
         "protocol": {
+            "fraud_metric": "AP",
             "selection": "validation mean only; deterministic lowest candidate ID breaks ties",
             "test_policy": "no test metric computed during reduction/search; unseal after all candidates for a group complete",
             "search_reduction_seed": 1,
@@ -418,7 +419,7 @@ def export(folder, manifest, update_readme=False):
         "",
         "GECC–Yelp: exhaustive 4,394 settings (13³ propagation weights × 2 weight decays), K=2, hard k-means++, one restart. SimGC: corrected author implementation/settings, then the 108-config downstream GCN grid from GC4NC Table 11. These are different search spaces, not interchangeable.",
         "",
-        "Searches use only validation metrics, ten fixed evaluation seeds, 300 epochs, and the seed-1 graph at the highest CLI reduction rate. A group must finish every candidate before its choice is frozen. That choice is reused across all three rates; each final cell requires 3 reduction seeds × 10 GCN fits. Values are test mean ± population standard deviation (%) (Yelp: F1-macro).",
+        f"Searches use only validation metrics, ten fixed evaluation seeds, 300 epochs, and the seed-1 graph at the highest CLI reduction rate. A group must finish every candidate before its choice is frozen. That choice is reused across all three rates; each final cell requires 3 reduction seeds × 10 GCN fits. Values are test mean ± population standard deviation (%) (Yelp: {manifest['protocol'].get('fraud_metric', 'F1-macro')}).",
         "",
         "Scope caveats: GECC has no published Yelp optimum; SimGC has no published Pubmed/Yelp optimum (common author defaults are extensions). Reddit uses Reddit2; FraudYelp uses the fixed local seed-1 split. SimGC synthetic alignment gradients, teacher propagation order/normalization, and smoothness sign were repaired against the pinned author code. GECC inductive propagation depth and downstream training-mode dropout were repaired. Do not interpret this batch as a hyperparameter-only comparison or an exact paper replay.",
         "",
@@ -443,7 +444,7 @@ def export(folder, manifest, update_readme=False):
             "every 100); others use the 300-epoch local protocol. Condensation selection "
             "is separate (citation: hidden 2048, 3,000 updates). Full groups freeze before "
             "testing. Final cells pool 3 reduction seeds × 10 GCN fits, test mean ± "
-            "population standard deviation (%; Yelp: F1-macro)."
+            f"population standard deviation (%; Yelp: {manifest['protocol'].get('fraud_metric', 'F1-macro')})."
         )
     if repaired:
         lines[10] += (

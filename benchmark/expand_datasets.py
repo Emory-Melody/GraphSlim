@@ -143,7 +143,7 @@ def initialize(options):
         max_rss_gib=options.max_rss_gib,
         failure_policy="terminal failures retained; no partial numeric cells",
         precision="float32; CGC reconstruction solve float64 as in package",
-        metric="accuracy except FraudYelp macro-F1",
+        metric="accuracy except FraudYelp anomaly-class AP",
         settings="original package trans/ind settings; new datasets transductive",
         comparison_scope="new source/budgets only; no pooling of historical batches",
     )
@@ -491,7 +491,6 @@ def worker(options, manifest, job):
     args.activation = "relu"
     args.nlayers = 2
     args.with_bn = False
-    args.cuda_graph = False
     args.eval_wd = 0.0005
 
     def phase(name):

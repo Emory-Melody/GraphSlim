@@ -11,7 +11,6 @@ import math
 
 import torch
 import torch.nn.functional as F
-from graphslim.acceleration import CUDAGraphCallable
 
 from graphslim.reduction.lightweight import (
     LightweightReducer,
@@ -243,11 +242,6 @@ class GCGP(LightweightReducer):
             )
             return ss, ts
 
-        kernels = (
-            CUDAGraphCallable(kernel_pair, args, f"gcgp.{kernel}.kernels", args.epochs)
-            if kernel in ("SGNK", "NTK")
-            else None
-        )
         for epoch in range(args.epochs):
             chosen = (
                 torch.randperm(len(train), device=self.device)[:batch_size]
@@ -261,7 +255,7 @@ class GCGP(LightweightReducer):
                 else torch.eye(size, device=self.device)
             )
             if kernel == "SGNK":
-                ss, ts = kernels(original, synthetic)
+                ss, ts = kernel_pair(original, synthetic)
             else:
                 chosen_cpu = chosen.cpu().numpy()
                 aa = sparse_tensor(
@@ -269,7 +263,7 @@ class GCGP(LightweightReducer):
                 )
                 hops = getattr(args, "gcgp_hops", 2) if kernel == "SNTK" else 0
                 if kernel == "NTK":
-                    ss, ts = kernels(original, synthetic)
+                    ss, ts = kernel_pair(original, synthetic)
                 else:
                     ss = tangent_kernel(
                         synthetic, synthetic, reduced_adjacency, reduced_adjacency, layers, hops
@@ -290,7 +284,7 @@ class GCGP(LightweightReducer):
             if learn_adjacency
             else torch.eye(size, device=self.device)
         )
-        if getattr(args, "_cuda_graph_trace", False):
+        if getattr(args, "record_loss", False):
             args._reduction_loss_trace = list(loss_history)
         return self.finish(
             data,

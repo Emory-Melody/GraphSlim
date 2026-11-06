@@ -1,0 +1,1994 @@
+{
+  "metric": "AP",
+  "positive_class": 1,
+  "score": "continuous log-odds",
+  "units": "percent",
+  "profile": "AP_epoch_HPO12",
+  "data": {
+    "nodes": 45954,
+    "classes": 2,
+    "split_sizes": {
+      "train": 36762,
+      "val": 4596,
+      "test": 4596
+    },
+    "labels_sha256": "a00af04f79f758675131338933753af5cf62063b38b69f145b36e54ddb4178b0",
+    "test_sha256": "fe247ea452165822f3bac698352514f714464755df8e987246e266f11b31b24a",
+    "features_sha256": "35484878b1ad02e77d29deb1f680b60d2da43de40feab78753d881018d948b66"
+  },
+  "sources": [
+    {
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "archive_sha256": "44f6bd83c4b0d6c2028d67a8ae576baac73c788e8b38245eba911f22a87a2159",
+      "manifest_sha256": "093c9731f0400fd0cbc2aea9ae57a63b7dab62236f754cb98c8e27c336764565",
+      "report": "output/gc4nc_yelp_ap_20261101/comparison.json",
+      "report_sha256": "2986a20380f2bf5517f8128ecc25b5fa22b9e22ba1e6b87a722383835bcd625b",
+      "protocol": {
+        "metric": "Binary anomaly-class Average Precision; pos_label=1; continuous log-odds; percentage in reports",
+        "profiles": {
+          "F1_epoch_default": "Raw graph-specific default evaluator params; validation macro-F1 chooses epoch; AP is diagnostic on the chosen model.",
+          "AP_epoch_HPO12": "12 predefined shared GCN settings; 3 validation seeds on highest-rate seed-1 graph; validation AP selects both epoch and configuration; freeze before final test evaluation."
+        },
+        "selection": "Highest mean validation AP; ties use lowest candidate ID",
+        "search_seeds": [
+          1,
+          2,
+          3
+        ],
+        "epochs": 300,
+        "final_seeds": "Preserve each input graph original ten evaluation seeds; pool all declared reduction seeds.",
+        "source": "One common frozen evaluation package (same as the completed extra-cell/GDEM HPO batch); original graph source identities retained per record.",
+        "graph_selection": "Existing graphs retained as frozen inputs. Graph generation and historical macro-F1-based reduction checkpoint selection are NOT redone. This is a retrospective downstream-AP extension, not a wholly new AP-optimal benchmark.",
+        "budget": "Whole is an unreduced control; TSpanner is an edge-reduction control retaining all train nodes. They are not node-budget competitors.",
+        "test_policy": "All 12 AP validation candidates complete and selection frozen before either final test profile is evaluated; no test-selected configuration or threshold.",
+        "comparison": "Compare AP to constant-score prevalence baseline and to Averaging. Macro-F1 and AP magnitudes are not improvements of the same metric."
+      },
+      "grid": [
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.5
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.001,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 64,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 3,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 4,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.5
+        },
+        {
+          "hidden": 256,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.5
+        }
+      ]
+    },
+    {
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "archive_sha256": "44f6bd83c4b0d6c2028d67a8ae576baac73c788e8b38245eba911f22a87a2159",
+      "manifest_sha256": "0ecc218e6649ea09e41c3d2d49384feba308cadd26d84632dee94db1816b0f5c",
+      "report": "output/gc4nc_yelp_ap_sfgc_gcsntk_20261101/comparison.json",
+      "report_sha256": "184e36575136d3b5ca9d114e1ade4577d019016c60b51f01c95ca88b724a36f5",
+      "protocol": {
+        "metric": "Binary anomaly-class Average Precision; pos_label=1; continuous log-odds; percentage in reports",
+        "profiles": {
+          "F1_epoch_default": "Raw graph-specific default evaluator params; validation macro-F1 chooses epoch; AP is diagnostic on the chosen model.",
+          "AP_epoch_HPO12": "12 predefined shared GCN settings; 3 validation seeds on highest-rate seed-1 graph; validation AP selects both epoch and configuration; freeze before final test evaluation."
+        },
+        "selection": "Highest mean validation AP; ties use lowest candidate ID",
+        "search_seeds": [
+          1,
+          2,
+          3
+        ],
+        "epochs": 300,
+        "final_seeds": "Preserve each input graph original ten evaluation seeds; pool all declared reduction seeds.",
+        "source": "One common frozen evaluation package (same as the completed extra-cell/GDEM HPO batch); original graph source identities retained per record.",
+        "graph_selection": "Existing graphs retained as frozen inputs. Graph generation and historical macro-F1-based reduction checkpoint selection are NOT redone. This is a retrospective downstream-AP extension, not a wholly new AP-optimal benchmark.",
+        "budget": "Whole is an unreduced control; TSpanner is an edge-reduction control retaining all train nodes. They are not node-budget competitors.",
+        "test_policy": "All 12 AP validation candidates complete and selection frozen before either final test profile is evaluated; no test-selected configuration or threshold.",
+        "comparison": "Compare AP to constant-score prevalence baseline and to Averaging. Macro-F1 and AP magnitudes are not improvements of the same metric."
+      },
+      "grid": [
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.5
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.001,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 64,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 3,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 256,
+          "lr": 0.01,
+          "nlayers": 4,
+          "weight_decay": 0.0005,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0005,
+          "dropout": 0.5
+        },
+        {
+          "hidden": 256,
+          "lr": 0.001,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.0
+        },
+        {
+          "hidden": 128,
+          "lr": 0.01,
+          "nlayers": 2,
+          "weight_decay": 0.0,
+          "dropout": 0.5
+        }
+      ]
+    }
+  ],
+  "constant_score_ap_percent": 14.53437771975631,
+  "scope": "Retrospective validation-AP downstream search on frozen saved graphs; historical graph generation and graph selection remain fixed.",
+  "cells": [
+    {
+      "dataset": "yelp",
+      "method": "whole",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": null,
+      "status": "complete",
+      "mean": 22.46609676230144,
+      "std": 0.16454187344680274,
+      "n": 10,
+      "implementation": "random",
+      "input_profile": "whole_control",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.2502592948365543,
+      "selection_sha256": "2e48e56783bec618de5ed27e5ee214c0eb15949cd9aa0a259b571b6cbc3f688d",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/whole__yelp/finals/AP_epoch_HPO12/yelp__whole.json": "def74a1780f936727da1621ce7a19a21717fbc491057705ef39e4c1ba046f716"
+      },
+      "group_result_sha256": "1c36cc6cd1495ed9cb927630959da628050e865b78e9cd77afca25d5e4e1ccde"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gdem",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 18.05286295074535,
+      "std": 0.6412651111690671,
+      "n": 10,
+      "implementation": "gdem",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.1814809086812226,
+      "selection_sha256": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.0005__s1.json": "cd599f2891bdf9c9d5fbed43f4f09369f366c7c313f0f373ebae363f3cdd696b"
+      },
+      "group_result_sha256": "638fc848139c76b275700e2bc75ded6c1f2e1e87b6f4998bec05e744f64a010a"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gdem",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.181942207264697,
+      "std": 0.5103105425712775,
+      "n": 10,
+      "implementation": "gdem",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.1814809086812226,
+      "selection_sha256": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.001__s1.json": "d4bab42bb769b4840e149fbaa5f32b9056d260c75148ad377045e7ae35963aa0"
+      },
+      "group_result_sha256": "638fc848139c76b275700e2bc75ded6c1f2e1e87b6f4998bec05e744f64a010a"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gdem",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 18.29156674670378,
+      "std": 0.5127920521099386,
+      "n": 10,
+      "implementation": "gdem",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.1814809086812226,
+      "selection_sha256": "072f0cd5635d2850638bead77000d8a34b7006bcc59a518030a361f8affe118f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gdem__yelp/finals/AP_epoch_HPO12/yelp__gdem__r0.002__s1.json": "e3efffc3cc561526d392bba6b5551c8f4bc60bf721f90e23feda299f738cca1a"
+      },
+      "group_result_sha256": "638fc848139c76b275700e2bc75ded6c1f2e1e87b6f4998bec05e744f64a010a"
+    },
+    {
+      "dataset": "yelp",
+      "method": "averaging",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 20.220914087856215,
+      "std": 0.2737822916361152,
+      "n": 10,
+      "implementation": "averaging",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.22420568508538763,
+      "selection_sha256": "a68dc95ab7e005d6edcf5a0d079411948a1e00e99f8be5ce24d366d382f73b78",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/averaging__yelp/finals/AP_epoch_HPO12/yelp__averaging__r0.0005__s1.json": "e2478921d3b222a3d1ece03aa1843b09df0436a60d0ff74e58d653e1b4fff911"
+      },
+      "group_result_sha256": "9b08c249fa2fc553a3256cf5f2eddab73415da9a2e9fa32d7fe879ff9110171f"
+    },
+    {
+      "dataset": "yelp",
+      "method": "averaging",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 20.381747868643775,
+      "std": 0.37157791118328354,
+      "n": 10,
+      "implementation": "averaging",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.22420568508538763,
+      "selection_sha256": "a68dc95ab7e005d6edcf5a0d079411948a1e00e99f8be5ce24d366d382f73b78",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/averaging__yelp/finals/AP_epoch_HPO12/yelp__averaging__r0.001__s1.json": "70e10eea3b2d9b68085fbcaa5968e32c72bfe578e7a1d9b96ffc93f09997fd3c"
+      },
+      "group_result_sha256": "9b08c249fa2fc553a3256cf5f2eddab73415da9a2e9fa32d7fe879ff9110171f"
+    },
+    {
+      "dataset": "yelp",
+      "method": "averaging",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 20.397614662463873,
+      "std": 0.3760597521230945,
+      "n": 10,
+      "implementation": "averaging",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.22420568508538763,
+      "selection_sha256": "a68dc95ab7e005d6edcf5a0d079411948a1e00e99f8be5ce24d366d382f73b78",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/averaging__yelp/finals/AP_epoch_HPO12/yelp__averaging__r0.002__s1.json": "87ac4d489aadc4a5c97951355325b623c43ff99cfbf539a863db74316481cf65"
+      },
+      "group_result_sha256": "9b08c249fa2fc553a3256cf5f2eddab73415da9a2e9fa32d7fe879ff9110171f"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 18.938669741890976,
+      "std": 0.5689515698679546,
+      "n": 10,
+      "implementation": "gcond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.18140757589959614,
+      "selection_sha256": "65631e3274a190288548176bb80fd2537a68fe42ef34615798710783a971d8bc",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcond__yelp/finals/AP_epoch_HPO12/yelp__gcond__r0.0005__s1.json": "e8eed1f3fe47ad4e15272625e14533e1f7d1e43cb0ac8a4d658843cf59896865"
+      },
+      "group_result_sha256": "a46c29fd6dbf4a2535becb880e813419c10b60b5b74854f4eac0f681723c8602"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.40884514156728,
+      "std": 0.6478405155311523,
+      "n": 10,
+      "implementation": "gcond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.18140757589959614,
+      "selection_sha256": "65631e3274a190288548176bb80fd2537a68fe42ef34615798710783a971d8bc",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcond__yelp/finals/AP_epoch_HPO12/yelp__gcond__r0.001__s1.json": "e4923113a167136bc8564be96e1be8cce66d8f7d78fff29f489e18bd18863e58"
+      },
+      "group_result_sha256": "a46c29fd6dbf4a2535becb880e813419c10b60b5b74854f4eac0f681723c8602"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 18.390002340683935,
+      "std": 0.6218764452840253,
+      "n": 10,
+      "implementation": "gcond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.18140757589959614,
+      "selection_sha256": "65631e3274a190288548176bb80fd2537a68fe42ef34615798710783a971d8bc",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcond__yelp/finals/AP_epoch_HPO12/yelp__gcond__r0.002__s1.json": "7765f620015f19973924b4781a99df07f37cb8de9e8461ac9385ea59261a2075"
+      },
+      "group_result_sha256": "a46c29fd6dbf4a2535becb880e813419c10b60b5b74854f4eac0f681723c8602"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcdmx",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 19.7748594963981,
+      "std": 0.03879703605967507,
+      "n": 10,
+      "implementation": "gcdmx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.23872862360843314,
+      "selection_sha256": "79ba425d4d811350669a774eca8930afffbbfa9ffc0cdec665fcc09c3811d810",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcdmx__yelp/finals/AP_epoch_HPO12/yelp__gcdmx__r0.0005__s1.json": "130ea3c79562df0c2465c4f9108fc73def4c3d64565f93f98d24919ee09638c7"
+      },
+      "group_result_sha256": "8ab71ca25224dd86e84916e457f064a88a3613c5c7a4de5a3edd1572dcd82ec1"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcdmx",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 21.813910938265394,
+      "std": 0.09637343630824591,
+      "n": 10,
+      "implementation": "gcdmx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.23872862360843314,
+      "selection_sha256": "79ba425d4d811350669a774eca8930afffbbfa9ffc0cdec665fcc09c3811d810",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcdmx__yelp/finals/AP_epoch_HPO12/yelp__gcdmx__r0.001__s1.json": "b5c0dacb66eb53d9258d5f1e7cd5f07366a34e7aef1c892ce0987aef6eb692fc"
+      },
+      "group_result_sha256": "8ab71ca25224dd86e84916e457f064a88a3613c5c7a4de5a3edd1572dcd82ec1"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcdmx",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 22.215966891447806,
+      "std": 0.07835806421833623,
+      "n": 10,
+      "implementation": "gcdmx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.23872862360843314,
+      "selection_sha256": "79ba425d4d811350669a774eca8930afffbbfa9ffc0cdec665fcc09c3811d810",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcdmx__yelp/finals/AP_epoch_HPO12/yelp__gcdmx__r0.002__s1.json": "896dc21495a06097d3dabd27220fa0dfb820a12822879084e16c2196756947fc"
+      },
+      "group_result_sha256": "8ab71ca25224dd86e84916e457f064a88a3613c5c7a4de5a3edd1572dcd82ec1"
+    },
+    {
+      "dataset": "yelp",
+      "method": "msgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 21.10729347668931,
+      "std": 0.2734621695963544,
+      "n": 10,
+      "implementation": "msgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.23285005882004944,
+      "selection_sha256": "989318efb06c38867d5b22d3ddb56fa2f2d75514b2b7b897d8bb6aed0f702d4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/msgc__yelp/finals/AP_epoch_HPO12/yelp__msgc__r0.0005__s1.json": "6ca2e384dd98f7d9eb68a0d9a7e31619c6eb034b092b82b2fc2954198cdbcffb"
+      },
+      "group_result_sha256": "3f55687cc8045cc66b0c7478b5472864a8acf610379f2fa25e94b8515ee53200"
+    },
+    {
+      "dataset": "yelp",
+      "method": "msgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 21.089271744907652,
+      "std": 0.3295029849947384,
+      "n": 10,
+      "implementation": "msgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.23285005882004944,
+      "selection_sha256": "989318efb06c38867d5b22d3ddb56fa2f2d75514b2b7b897d8bb6aed0f702d4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/msgc__yelp/finals/AP_epoch_HPO12/yelp__msgc__r0.001__s1.json": "fed49e7188ee75ddc013607682f7cea893491fcfca1240292634714dd67ece00"
+      },
+      "group_result_sha256": "3f55687cc8045cc66b0c7478b5472864a8acf610379f2fa25e94b8515ee53200"
+    },
+    {
+      "dataset": "yelp",
+      "method": "msgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 21.05113348669816,
+      "std": 0.34856323801724454,
+      "n": 10,
+      "implementation": "msgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.23285005882004944,
+      "selection_sha256": "989318efb06c38867d5b22d3ddb56fa2f2d75514b2b7b897d8bb6aed0f702d4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/msgc__yelp/finals/AP_epoch_HPO12/yelp__msgc__r0.002__s1.json": "86fd35045dddca137c093b70a97df203e958661fc435917367e1d575efb02541"
+      },
+      "group_result_sha256": "3f55687cc8045cc66b0c7478b5472864a8acf610379f2fa25e94b8515ee53200"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sgdd",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 18.576824679623698,
+      "std": 0.6315405332683846,
+      "n": 10,
+      "implementation": "sgdd",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17687618087929557,
+      "selection_sha256": "1737b8f58e28efc1fae9d305ee88478ef5e28ee33cd1cd66a9cfb6a622d2127f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/sgdd__yelp/finals/AP_epoch_HPO12/yelp__sgdd__r0.0005__s1.json": "3523ee8a701fb40b7ee6f6b2072b2af3ff20d01d70f3957700b4f840bd3d49e8"
+      },
+      "group_result_sha256": "b8cf440dc0c22401ef38436b22c4b1f814a8387b655f97bd6b9ad6f3f9934708"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sgdd",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 17.721110157892245,
+      "std": 0.46676974534217397,
+      "n": 10,
+      "implementation": "sgdd",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17687618087929557,
+      "selection_sha256": "1737b8f58e28efc1fae9d305ee88478ef5e28ee33cd1cd66a9cfb6a622d2127f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/sgdd__yelp/finals/AP_epoch_HPO12/yelp__sgdd__r0.001__s1.json": "16f3ee26c7a8eee9284bbf25199671504e6efa1fbefed516e9e53dec95bc3e3f"
+      },
+      "group_result_sha256": "b8cf440dc0c22401ef38436b22c4b1f814a8387b655f97bd6b9ad6f3f9934708"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sgdd",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 17.743614542850132,
+      "std": 0.42887995456748,
+      "n": 10,
+      "implementation": "sgdd",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17687618087929557,
+      "selection_sha256": "1737b8f58e28efc1fae9d305ee88478ef5e28ee33cd1cd66a9cfb6a622d2127f",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/sgdd__yelp/finals/AP_epoch_HPO12/yelp__sgdd__r0.002__s1.json": "6585154c945939669c04ba02ebd7c55695bff122b2ee05ead68181a6985c0f29"
+      },
+      "group_result_sha256": "b8cf440dc0c22401ef38436b22c4b1f814a8387b655f97bd6b9ad6f3f9934708"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.758224229516035,
+      "std": 1.1080899256810248,
+      "n": 10,
+      "implementation": "doscond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.20312845928249051,
+      "selection_sha256": "4fbfe03faaa19acbc18914f21c180abccf35fbb11a06e891f186cc9259a121bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/doscond__yelp/finals/AP_epoch_HPO12/yelp__doscond__r0.0005__s1.json": "cb16243d5cc5b47e49a85a4444235f900c0b5ea1614d9141d97abbd2237424b3"
+      },
+      "group_result_sha256": "07640d9a16bc1b2f20ad3118afe957a8e47b29d15728d639086daea544aba91c"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.281749724902934,
+      "std": 0.5195236305033865,
+      "n": 10,
+      "implementation": "doscond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.20312845928249051,
+      "selection_sha256": "4fbfe03faaa19acbc18914f21c180abccf35fbb11a06e891f186cc9259a121bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/doscond__yelp/finals/AP_epoch_HPO12/yelp__doscond__r0.001__s1.json": "ca8a2fbfc4ea25d59c31f8d7d0b9cad4ebdb2b2fd911bfc9a4c970ae5e12f8cc"
+      },
+      "group_result_sha256": "07640d9a16bc1b2f20ad3118afe957a8e47b29d15728d639086daea544aba91c"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscond",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 18.12569657026059,
+      "std": 0.5583983449343763,
+      "n": 10,
+      "implementation": "doscond",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 128,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.20312845928249051,
+      "selection_sha256": "4fbfe03faaa19acbc18914f21c180abccf35fbb11a06e891f186cc9259a121bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/doscond__yelp/finals/AP_epoch_HPO12/yelp__doscond__r0.002__s1.json": "d4d45f90f3bf6a0b8a15089f39ce13e138a5ee072a89ce419e9af2b4ea878806"
+      },
+      "group_result_sha256": "07640d9a16bc1b2f20ad3118afe957a8e47b29d15728d639086daea544aba91c"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscondx",
+      "legacy_method": "gcondx",
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 16.837019068557716,
+      "std": 0.6915180926282044,
+      "n": 10,
+      "implementation": "doscondx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17136394678264383,
+      "selection_sha256": "7213edbfc8d68718f16726ded774efcf2ab4b725ceb1b936c6df4741ba2ce0ef",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcondx__yelp/finals/AP_epoch_HPO12/yelp__gcondx__r0.0005__s1.json": "0e5a398c42b8d806ae5b4dcf917cddbacf51fcb6a2815c94a770e2c643b58322"
+      },
+      "group_result_sha256": "a870d1a869e21032faba5972362249650c1f7643cd70f617129fa7b684b48adb"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscondx",
+      "legacy_method": "gcondx",
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 16.756943931174806,
+      "std": 0.8302993449344241,
+      "n": 10,
+      "implementation": "doscondx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17136394678264383,
+      "selection_sha256": "7213edbfc8d68718f16726ded774efcf2ab4b725ceb1b936c6df4741ba2ce0ef",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcondx__yelp/finals/AP_epoch_HPO12/yelp__gcondx__r0.001__s1.json": "9dbd3de0589af36c8e46c1b437992657b004aa99a16fcb9abe66576396453910"
+      },
+      "group_result_sha256": "a870d1a869e21032faba5972362249650c1f7643cd70f617129fa7b684b48adb"
+    },
+    {
+      "dataset": "yelp",
+      "method": "doscondx",
+      "legacy_method": "gcondx",
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 17.41303762954107,
+      "std": 0.6279298377578048,
+      "n": 10,
+      "implementation": "doscondx",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17136394678264383,
+      "selection_sha256": "7213edbfc8d68718f16726ded774efcf2ab4b725ceb1b936c6df4741ba2ce0ef",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/gcondx__yelp/finals/AP_epoch_HPO12/yelp__gcondx__r0.002__s1.json": "f8adeeae4477f5ed74fcdf7eb80551e6b7841442a4c94643be92c7ab2d4b264f"
+      },
+      "group_result_sha256": "a870d1a869e21032faba5972362249650c1f7643cd70f617129fa7b684b48adb"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_d",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.52333451776576,
+      "std": 0.6091720982376142,
+      "n": 10,
+      "implementation": "cent_d",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17468364139538364,
+      "selection_sha256": "560a0d3633d945aeed4ffef0ca5c801f5638fab9f256128e9179f11b7ed3d445",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_d__yelp/finals/AP_epoch_HPO12/yelp__cent_d__r0.0005__s1.json": "ddbb1f530ac4a8a06c6bf9ca4a832df8c7e8633c36518d4e8a60bc5e96cabe08"
+      },
+      "group_result_sha256": "e9480c991d3abf323cabe12bfebfe07aac9db16946b919240e383d7fff6d0661"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_d",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 17.685460746782926,
+      "std": 0.42971345774980363,
+      "n": 10,
+      "implementation": "cent_d",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17468364139538364,
+      "selection_sha256": "560a0d3633d945aeed4ffef0ca5c801f5638fab9f256128e9179f11b7ed3d445",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_d__yelp/finals/AP_epoch_HPO12/yelp__cent_d__r0.001__s1.json": "3de83b2092eeef27bed2dbd4f2f9b08e162d8ef7ee9b5efa56b495424fc18453"
+      },
+      "group_result_sha256": "e9480c991d3abf323cabe12bfebfe07aac9db16946b919240e383d7fff6d0661"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_d",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 17.660299822771183,
+      "std": 0.46081049796643253,
+      "n": 10,
+      "implementation": "cent_d",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17468364139538364,
+      "selection_sha256": "560a0d3633d945aeed4ffef0ca5c801f5638fab9f256128e9179f11b7ed3d445",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_d__yelp/finals/AP_epoch_HPO12/yelp__cent_d__r0.002__s1.json": "6d52d74e482eecd19e6c7d9b0dbe055c193c8996caa9ec2621676ced0ff6243f"
+      },
+      "group_result_sha256": "e9480c991d3abf323cabe12bfebfe07aac9db16946b919240e383d7fff6d0661"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_p",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.63574027723602,
+      "std": 0.5010296476080469,
+      "n": 10,
+      "implementation": "cent_p",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17693070875273345,
+      "selection_sha256": "955fd082dcd9b48c30db405ca754c72fd4b90d8bd8c1355e678b29663e1cebfb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_p__yelp/finals/AP_epoch_HPO12/yelp__cent_p__r0.0005__s1.json": "cb25b4d1ce8d70d431ee7ddeab738265864e980b337763a06b15a9713b0d0cd9"
+      },
+      "group_result_sha256": "3226d3cb31ed4b83883bc2e8e3e9f95f61527a42f326bc6fc29acb537450a0c4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_p",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 17.647961643906672,
+      "std": 0.47247234714442776,
+      "n": 10,
+      "implementation": "cent_p",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17693070875273345,
+      "selection_sha256": "955fd082dcd9b48c30db405ca754c72fd4b90d8bd8c1355e678b29663e1cebfb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_p__yelp/finals/AP_epoch_HPO12/yelp__cent_p__r0.001__s1.json": "5954879bd7737bf711cdbb6897d842502658799737b0971cc99fd964aadbb53a"
+      },
+      "group_result_sha256": "3226d3cb31ed4b83883bc2e8e3e9f95f61527a42f326bc6fc29acb537450a0c4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "cent_p",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 17.732781158376678,
+      "std": 0.38808924690724955,
+      "n": 10,
+      "implementation": "cent_p",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.17693070875273345,
+      "selection_sha256": "955fd082dcd9b48c30db405ca754c72fd4b90d8bd8c1355e678b29663e1cebfb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/cent_p__yelp/finals/AP_epoch_HPO12/yelp__cent_p__r0.002__s1.json": "93ab84e8aea6ef9b22d51f70be2098cc583ff7edbfa15ee5c94d7aeea7525630"
+      },
+      "group_result_sha256": "3226d3cb31ed4b83883bc2e8e3e9f95f61527a42f326bc6fc29acb537450a0c4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "vng",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.80225182681146,
+      "std": 0.3253083420577701,
+      "n": 10,
+      "implementation": "vng",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1762076056514453,
+      "selection_sha256": "ea5b0134cf4c2cfb0fd79143ccc31c6ba690edde2c5a9969ccea2783f892218c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/vng__yelp/finals/AP_epoch_HPO12/yelp__vng__r0.0005__s1.json": "e67bbf3be1e9a86feac2b6dfc735b61aa1243ba81a1fcf8b5ea82f76b0840fb0"
+      },
+      "group_result_sha256": "0a2538179cd0fefa806cef1714a60c0f9e697ad614e9e198c532dc07c44ad9b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "vng",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 17.82455514084519,
+      "std": 0.31074461759431155,
+      "n": 10,
+      "implementation": "vng",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1762076056514453,
+      "selection_sha256": "ea5b0134cf4c2cfb0fd79143ccc31c6ba690edde2c5a9969ccea2783f892218c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/vng__yelp/finals/AP_epoch_HPO12/yelp__vng__r0.001__s1.json": "e85f2636a280f23f5ccbdc110311899bb1ecf6f4029a4b4ecec62eb4cc1b1b61"
+      },
+      "group_result_sha256": "0a2538179cd0fefa806cef1714a60c0f9e697ad614e9e198c532dc07c44ad9b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "vng",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 17.808486755674696,
+      "std": 0.3360740159681572,
+      "n": 10,
+      "implementation": "vng",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 64,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1762076056514453,
+      "selection_sha256": "ea5b0134cf4c2cfb0fd79143ccc31c6ba690edde2c5a9969ccea2783f892218c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/vng__yelp/finals/AP_epoch_HPO12/yelp__vng__r0.002__s1.json": "fcb4b97c1d6f82da4413de3c4dbea46942cf57c0c8b1ace334a797a714428709"
+      },
+      "group_result_sha256": "0a2538179cd0fefa806cef1714a60c0f9e697ad614e9e198c532dc07c44ad9b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "t_spanner",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 24.110823341004934,
+      "std": 0.4337948757657463,
+      "n": 10,
+      "implementation": "t_spanner",
+      "input_profile": "edge_control",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.253324739125243,
+      "selection_sha256": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.0005__s1.json": "ee9d440543c84aa7c0e88d3b6f02c63be90e0387f3b6b3ce0aefc530bcb5bec7"
+      },
+      "group_result_sha256": "7d21783a99200498ae03d7caabdfb0e4cd07a0b021043e32f85c6d3e20969ac0"
+    },
+    {
+      "dataset": "yelp",
+      "method": "t_spanner",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 24.36427434579407,
+      "std": 0.3739965568554008,
+      "n": 10,
+      "implementation": "t_spanner",
+      "input_profile": "edge_control",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.253324739125243,
+      "selection_sha256": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.001__s1.json": "4dbc7edc7a951f3a4088e047e694814b864c07f323a0e6a306fce3c27ba98b64"
+      },
+      "group_result_sha256": "7d21783a99200498ae03d7caabdfb0e4cd07a0b021043e32f85c6d3e20969ac0"
+    },
+    {
+      "dataset": "yelp",
+      "method": "t_spanner",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 24.1023501072066,
+      "std": 0.3096803910036912,
+      "n": 10,
+      "implementation": "t_spanner",
+      "input_profile": "edge_control",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.001,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.253324739125243,
+      "selection_sha256": "d250e0efb7b3e469c522c51a5797b5cca888bb209ff85c9110a53dbd8f8fdd4a",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/t_spanner__yelp/finals/AP_epoch_HPO12/yelp__t_spanner__r0.002__s1.json": "062474b909c97f9804bb648ae752ff8dc9ebff6328c5e19609355849b01621e1"
+      },
+      "group_result_sha256": "7d21783a99200498ae03d7caabdfb0e4cd07a0b021043e32f85c6d3e20969ac0"
+    },
+    {
+      "dataset": "yelp",
+      "method": "random",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.575038301273032,
+      "std": 0.4134720716226219,
+      "n": 30,
+      "implementation": "random",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1957202263204361,
+      "selection_sha256": "a903363118eaabab5f861a962fed8e71fb7dbdc6accb2739b016800efef75208",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.0005__s1.json": "fdeef5bb77b0e162b4d380522a4bf5b410feb6278847d504c0e5979e55884f5f",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.0005__s2.json": "0f4cefcb41efe6da06bd53cd448440dcb22af6cd27269efd798dcd90f165c638",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.0005__s3.json": "cf4168477770f0f720f21fbe6ce17f29c92a629e84b07d90ad7e1ed7a6405c19"
+      },
+      "group_result_sha256": "766a7e4c9465c0ecd773a2b17b6827104444f5506058b1df1b5f35519b6ee377"
+    },
+    {
+      "dataset": "yelp",
+      "method": "random",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 17.96220713363029,
+      "std": 0.491629453694994,
+      "n": 30,
+      "implementation": "random",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1957202263204361,
+      "selection_sha256": "a903363118eaabab5f861a962fed8e71fb7dbdc6accb2739b016800efef75208",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.001__s1.json": "b665fb24d95b39343f333bfeac690479158b15019311d29843d0458f072c48db",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.001__s2.json": "1753ba2c416ef59988896c84ef3a082e563339a5edeadf87ff834eb666ebb6e7",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.001__s3.json": "2e3f5e3bba3c1ad2cdb78ad3b835792a8ca7978a1dc520ec9a30b501f2144d7c"
+      },
+      "group_result_sha256": "766a7e4c9465c0ecd773a2b17b6827104444f5506058b1df1b5f35519b6ee377"
+    },
+    {
+      "dataset": "yelp",
+      "method": "random",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 19.45221209282719,
+      "std": 0.8440760063618682,
+      "n": 30,
+      "implementation": "random",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.1957202263204361,
+      "selection_sha256": "a903363118eaabab5f861a962fed8e71fb7dbdc6accb2739b016800efef75208",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.002__s1.json": "b6167ca5560d3fe16dcd794bb53329938babd92e195c90f0a2576487670d5abd",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.002__s2.json": "438ca8dbb6b1e5cf19634a51edcb85a8ff5d37a9915e48d797d439bd77847b30",
+        "runs/gc4nc_yelp_ap_20261101/groups/random__yelp/finals/AP_epoch_HPO12/yelp__random__r0.002__s3.json": "221ec60bcfdda32c0adf8d8393766a64c74381fd71361961b900c58e8647828e"
+      },
+      "group_result_sha256": "766a7e4c9465c0ecd773a2b17b6827104444f5506058b1df1b5f35519b6ee377"
+    },
+    {
+      "dataset": "yelp",
+      "method": "herding",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.680910278331872,
+      "std": 0.9212086812031351,
+      "n": 30,
+      "implementation": "herding",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19939097557126778,
+      "selection_sha256": "b7754a17c5ea3fb59bb3b378e8d9b47b890b80c23dc7b100d85b1e4cf13693bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.0005__s1.json": "c7a994eedebd13274bff50a1c5beb1997d6fb92314c79c8524e5c24beeaf030f",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.0005__s2.json": "6eac413777dfad1dc6e84376dfef95f146892a0d0c042a3ab4864f78e6752e3e",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.0005__s3.json": "a17af031660d872650c24dbcf87cf568988d716611dabe5615c618746a434d1c"
+      },
+      "group_result_sha256": "1ec0a0db0c7a4b82e9dcc79eb4db81c4b7965657daca37066bf69f23a4b6b52e"
+    },
+    {
+      "dataset": "yelp",
+      "method": "herding",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.93199125597226,
+      "std": 0.8185306288696839,
+      "n": 30,
+      "implementation": "herding",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19939097557126778,
+      "selection_sha256": "b7754a17c5ea3fb59bb3b378e8d9b47b890b80c23dc7b100d85b1e4cf13693bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.001__s1.json": "0e8dc5de1e1d8393263903eaadb84e692c521f14ed01db93ba99fe5c66143c49",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.001__s2.json": "29abbebe26f046245ae54e2d80e8850a53c3ef83bd51c9d5a62d2e81148f9d91",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.001__s3.json": "104d43eaa16feab381aa244084ccdb0871fa90671eaa259876d7bf8bd33f05ac"
+      },
+      "group_result_sha256": "1ec0a0db0c7a4b82e9dcc79eb4db81c4b7965657daca37066bf69f23a4b6b52e"
+    },
+    {
+      "dataset": "yelp",
+      "method": "herding",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 18.666540631632323,
+      "std": 0.6203073765518975,
+      "n": 30,
+      "implementation": "herding",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19939097557126778,
+      "selection_sha256": "b7754a17c5ea3fb59bb3b378e8d9b47b890b80c23dc7b100d85b1e4cf13693bb",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.002__s1.json": "dcdc560424d2d8eeeff0c41502711f5b623e60b5ee5d2e2f0a0027074ac4ff84",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.002__s2.json": "55a806e3d3e805a415ce48797944c7e4ce1bd54c0b79e58ce6a4a184a1f293db",
+        "runs/gc4nc_yelp_ap_20261101/groups/herding__yelp/finals/AP_epoch_HPO12/yelp__herding__r0.002__s3.json": "46f624db0610168fc09f38a20ad5e62caac5955bb01a34cef967041604a0ad8b"
+      },
+      "group_result_sha256": "1ec0a0db0c7a4b82e9dcc79eb4db81c4b7965657daca37066bf69f23a4b6b52e"
+    },
+    {
+      "dataset": "yelp",
+      "method": "kcenter",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 18.002611746413884,
+      "std": 0.5566893300271011,
+      "n": 30,
+      "implementation": "kcenter",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.2161045494437158,
+      "selection_sha256": "c7c63d8473d78117d7686e9f619eb62b772ecf9802c47aef3059fed310eba0b6",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.0005__s1.json": "6ab13f8ad9e1f18d5bab339e616acf9d1dbb5ef777e18004e0265242cfe50bc6",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.0005__s2.json": "db0b74018c2f6219bdf13013c74bad5875fbc302d62fabe79f53dd1d9187b0db",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.0005__s3.json": "abefa83520fc28a5d88bdd4fcd89332afaaae2f24248f53607417c30b79e3912"
+      },
+      "group_result_sha256": "86476c3b42dad1b63233eee4545829bdd9606dfe862fe4d452b08955d5aeb297"
+    },
+    {
+      "dataset": "yelp",
+      "method": "kcenter",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.894703290105024,
+      "std": 0.757865587882725,
+      "n": 30,
+      "implementation": "kcenter",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.2161045494437158,
+      "selection_sha256": "c7c63d8473d78117d7686e9f619eb62b772ecf9802c47aef3059fed310eba0b6",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.001__s1.json": "e39eb84d8f1fbdb68df9b14d7fa45069e7c6ceae4661a6c869061a5d955e107f",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.001__s2.json": "64e111a6f64216a4d91fc62754866e91e059b031ccb7b0f95713ce7c15e6f3f8",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.001__s3.json": "22c183d6b0762be3436d27528dee5fb1b5fe51c1d1a08e8fabd2d925830f5369"
+      },
+      "group_result_sha256": "86476c3b42dad1b63233eee4545829bdd9606dfe862fe4d452b08955d5aeb297"
+    },
+    {
+      "dataset": "yelp",
+      "method": "kcenter",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 19.944239820752575,
+      "std": 0.7145601271097469,
+      "n": 30,
+      "implementation": "kcenter",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1,
+        2,
+        3
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.2161045494437158,
+      "selection_sha256": "c7c63d8473d78117d7686e9f619eb62b772ecf9802c47aef3059fed310eba0b6",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.002__s1.json": "0ba1c9bb7f680d5d2e7e02a5a9b80a86d67e7fa2d99f0fbabc137027733c35dd",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.002__s2.json": "34cd0ec2512abb346d0f875baac6908663f351bb55cf268f375d188f5e92492d",
+        "runs/gc4nc_yelp_ap_20261101/groups/kcenter__yelp/finals/AP_epoch_HPO12/yelp__kcenter__r0.002__s3.json": "adc34b2ffa1f5472c6da9a6deec4573ddb3c212d97ef71ed7f2c74a07821ca08"
+      },
+      "group_result_sha256": "86476c3b42dad1b63233eee4545829bdd9606dfe862fe4d452b08955d5aeb297"
+    },
+    {
+      "dataset": "yelp",
+      "method": "variation_neighborhoods",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 18.79397128727626,
+      "std": 0.3320077015548809,
+      "n": 10,
+      "implementation": "variation_neighborhoods",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 3,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19410823340448174,
+      "selection_sha256": "7e786ed36d0a4104323df0c570637a9bdf29fd586f2f037e3d42ed8043d13909",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/variation_neighborhoods__yelp/finals/AP_epoch_HPO12/yelp__variation_neighborhoods__r0.0005__s1.json": "9ded4f33e612d4d016b181abea54ad93abd173f3da506d96f8242b4c4a78e619"
+      },
+      "group_result_sha256": "7c8551e3d3b8e8c1ae85a1fb37d2d560f7f9363342289c706de13964a69f7e67"
+    },
+    {
+      "dataset": "yelp",
+      "method": "variation_neighborhoods",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 18.393241392413177,
+      "std": 0.6085072067629131,
+      "n": 10,
+      "implementation": "variation_neighborhoods",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 3,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19410823340448174,
+      "selection_sha256": "7e786ed36d0a4104323df0c570637a9bdf29fd586f2f037e3d42ed8043d13909",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/variation_neighborhoods__yelp/finals/AP_epoch_HPO12/yelp__variation_neighborhoods__r0.001__s1.json": "cc4b6b0c697465b5f72b44104940375f3d243897d0aaa231d333cf883202421a"
+      },
+      "group_result_sha256": "7c8551e3d3b8e8c1ae85a1fb37d2d560f7f9363342289c706de13964a69f7e67"
+    },
+    {
+      "dataset": "yelp",
+      "method": "variation_neighborhoods",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 18.768449320670825,
+      "std": 0.6464604581405803,
+      "n": 10,
+      "implementation": "variation_neighborhoods",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 3,
+        "weight_decay": 0.0005,
+        "dropout": 0.0
+      },
+      "validation_ap": 0.19410823340448174,
+      "selection_sha256": "7e786ed36d0a4104323df0c570637a9bdf29fd586f2f037e3d42ed8043d13909",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_20261101/groups/variation_neighborhoods__yelp/finals/AP_epoch_HPO12/yelp__variation_neighborhoods__r0.002__s1.json": "d77f9c90eb5d648a50b3b6bed25d099d513fa4eceaeb8c6e936598212489ca5e"
+      },
+      "group_result_sha256": "7c8551e3d3b8e8c1ae85a1fb37d2d560f7f9363342289c706de13964a69f7e67"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sfgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 21.90194450793428,
+      "std": 0.1812271938605025,
+      "n": 10,
+      "implementation": "sfgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24080050118200183,
+      "selection_sha256": "707bae2b03ea7a28eccc92836931edb62b09da8e5658594c5cbbefa19501a783",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/sfgc__yelp/finals/AP_epoch_HPO12/yelp__sfgc__r0.0005__s1.json": "e6ff68179b4091a1e649f849ffa0c3492cb2ba8ae2be558036825584e34026c0"
+      },
+      "group_result_sha256": "20970e841111972db8da2b54b83c700d96dd5d91787b95469a0b9a3ac721f0b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sfgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 22.073282112158257,
+      "std": 0.08829446204400987,
+      "n": 10,
+      "implementation": "sfgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24080050118200183,
+      "selection_sha256": "707bae2b03ea7a28eccc92836931edb62b09da8e5658594c5cbbefa19501a783",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/sfgc__yelp/finals/AP_epoch_HPO12/yelp__sfgc__r0.001__s1.json": "1931b11b0890d67471780a77aa2006d314d09283c41474d2a0d4304e6adff2c8"
+      },
+      "group_result_sha256": "20970e841111972db8da2b54b83c700d96dd5d91787b95469a0b9a3ac721f0b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "sfgc",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 22.36472175023085,
+      "std": 0.1328719231352932,
+      "n": 10,
+      "implementation": "sfgc",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24080050118200183,
+      "selection_sha256": "707bae2b03ea7a28eccc92836931edb62b09da8e5658594c5cbbefa19501a783",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/sfgc__yelp/finals/AP_epoch_HPO12/yelp__sfgc__r0.002__s1.json": "a34c3567cc1299a56b6b916160862db4bb5b161a284c7fe466be86fd61f5032d"
+      },
+      "group_result_sha256": "20970e841111972db8da2b54b83c700d96dd5d91787b95469a0b9a3ac721f0b4"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcsntk",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.0005",
+      "status": "complete",
+      "mean": 17.790197310885702,
+      "std": 0.33471868107312613,
+      "n": 10,
+      "implementation": "gcsntk",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24469286337594073,
+      "selection_sha256": "3aaedc2c86473c64a062ef892a6b4704b8d0abd263121c2df55c67511ae36b4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/gcsntk__yelp/finals/AP_epoch_HPO12/yelp__gcsntk__r0.0005__s1.json": "564ad591ab6865b7d73d5151035838b32ae35f4856286fe2293c184818573e1c"
+      },
+      "group_result_sha256": "9c4aeb7ded90d8129cf46912ead1341bf99574330bba8a46600c1bfa0433d502"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcsntk",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.001",
+      "status": "complete",
+      "mean": 21.607747163553935,
+      "std": 0.3461612457991536,
+      "n": 10,
+      "implementation": "gcsntk",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24469286337594073,
+      "selection_sha256": "3aaedc2c86473c64a062ef892a6b4704b8d0abd263121c2df55c67511ae36b4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/gcsntk__yelp/finals/AP_epoch_HPO12/yelp__gcsntk__r0.001__s1.json": "16a83562ac0d98976b77b6e4f7c9078196ea6ce35562b664567f3baec1e93959"
+      },
+      "group_result_sha256": "9c4aeb7ded90d8129cf46912ead1341bf99574330bba8a46600c1bfa0433d502"
+    },
+    {
+      "dataset": "yelp",
+      "method": "gcsntk",
+      "legacy_method": null,
+      "metric": "AP",
+      "rate": "0.002",
+      "status": "complete",
+      "mean": 21.902440000465514,
+      "std": 0.33373769071706133,
+      "n": 10,
+      "implementation": "gcsntk",
+      "input_profile": "node_reduction",
+      "source_sha256": "e77120a5ac9e3e8331c68a0dbc5ed81c358bb64230e2a12437eccff7cfa094e0",
+      "run": "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101",
+      "reduction_seeds": [
+        1
+      ],
+      "selected_params": {
+        "hidden": 256,
+        "lr": 0.01,
+        "nlayers": 2,
+        "weight_decay": 0.0005,
+        "dropout": 0.5
+      },
+      "validation_ap": 0.24469286337594073,
+      "selection_sha256": "3aaedc2c86473c64a062ef892a6b4704b8d0abd263121c2df55c67511ae36b4c",
+      "result_sha256": {
+        "runs/gc4nc_yelp_ap_sfgc_gcsntk_20261101/groups/gcsntk__yelp/finals/AP_epoch_HPO12/yelp__gcsntk__r0.002__s1.json": "e4dec4c83420c55ce1c08a107ae2911a38943d07b05aeada0ae5432628a18826"
+      },
+      "group_result_sha256": "9c4aeb7ded90d8129cf46912ead1341bf99574330bba8a46600c1bfa0433d502"
+    }
+  ]
+}

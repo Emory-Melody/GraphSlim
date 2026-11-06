@@ -13,7 +13,6 @@ import scipy.sparse as sp
 import torch
 from torch import nn
 import torch.nn.functional as F
-from graphslim.acceleration import CUDAGraphStep
 
 from graphslim.reduction.lightweight import (
     LightweightReducer,
@@ -196,27 +195,19 @@ class ClustGDD(LightweightReducer):
         )
         best_score, best_weights = -1, deepcopy(model.state_dict())
         training_features = target[train]
-        pretraining_step = CUDAGraphStep(
-            lambda: F.cross_entropy(model(training_features), labels),
-            model.parameters(),
-            args,
-            "clustgdd.pretrain",
-            pre_epochs,
-            modules=(model,),
-            inputs=(training_features, labels),
-        )
         for epoch in range(pre_epochs):
             model.train()
             if epoch == pre_epochs // 2:
                 for group in optimizer.param_groups:
                     group["lr"] *= 0.1
             optimizer.zero_grad()
-            pretraining_step()
+            pretraining_loss = F.cross_entropy(model(training_features), labels)
+            pretraining_loss.backward()
             optimizer.step()
             with torch.no_grad():
                 model.eval()
                 score = (
-                    float((model(validation).argmax(1) == validation_labels).float().mean())
+                    float(args.metric(model(validation), validation_labels))
                     if len(validation_labels)
                     else -float(F.cross_entropy(model(target[train]), labels))
                 )
@@ -297,22 +288,14 @@ class ClustGDD(LightweightReducer):
             consistency = consistency_loss(predictions, getattr(args, "clustgdd_temperature", 0.5))
             return classification + getattr(args, "clustgdd_consistency_weight", 0.1) * consistency
 
-        refinement_step = CUDAGraphStep(
-            refinement_loss,
-            list(model.parameters()) + [offset],
-            args,
-            "clustgdd.refinement",
-            args.epochs,
-            modules=(model,),
-            inputs=(centers, target, synthetic_labels),
-        )
         for epoch in range(args.epochs):
             model.train()
             if epoch == args.epochs // 2:
                 for group in optimizer.param_groups:
                     group["lr"] *= 0.1
             optimizer.zero_grad()
-            loss = refinement_step()
+            loss = refinement_loss()
+            loss.backward()
             if not torch.isfinite(loss):
                 raise FloatingPointError("Non-finite ClustGDD refinement loss")
             optimizer.step()
@@ -320,7 +303,7 @@ class ClustGDD(LightweightReducer):
             with torch.no_grad():
                 model.eval()
                 score = (
-                    float((model(validation).argmax(1) == validation_labels).float().mean())
+                    float(args.metric(model(validation), validation_labels))
                     if len(validation_labels)
                     else -history[-1]
                 )

@@ -1,6 +1,6 @@
 [project]
 name = "graphslim"
-version = "1.3.2"
+version = "1.3.3"
 description = "Slimming the graph data for graph learning"
 authors = [
     {name = "Rockcor", email = "jshmhsb@gmail.com"},
@@ -36,9 +36,9 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-dgl = ["dgl"]
+dgl = ["dgl==1.1.3", "numpy<2"]
 tracking = ["wandb"]
-viz = ["matplotlib", "networkx", "pyvis", "streamlit"]
+viz = ["matplotlib", "networkx"]
 test = ["pytest", "matplotlib"]
 dev = ["build", "pytest", "ruff", "twine", "wandb", "matplotlib"]
 fuzzy = ["scikit-fuzzy"]

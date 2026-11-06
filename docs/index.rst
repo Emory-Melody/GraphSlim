@@ -23,12 +23,19 @@ canonical registry entries; aliases are not counted separately.
    quickstart.md
 
 .. toctree::
+   :maxdepth: 1
+   :caption: Guides
+
+   hpo.md
+   extending.md
+   testing_snapshot.md
+
+.. toctree::
    :hidden:
 
    source/modules
    changes_since_gc4nc
    gc4nc_reference_corrections
-   testing_snapshot
 
 .. toctree::
    :maxdepth: 1

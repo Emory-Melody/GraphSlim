@@ -265,15 +265,6 @@ def test_final_output_returns_none_and_invalid_validation_interval_fails(tmp_pat
         model.fit_with_val(tiny_graph(), train_iters=1)
 
 
-def test_cuda_graph_request_on_cpu_trains_eagerly_on_training_rows(tmp_path):
-    args = quick_args(tmp_path, "random", "trans")
-    args.cuda_graph, args.val_interval = True, 2
-    model = GCN(8, 8, 2, args)
-    score = model.fit_with_val(tiny_graph(), train_iters=4)
-    assert 0 <= score <= 1
-    assert all(record["status"] == "eager" for record in args._cuda_graph_records)
-
-
 @pytest.mark.parametrize("setting", ["trans", "ind"])
 def test_verbose_test_reports_metric_on_held_out_nodes(tmp_path, capsys, setting):
     args = quick_args(tmp_path, "random", setting)

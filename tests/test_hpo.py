@@ -88,3 +88,54 @@ def test_failed_trials_are_recorded_and_skipped_for_selection(tmp_path, monkeypa
     ]
     assert [r["status"] for r in lines] == ["failed", "complete"] and "boom" in lines[0]["error"]
     assert best["params"] == {"hidden": 16}
+
+
+@pytest.mark.parametrize("change", ["grid", "seed", "model", "graph", "labels", "source"])
+def test_resume_rejects_changed_search_without_overwriting_records(tmp_path, monkeypatch, change):
+    import click
+
+    args = search_args(tmp_path)
+    space = tmp_path / "space.json"
+    space.write_text(json.dumps({"hidden": [8, 16]}))
+    args.hpo_space = str(space)
+    graph = tiny_graph()
+    hpo.run_search(args, graph)
+    folder = hpo.search_dir(args)
+    saved = {p.name: p.read_bytes() for p in folder.glob("*.json*")}
+    args = _resume_args(tmp_path, space)
+    graph = tiny_graph()
+    if change == "grid":
+        space.write_text(json.dumps({"hidden": [32, 64]}))
+    elif change == "seed":
+        args.seed += 1
+    elif change == "model":
+        args.eval_model = "GAT"
+    elif change == "graph":
+        graph.feat_full[0, 0] += 1
+    elif change == "labels":
+        graph.labels_val = 1 - graph.labels_val
+    else:
+        original = hpo.search_identity
+
+        def changed(*values):
+            identity = original(*values)
+            return dict(identity, source_sha256="changed")
+
+        monkeypatch.setattr(hpo, "search_identity", changed)
+    with pytest.raises(click.BadParameter, match="Cannot resume HPO"):
+        hpo.run_search(args, graph)
+    assert {p.name: p.read_bytes() for p in folder.glob("*.json*")} == saved
+
+
+def test_legacy_trials_without_identity_cannot_be_reused(tmp_path):
+    import click
+
+    args = search_args(tmp_path)
+    space = tmp_path / "space.json"
+    space.write_text(json.dumps({"hidden": [8, 16]}))
+    args.hpo_space = str(space)
+    folder = hpo.search_dir(args)
+    folder.mkdir(parents=True)
+    (folder / "trials.jsonl").write_text(json.dumps({"trial": 0, "params": {"hidden": 8}}) + "\n")
+    with pytest.raises(click.BadParameter, match="legacy HPO"):
+        hpo.run_search(args, tiny_graph())

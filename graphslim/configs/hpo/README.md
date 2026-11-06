@@ -7,5 +7,7 @@ Keys starting with `_` are comments. Identity, device and seed settings cannot b
 
 Without a shipped file, the first `--hpo` run writes a one-point template to
 `<save_path>/hpo/<method>/<dataset>_r<rate>/space.json`; widen it and rerun. `--hpo_space path.json`
-points at any file. Trials are selected by mean validation accuracy only and resume from
+points at any file. Trials are selected by mean validation metric only and resume from
 `trials.jsonl`; the winner is written to `best.json` for `--config`.
+
+Yelp and Amazon Fraud use anomaly-class AP (positive label 1); other classification datasets use accuracy. Resumes require the same grid, configuration, model, seeds, graph, package source and dependencies. Use a new save directory for a changed search.

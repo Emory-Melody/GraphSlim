@@ -9,7 +9,7 @@
 2. the space, the number of trials and a time estimate are printed and confirmed (``--hpo_yes``
    skips the prompt);
 3. every trial reduces the graph with its settings and scores the reduced graph by the mean
-   validation accuracy of ``--hpo_eval_runs`` GCN fits. Test scores are never computed;
+   validation score of ``--hpo_eval_runs`` downstream fits. Test scores are never computed;
 4. each finished trial is appended to ``hpo/<method>/<dataset>_r<rate>/trials.jsonl`` under
    ``--save_path``, so an interrupted search resumes from the first unfinished trial;
 5. the best trial is written to ``best.json`` and can be replayed with ``--config``.
@@ -18,6 +18,8 @@
 from copy import copy
 from datetime import datetime, timezone
 import itertools
+import hashlib
+import importlib.metadata
 import json
 import math
 from pathlib import Path
@@ -62,6 +64,112 @@ def utcnow():
     :returns: ISO 8601 timestamp string including the UTC offset.
     """
     return datetime.now(timezone.utc).isoformat()
+
+
+def search_identity(args, graph, space):
+    """Fingerprint the grid, scientific configuration, source, environment, and graph.
+
+    Graph contents and split identities are hashed; test labels are never read.
+
+    :param args: Configuration namespace used by the search.
+    :param graph: Original graph with training and validation labels.
+    :param space: Parameter-to-candidate-list mapping.
+    :returns: JSON-compatible search identity used to validate resumes.
+    """
+    import numpy as np
+    import torch
+    from graphslim.dataset.noise import graph_fingerprint
+
+    def serial(value):
+        if callable(value):
+            return f"{value.__module__}.{value.__qualname__}"
+        if isinstance(value, dict):
+            return {str(k): serial(v) for k, v in sorted(value.items())}
+        if isinstance(value, (list, tuple, set)):
+            return [serial(v) for v in (sorted(value) if isinstance(value, set) else value)]
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        return str(value)
+
+    operational = {
+        "logger",
+        "verbose",
+        "hpo",
+        "hpo_yes",
+        "hpo_space",
+        "save_path",
+        "load_path",
+        "wandb",
+        "wandb_project",
+        "wandb_run_name",
+        "run_reduction",
+    }
+    config = {
+        k: serial(v)
+        for k, v in vars(args).items()
+        if k not in operational and not k.startswith("_")
+    }
+    source = hashlib.sha256()
+    root = Path(__file__).resolve().parent
+    for path in sorted([*root.rglob("*.py"), *root.rglob("*.json")]):
+        source.update(str(path.relative_to(root)).encode())
+        source.update(path.read_bytes())
+    data = hashlib.sha256(graph_fingerprint(graph, "trans").encode())
+    for name in ("labels_train", "labels_val"):
+        value = torch.as_tensor(getattr(graph, name)).detach().cpu().numpy()
+        data.update(name.encode())
+        data.update(str((value.shape, value.dtype)).encode())
+        data.update(np.ascontiguousarray(value).tobytes())
+    environment = {}
+    for name in ("torch", "torch-geometric", "numpy", "scipy", "scikit-learn", "networkit", "dgl"):
+        try:
+            environment[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            environment[name] = None
+    return dict(
+        schema=1,
+        config=config,
+        space=space,
+        source_sha256=source.hexdigest(),
+        graph_sha256=data.hexdigest(),
+        environment=environment,
+    )
+
+
+def validate_resume(folder, identity, trials, log):
+    """Reject incompatible or unverifiable trial histories before changing any records.
+
+    :param folder: Search output directory.
+    :param identity: Current search identity.
+    :param trials: Ordered trial parameter dictionaries.
+    :param log: Existing trial records.
+    :returns: Path of the search identity file.
+    :raises click.BadParameter: If identity or trial parameters do not match.
+    """
+    path = folder / "search_identity.json"
+    if path.exists():
+        previous = json.loads(path.read_text(encoding="utf-8"))
+        if previous != identity:
+            changed = ", ".join(k for k in identity if previous.get(k) != identity[k])
+            raise click.BadParameter(
+                f"Cannot resume HPO: changed {changed}. Use a new --save_path.",
+                param_hint="--save_path",
+            )
+    elif log.records:
+        raise click.BadParameter(
+            "Cannot resume legacy HPO records without search identity. Use a new --save_path.",
+            param_hint="--save_path",
+        )
+    for trial, record in log.records.items():
+        if (
+            not isinstance(trial, int)
+            or not 0 <= trial < len(trials)
+            or record["params"] != trials[trial]
+        ):
+            raise click.BadParameter(
+                "HPO trial history does not match the grid. Use a new --save_path."
+            )
+    return path
 
 
 def search_dir(args):
@@ -246,7 +354,7 @@ def describe(args, path, space, trials, log, created):
         + ("  [template just written; widen it before searching]" if created else ""),
         box_table(rows, ["parameter", "values", "count"]),
         f"trials: {len(trials)} total, {len(log.records)} already recorded, {remaining} to run",
-        f"selection: mean validation accuracy of {args.hpo_eval_runs} GCN fits per trial; no test scores are computed",
+        f"selection: mean validation score of {args.hpo_eval_runs} downstream fits per trial; no test scores are computed",
         f"estimated time: {format_seconds(per_trial * remaining if per_trial else None)}"
         + (f" ({format_seconds(per_trial)} per trial so far)" if per_trial else ""),
         f"records: {log.path}",
@@ -311,7 +419,7 @@ def validation_score(graph, run_args, runs):
 
 
 def run_search(args, graph):
-    """Run or resume a grid search selected only by mean validation accuracy.
+    """Run or resume a grid search selected only by mean validation score.
 
     Trial records are appended to JSONL. The selected parameters and summary
     are saved beneath the search directory; no test metric selects the winner.
@@ -337,11 +445,16 @@ def run_search(args, graph):
             "The template holds a single point. Edit it to add values, then rerun with --hpo."
         )
         return None
+    identity = search_identity(args, graph, space)
+    identity_path = validate_resume(folder, identity, trials, log)
     if not getattr(args, "hpo_yes", False) and not click.confirm(
         "Start the search?", default=False
     ):
         click.echo("HPO cancelled; nothing was run.")
         return None
+    identity_path.write_text(
+        json.dumps(identity, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     (folder / "space_used.json").write_text(json.dumps(space, indent=2) + "\n", encoding="utf-8")
     started = time.monotonic()
     finished_now = 0
@@ -406,7 +519,7 @@ def run_search(args, graph):
                 best_trial=best["trial"],
                 best_params=best["params"],
                 best_validation_mean=best["validation_mean"],
-                selection="highest mean validation accuracy, earliest trial on ties; no test metric used",
+                selection="highest mean validation score, earliest trial on ties; no test metric used",
                 wall_seconds_this_session=round(time.monotonic() - started, 1),
                 trials_run_this_session=finished_now,
             ),

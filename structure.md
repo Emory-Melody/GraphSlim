@@ -17,7 +17,6 @@ GraphSlim is a PyTorch/PyG graph reduction package. The current code already sep
 - `graphslim/visualization.py`: local visualization utilities for small before/after graph inspection.
 - `benchmark/`: benchmark scripts for end-to-end experiments.
 - `examples/`: small training examples.
-- `interface/`: Streamlit visualization prototype.
 
 ## Target Modularization
 

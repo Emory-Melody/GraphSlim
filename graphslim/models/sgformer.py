@@ -552,7 +552,7 @@ class SGFormer(nn.Module):
         reindex=False,
         **kwargs,
     ):
-        """Train SGFormer and restore the state with the highest validation accuracy.
+        """Train SGFormer and restore the state with the highest validation metric.
 
         :param data: Graph data containing features, adjacency, labels, and split indices.
         :param train_iters: Number of training iterations. Defaults to ``600``.
@@ -562,10 +562,9 @@ class SGFormer(nn.Module):
         :param reduced: Whether to use the synthetic graph instead of the original training graph. Defaults to ``False``.
         :param reindex: Whether to reindex reduced-graph training outputs through the original training indices. Defaults to ``False``.
         :param kwargs: Additional keyword options passed to the underlying implementation.
-        :returns: Best validation accuracy tensor.
+        :returns: Best validation metric score.
         """
         args = self.args
-        from graphslim.acceleration import CUDAGraphStep
 
         self.reset_parameters()
         # data for training
@@ -634,11 +633,7 @@ class SGFormer(nn.Module):
             lr=self.lr,
         )
 
-        training_index = (
-            torch.as_tensor(data.idx_train, device=self.device)
-            if getattr(args, "cuda_graph", False) and not reindex
-            else data.idx_train
-        )
+        training_index = data.idx_train
 
         def training_loss():
             """Compute SGFormer predictions and the current training objective.
@@ -648,20 +643,12 @@ class SGFormer(nn.Module):
             output = self.forward(features, adj)
             return output, self.loss(output if reindex else output[training_index], labels)
 
-        training_step = CUDAGraphStep(
-            training_loss,
-            self.parameters(),
-            args,
-            stage=f"{args.method}.SGFormer.fit",
-            steps=train_iters,
-            modules=(self,),
-            inputs=(features, labels),
-        )
         self.train()
         for i in range(train_iters):
             self.train()
             optimizer.zero_grad()
-            output, loss_train = training_step()
+            output, loss_train = training_loss()
+            loss_train.backward()
             optimizer.step()
 
             if verbose and i % 100 == 0:
@@ -676,10 +663,10 @@ class SGFormer(nn.Module):
 
                 if setting == "ind":
                     # loss_val = F.nll_loss(output, labels_val)
-                    acc_val = accuracy(output, labels_val)
+                    acc_val = args.metric(output, labels_val)
                 else:
                     # loss_val = F.nll_loss(output[data.idx_val], labels_val)
-                    acc_val = accuracy(output[data.idx_val], labels_val)
+                    acc_val = args.metric(output[data.idx_val], labels_val)
                 if acc_val > best_acc_val:
                     best_acc_val = acc_val
                     # self.output = output
@@ -699,7 +686,7 @@ class SGFormer(nn.Module):
         :param data: Graph data containing features, adjacency, labels, and split indices.
         :param setting: Graph learning setting: ``trans`` for the full graph or ``ind`` for split subgraphs. Defaults to ``'trans'``.
         :param verbose: Whether to print progress and diagnostic information. Defaults to ``False``.
-        :returns: Test accuracy as a Python float in the interval [0, 1].
+        :returns: Configured test metric as a Python float in the interval [0, 1].
         """
         self.eval()
         idx_test = data.idx_test
@@ -709,19 +696,19 @@ class SGFormer(nn.Module):
         if setting == "ind":
             output = self.predict(data.feat_test, data.adj_test)
             loss_test = F.nll_loss(output, labels_test)
-            acc_test = accuracy(output, labels_test)
+            acc_test = self.args.metric(output, labels_test)
         else:
             output = self.predict(data.feat_full, data.adj_full)
             loss_test = F.nll_loss(output[idx_test], labels_test)
-            acc_test = accuracy(output[idx_test], labels_test)
+            acc_test = self.args.metric(output[idx_test], labels_test)
 
         if verbose:
             print(
                 "Test set results:",
                 "loss= {:.4f}".format(loss_test.item()),
-                "accuracy= {:.4f}".format(acc_test.item()),
+                f"{getattr(self.args.metric, '__name__', 'score')}= {float(acc_test):.4f}",
             )
-        return acc_test.item()
+        return float(acc_test)
 
     @torch.no_grad()
     def predict(self, features=None, adj=None, normadj=True, output_layer_features=False):

@@ -16,7 +16,6 @@ from graphslim.sparsification import *
 from graphslim.utils import *
 from tqdm import trange
 from torch.optim import Adam, SGD
-from graphslim.acceleration import CUDAGraphStep
 
 
 class SFGC(GCondBase):
@@ -87,11 +86,7 @@ class SFGC(GCondBase):
 
                 timestamps.append([p.detach().to("cpu", copy=True) for p in model.parameters()])
 
-                training_index = (
-                    torch.as_tensor(data.idx_train, device=device)
-                    if getattr(args, "cuda_graph", False)
-                    else data.idx_train
-                )
+                training_index = data.idx_train
 
                 def expert_loss():
                     """Compute current expert predictions and the training-split objective.
@@ -106,19 +101,11 @@ class SFGC(GCondBase):
                     )
                     return output, loss
 
-                expert_step = CUDAGraphStep(
-                    expert_loss,
-                    model_parameters,
-                    args,
-                    "sfgc.expert_training",
-                    args.teacher_epochs,
-                    modules=(model,),
-                    inputs=(features, labels),
-                )
                 for e in range(args.teacher_epochs):
                     model.train()
                     optimizer_model.zero_grad()
-                    output, loss_buffer = expert_step()
+                    output, loss_buffer = expert_loss()
+                    loss_buffer.backward()
                     optimizer_model.step()
 
                     if e % 10 == 0 and e > 1:

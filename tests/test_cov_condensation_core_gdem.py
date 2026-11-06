@@ -31,7 +31,7 @@ def gdem_args(tmp_path, monkeypatch):
     args.load_path = str(tmp_path / "cache")  # a non-default dataset root
     args.eigen_k, args.e1, args.e2 = 4, 2, 2
     args.epochs, args.eval_epochs, args.run_inter_eval = 12, 2, 1
-    args.checkpoints, args._cuda_graph_trace = [11], True
+    args.checkpoints, args.record_loss = [11], True
     return args
 
 
@@ -67,8 +67,7 @@ def test_gdem_learns_spectral_graph_and_reuses_preprocessing(tmp_path, monkeypat
     initial = reducer.eigenvecs_syn.detach().clone()
     reduced = reducer.reduce(graph, verbose=True)
     assert not torch.equal(initial, reducer.eigenvecs_syn)
-    trace = next(r for r in args._cuda_graph_records if r["stage"] == "gdem.spectral_loss")
-    losses = trace["loss_trace"]
+    losses = args._reduction_loss_trace
     assert len(losses) == 12 and np.isfinite(losses).all()
     assert min(losses[1:]) < losses[0]
     cache = tmp_path / "cache" / "cora"

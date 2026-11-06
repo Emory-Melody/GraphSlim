@@ -60,27 +60,7 @@ def validated_data(path):
     assert len(cells) == 13
     for method in METHODS[:-1]:
         assert all("MIG" not in jobs[key]["gpu_name"] for key in cells[method, "0.002"]["job_ids"])
-    timing = []
-    for row in payload["cuda_graph"]["rows"]:
-        assert all(
-            row[key]
-            for key in ("loss_histories_exact", "parameter_hashes_exact", "downstream_exact")
-        )
-        eager = statistics.median(row["warm_seconds"]["eager"])
-        captured = statistics.median(row["warm_seconds"]["capture"])
-        setup = statistics.median(row["graph_setup_seconds"])
-        speedup = eager / (captured + setup)
-        assert math.isclose(speedup, row["speedup_including_setup"], abs_tol=1e-14)
-        timing.append(
-            {
-                "seed": row["seed"],
-                "eager_seconds": eager,
-                "cuda_graph_seconds_including_setup": captured + setup,
-                "speedup_including_setup": speedup,
-            }
-        )
-    assert [r["seed"] for r in timing] == [1, 2, 3]
-    return payload, cells, timing
+    return payload, cells
 
 
 def style():
@@ -251,76 +231,6 @@ def results_figure(cells):
     return fig
 
 
-def timing_figure(rows):
-    fig, ax = plt.subplots(figsize=(12, 5.3))
-    fig.subplots_adjust(left=0.08, right=0.98, bottom=0.23, top=0.72)
-    fig.text(0.08, 0.94, "GCGP optimization on ogbn-products", fontsize=22, weight="bold")
-    handles = [
-        Patch(facecolor=COLORS["whole"], edgecolor="white", label="Eager"),
-        Patch(
-            facecolor=COLORS["clustgdd"],
-            edgecolor="white",
-            hatch="//",
-            label="CUDA Graph (including setup)",
-        ),
-    ]
-    fig.legend(
-        handles=handles,
-        loc="upper center",
-        bbox_to_anchor=(0.54, 0.87),
-        ncol=2,
-        frameon=True,
-        edgecolor="#D3D3D3",
-        fontsize=12.5,
-    )
-    x = np.arange(3)
-    for offset, field, color in [
-        (-0.18, "eager_seconds", "whole"),
-        (0.18, "cuda_graph_seconds_including_setup", "clustgdd"),
-    ]:
-        values = [row[field] for row in rows]
-        bar(ax, x + offset, values, 0.35, color)
-        for position, value in zip(x + offset, values):
-            ax.text(
-                position,
-                value + 0.045,
-                f"{value:.2f}",
-                ha="center",
-                va="bottom",
-                fontsize=12,
-                weight="bold" if color == "clustgdd" else "normal",
-            )
-    for position, row in zip(x, rows):
-        ax.text(
-            position,
-            2.08,
-            f"{row['speedup_including_setup']:.2f}×",
-            ha="center",
-            color=COLORS["clustgdd"],
-            fontsize=16,
-            weight="bold",
-        )
-    ax.set_xticks(x, [f"Seed {row['seed']}" for row in rows], weight="bold")
-    ax.set_ylabel("Optimization time (s)")
-    ax.set_ylim(0, 2.35)
-    ax.set_yticks([0, 0.5, 1, 1.5, 2])
-    axes_style(ax)
-    fig.text(
-        0.08,
-        0.11,
-        "200 updates · batch size 1,024 · 393 reduced nodes · 3 timing repeats per seed.",
-        fontsize=10.5,
-    )
-    fig.text(
-        0.08,
-        0.065,
-        "CUDA Graph: median(loop) + median(setup). GPU: NVIDIA RTX PRO 6000 "
-        "Blackwell Server Edition.",
-        fontsize=10,
-    )
-    return fig
-
-
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -328,11 +238,10 @@ def main(argv=None):
     )
     parser.add_argument("--output-dir", type=Path, default=ROOT / "figures")
     options = parser.parse_args(argv)
-    payload, cells, timing = validated_data(options.input)
+    payload, cells = validated_data(options.input)
     options.output_dir.mkdir(parents=True, exist_ok=True)
     style()
     paths = save(results_figure(cells), "products_results", options.output_dir)
-    paths += save(timing_figure(timing), "products_cuda_graph", options.output_dir)
     manifest = {
         "input_sha256": hashlib.sha256(options.input.read_bytes()).hexdigest(),
         "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -340,7 +249,6 @@ def main(argv=None):
         "accuracy_error_bars": "population standard deviation over 30 evaluations; full graph 10",
         "time_error_bars": "minimum to maximum of three reduction times; bar is the median",
         "timing_gpu": payload["hardware"]["gpu"],
-        "paired_timings": timing,
         "files": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in paths},
     }
     target = options.output_dir / "products_figures.json"

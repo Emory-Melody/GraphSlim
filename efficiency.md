@@ -36,8 +36,8 @@ Re-run the local checks with:
 
 ```bash
 python -m pytest -q
-ruff check graphslim examples benchmark tests interface
-ruff format --check graphslim examples benchmark tests interface
+ruff check graphslim examples benchmark tests
+ruff format --check graphslim examples benchmark tests
 python -m benchmark.render_results --check
 python -m build
 ```

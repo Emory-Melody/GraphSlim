@@ -7,7 +7,6 @@ import torch.optim as optim
 from torch_geometric.nn.resolver import activation_resolver
 
 from graphslim.utils import *
-from graphslim.acceleration import CUDAGraphStep
 
 
 class BaseGNN(nn.Module):
@@ -233,8 +232,6 @@ class BaseGNN(nn.Module):
         training_index = None
         if features.shape[0] != labels.shape[0]:
             training_index = data.idx_train
-            if getattr(args, "cuda_graph", False):
-                training_index = torch.as_tensor(training_index, device=self.device)
 
         def training_loss():
             """Compute predictions and the training objective on the selected graph.
@@ -247,18 +244,6 @@ class BaseGNN(nn.Module):
             )
             return output, loss
 
-        training_step = CUDAGraphStep(
-            training_loss,
-            self.parameters(),
-            args,
-            stage=f"{args.method}.{self.__class__.__name__}.fit",
-            steps=train_iters,
-            modules=(self,),
-            inputs=(features, labels),
-            blocked_reason="dynamic_attention_structure"
-            if self.__class__.__name__ == "GAT"
-            else None,
-        )
         self.train()
         for i in range(train_iters):
             self.train()
@@ -268,7 +253,8 @@ class BaseGNN(nn.Module):
                 )
 
             optimizer.zero_grad()
-            output, loss_train = training_step()
+            output, loss_train = training_loss()
+            loss_train.backward()
             optimizer.step()
 
             if verbose and i % 100 == 0:
@@ -330,7 +316,7 @@ class BaseGNN(nn.Module):
             print(
                 "Test set results:",
                 "loss= {:.4f}".format(loss_test.item()),
-                "accuracy= {:.4f}".format(float(acc_test)),
+                f"{getattr(self.metric, '__name__', 'score')}= {float(acc_test):.4f}",
             )
         return float(acc_test)
 

@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "cells": 55,
+  "methods_including_whole": 19,
+  "validation_candidates_checked": 228,
+  "validation_fits": 684,
+  "final_ap_fits_checked": 730,
+  "snapshot_sha256": "f4ce2499e9541e47d2e7f516961c2ab1c54447bac863c2f3829e60bbfe012433"
+}

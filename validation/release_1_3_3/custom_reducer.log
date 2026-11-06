@@ -1,0 +1,92 @@
+Common
++--------------------+-------------------------------------------------------+
+| Parameter          | Value                                                 |
++--------------------+-------------------------------------------------------+
+| checkpoints        | [-1, 99, 199, 299, 399, 499, 599, 699, 799, 899, 999] |
+| condense_model     | SGC                                                   |
+| dataset            | cora                                                  |
+| device             | cpu                                                   |
+| dis_metric         | ours                                                  |
+| dropout            | 0                                                     |
+| edge_reduction     | False                                                 |
+| epochs             | 1000                                                  |
+| eval_interval      | 100                                                   |
+| eval_whole         | False                                                 |
+| gpu_id             | -1                                                    |
+| hidden             | 256                                                   |
+| init               | random                                                |
+| inner_loop         | 1                                                     |
+| load_path          | ./data                                                |
+| logger             | graphslim.config.random.cora                          |
+| lr                 | 0.01                                                  |
+| lr_adj             | 0.0001                                                |
+| lr_feat            | 0.0001                                                |
+| method             | random                                                |
+| metric             | accuracy                                              |
+| multi_label        | False                                                 |
+| nlayers            | 2                                                     |
+| ntrans             | 1                                                     |
+| optim              | Adam                                                  |
+| outer_loop         | 10                                                    |
+| pre_norm           | True                                                  |
+| reduction_rate     | 0.5                                                   |
+| run_eval           | 10                                                    |
+| run_inter_eval     | 3                                                     |
+| run_reduction      | 3                                                     |
+| save_path          | ./checkpoints/custom_reducer                          |
+| seed               | 1                                                     |
+| setting            | trans                                                 |
+| soft_label         | 0                                                     |
+| sparsifier_options | None                                                  |
+| split              | fixed                                                 |
+| threshold          | 0                                                     |
+| verbose            | False                                                 |
+| wandb              | False                                                 |
+| wandb_project      | graphslim                                             |
+| wandb_required     | False                                                 |
+| wandb_run_name     | None                                                  |
+| weight_decay       | 0                                                     |
+| with_bn            | False                                                 |
+| with_structure     | 1                                                     |
++--------------------+-------------------------------------------------------+
+
+Downstream Evaluation
++---------------+-------+
+| Parameter     | Value |
++---------------+-------+
+| activation    | relu  |
+| alpha         | 0.1   |
+| eval_epochs   | 300   |
+| eval_loss     | CE    |
+| eval_model    | GCN   |
+| eval_wd       | 0     |
+| gin_eps       | 0     |
+| gin_train_eps | False |
++---------------+-------+
+
+RANDOM
++------------------+-------+
+| Parameter        | Value |
++------------------+-------+
+| config           | None  |
+| dataset_split_id | 0     |
++------------------+-------+
+
+HPO
++---------------+-------+
+| Parameter     | Value |
++---------------+-------+
+| hpo           | False |
+| hpo_eval_runs | 3     |
+| hpo_space     | None  |
+| hpo_yes       | False |
++---------------+-------+
+
+KCenter, Herding, Random, Clustering
++-----------+-------+
+| Parameter | Value |
++-----------+-------+
+| agg       | False |
++-----------+-------+
+Saved and reloaded: features=(8, 4), adjacency=(8, 8), labels=(8,)
+Illustrative five-epoch GCN test accuracy: 75.00% +/- 25.00%
