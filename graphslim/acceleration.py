@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Optional native CUDA graphs for first-order, fixed-input training stages.
 
 Optimizers, validation, sampling and higher-order differentiation stay eager.

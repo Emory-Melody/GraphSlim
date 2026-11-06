@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Keep public imports available without importing unrelated optional methods."""
 
 from importlib import import_module

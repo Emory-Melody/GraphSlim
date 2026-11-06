@@ -1,0 +1,35 @@
+{
+  "public_repository_base_commit": "eb66013f3c619836a0fb57c239d70b084dd06e82",
+  "historical": "sources/benchmark/results/reproduction_coverage_20261101.json",
+  "numerical_only": "sources/benchmark/results/reproduction_coverage_20261102.json",
+  "paper": "sources/benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json",
+  "reference_catalog": {
+    "GC4NC_Table9": {
+      "url": "https://arxiv.org/html/2406.16715v3",
+      "table": "Table 9 with author-confirmed Pubmed corrections",
+      "correction_note": "../../../docs/gc4nc_reference_corrections.md"
+    },
+    "gecc": {
+      "url": "https://arxiv.org/html/2502.17614v3",
+      "table": "Table 9, non-evolving GECC"
+    },
+    "cgc": {
+      "url": "https://arxiv.org/html/2405.13707v2",
+      "table": "Table 3, structured CGC"
+    },
+    "clustgdd": {
+      "url": "https://arxiv.org/html/2505.20807v1",
+      "table": "Table 3, structured ClustGDD"
+    },
+    "GC4NC_updated_manuscript_20261101": {
+      "commit": "7ec4c63691f9ba1629e0eee85d73fde78eed4d39",
+      "files": {
+        "682522352d97d4347ec4cdf8/8appendix.tex": "47de3a4e4b4667c3f3736c2778c2faad1323ccdb154830ec8e548a4d469c4715",
+        "682522352d97d4347ec4cdf8/tables/edge_sparsification.tex": "3e69f023265386a410bee9e148b34030cb32043231c40fd7c35a739e8714c2f6"
+      },
+      "shared_observations": true,
+      "public_reference_values": "settings.json",
+      "author_confirmation": "2026-11-05; see reference_corrections.json and public correction note"
+    }
+  }
+}

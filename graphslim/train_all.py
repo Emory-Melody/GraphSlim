@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Shared training command for the package, examples and benchmark scripts."""
 
 from copy import copy

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 # License: MIT. PyG and pygcn adaptations; see ../THIRD_PARTY_NOTICES.md.
 import math
 from typing import Union, Tuple, Optional

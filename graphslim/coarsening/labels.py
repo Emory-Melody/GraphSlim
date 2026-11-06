@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Class-balanced synthetic labels shared by structure-free coarsening."""
 
 from collections import Counter

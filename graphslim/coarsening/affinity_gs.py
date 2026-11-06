@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT AND Apache-2.0
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 import numpy as np
 import scipy as sp
 from pygsp import graphs

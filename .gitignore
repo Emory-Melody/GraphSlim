@@ -24,3 +24,6 @@ coverage.xml
 !validation/20261105/coverage.xml
 ._*
 __MACOSX/
+
+!validation/release_1_3_1/coverage.xml
+!validation/release_1_3_1/*.log

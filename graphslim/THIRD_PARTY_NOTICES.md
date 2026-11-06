@@ -1,6 +1,6 @@
 # Third-party notices
 
-CGC is independently implemented from their published algorithms.
+CGC is independently implemented from its published algorithm.
 The package does not redistribute their author source files; the verification
 script reads separately cloned, pinned references supplied by the user.
 
@@ -56,3 +56,12 @@ This inventory records the explicit source attributions checked during packaging
 on 2026-11-05. The cited upstream revisions identify license evidence, not a claim
 that every adaptation was originally copied from that revision. It is not an
 exhaustive historical authorship audit of every algorithm implementation.
+
+## Per-file license identifiers
+
+Every Python module and shell script distributed under `graphslim/` states its
+license in a source header. GraphSlim contributions use MIT. The graph-coarsening
+adaptations additionally retain Apache-2.0 terms, and the PyGSP-derived portions
+of `coarsening/utils.py` additionally retain BSD-3-Clause terms. Combined SPDX
+expressions identify these retained terms; the upstream texts above remain in
+source and wheel distributions. Headers do not replace the original notices.

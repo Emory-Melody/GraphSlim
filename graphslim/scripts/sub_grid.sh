@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 source "$(dirname -- "${BASH_SOURCE[0]}")/common.sh"
 # Define hyperparameter values for grid search
 lr_feat_values=(1e-4 1e-3 1e-2 1e-1)

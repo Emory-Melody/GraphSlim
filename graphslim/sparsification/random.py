@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 import numpy as np
 
 from graphslim.sparsification.model_free_coreset_base import MFCoreSet

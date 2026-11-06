@@ -1,4 +1,5 @@
 recursive-include graphslim/configs *.json
+include CHANGELOG.md
 include graphslim/THIRD_PARTY_NOTICES.md
 recursive-include graphslim/licenses *.txt
 recursive-include graphslim/sparsification/fixed_idx *.npy

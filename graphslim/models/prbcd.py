@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 # License: MIT. Modified PRBCD; see ../THIRD_PARTY_NOTICES.md.
 """
 Robustness of Graph Neural Networks at Scale. NeurIPS 2021.

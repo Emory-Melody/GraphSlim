@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Probe the selected runtime and optional DGL graph interchange, without installing anything."""
 
 import argparse

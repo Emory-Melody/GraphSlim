@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT AND Apache-2.0 AND BSD-3-Clause
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 # License: Apache-2.0; PyGSP-derived portions: BSD-3-Clause.
 # Adapted upstream components and full terms: ../THIRD_PARTY_NOTICES.md.
 # GraphSlim modifications are documented in the project Git history.

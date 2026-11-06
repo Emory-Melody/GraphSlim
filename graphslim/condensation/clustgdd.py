@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """ClustGDD: propagated-attribute clustering and class-aware refinement.
 
 Huang et al., KDD 2025, arXiv:2505.20807. Adapted algorithm components from

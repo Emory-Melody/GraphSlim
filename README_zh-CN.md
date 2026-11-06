@@ -14,7 +14,7 @@
 
 </div>
 
-**2026-11-05 固定源码：**[提交 `1a024c6`](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) 包含本文描述的 49 种方法和 8 种 GNN。源码版本标为 1.3.0；PyPI 当前仍为较早的 1.2.1。请按下文固定提交安装，并参阅[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/docs/testing_snapshot.md)。
+**Git 版本 1.3.1（2026-11-05）：**[tag `1.3.1`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.1) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/docs/testing_snapshot.md)。
 
 
 GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
@@ -89,22 +89,22 @@ Figure 1 展示软件包论文中包含 49 种方法的开发版框架。数据�
 新增八点与新版 GC4NC 表格采用同一批归档观测，是有记录的数值对照，不是独立重跑的复现证据。
 [逐点统计快照](benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json)记录了 19 × 7 范围内这 124 个组合及其来源。
 
-先前公开 README 使用 **123 个组合、20 种方法**，包含 7 个已完成但无数值参照的 Clustering 组合，
-这些组合按历史规则在各阈值获得通过计数。去除这 7 个后，116 个有数值参照组合的双边误差
-<5% 为 **104/116（89.66%）**，<10% 为 **109/116（93.97%）**。
-再加入 8 个新版 GC4NC 比较，得到 **123 − 7 + 8 = 124 个组合、19 种方法**；
-保留的 116 条组合记录未改变。旧版 111/123 和 116/123 混合了数值比较与完成计数，仅作为历史报告保留。
+剔除 8 个复用观测的比较后，剩余 116 个有数值参照的组合：
+单边短缺 <5% 为 **114/116（98.28%）**，<10% 为 **116/116（100.00%）**；
+双边误差 <5% 为 **104/116（89.66%）**，<10% 为 **109/116（93.97%）**。
 
-[固定结果产物与完整协议对照](benchmark/results/reproducibility_20261103/README.md)
-保存 355 个设置的参照值和复现值、逐组合指标、历史范围、源文件哈希及两种口径。仅用 Python 标准库即可离线重算：
+[固定版本结果产物](benchmark/results/reproducibility_20261105/README.md)
+保存 355 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。
+仅用 Python 标准库即可离线重算：
 
 ```bash
-python benchmark/results/reproducibility_20261103/verify.py --check
+python benchmark/results/reproducibility_20261105/verify.py --check
 ```
 
-参考值固定到 GC4NC 与 GECC/CGC/ClustGDD 的明确版本及表格；产物披露三项 Pubmed 修订，
-其中 TSpanner 单元交换是**推定修订，未经原作者确认**。统计汇合历史批次、来源对齐重跑和验证集选参，
-并非当前代码的一次统一实验。该产物重算冻结分数的报告统计，不重新训练模型。
+GC4NC 的统一评价协议是主要参照，另 16 个方法原论文比较保留独立来源标签。
+三项 Pubmed 更正已由 [GC4NC 作者确认](docs/gc4nc_reference_corrections.md)。
+统计汇合历史批次、来源对齐重跑和验证集选参，并非当前代码的一次统一全量运行。
+该产物从固定分数重算统计量，不重新训练。
 
 ## 聚类加速
 
@@ -341,7 +341,7 @@ GECC、CGC 和 ClustGDD 与各自论文报告的比例进行比较。
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab
+git checkout --detach 1.3.1
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu

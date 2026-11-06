@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Graph Isomorphism Network for node prediction on original and reduced graphs."""
 
 import torch

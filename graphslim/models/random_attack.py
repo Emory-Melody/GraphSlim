@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 import numpy as np
 from deeprobust.graph.global_attack import BaseAttack
 import scipy.sparse as sp

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 import torch
 from sklearn.cluster import BisectingKMeans
 from torch_scatter import scatter_mean

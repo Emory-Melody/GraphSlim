@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Grid search over reduction-method hyperparameters with validation-only selection.
 
 ``--hpo`` turns one ``graphslim.train_all`` invocation into a resumable grid search:

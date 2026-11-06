@@ -1,0 +1,2 @@
+# Preserve original CSV bytes and hashes, including their CRLF line endings.
+sources/**/*.csv -text whitespace=cr-at-eol

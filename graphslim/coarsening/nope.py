@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """NOPE / NOPE*: non-selfish neighbor-interference graph coarsening.
 
 Independent implementation of Bai et al., ICML 2026 (arXiv:2605.13021).

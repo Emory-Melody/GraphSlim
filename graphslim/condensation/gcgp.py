@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """GCGP: Gaussian-process prediction matching with learned synthetic targets.
 
 Wang et al., arXiv:2501.02565. Kernel formulas follow the MIT-licensed

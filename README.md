@@ -14,7 +14,7 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
-**Frozen source (2026-11-05):** [commit `1a024c6`](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) contains the described 49-method, eight-backbone feature set. This source is versioned 1.3.0; PyPI still distributes the earlier 1.2.1. Install the pinned source below and see its [version-specific testing record](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/docs/testing_snapshot.md).
+**Git release 1.3.1 (2026-11-05):** [tag `1.3.1`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.1) fixes the reviewed source version for the 49-method, eight-backbone feature set. Install this Git release for the manuscript; PyPI still provides the earlier 1.2.1. See the [release testing record](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/docs/testing_snapshot.md).
 
 
 GraphSlim brings **49 graph reduction methods**, **8 downstream GNN backbones**,
@@ -94,25 +94,25 @@ The eight added pairs use the same archived observations reported in the revised
 they are documented comparisons rather than independent replication runs. The
 [pair-level snapshot](benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json) records all 124 pairs within the 19 × 7 combinations and their provenance.
 
-The previous public README used **123 pairs / 20 methods**, including seven completed Clustering pairs
-with unknown numerical gaps that received policy credit at every cutoff. Removing those seven leaves
-116 numerical comparisons: two-sided <5% **104/116 (89.66%)**, <10% **109/116 (93.97%)**.
-Adding eight documented GC4NC comparisons gives **123 − 7 + 8 = 124 pairs / 19 methods**;
-the retained 116 pair records are unchanged. The old 111/123 and 116/123 counts combine measured agreement
-with completion credits and are preserved only as historical reporting results.
+Excluding the eight reused-observation comparisons leaves 116 numerical comparisons:
+one-sided <5% **114/116 (98.28%)**, <10% **116/116 (100.00%)**;
+two-sided <5% **104/116 (89.66%)**, <10% **109/116 (93.97%)**.
 
-[Fixed results artifact and full protocol reconciliation](benchmark/results/reproducibility_20261103/README.md)
-contains 355 setting-level reference/reproduced scores, per-pair metrics, historical rosters,
-source hashes and both metrics. Recompute offline with Python's standard library:
+[Fixed release results artifact](benchmark/results/reproducibility_20261105/README.md)
+contains 355 setting-level reference/reproduced scores, per-pair metrics,
+source hashes, author-confirmed reference corrections and both metrics.
+Recompute offline with Python's standard library:
 
 ```bash
-python benchmark/results/reproducibility_20261103/verify.py --check
+python benchmark/results/reproducibility_20261105/verify.py --check
 ```
 
-References are versioned GC4NC and GECC/CGC/ClustGDD tables. The artifact discloses three Pubmed
-corrections, including an **inferred, not author-confirmed** TSpanner cell swap. Historical runs,
-provenance replays and validation-selected HPO are combined; this is not one uniform current-checkout run.
-The artifact reproduces the reported calculations from frozen scores, without rerunning training.
+GC4NC is the primary reference under its unified evaluation protocol;
+the 16 method-paper comparisons retain separate source labels.
+The three Pubmed corrections are [confirmed by a GC4NC author](docs/gc4nc_reference_corrections.md).
+Historical runs, provenance replays and validation-selected HPO are combined;
+this is not one uniform current-checkout run. The artifact reproduces the
+reported calculations from frozen scores without rerunning training.
 
 ## Clustering acceleration
 
@@ -354,7 +354,7 @@ install matching PyG extension wheels. For example, a CPU development environmen
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab
+git checkout --detach 1.3.1
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
@@ -383,7 +383,7 @@ python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
 The published PyPI distribution is installed with `pip install graphslim`.
-Use [the pinned Git source](https://github.com/Emory-Melody/GraphSlim/tree/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab) for the manuscript's 49-method, eight-backbone feature set; PyPI 1.2.1 predates this revision.
+Use [the pinned Git source](https://github.com/Emory-Melody/GraphSlim/tree/1.3.1) for the manuscript's 49-method, eight-backbone feature set; PyPI 1.2.1 predates this revision.
 
 ## Quick start
 

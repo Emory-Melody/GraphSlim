@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 # License: MIT. Adapted from PyTorch Geometric; see ../THIRD_PARTY_NOTICES.md.
 """
 Extended from https://github.com/rusty1s/pytorch_geometric/tree/master/benchmark/citation

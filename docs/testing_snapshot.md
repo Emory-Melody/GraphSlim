@@ -1,12 +1,12 @@
 # Version-specific software testing record
 
-The 2026-11-05 reviewed implementation has **49 canonical methods** (5 node,
+The Git 1.3.1 release has **49 canonical methods** (5 node,
 18 edge, 10 coarsening, 16 condensation) and **eight downstream GNN architectures**.
 The source fingerprint, environment, raw test log, JUnit results, and full
-coverage data are in [validation/20261105](https://github.com/Emory-Melody/GraphSlim/blob/1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab/validation/20261105/README.md).
+coverage data are in [validation/release_1_3_1](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/validation/release_1_3_1/README.md).
 These files are committed with the implementation they describe.
 
-## Current reviewed implementation
+## Current reviewed release: 1.3.1
 
 On Linux CPU with Python 3.11 and PyTorch 2.6.0+cpu, the repository suite reports
 **479 passed, 31 skipped, zero failures/errors**. Skips include CUDA-only checks
@@ -33,7 +33,7 @@ python -m coverage run -m pytest -q -ra --junitxml=pytest.xml
 python -m coverage combine
 python -m coverage json -o coverage.json
 python -m coverage xml -o coverage.xml
-python benchmark/results/reproducibility_20261103/verify.py --check
+python benchmark/results/reproducibility_20261105/verify.py --check
 ```
 
 The checked-in `.coveragerc` measures all `graphslim` modules, enables branch
@@ -55,6 +55,10 @@ test suite and production code are therefore not interchangeable with the
 reviewed tree. The earlier percentages remain historical evidence only; they
 must not be presented as coverage of the reviewed Git revision.
 
-See the archived historical summary and module comparison under
+The source-only cleanup adds license headers without changing any package
+module AST. This 1.3.1 record reruns the actual release suite rather than carrying
+forward the historical coverage claim.
+
+See the earlier historical summary and module comparison under
 `validation/20261105`. They document the discrepancy; they do not assert that
 the historic 843-test suite was rerun on this revision.

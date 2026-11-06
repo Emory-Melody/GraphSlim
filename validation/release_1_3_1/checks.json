@@ -1,0 +1,39 @@
+{
+  "version": "1.3.1",
+  "checked_at_utc": "2026-11-06T00:43:07.747014+00:00",
+  "pytest": {
+    "passed": 479,
+    "skipped": 31,
+    "failures": 0,
+    "errors": 0
+  },
+  "statement_coverage": {
+    "covered": 4522,
+    "total": 10625,
+    "percent": 42.56
+  },
+  "branch_coverage": {
+    "covered": 1145,
+    "total": 3368,
+    "percent": 34.0
+  },
+  "package_python_modules": 106,
+  "package_python_license_headers": 106,
+  "package_shell_license_headers": 24,
+  "old_manuscript_draft_removed": true,
+  "upstream_license_texts_in_wheel_and_sdist": 6,
+  "package_module_ASTs_unchanged": true,
+  "fixed_numerical_settings_and_pairs_unchanged": true,
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "strict_sphinx_html": "passed",
+    "wheel_and_sdist": "passed",
+    "fresh_wheel_install_with_shared_dependencies": "passed",
+    "cpu_dgl_doctor": "passed",
+    "new_and_historical_artifact_verifiers": "passed",
+    "readme_renderer_check": "passed",
+    "twine": "passed"
+  },
+  "remote_ci": "pending publication; local verification only in this frozen record"
+}

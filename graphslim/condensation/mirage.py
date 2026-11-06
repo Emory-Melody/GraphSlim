@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 from tqdm import trange
 
 from graphslim.condensation.gcond_base import GCondBase

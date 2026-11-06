@@ -27,6 +27,7 @@ canonical registry entries; aliases are not counted separately.
 
    source/modules
    changes_since_gc4nc
+   gc4nc_reference_corrections
    testing_snapshot
 
 .. toctree::

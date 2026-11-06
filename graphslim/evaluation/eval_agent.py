@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 from graphslim.models import DOWNSTREAM_MODELS, get_model_class
 import numpy as np
 import torch

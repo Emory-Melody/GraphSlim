@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Bounded distance, propagation and aggregation operators for clustering.
 
 Clustering algorithms, initializers, restarts and stopping rules remain with

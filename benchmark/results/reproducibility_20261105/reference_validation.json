@@ -1,0 +1,19 @@
+{
+  "source_url": "https://arxiv.org/html/2406.16715v3",
+  "retrieved_at_utc": "2026-11-03T23:15:33.334725+00:00",
+  "retrieved_html_sha256": "d59f8cd3ff5ae8fed20d41f9407451df1c122450e9045a7bd5f441d3f1d00986",
+  "scope": "Live primary-source check of the three disclosed Pubmed conflicts; the artifact retains the complete frozen setting-level reference list.",
+  "paper_rate_label": "0.02%",
+  "cli_rate": "0.05 of labeled training nodes",
+  "main_table1": {
+    "kcenter": 62.91,
+    "averaging": 75.6,
+    "t_spanner": null
+  },
+  "appendix_table9": {
+    "kcenter": 79.18,
+    "averaging": 74.09,
+    "t_spanner": 62.91
+  },
+  "tspanner_adoption_status": "Inferred swap only; not confirmed by the original authors"
+}

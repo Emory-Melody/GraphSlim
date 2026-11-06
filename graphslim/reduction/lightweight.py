@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Shared I/O for lightweight reducers; no validation/test labels enter reduction."""
 
 from collections import Counter

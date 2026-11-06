@@ -6,14 +6,14 @@ Use Python 3.10 or 3.11. Install PyTorch and matching `torch-scatter` /
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1a024c6bf2d3a73e40a3d1facb6dd6b9c1328bab
+git checkout --detach 1.3.1
 pip install -e .
 ```
 
 See the repository [README](https://github.com/Emory-Melody/GraphSlim#install)
 for the full CPU setup and optional dependency groups. For a published version,
 use `pip install graphslim`. As checked on 2026-11-05, PyPI provides 1.2.1;
-the pinned source above is versioned 1.3.0 and includes the 49 methods and eight
+the pinned source above is versioned 1.3.1 and includes the 49 methods and eight
 GNN architectures described by the package paper. The `uv.lock` environment is consumed by
 `uv sync --locked`; PyG extension wheels must match its Torch version.
 

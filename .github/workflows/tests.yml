@@ -54,6 +54,8 @@ jobs:
       - run: ruff check graphslim examples benchmark tests interface
       - run: ruff format --check graphslim examples benchmark tests interface
       - run: python -m benchmark.render_results --check
+      - run: python benchmark/results/reproducibility_20261105/verify.py --check
+      - run: python -m benchmark.render_readme_highlights --coverage-only --check
       - run: sphinx-build -E -W --keep-going -b html docs docs/_build/html
       - run: python -m build
       - uses: actions/upload-artifact@v4

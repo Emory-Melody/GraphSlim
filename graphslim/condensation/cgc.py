@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """CGC: training-free class partition, calibration and feature reconstruction.
 
 Independent implementation of Gao et al., WWW 2025 (arXiv:2405.13707).

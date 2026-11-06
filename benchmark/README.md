@@ -261,17 +261,17 @@ paper-matched tuning protocol.
 
 The package manuscript and both READMEs use the fixed 124-pair numerical-reference
 cohort, with one-sided shortfall and two-sided relative error reported together.
-The previous 123-pair cohort included seven no-reference Clustering completion
-credits. The transition is 123 − 7 + 8 = 124; the eight additions share observations
-with the updated GC4NC reference tables and are not independent replications.
+GC4NC provides the primary reference under its unified evaluation protocol. Eight
+comparisons reuse observations underlying their GC4NC references; their sources
+are explicit and they are not independent replications.
 
-The [fixed artifact](results/reproducibility_20261103/README.md) contains all 355
+The [fixed artifact](results/reproducibility_20261105/README.md) contains all 355
 matched-setting scores, reference versions/corrections, per-pair aggregates,
 historical rosters, both formulas, sensitivity results and SHA-256 hashes.
 This offline calculation check requires only Python's standard library:
 
 ```bash
-python benchmark/results/reproducibility_20261103/verify.py --check
+python benchmark/results/reproducibility_20261105/verify.py --check
 python -m benchmark.plot_reproduction_coverage --check
 python -m benchmark.render_readme_highlights --coverage-only --check
 ```

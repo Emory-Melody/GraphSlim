@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Shared registry for graph reduction methods.
 
 The registry keeps orchestration code independent from concrete method classes.
