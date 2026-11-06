@@ -1,0 +1,13 @@
+{
+ "decided_by": "user",
+ "decision_utc": "2026-11-06",
+ "methods": [
+  "cent_p",
+  "gdem"
+ ],
+ "reasons": {
+  "cent_p": "GraphSlim's CentP PageRank update applied a row-stochastic transition matrix without transposing it (introduced 2024-05-29 in commit 14499d5, before GC4NC's first arXiv version), so every node with an edge kept the uniform score 1/n. GC4NC's CentP references were generated with that implementation. The defect is fixed after 1.3.1 (commit 6e3974a); the references therefore do not describe the corrected method.",
+  "gdem": "GraphSlim's GDEM (added 2024-08-17) optimized synthetic features from uninitialized memory and, on Cora and Citeseer, filled its largest-component training map with validation, test and unlabeled nodes and their labels. GC4NC's GDEM references were generated with that implementation. Both defects are fixed after 1.3.1 (commit 6e3974a); the references therefore do not describe the corrected method."
+ },
+ "rule": "Drop every setting of the listed methods from the base 124-pair roster; all other settings, references and reproduced scores are unchanged."
+}

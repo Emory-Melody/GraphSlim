@@ -1,0 +1,184 @@
+{
+  "artifact_id": "graphslim-reproducibility-20261106",
+  "base_artifact": "graphslim-reproducibility-20261105",
+  "excluded_methods": [
+    "cent_p",
+    "gdem"
+  ],
+  "setting_count": 313,
+  "pair_count": 110,
+  "method_count": 17,
+  "dataset_count": 7,
+  "threshold_rule": "strict < after averaging per-setting errors within a pair",
+  "shared_observation_pairs": 4,
+  "cohort_results": {
+    "paper_110": {
+      "mean_shortfall_percent": {
+        "1": {
+          "count": 64,
+          "denominator": 110
+        },
+        "2": {
+          "count": 84,
+          "denominator": 110
+        },
+        "5": {
+          "count": 108,
+          "denominator": 110
+        },
+        "10": {
+          "count": 110,
+          "denominator": 110
+        }
+      },
+      "mean_relative_gap_percent": {
+        "1": {
+          "count": 39,
+          "denominator": 110
+        },
+        "2": {
+          "count": 64,
+          "denominator": 110
+        },
+        "5": {
+          "count": 98,
+          "denominator": 110
+        },
+        "10": {
+          "count": 103,
+          "denominator": 110
+        }
+      },
+      "mean_absolute_gap_pp": {
+        "1": {
+          "count": 50,
+          "denominator": 110
+        },
+        "2": {
+          "count": 79,
+          "denominator": 110
+        },
+        "5": {
+          "count": 104,
+          "denominator": 110
+        },
+        "10": {
+          "count": 107,
+          "denominator": 110
+        }
+      }
+    },
+    "without_shared_observations_106": {
+      "mean_shortfall_percent": {
+        "1": {
+          "count": 60,
+          "denominator": 106
+        },
+        "2": {
+          "count": 80,
+          "denominator": 106
+        },
+        "5": {
+          "count": 104,
+          "denominator": 106
+        },
+        "10": {
+          "count": 106,
+          "denominator": 106
+        }
+      },
+      "mean_relative_gap_percent": {
+        "1": {
+          "count": 35,
+          "denominator": 106
+        },
+        "2": {
+          "count": 60,
+          "denominator": 106
+        },
+        "5": {
+          "count": 94,
+          "denominator": 106
+        },
+        "10": {
+          "count": 99,
+          "denominator": 106
+        }
+      },
+      "mean_absolute_gap_pp": {
+        "1": {
+          "count": 46,
+          "denominator": 106
+        },
+        "2": {
+          "count": 75,
+          "denominator": 106
+        },
+        "5": {
+          "count": 100,
+          "denominator": 106
+        },
+        "10": {
+          "count": 103,
+          "denominator": 106
+        }
+      }
+    }
+  },
+  "uncorrected_table9_sensitivity": {
+    "mean_shortfall_percent": {
+      "1": {
+        "count": 63,
+        "denominator": 110
+      },
+      "2": {
+        "count": 83,
+        "denominator": 110
+      },
+      "5": {
+        "count": 107,
+        "denominator": 110
+      },
+      "10": {
+        "count": 110,
+        "denominator": 110
+      }
+    },
+    "mean_relative_gap_percent": {
+      "1": {
+        "count": 39,
+        "denominator": 110
+      },
+      "2": {
+        "count": 63,
+        "denominator": 110
+      },
+      "5": {
+        "count": 96,
+        "denominator": 110
+      },
+      "10": {
+        "count": 103,
+        "denominator": 110
+      }
+    },
+    "mean_absolute_gap_pp": {
+      "1": {
+        "count": 50,
+        "denominator": 110
+      },
+      "2": {
+        "count": 78,
+        "denominator": 110
+      },
+      "5": {
+        "count": 102,
+        "denominator": 110
+      },
+      "10": {
+        "count": 107,
+        "denominator": 110
+      }
+    }
+  }
+}

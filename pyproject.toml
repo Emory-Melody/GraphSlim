@@ -75,4 +75,4 @@ select = ["E9", "F63", "F7", "F82"]
 
 [tool.ruff.format]
 # This offline evidence artifact is immutable and has a checked SHA-256 manifest.
-exclude = ["benchmark/results/reproducibility_20261103/verify.py", "benchmark/results/reproducibility_20261105/verify.py"]
+exclude = ["benchmark/results/reproducibility_20261103/verify.py", "benchmark/results/reproducibility_20261105/verify.py", "benchmark/results/reproducibility_20261106/base_20261105/verify.py"]

@@ -1,16 +1,16 @@
 {
-  "source": "benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json",
-  "source_sha256": "a2ea70a7e9abf20e8ff0dddb24387b01d70ee93b2fbb0a52624ef5e9fa67d4ee",
-  "renderer_sha256": "ddb115a486a2aa7c6e6ab51f0d9558ccc82811112670f6ade1115da4374373f5",
-  "as_of_utc": "2026-11-03T03:37:16.511688+00:00",
-  "scope": "124 unique method x dataset pairs: 116 legacy numerical comparisons and 8 newly documented GC4NC pairs, across 19 methods and 7 datasets.",
+  "source": "benchmark/results/reproduction_coverage_20261106.json",
+  "source_sha256": "6d9cf83de30995733c9ee859629fe327c7aa428593448ba013b25d1dd46fb897",
+  "renderer_sha256": "a273bbb1c6470cd68aa2f954e8c4d28a8d75c2d1a08bd149535c6400dc2d6a75",
+  "as_of_utc": "2026-11-06T00:00:00+00:00",
+  "scope": "110 unique method x dataset pairs across 17 methods and 7 datasets: the 124-pair roster of 2026-11-03 without CentP and GDEM.",
   "unit": "Equal weight per unique method x dataset pair; average its matched node-budget settings or saved edge graphs before thresholding.",
   "metric": "mean_shortfall_percent",
   "formula": "mean_r(100 * max(0, reference_r - reproduced_r) / reference_r)",
   "threshold_rule": "strict <; only pairs with published numerical references enter either numerator or denominator; no completion credits",
-  "total_pairs": 124,
-  "numeric_reference_pairs": 124,
-  "method_count": 19,
+  "total_pairs": 110,
+  "numeric_reference_pairs": 110,
+  "method_count": 17,
   "dataset_count": 7,
   "shared_observation_pairs": 8,
   "segments": [
@@ -19,7 +19,7 @@
       "lower_inclusive": 0,
       "upper_exclusive": 1,
       "label": "Measured shortfall <1%",
-      "count": 72,
+      "count": 64,
       "pairs": [
         "averaging/citeseer",
         "averaging/cora",
@@ -33,9 +33,6 @@
         "cent_d/ogbn-arxiv",
         "cent_d/pubmed",
         "cent_d/reddit",
-        "cent_p/citeseer",
-        "cent_p/reddit",
-        "cent_p/yelp",
         "clustgdd/flickr",
         "doscond/citeseer",
         "doscond/flickr",
@@ -53,11 +50,6 @@
         "gcond/pubmed",
         "gcsntk/cora",
         "gcsntk/pubmed",
-        "gdem/citeseer",
-        "gdem/flickr",
-        "gdem/ogbn-arxiv",
-        "gdem/reddit",
-        "gdem/yelp",
         "gecc/citeseer",
         "gecc/cora",
         "gecc/ogbn-arxiv",
@@ -101,11 +93,9 @@
       "lower_inclusive": 1,
       "upper_exclusive": 2,
       "label": "Measured shortfall 1\u2013<2%",
-      "count": 22,
+      "count": 20,
       "pairs": [
         "averaging/yelp",
-        "cent_p/ogbn-arxiv",
-        "cent_p/pubmed",
         "cgc/citeseer",
         "cgc/cora",
         "cgc/reddit",
@@ -133,11 +123,9 @@
       "lower_inclusive": 2,
       "upper_exclusive": 5,
       "label": "Measured shortfall 2\u2013<5%",
-      "count": 28,
+      "count": 24,
       "pairs": [
         "cent_d/yelp",
-        "cent_p/cora",
-        "cent_p/flickr",
         "cgc/flickr",
         "cgc/ogbn-arxiv",
         "clustgdd/cora",
@@ -147,8 +135,6 @@
         "doscond/reddit",
         "doscond/yelp",
         "gcond/yelp",
-        "gdem/cora",
-        "gdem/pubmed",
         "herding/flickr",
         "herding/reddit",
         "herding/yelp",
@@ -183,61 +169,61 @@
     {
       "threshold_percent": 1,
       "segment_counts": [
-        72,
+        64,
         0,
         0,
         0
       ],
-      "measured_count": 72,
-      "count": 72,
-      "denominator": 124,
-      "percent": 58.064516129032256
+      "measured_count": 64,
+      "count": 64,
+      "denominator": 110,
+      "percent": 58.18181818181818
     },
     {
       "threshold_percent": 2,
       "segment_counts": [
-        72,
-        22,
+        64,
+        20,
         0,
         0
       ],
-      "measured_count": 94,
-      "count": 94,
-      "denominator": 124,
-      "percent": 75.80645161290323
+      "measured_count": 84,
+      "count": 84,
+      "denominator": 110,
+      "percent": 76.36363636363636
     },
     {
       "threshold_percent": 5,
       "segment_counts": [
-        72,
-        22,
-        28,
+        64,
+        20,
+        24,
         0
       ],
-      "measured_count": 122,
-      "count": 122,
-      "denominator": 124,
-      "percent": 98.38709677419355
+      "measured_count": 108,
+      "count": 108,
+      "denominator": 110,
+      "percent": 98.18181818181819
     },
     {
       "threshold_percent": 10,
       "segment_counts": [
-        72,
-        22,
-        28,
+        64,
+        20,
+        24,
         2
       ],
-      "measured_count": 124,
-      "count": 124,
-      "denominator": 124,
+      "measured_count": 110,
+      "count": 110,
+      "denominator": 110,
       "percent": 100.0
     }
   ],
   "outside_largest_threshold": [],
   "interpretation": "Each column is cumulative for the same roster of documented numerical comparisons. Measured ranges are disjoint; missing references and completion credits are excluded. Eight added GC4NC pairs reuse the archived observations reported by the revised reference tables; they are not independent replication runs.",
   "assets_sha256": {
-    ".svg": "35791fd40f756c401716423d3dec6466f8da691314959b8396c0beba5849ff6e",
-    ".png": "505c70c782c972b804c7a1862b838fa97b625d98236cb6e979b69eccf5290fa3",
-    ".pdf": "c8edb09d7f9180565bc90f0f01256f8d957a125e05412b515e4e18858ab0cd60"
+    ".svg": "3e240ae2ec85b3ea5cc761224457679397b64fa68f99539c5f412cec667de9ab",
+    ".png": "82c830574dd84a87d1f65b125174758e111ff17da6fc5771a9348b331d7ed123",
+    ".pdf": "704652010405d33291063bf10af720509cc0cdf9d680e522dcb272dfddd7eddb"
   }
 }

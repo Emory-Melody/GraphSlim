@@ -259,19 +259,22 @@ paper-matched tuning protocol.
 
 ## Package-paper reproducibility cohort
 
-The package manuscript and both READMEs use the fixed 124-pair numerical-reference
+The package manuscript and both READMEs use the fixed 110-pair numerical-reference
 cohort, with one-sided shortfall and two-sided relative error reported together.
-GC4NC provides the primary reference under its unified evaluation protocol. Eight
+GC4NC provides the primary reference under its unified evaluation protocol. Four
 comparisons reuse observations underlying their GC4NC references; their sources
-are explicit and they are not independent replications.
+are explicit and they are not independent replications. CentP and GDEM are
+excluded because defects fixed after 1.3.1 also affected the implementation that
+generated their GC4NC references.
 
-The [fixed artifact](results/reproducibility_20261105/README.md) contains all 355
+The [fixed artifact](results/reproducibility_20261106/README.md) contains all 313
 matched-setting scores, reference versions/corrections, per-pair aggregates,
-historical rosters, both formulas, sensitivity results and SHA-256 hashes.
+both formulas, sensitivity results and SHA-256 hashes. It embeds the unchanged
+124-pair 1.3.1 artifact and records fresh CentP and GDEM scores outside the counts.
 This offline calculation check requires only Python's standard library:
 
 ```bash
-python benchmark/results/reproducibility_20261105/verify.py --check
+python benchmark/results/reproducibility_20261106/verify.py --check
 python -m benchmark.plot_reproduction_coverage --check
 python -m benchmark.render_readme_highlights --coverage-only --check
 ```

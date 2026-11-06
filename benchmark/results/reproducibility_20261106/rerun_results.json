@@ -1,0 +1,884 @@
+{
+ "purpose": "Fresh scores of the excluded methods with the fixed code, recorded for transparency only. They do not enter any count.",
+ "records": [
+  {
+   "method": "cent_p",
+   "dataset": "citeseer",
+   "setting": "0.1",
+   "reference_percent": 37.78,
+   "archived_reproduced_percent": 41.04,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.535,
+     0.528,
+     0.53,
+     0.524,
+     0.537,
+     0.53,
+     0.529,
+     0.54,
+     0.531,
+     0.535
+    ],
+    "mean_percent": 53.190000000000005,
+    "pstd_percent": 0.4526588119102514
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "citeseer",
+   "setting": "0.25",
+   "reference_percent": 52.83,
+   "archived_reproduced_percent": 52.010000000000005,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.605,
+     0.61,
+     0.616,
+     0.607,
+     0.611,
+     0.597,
+     0.613,
+     0.607,
+     0.601,
+     0.603
+    ],
+    "mean_percent": 60.699999999999996,
+    "pstd_percent": 0.5458937625582477
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "citeseer",
+   "setting": "0.5",
+   "reference_percent": 63.37,
+   "archived_reproduced_percent": 65.42,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.681,
+     0.669,
+     0.67,
+     0.671,
+     0.678,
+     0.679,
+     0.676,
+     0.682,
+     0.678,
+     0.678
+    ],
+    "mean_percent": 67.62,
+    "pstd_percent": 0.43772137256478616
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "cora",
+   "setting": "0.1",
+   "reference_percent": 58.44,
+   "archived_reproduced_percent": 52.07,
+   "archived_evaluation_profile": "runs/coverage_hpo_20261031_v2",
+   "rerun": {
+    "run": "runs/rerun_centp_cora_profile_20261105",
+    "profile": "runs/coverage_hpo_20261031_v2 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.5660000000000001,
+     0.58,
+     0.5690000000000001,
+     0.588,
+     0.586,
+     0.5680000000000001,
+     0.584,
+     0.597,
+     0.592,
+     0.598
+    ],
+    "mean_percent": 58.28,
+    "pstd_percent": 1.1205355862265116
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "cora",
+   "setting": "0.25",
+   "reference_percent": 66.38,
+   "archived_reproduced_percent": 66.27000000000001,
+   "archived_evaluation_profile": "runs/coverage_hpo_20261031_v2",
+   "rerun": {
+    "run": "runs/rerun_centp_cora_profile_20261105",
+    "profile": "runs/coverage_hpo_20261031_v2 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.65,
+     0.656,
+     0.669,
+     0.656,
+     0.657,
+     0.647,
+     0.665,
+     0.659,
+     0.658,
+     0.655
+    ],
+    "mean_percent": 65.72,
+    "pstd_percent": 0.6063002556489653
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "cora",
+   "setting": "0.5",
+   "reference_percent": 75.64,
+   "archived_reproduced_percent": 73.87,
+   "archived_evaluation_profile": "runs/coverage_hpo_20261031_v2",
+   "rerun": {
+    "run": "runs/rerun_centp_cora_profile_20261105",
+    "profile": "runs/coverage_hpo_20261031_v2 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.748,
+     0.749,
+     0.766,
+     0.773,
+     0.778,
+     0.775,
+     0.759,
+     0.754,
+     0.758,
+     0.745
+    ],
+    "mean_percent": 76.05,
+    "pstd_percent": 1.1324751652906135
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "pubmed",
+   "setting": "0.05",
+   "reference_percent": 57.28,
+   "archived_reproduced_percent": 56.17,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.555,
+     0.532,
+     0.582,
+     0.5650000000000001,
+     0.5,
+     0.489,
+     0.521,
+     0.503,
+     0.531,
+     0.466
+    ],
+    "mean_percent": 52.44,
+    "pstd_percent": 3.4252591142861006
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "pubmed",
+   "setting": "0.1",
+   "reference_percent": 62.5,
+   "archived_reproduced_percent": 62.5,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.619,
+     0.642,
+     0.638,
+     0.622,
+     0.628,
+     0.623,
+     0.621,
+     0.621,
+     0.631,
+     0.605
+    ],
+    "mean_percent": 62.5,
+    "pstd_percent": 0.9919677414109804
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "pubmed",
+   "setting": "0.5",
+   "reference_percent": 73.35,
+   "archived_reproduced_percent": 72.47999999999999,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.73,
+     0.727,
+     0.726,
+     0.745,
+     0.731,
+     0.741,
+     0.741,
+     0.736,
+     0.731,
+     0.727
+    ],
+    "mean_percent": 73.35000000000001,
+    "pstd_percent": 0.6453681120105027
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.001",
+   "reference_percent": 36.48,
+   "archived_reproduced_percent": 34.4482850852828,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.35162438532600865,
+     0.36907186799168773,
+     0.3585375388350513,
+     0.3700594613501224,
+     0.35250910437627303,
+     0.3539493446906569,
+     0.3655124169289961,
+     0.3541962430302656,
+     0.36717898072135463,
+     0.39812357261897413
+    ],
+    "mean_percent": 36.40762915869391,
+    "pstd_percent": 1.323389047118998
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.005",
+   "reference_percent": 47.9,
+   "archived_reproduced_percent": 48.52231343744213,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.5069028660782255,
+     0.499639939921404,
+     0.5069645906631277,
+     0.5152562599016521,
+     0.5164701767380614,
+     0.5242886241590025,
+     0.513363372631319,
+     0.5244120733288068,
+     0.5190831841655864,
+     0.5162438532600868
+    ],
+    "mean_percent": 51.42624940847272,
+    "pstd_percent": 0.7474052058453381
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.01",
+   "reference_percent": 55.65,
+   "archived_reproduced_percent": 57.400571981153426,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.5480320144847025,
+     0.5506450219122276,
+     0.5530728555850462,
+     0.5490607575664054,
+     0.5542250478365532,
+     0.5507273213587638,
+     0.5518589387486369,
+     0.548217188239409,
+     0.5510770940065428,
+     0.5544307964528938
+    ],
+    "mean_percent": 55.11347036191181,
+    "pstd_percent": 0.21804655546410354
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "flickr",
+   "setting": "0.001",
+   "reference_percent": 40.97,
+   "archived_reproduced_percent": 39.820732308519695,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.39169990588446196,
+     0.4009321919956976,
+     0.3898175951239188,
+     0.38327432438488773,
+     0.3883834535920764,
+     0.3948370904853673,
+     0.39927396584950475,
+     0.4047864473625241,
+     0.39667458432304037,
+     0.39586787971137904
+    ],
+    "mean_percent": 39.45547438712858,
+    "pstd_percent": 0.60815441424269
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "flickr",
+   "setting": "0.005",
+   "reference_percent": 44.06,
+   "archived_reproduced_percent": 41.77116479182539,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.4282256980235737,
+     0.4280016134092233,
+     0.4265674718773809,
+     0.42369918881369606,
+     0.43181105185317975,
+     0.42939093801819567,
+     0.43405189799668353,
+     0.4324833056962309,
+     0.42011383498409,
+     0.42602966880294
+    ],
+    "mean_percent": 42.803746694751936,
+    "pstd_percent": 0.399805134999762
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "flickr",
+   "setting": "0.01",
+   "reference_percent": 44.51,
+   "archived_reproduced_percent": 42.14314525164702,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.42513333034553846,
+     0.4300631918612468,
+     0.4267019226459911,
+     0.42741899341191236,
+     0.4261641195715502,
+     0.4235647380450858,
+     0.4286290503294044,
+     0.4286290503294044,
+     0.4237440057365661,
+     0.42885313494375477
+    ],
+    "mean_percent": 42.689015372204544,
+    "pstd_percent": 0.2117882952912676
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "reddit",
+   "setting": "0.0005",
+   "reference_percent": 45.83,
+   "archived_reproduced_percent": 46.177214732352624,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.43139841688654357,
+     0.41950699389163987,
+     0.402754183684534,
+     0.40466982325514156,
+     0.40810351682509854,
+     0.40026023782845993,
+     0.4160552282502621,
+     0.4124769581089385,
+     0.4146456066794376,
+     0.42030216503415624
+    ],
+    "mean_percent": 41.30173130444212,
+    "pstd_percent": 0.8984002606147407
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "reddit",
+   "setting": "0.001",
+   "reference_percent": 51.22,
+   "archived_reproduced_percent": 52.3708750496982,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.49857230635775474,
+     0.5179997831351429,
+     0.5421802146962085,
+     0.5340477825568367,
+     0.5404272237683884,
+     0.5322767195575957,
+     0.5026746665702824,
+     0.5030541800701197,
+     0.5162648642787436,
+     0.492409730003253
+    ],
+    "mean_percent": 51.79907470994326,
+    "pstd_percent": 1.7442963084746077
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "reddit",
+   "setting": "0.002",
+   "reference_percent": 61.56,
+   "archived_reproduced_percent": 62.00310839628438,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.5469693136227275,
+     0.5402284309827593,
+     0.4645245238009181,
+     0.5849025915350418,
+     0.5842339248924712,
+     0.541511548053638,
+     0.5450898181949615,
+     0.5387826652690931,
+     0.4784400187949543,
+     0.5487584486933893
+    ],
+    "mean_percent": 53.734412838399535,
+    "pstd_percent": 3.6801537954569508
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "yelp",
+   "setting": "0.0005",
+   "reference_percent": 46.81,
+   "archived_reproduced_percent": 47.396335788967725,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.4919188046444707,
+     0.4857376617072528,
+     0.4905942782866269,
+     0.5034761162383435,
+     0.47905900870393026,
+     0.48073636352143423,
+     0.49544430740009615,
+     0.4946323442621932,
+     0.48751546908906657,
+     0.47942409864293334
+    ],
+    "mean_percent": 48.88538452496348,
+    "pstd_percent": 0.7518732862381857
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "yelp",
+   "setting": "0.001",
+   "reference_percent": 46.08,
+   "archived_reproduced_percent": 48.61621671893385,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.49942374793068284,
+     0.5005441481881778,
+     0.5006993027507147,
+     0.5005490889805582,
+     0.4954762304758968,
+     0.49995297606204947,
+     0.5015464154998821,
+     0.4969925683968418,
+     0.4986395564327038,
+     0.506630271471132
+    ],
+    "mean_percent": 50.004543061886395,
+    "pstd_percent": 0.2812687354063979
+   }
+  },
+  {
+   "method": "cent_p",
+   "dataset": "yelp",
+   "setting": "0.002",
+   "reference_percent": 46.08,
+   "archived_reproduced_percent": 46.11262852104103,
+   "archived_evaluation_profile": "historical_frozen",
+   "rerun": {
+    "run": "runs/rerun_centp_20261105",
+    "profile": "GC4NC Table 9 protocol (benchmark.reproduce_table9)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.5164355387516645,
+     0.5165075316452662,
+     0.5170251585597438,
+     0.5199128341438173,
+     0.5169111464075493,
+     0.5192079855844401,
+     0.5174756146662683,
+     0.5177005981519996,
+     0.5160938489892299,
+     0.5183329271264928
+    ],
+    "mean_percent": 51.75603184026472,
+    "pstd_percent": 0.11876344943859407
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "citeseer",
+   "setting": "0.1",
+   "reference_percent": 67.88,
+   "archived_reproduced_percent": 67.07000000000001,
+   "archived_evaluation_profile": "runs/coverage_gdem_full_grid_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_citeseer_20261105",
+    "profile": "runs/coverage_gdem_full_grid_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.6880000000000001,
+     0.6960000000000001,
+     0.687,
+     0.704,
+     0.664,
+     0.706,
+     0.7000000000000001,
+     0.67,
+     0.7020000000000001,
+     0.682
+    ],
+    "mean_percent": 68.99000000000001,
+    "pstd_percent": 1.3729166034395521
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "citeseer",
+   "setting": "0.25",
+   "reference_percent": 70.13,
+   "archived_reproduced_percent": 72.32,
+   "archived_evaluation_profile": "runs/coverage_gdem_full_grid_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_citeseer_20261105",
+    "profile": "runs/coverage_gdem_full_grid_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.729,
+     0.731,
+     0.73,
+     0.72,
+     0.73,
+     0.733,
+     0.727,
+     0.732,
+     0.728,
+     0.73
+    ],
+    "mean_percent": 72.89999999999999,
+    "pstd_percent": 0.3435112807463537
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "citeseer",
+   "setting": "0.5",
+   "reference_percent": 71.74,
+   "archived_reproduced_percent": 73.48,
+   "archived_evaluation_profile": "runs/coverage_gdem_full_grid_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_citeseer_20261105",
+    "profile": "runs/coverage_gdem_full_grid_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.733,
+     0.735,
+     0.738,
+     0.742,
+     0.733,
+     0.738,
+     0.735,
+     0.737,
+     0.736,
+     0.736
+    ],
+    "mean_percent": 73.63,
+    "pstd_percent": 0.2531797780234435
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "cora",
+   "setting": "0.1",
+   "reference_percent": 54.76,
+   "archived_reproduced_percent": 53.14,
+   "archived_evaluation_profile": "runs/coverage_gdem_operator_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_cora_20261105",
+    "profile": "runs/coverage_gdem_operator_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.491,
+     0.484,
+     0.498,
+     0.448,
+     0.525,
+     0.421,
+     0.393,
+     0.47400000000000003,
+     0.6,
+     0.358
+    ],
+    "mean_percent": 46.92,
+    "pstd_percent": 6.535564244960032
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "cora",
+   "setting": "0.25",
+   "reference_percent": 72.87,
+   "archived_reproduced_percent": 73.35000000000001,
+   "archived_evaluation_profile": "runs/coverage_gdem_operator_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_cora_20261105",
+    "profile": "runs/coverage_gdem_operator_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.76,
+     0.765,
+     0.722,
+     0.75,
+     0.73,
+     0.758,
+     0.6900000000000001,
+     0.6940000000000001,
+     0.756,
+     0.766
+    ],
+    "mean_percent": 73.91,
+    "pstd_percent": 2.7226641364663386
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "cora",
+   "setting": "0.5",
+   "reference_percent": 81.76,
+   "archived_reproduced_percent": 76.39,
+   "archived_evaluation_profile": "runs/coverage_gdem_operator_20261031",
+   "rerun": {
+    "run": "runs/rerun_gdem_cora_20261105",
+    "profile": "runs/coverage_gdem_operator_20261031 (replayed)",
+    "source_commit": "7a2bea0",
+    "tests": [
+     0.764,
+     0.743,
+     0.738,
+     0.737,
+     0.747,
+     0.766,
+     0.773,
+     0.744,
+     0.772,
+     0.769
+    ],
+    "mean_percent": 75.53,
+    "pstd_percent": 1.3971757226634034
+   }
+  },
+  {
+   "method": "gdem",
+   "dataset": "pubmed",
+   "setting": "0.05",
+   "reference_percent": 77.52,
+   "archived_reproduced_percent": 71.92,
+   "archived_evaluation_profile": "runs/coverage_gdem_author_gcn_20261031",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "pubmed",
+   "setting": "0.1",
+   "reference_percent": 78.05,
+   "archived_reproduced_percent": 75.87,
+   "archived_evaluation_profile": "runs/coverage_gdem_author_gcn_20261031",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "pubmed",
+   "setting": "0.5",
+   "reference_percent": 78.76,
+   "archived_reproduced_percent": 77.11,
+   "archived_evaluation_profile": "runs/coverage_gdem_author_gcn_20261031",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.001",
+   "reference_percent": 56.25,
+   "archived_reproduced_percent": 56.250025718577035,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.005",
+   "reference_percent": 61.41,
+   "archived_reproduced_percent": 61.409995267781824,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "ogbn-arxiv",
+   "setting": "0.01",
+   "reference_percent": 63.68,
+   "archived_reproduced_percent": 63.675699030924015,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "flickr",
+   "setting": "0.001",
+   "reference_percent": 44.61,
+   "archived_reproduced_percent": 44.60762784027249,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "flickr",
+   "setting": "0.005",
+   "reference_percent": 43.88,
+   "archived_reproduced_percent": 43.878008335947655,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "flickr",
+   "setting": "0.01",
+   "reference_percent": 45.3,
+   "archived_reproduced_percent": 45.30184197552996,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "reddit",
+   "setting": "0.0005",
+   "reference_percent": 87.95,
+   "archived_reproduced_percent": 87.95496439801931,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "reddit",
+   "setting": "0.001",
+   "reference_percent": 88.48,
+   "archived_reproduced_percent": 88.4752593342249,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "reddit",
+   "setting": "0.002",
+   "reference_percent": 90.76,
+   "archived_reproduced_percent": 90.76101492753101,
+   "archived_evaluation_profile": "gc4nc_new_fixed_GCN_cells",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "yelp",
+   "setting": "0.0005",
+   "reference_percent": 18.05,
+   "archived_reproduced_percent": 18.05286295074535,
+   "archived_evaluation_profile": "gc4nc_yelp_AP_epoch_HPO12",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "yelp",
+   "setting": "0.001",
+   "reference_percent": 18.18,
+   "archived_reproduced_percent": 18.181942207264697,
+   "archived_evaluation_profile": "gc4nc_yelp_AP_epoch_HPO12",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  },
+  {
+   "method": "gdem",
+   "dataset": "yelp",
+   "setting": "0.002",
+   "reference_percent": 18.29,
+   "archived_reproduced_percent": 18.291566746703776,
+   "archived_evaluation_profile": "gc4nc_yelp_AP_epoch_HPO12",
+   "rerun": null,
+   "note": "Not rerun after the fixes; excluded with the whole method."
+  }
+ ]
+}

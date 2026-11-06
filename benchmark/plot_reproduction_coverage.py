@@ -1,6 +1,6 @@
 """Plot cumulative reproduction coverage for documented numerical references.
 
-The 124 method--dataset pairs exclude Clustering and other missing references.
+The 110 method--dataset pairs exclude Clustering, CentP, GDEM and other missing references.
 Measured shortfall bands are disjoint. Both the README and paper count scores
 at or above the reference as zero shortfall; two-sided errors remain optional.
 """
@@ -12,7 +12,7 @@ import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json"
+SOURCE = ROOT / "benchmark/results/reproduction_coverage_20261106.json"
 REVIEWED = ROOT / "benchmark/results/reproduction_coverage_figure.json"
 STEM = ROOT / "figures/reproduction_coverage"
 METRIC = "mean_shortfall_percent"

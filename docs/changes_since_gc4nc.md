@@ -17,12 +17,12 @@ every shared interface as newly introduced after the earlier paper.
 | Compatibility and extension | PyG/DGL graph conversion, eight registered downstream GNN architectures, and reusable loading, initialization, clustering, and evaluation components. |
 | Hyperparameter optimization | A shared HPO interface chooses reduction settings using validation data, with explicit CLI overrides taking precedence over configuration defaults. |
 | Software quality | Installation diagnostics, regression tests, documentation, examples, and a Python/PyTorch CI matrix. Test results are version-specific; see [testing record](testing_snapshot.md). |
-| Reproducibility records | A fixed, offline-verifiable [artifact](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/benchmark/results/reproducibility_20261105/README.md) stores setting-level inputs, reference provenance, both error formulas, and author-confirmed reference corrections. It explicitly identifies reused observations and historical comparisons. |
+| Reproducibility records | A fixed, offline-verifiable [artifact](https://github.com/Emory-Melody/GraphSlim/blob/main/benchmark/results/reproducibility_20261106/README.md) stores setting-level inputs, reference provenance, both error formulas, and author-confirmed reference corrections. It explicitly identifies reused observations and historical comparisons. |
 | Targeted efficiency work | Shared clustering operators reuse fitted assignments, stream distances, and use sparse or segmented aggregation. [Matched comparisons](../benchmark/results/implementation_comparison_20261031.json) and [GECC comparisons](../benchmark/results/gecc_arxiv_comparison_20261102.json) document method- and budget-dependent behavior, including configurations without a speed improvement. |
 
 The benchmark paper, the present package, and the associated method papers
 share algorithms and some experimental observations. This document does not
-claim that the 124 reference-backed pairs are independent fresh replications,
+claim that the 110 reference-backed pairs are independent fresh replications,
 that all methods become faster, or that PyPI and Git carry identical features.
 Use the permanent source revision specified in the cover letter and installation
 instructions for the reviewed feature set.

@@ -157,6 +157,9 @@ OWN_PAPER = {"gecc": GECC_PAPER, "cgc": CGC_PAPER, "clustgdd": CLUSTGDD_PAPER}
 # training is too slow to rerun for the full matrix, so the README shows the
 # published values for these rows.
 PUBLISHED_ONLY = ("geom", "sfgc")
+# Defects fixed after 1.3.1 also affected the code behind these GC4NC references,
+# so their rows are not compared with published values.
+EXCLUDED_FROM_REFERENCE = ("cent_p", "gdem")
 TABLE9_METHODS = tuple(m for _, ms in METHODS for m in ms if m not in OWN_PAPER) + ("whole",)
 
 
@@ -308,6 +311,8 @@ def readme_tables(snapshot, language="en"):
         rows = []
         for family, methods in METHODS:
             for method in methods:
+                if method in EXCLUDED_FROM_REFERENCE:
+                    continue
                 if method in PUBLISHED_ONLY:
                     texts = [
                         cells[(dataset, method, rate)]["paper_text"]
@@ -375,7 +380,10 @@ def readme_section(snapshot, language="en"):
             "training is too slow to rerun for the full matrix.\n"
             "³ The published GC4NC benchmark reports no value for these cells; "
             "GraphSlim measurements "
-            "under the same protocol are shown without a published comparison."
+            "under the same protocol are shown without a published comparison.\n"
+            "CentP and GDEM are not compared with published values: defects fixed after 1.3.1 "
+            "also affected the implementation behind their GC4NC references "
+            "([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md))."
         )
         extra = []
         if outside:
@@ -391,7 +399,9 @@ def readme_section(snapshot, language="en"):
             "¹ 这些历史测量实际运行 DosCondX，采用归档实验配置及对应的论文参考行；其中 Reddit 配置与当前 DosCondX 默认值不同，原始记录和配置均保留。\n"
             "² GC4NC 论文数值（均值 ± 标准误）。论文中 GEOM 和 SFGC 的得分来自原作者实现，"
             "其专家轨迹训练太慢，未对完整矩阵重跑。\n"
-            "³ GC4NC 论文未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。"
+            "³ GC4NC 论文未给出这些单元的数值；此处为相同协议下的 GraphSlim 测量，无论文对照。\n"
+            "CentP 和 GDEM 不与论文数值对照：1.3.1 之后修复的缺陷同样存在于生成其 GC4NC 参照值的实现中"
+            "（[原因与重跑分数](benchmark/results/reproducibility_20261106/README.md)）。"
         )
         extra = []
         if outside:

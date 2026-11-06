@@ -15,7 +15,7 @@ from benchmark.render_arxiv_efficiency import speed_figure
 from benchmark.plot_reproduction_coverage import METRIC, THRESHOLDS
 
 ROOT = Path(__file__).resolve().parents[1]
-COVERAGE = ROOT / "benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json"
+COVERAGE = ROOT / "benchmark/results/reproduction_coverage_20261106.json"
 COVERAGE_FIGURE = ROOT / "benchmark/results/reproduction_coverage_figure.json"
 
 
@@ -99,7 +99,7 @@ def coverage_context(text, language, data):
         heading = "## Reproduction coverage\n"
         intro = (
             "The original Yelp pairs retain their historical macro-F1 protocol.\n"
-            "The added TSpanner/Yelp and GDEM/Yelp pairs use AP matched to the revised GC4NC tables;\n"
+            "The added TSpanner/Yelp pair uses AP matched to the revised GC4NC tables;\n"
             "Other Yelp AP results remain outside this roster."
         )
         summary = (
@@ -116,19 +116,21 @@ def coverage_context(text, language, data):
             "The displayed 1%, 2%, 5% and 10% cutoffs are relative percentages, not percentage-point gaps."
         )
         boundary = (
-            "The denominator is **124 = 100 historical GC4NC pairs + 16 method-paper pairs + 8 updated GC4NC pairs**\n"
-            "(method papers: GECC 6, CGC 5, ClustGDD 5). TSpanner and GDEM each add Arxiv, Flickr, Reddit and Yelp;\n"
-            "their existing three pairs each are not counted again. Each unique method–dataset pair counts once.\n"
+            "The denominator is **110 = 90 historical GC4NC pairs + 16 method-paper pairs + 4 updated GC4NC pairs**\n"
+            "(method papers: GECC 6, CGC 5, ClustGDD 5). TSpanner adds Arxiv, Flickr, Reddit and Yelp;\n"
+            "its existing three pairs are not counted again. Each unique method–dataset pair counts once.\n"
             "Multiple reduction rates, saved edge graphs and evaluation seeds do not add data points.\n"
-            "The eight added pairs use the same archived observations reported in the revised GC4NC tables;\n"
-            "they are documented comparisons rather than independent replication runs. The\n"
-            "[pair-level snapshot](benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json) records all 124 pairs within the 19 × 7 combinations and their provenance."
+            "The four added pairs use the same archived observations reported in the revised GC4NC tables;\n"
+            "they are documented comparisons rather than independent replication runs.\n"
+            "CentP and GDEM are excluded: defects fixed after 1.3.1 also affected the implementation that\n"
+            "generated their GC4NC references ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)).\n"
+            "The [pair-level snapshot](benchmark/results/reproduction_coverage_20261106.json) records all 110 pairs within the 17 × 7 combinations and their provenance."
         )
     else:
         heading = "## 复现覆盖率\n"
         intro = (
             "原有 Yelp 组合保留历史宏 F1 协议。\n"
-            "新增的 TSpanner/Yelp 与 GDEM/Yelp 两点使用与新版 GC4NC 表格匹配的 AP；\n"
+            "新增的 TSpanner/Yelp 使用与新版 GC4NC 表格匹配的 AP；\n"
             "其他 Yelp AP 结果不纳入这一范围。"
         )
         summary = (
@@ -144,33 +146,36 @@ def coverage_context(text, language, data):
             "图中展示 1%、2%、5%、10% 四档相对容差，并非百分点差。"
         )
         boundary = (
-            "分母为 **124 = 100 个历史 GC4NC 组合 + 16 个方法原论文组合 + 8 个新版 GC4NC 组合**\n"
-            "（方法原论文：GECC 6、CGC 5、ClustGDD 5）。TSpanner 和 GDEM 各新增 Arxiv、Flickr、Reddit、Yelp 四点，\n"
-            "两种方法原有的各三点不重复计数。每个唯一的“方法×数据集”组合只计一个点，\n"
+            "分母为 **110 = 90 个历史 GC4NC 组合 + 16 个方法原论文组合 + 4 个新版 GC4NC 组合**\n"
+            "（方法原论文：GECC 6、CGC 5、ClustGDD 5）。TSpanner 新增 Arxiv、Flickr、Reddit、Yelp 四点，\n"
+            "其原有三点不重复计数。每个唯一的“方法×数据集”组合只计一个点，\n"
             "多个缩减率、保存的边稀疏图和评估种子不增加点数。\n"
-            "新增八点与新版 GC4NC 表格采用同一批归档观测，是有记录的数值对照，不是独立重跑的复现证据。\n"
-            "[逐点统计快照](benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json)记录了 19 × 7 范围内这 124 个组合及其来源。"
+            "新增四点与新版 GC4NC 表格采用同一批归档观测，是有记录的数值对照，不是独立重跑的复现证据。\n"
+            "CentP 和 GDEM 不纳入比较：1.3.1 之后修复的缺陷同样存在于生成其 GC4NC 参照值的实现中\n"
+            "（[原因与重跑分数](benchmark/results/reproducibility_20261106/README.md)）。\n"
+            "[逐点统计快照](benchmark/results/reproduction_coverage_20261106.json)记录了 17 × 7 范围内这 110 个组合及其来源。"
         )
     if language == "en":
         formula += (
             "\nShortfall measures performance retention for these higher-is-better scores; it does not establish numerical agreement.\n"
             "We therefore also report two-sided relative error, `100 * abs(reference - reproduced) / reference`,\n"
-            "on the **same 124 pairs**. For reference 80 and reproduction 88, shortfall is 0% and two-sided error is 10%.\n"
+            "on the **same 110 pairs**. For reference 80 and reproduction 88, shortfall is 0% and two-sided error is 10%.\n"
             "Improvements at one setting do not cancel shortfalls at another: clip per setting before averaging.\n"
             "The metric choice was made after historical results existed; it is not a preregistered independent benchmark."
         )
         reconciliation = (
-            "Excluding the eight reused-observation comparisons leaves 116 numerical comparisons:\n"
-            "one-sided <5% **114/116 (98.28%)**, <10% **116/116 (100.00%)**;\n"
-            "two-sided <5% **104/116 (89.66%)**, <10% **109/116 (93.97%)**.\n"
+            "Excluding the four reused-observation comparisons leaves 106 numerical comparisons:\n"
+            "one-sided <5% **104/106 (98.11%)**, <10% **106/106 (100.00%)**;\n"
+            "two-sided <5% **94/106 (88.68%)**, <10% **99/106 (93.40%)**.\n"
             "\n"
-            "[Fixed release results artifact](benchmark/results/reproducibility_20261105/README.md)\n"
-            "contains 355 setting-level reference/reproduced scores, per-pair metrics,\n"
+            "[Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)\n"
+            "contains 313 setting-level reference/reproduced scores, per-pair metrics,\n"
             "source hashes, author-confirmed reference corrections and both metrics.\n"
+            "It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.\n"
             "Recompute offline with Python's standard library:\n"
             "\n"
             "```bash\n"
-            "python benchmark/results/reproducibility_20261105/verify.py --check\n"
+            "python benchmark/results/reproducibility_20261106/verify.py --check\n"
             "```\n"
             "\n"
             "GC4NC is the primary reference under its unified evaluation protocol;\n"
@@ -183,22 +188,23 @@ def coverage_context(text, language, data):
     else:
         formula += (
             "\n单边短缺衡量这些越高越好指标的性能保持程度，不能证明数值一致性。\n"
-            "因此在**同样的 124 个组合**上并列报告双边相对误差 `100 * abs(参照值 - 复现值) / 参照值`。\n"
+            "因此在**同样的 110 个组合**上并列报告双边相对误差 `100 * abs(参照值 - 复现值) / 参照值`。\n"
             "例如参照值 80、复现值 88 时，短缺为 0%，双边误差为 10%。\n"
             "每个设置先截断再平均，一个设置的提升不会抵消另一个设置的短缺。\n"
             "该指标选择发生在历史结果产生之后，并非预注册的独立基准实验。"
         )
         reconciliation = (
-            "剔除 8 个复用观测的比较后，剩余 116 个有数值参照的组合：\n"
-            "单边短缺 <5% 为 **114/116（98.28%）**，<10% 为 **116/116（100.00%）**；\n"
-            "双边误差 <5% 为 **104/116（89.66%）**，<10% 为 **109/116（93.97%）**。\n"
+            "剔除 4 个复用观测的比较后，剩余 106 个有数值参照的组合：\n"
+            "单边短缺 <5% 为 **104/106（98.11%）**，<10% 为 **106/106（100.00%）**；\n"
+            "双边误差 <5% 为 **94/106（88.68%）**，<10% 为 **99/106（93.40%）**。\n"
             "\n"
-            "[固定版本结果产物](benchmark/results/reproducibility_20261105/README.md)\n"
-            "保存 355 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。\n"
+            "[固定结果产物](benchmark/results/reproducibility_20261106/README.md)\n"
+            "保存 313 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。\n"
+            "它内含未改动的 1.3.1 产物，并在去掉 CentP 和 GDEM 后重算全部统计。\n"
             "仅用 Python 标准库即可离线重算：\n"
             "\n"
             "```bash\n"
-            "python benchmark/results/reproducibility_20261105/verify.py --check\n"
+            "python benchmark/results/reproducibility_20261106/verify.py --check\n"
             "```\n"
             "\n"
             "GC4NC 的统一评价协议是主要参照，另 16 个方法原论文比较保留独立来源标签。\n"

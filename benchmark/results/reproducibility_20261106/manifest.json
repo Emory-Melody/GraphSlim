@@ -1,0 +1,11 @@
+{
+  "artifact_id": "graphslim-reproducibility-20261106",
+  "files_sha256": {
+    "README.md": "bb2cacfe6359ab8a28f7793b1fde006c0f5618aa7cd5ecade5b9f47c840a6acf",
+    "exclusions.json": "ec4c6b7a247e68c83dbfadae72c802a22f4a7582b6be4a965f2906b0f1aa3a66",
+    "pairs.csv": "5f93b2299a390de6cd24da5d7afe1460130aaa6129d57e0b26ecef57b1d184ad",
+    "rerun_results.json": "90d319da42d28ccd90132474c18d68b22ef20c201943c9650b69eae38a0a909f",
+    "summary.json": "5b66f6cf2b900ea65cd7bcd1f1b261314e4626d2a5baca50a013c9f092051f5c",
+    "verify.py": "96105675ff6a1849f75a04baf1dcdcaeb1804792177b812896f67d5dbbdb1744"
+  }
+}

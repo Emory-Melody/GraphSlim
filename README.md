@@ -52,27 +52,27 @@ node selection or coarsening used to initialize condensation.
 ## Reproduction coverage
 
 The original Yelp pairs retain their historical macro-F1 protocol.
-The added TSpanner/Yelp and GDEM/Yelp pairs use AP matched to the revised GC4NC tables;
+The added TSpanner/Yelp pair uses AP matched to the revised GC4NC tables;
 Other Yelp AP results remain outside this roster.
 
-**124/124 declared method–dataset pairs completed all declared settings.**
-**122/124 (98.39%)** meet a mean one-sided relative shortfall below 5%;
-**124/124 (100.00%)** meet a mean one-sided relative shortfall below 10%.
-The fixed roster spans **19 methods and 7 datasets**, with equal weight per pair.
+**110/110 declared method–dataset pairs completed all declared settings.**
+**108/110 (98.18%)** meet a mean one-sided relative shortfall below 5%;
+**110/110 (100.00%)** meet a mean one-sided relative shortfall below 10%.
+The fixed roster spans **17 methods and 7 datasets**, with equal weight per pair.
 Pairs without documented numerical references are excluded.
 
 <!-- reproduction-coverage:start -->
 
-[![Cumulative reproduction coverage of 124 documented-reference pairs at 1%, 2%, 5% and 10% one-sided relative-shortfall thresholds](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
+[![Cumulative reproduction coverage of 110 documented-reference pairs at 1%, 2%, 5% and 10% one-sided relative-shortfall thresholds](figures/reproduction_coverage.svg)](figures/reproduction_coverage.pdf)
 
-Each column is cumulative for the same **124 pairs with documented numerical references**; blue segments show disjoint measured-shortfall ranges.
+Each column is cumulative for the same **110 pairs with documented numerical references**; blue segments show disjoint measured-shortfall ranges.
 
 [Vector PDF](figures/reproduction_coverage.pdf) · [High-resolution PNG](figures/reproduction_coverage.png) · [Reviewed chart data](benchmark/results/reproduction_coverage_figure.json) · [Figure renderer](benchmark/plot_reproduction_coverage.py)
 
 | Criterion | <1% | <2% | <5% | <10% |
 | --- | ---: | ---: | ---: | ---: |
-| One-sided relative shortfall | 72/124 (58.06%) | 94/124 (75.81%) | 122/124 (98.39%) | 124/124 (100.00%) |
-| Two-sided relative error | 43/124 (34.68%) | 70/124 (56.45%) | 112/124 (90.32%) | 117/124 (94.35%) |
+| One-sided relative shortfall | 64/110 (58.18%) | 84/110 (76.36%) | 108/110 (98.18%) | 110/110 (100.00%) |
+| Two-sided relative error | 39/110 (35.45%) | 64/110 (58.18%) | 98/110 (89.09%) | 103/110 (93.64%) |
 
 <!-- reproduction-coverage:end -->
 
@@ -82,29 +82,32 @@ matched setting, average within a method–dataset pair, then apply the strict `
 The displayed 1%, 2%, 5% and 10% cutoffs are relative percentages, not percentage-point gaps.
 Shortfall measures performance retention for these higher-is-better scores; it does not establish numerical agreement.
 We therefore also report two-sided relative error, `100 * abs(reference - reproduced) / reference`,
-on the **same 124 pairs**. For reference 80 and reproduction 88, shortfall is 0% and two-sided error is 10%.
+on the **same 110 pairs**. For reference 80 and reproduction 88, shortfall is 0% and two-sided error is 10%.
 Improvements at one setting do not cancel shortfalls at another: clip per setting before averaging.
 The metric choice was made after historical results existed; it is not a preregistered independent benchmark.
 
-The denominator is **124 = 100 historical GC4NC pairs + 16 method-paper pairs + 8 updated GC4NC pairs**
-(method papers: GECC 6, CGC 5, ClustGDD 5). TSpanner and GDEM each add Arxiv, Flickr, Reddit and Yelp;
-their existing three pairs each are not counted again. Each unique method–dataset pair counts once.
+The denominator is **110 = 90 historical GC4NC pairs + 16 method-paper pairs + 4 updated GC4NC pairs**
+(method papers: GECC 6, CGC 5, ClustGDD 5). TSpanner adds Arxiv, Flickr, Reddit and Yelp;
+its existing three pairs are not counted again. Each unique method–dataset pair counts once.
 Multiple reduction rates, saved edge graphs and evaluation seeds do not add data points.
-The eight added pairs use the same archived observations reported in the revised GC4NC tables;
-they are documented comparisons rather than independent replication runs. The
-[pair-level snapshot](benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json) records all 124 pairs within the 19 × 7 combinations and their provenance.
+The four added pairs use the same archived observations reported in the revised GC4NC tables;
+they are documented comparisons rather than independent replication runs.
+CentP and GDEM are excluded: defects fixed after 1.3.1 also affected the implementation that
+generated their GC4NC references ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)).
+The [pair-level snapshot](benchmark/results/reproduction_coverage_20261106.json) records all 110 pairs within the 17 × 7 combinations and their provenance.
 
-Excluding the eight reused-observation comparisons leaves 116 numerical comparisons:
-one-sided <5% **114/116 (98.28%)**, <10% **116/116 (100.00%)**;
-two-sided <5% **104/116 (89.66%)**, <10% **109/116 (93.97%)**.
+Excluding the four reused-observation comparisons leaves 106 numerical comparisons:
+one-sided <5% **104/106 (98.11%)**, <10% **106/106 (100.00%)**;
+two-sided <5% **94/106 (88.68%)**, <10% **99/106 (93.40%)**.
 
-[Fixed release results artifact](benchmark/results/reproducibility_20261105/README.md)
-contains 355 setting-level reference/reproduced scores, per-pair metrics,
+[Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)
+contains 313 setting-level reference/reproduced scores, per-pair metrics,
 source hashes, author-confirmed reference corrections and both metrics.
+It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.
 Recompute offline with Python's standard library:
 
 ```bash
-python benchmark/results/reproducibility_20261105/verify.py --check
+python benchmark/results/reproducibility_20261106/verify.py --check
 ```
 
 GC4NC is the primary reference under its unified evaluation protocol;
@@ -172,7 +175,6 @@ papers report.
 | Family | Method | 0.36% | 0.90% | 1.80% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 44.56 ± 2.30 | 59.32 ± 0.24 | 62.91 ± 0.47 |
-| Node sparsification | Cent-P | 41.04 ± 1.55 | 52.01 ± 0.78 | 65.42 ± 0.36 |
 | Node sparsification | Random | 36.94 ± 4.89 | 51.01 ± 4.46 | 63.13 ± 2.72 |
 | Node sparsification | Herding | 46.11 ± 2.80 | 61.67 ± 1.43 | 67.37 ± 1.37 |
 | Node sparsification | K-Center | 44.92 ± 4.69 | 53.58 ± 2.70 | 60.16 ± 1.28 |
@@ -210,7 +212,6 @@ Whole graph: 71.84 ± 0.21.
 | Condensation | DosCond | 79.12 ± 0.70 | 79.96 ± 0.84 | 78.99 ± 0.96 |
 | Condensation | MSGC | 79.78 ± 0.45 | 80.39 ± 0.58 | 80.89 ± 0.48 |
 | Condensation | SGDD | 80.41 ± 0.49 | 81.00 ± 0.52 | 79.64 ± 0.60 |
-| Condensation | GDEM | 53.60 ± 5.81 | 72.23 ± 2.19 | 75.94 ± 0.74 |
 | Condensation | GECC | 81.94 ± 0.59 | 82.86 ± 0.35 | 82.61 ± 0.34 |
 | Condensation | CGC | 79.75 ± 0.56 | 81.32 ± 0.37 | 80.75 ± 0.60 |
 
@@ -221,7 +222,6 @@ Whole graph: 80.81 ± 0.51.
 | Family | Method | 0.02% | 0.03% | 0.15% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 56.17 ± 2.57 | 55.61 ± 1.55 | 71.75 ± 0.82 |
-| Node sparsification | Cent-P | 56.17 ± 2.57 | 62.50 ± 0.99 | 72.48 ± 0.75 |
 | Node sparsification | Random | 51.17 ± 3.25 | 57.72 ± 2.02 | 74.08 ± 1.81 |
 | Node sparsification | Herding | 63.03 ± 1.61 | 68.99 ± 1.67 | 75.69 ± 0.63 |
 | Coarsening | Averaging | 75.60 ± 0.42 | 75.60 ± 0.42 | 75.60 ± 0.42 |
@@ -243,7 +243,6 @@ Whole graph: 78.60 ± 0.57.
 | Family | Method | 0.05% | 0.25% | 0.50% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 40.07 ± 1.51 | 49.09 ± 1.03 | 52.10 ± 0.49 |
-| Node sparsification | Cent-P | 34.45 ± 1.34 | 48.52 ± 0.88 | 57.40 ± 0.63 |
 | Node sparsification | Random | 44.91 ± 5.23 | 57.63 ± 1.14 | 59.74 ± 0.39 |
 | Node sparsification | Herding | 49.25 ± 1.86 | 57.26 ± 0.92 | 57.54 ± 0.72 |
 | Node sparsification | K-Center | 48.66 ± 1.70 | 55.40 ± 1.63 | 59.00 ± 0.55 |
@@ -255,7 +254,6 @@ Whole graph: 78.60 ± 0.57.
 | Condensation | DosCondX¹ | 59.58 ± 0.48 | 62.28 ± 0.39 | 59.73 ± 0.30 |
 | Condensation | DosCond | 56.03 ± 0.60 | 57.41 ± 0.48 | 54.00 ± 0.58 |
 | Condensation | MSGC | 61.09 ± 0.32 | 65.68 ± 0.23 | 64.85 ± 0.21 |
-| Condensation | GDEM³ | 56.25 ± 1.21 | 61.41 ± 0.48 | 63.68 ± 0.40 |
 | Condensation | GECC | 61.52 ± 0.22 | 64.95 ± 0.19 | 66.44 ± 0.19 |
 | Condensation | CGC | 60.71 ± 0.61 | 63.52 ± 0.28 | 64.65 ± 0.28 |
 | Condensation | ClustGDD | 62.11 ± 0.09 | 65.32 ± 0.08 | 66.38 ± 0.12 |
@@ -267,7 +265,6 @@ Whole graph: 70.70 ± 0.14.
 | Family | Method | 0.10% | 0.50% | 1.00% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 40.69 ± 0.39 | 42.88 ± 0.29 | 42.63 ± 0.23 |
-| Node sparsification | Cent-P | 39.82 ± 1.34 | 41.77 ± 0.53 | 42.14 ± 0.35 |
 | Node sparsification | Random | 41.22 ± 1.91 | 43.89 ± 0.45 | 44.04 ± 0.68 |
 | Node sparsification | Herding | 40.05 ± 1.49 | 42.63 ± 0.95 | 44.44 ± 0.45 |
 | Node sparsification | K-Center | 39.88 ± 2.36 | 42.35 ± 1.10 | 43.02 ± 0.69 |
@@ -282,7 +279,6 @@ Whole graph: 70.70 ± 0.14.
 | Condensation | DosCond | 45.73 ± 0.34 | 46.07 ± 0.26 | 46.30 ± 0.20 |
 | Condensation | MSGC | 45.71 ± 0.26 | 46.35 ± 0.31 | 46.43 ± 0.22 |
 | Condensation | SGDD | 42.21 ± 0.31 | 44.32 ± 0.20 | 43.97 ± 0.21 |
-| Condensation | GDEM³ | 44.61 ± 1.04 | 43.88 ± 1.45 | 45.30 ± 0.67 |
 | Condensation | GECC | 46.34 ± 0.10 | 45.92 ± 0.20 | 45.83 ± 0.13 |
 | Condensation | CGC | 46.01 ± 0.14 | 45.93 ± 0.18 | 45.38 ± 0.31 |
 | Condensation | ClustGDD | 46.32 ± 0.05 | 46.63 ± 0.04 | 46.62 ± 0.08 |
@@ -294,7 +290,6 @@ Whole graph: 46.95 ± 0.19.
 | Family | Method | 0.05% | 0.10% | 0.20% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 39.87 ± 0.78 | 51.49 ± 1.15 | 56.83 ± 1.99 |
-| Node sparsification | Cent-P | 46.18 ± 1.55 | 52.37 ± 0.82 | 62.00 ± 0.41 |
 | Node sparsification | Herding | 49.88 ± 4.41 | 58.71 ± 4.57 | 69.33 ± 1.92 |
 | Edge sparsification | TSpanner³ | 94.01 ± 0.04 | 93.99 ± 0.03 | 94.00 ± 0.05 |
 | Coarsening | Averaging | 88.29 ± 0.06 | 88.43 ± 0.09 | 88.41 ± 0.07 |
@@ -304,7 +299,6 @@ Whole graph: 46.95 ± 0.19.
 | Condensation | DosCondX¹ | 87.31 ± 0.23 | 88.04 ± 0.24 | 88.67 ± 0.23 |
 | Condensation | GCond | 84.48 ± 0.76 | 86.98 ± 0.13 | 90.18 ± 0.07 |
 | Condensation | DosCond | 82.72 ± 0.10 | 86.67 ± 0.10 | 88.07 ± 0.26 |
-| Condensation | GDEM³ | 87.95 ± 0.09 | 88.48 ± 0.62 | 90.76 ± 0.25 |
 | Condensation | GECC | 89.95 ± 0.10 | 91.00 ± 0.03 | 91.58 ± 0.05 |
 | Condensation | CGC | 89.39 ± 0.14 | 90.29 ± 0.06 | 90.92 ± 0.06 |
 | Condensation | ClustGDD | 86.89 ± 0.14 | 90.39 ± 0.04 | 91.33 ± 0.07 |
@@ -316,7 +310,6 @@ Whole graph: 93.99 ± 0.05.
 | Family | Method | 0.05% | 0.10% | 0.20% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 50.23 ± 0.53 | 46.08 ± 0.00 | 46.08 ± 0.00 |
-| Node sparsification | Cent-P | 47.40 ± 0.09 | 48.62 ± 0.54 | 46.11 ± 0.06 |
 | Node sparsification | Random | 46.10 ± 0.05 | 47.74 ± 1.05 | 49.21 ± 2.60 |
 | Node sparsification | Herding | 46.13 ± 0.07 | 46.43 ± 0.39 | 47.00 ± 0.35 |
 | Node sparsification | K-Center | 46.45 ± 0.26 | 48.30 ± 0.30 | 48.42 ± 0.64 |
@@ -330,15 +323,15 @@ Whole graph: 93.99 ± 0.05.
 | Condensation | GCond | 52.09 ± 0.13 | 51.74 ± 0.14 | 49.83 ± 0.16 |
 | Condensation | DosCond | 46.74 ± 1.48 | 51.72 ± 0.58 | 53.41 ± 0.17 |
 | Condensation | SGDD | 53.66 ± 0.25 | 51.81 ± 0.30 | 51.89 ± 0.12 |
-| Condensation | GDEM³ | 46.08 ± 0.00 | 46.08 ± 0.00 | 46.08 ± 0.00 |
 
 Whole graph: 47.43 ± 0.22.
 
 ¹ Archived DosCondX measurements use the archived experimental settings and corresponding reference row. The Reddit configuration differs from current DosCondX defaults; raw archived names and configurations are preserved.
 ² Published GC4NC values (mean ± standard error). The paper obtained GEOM and SFGC scores from the authors' implementations; their expert-trajectory training is too slow to rerun for the full matrix.
 ³ The published GC4NC benchmark reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
+CentP and GDEM are not compared with published values: defects fixed after 1.3.1 also affected the implementation behind their GC4NC references ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)).
 
-Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); GDEM (Citeseer, Pubmed); Cent-P (Cora); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
+Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
 
 <!-- reproduction-results:end -->
 
