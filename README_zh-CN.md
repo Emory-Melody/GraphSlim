@@ -35,7 +35,7 @@ Torch 与 PyG 扩展 wheel。
 
 [快速开始](#快速开始) · [软件框架](#软件框架) ·
 [复现覆盖率](#复现覆盖率) · [聚类加速](#聚类加速) ·
-[HPO](#超参数优化hpo) · [支持的方法](#支持的方法)
+[HPO](#搜索方法自身的参数) · [支持的方法](#支持的方法)
 
 ## 软件框架
 
@@ -380,38 +380,15 @@ python -m graphslim.run_eval -D cora -W -G -1
 python -m graphslim.train_all --help
 ```
 
+## 命令行参数
+
 安装后可使用命令：`graphslim-train`、`graphslim-eval`、`graphslim-doctor` 和 `graphslim-visualize`。
 `--run_reduction N` 使用连续随机种子执行 N 次缩减；`--run_eval N` 控制下游评估重复次数。
 `--run_reduction 0` 评估已保存的图，`-W` 评估完整图。
 程序先加载方法 JSON 中的默认配置，再应用显式命令行参数覆盖。
 对于提供聚合变体的方法，可通过 `--agg`（别名 `--aggpreprocess`）选择该变体。
 
-### 超参数优化（HPO）
-
-对缩减方法的设置进行网格搜索，**仅按平均验证集准确率选参**。
-例如，GDEM 已提供搜索空间：
-
-```bash
-python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 --hpo --save_path ./checkpoints
-```
-
-使用 `--hpo_space path/to/space.json` 指定自定义网格：键为方法参数名，列表为候选值。
-未提供内置网格的方法首次运行会生成单点模板，可扩展候选值后重跑。
-命令会预览搜索空间并请求确认，`--hpo_yes` 可直接开始。
-再次运行相同命令时，会读取 `trials.jsonl` 恢复进度。
-
-最优参数写入 `checkpoints/hpo/gdem/cora_r0.5/best.json`：
-
-```bash
-python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 \
-  --config ./checkpoints/hpo/gdem/cora_r0.5/best.json --save_path ./checkpoints
-```
-
-HPO 搜索期间计算验证集得分，重放命令再评估选定配置。
-`--hpo_eval_runs` 控制每个候选配置的验证次数，默认为 3。
-[搜索空间格式](graphslim/configs/hpo/README.md)。
-
-### 示例
+## 示例
 
 各示例使用相同流程，并加载所选方法的默认配置。
 
@@ -424,7 +401,7 @@ python -m examples.train_gcond -G -1
 也可以从任意目录直接执行示例，例如 `python examples/train_gcond.py --help`。
 导入示例模块不会启动训练。
 
-### 软件包 API
+## 软件包 API
 
 ```python
 from graphslim.config import get_args
@@ -501,13 +478,22 @@ python -m graphslim.train_all -D cora -M gcgp -G -1 --save_path ./checkpoints
 
 ## 搜索方法自身的参数
 
-固定复现产物记录了各历史方法–数据集对实际采用的设置。遇到新数据集或新方法时，`--hpo` 会对约简方法自身的参数做网格搜索，只按验证集选参：
+固定复现产物记录了各历史方法–数据集对实际采用的设置。遇到新数据集或新方法时，`--hpo` 会对约简方法自身的参数做网格搜索，**仅按平均验证集准确率选参**。例如，GDEM 已提供搜索空间：
 
 ```bash
-python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./checkpoints
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 --hpo --save_path ./checkpoints
 ```
 
-它会打印搜索空间（来自 `--hpo_space`，否则是 `graphslim/configs/hpo/<method>.json`，再否则在 `save_path/hpo/` 下生成一个单点模板供你扩展）、试验数和预计时间，然后询问是否开始（`--hpo_yes` 跳过询问）。每个试验执行一次约简，用 `--hpo_eval_runs` 次下游模型训练的平均验证准确率（`--eval_model`，默认 GCN）打分，不计算测试分数。完成的试验逐条追加到 `trials.jsonl`，中断后可续跑；最优参数写入 `best.json`，可直接用 `--config` 复用。
+它会打印搜索空间（来自 `--hpo_space`，否则是 `graphslim/configs/hpo/<method>.json`，再否则在 `save_path/hpo/` 下生成一个单点模板供你扩展）、试验数和预计时间，然后询问是否开始（`--hpo_yes` 跳过询问）。每个试验执行一次约简，用 `--hpo_eval_runs` 次（默认 3）下游模型训练的平均验证准确率（`--eval_model`，默认 GCN）打分，不计算测试分数。完成的试验逐条追加到 `trials.jsonl`，中断后可续跑；最优参数写入 `best.json`，可直接用 `--config` 复用。
+
+用保存在 `checkpoints/hpo/gdem/cora_r0.5/best.json` 的最优参数重放：
+
+```bash
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 \
+  --config ./checkpoints/hpo/gdem/cora_r0.5/best.json --save_path ./checkpoints
+```
+
+使用 `--hpo_space path/to/space.json` 指定自定义网格：键为方法参数名，列表为候选值（[搜索空间格式](graphslim/configs/hpo/README.md)）。
 
 ## 复现基准
 

@@ -37,7 +37,7 @@ extension wheels for your GPU and CUDA runtime.
 
 [Quick start](#quick-start) · [Architecture](#architecture) ·
 [Reproduction coverage](#reproduction-coverage) · [Clustering acceleration](#clustering-acceleration) ·
-[HPO](#hyperparameter-optimization-hpo) · [Methods](#methods)
+[HPO](#search-a-methods-settings) · [Methods](#methods)
 
 ## Architecture
 
@@ -394,6 +394,8 @@ python -m graphslim.run_eval -D cora -W -G -1
 python -m graphslim.train_all --help
 ```
 
+## Command-line options
+
 Installed commands: `graphslim-train`, `graphslim-eval`, `graphslim-doctor`, and `graphslim-visualize`.
 `--run_reduction N` uses consecutive seeds for N reductions; `--run_eval N`
 controls downstream evaluation repetitions. `--run_reduction 0` evaluates a saved
@@ -401,33 +403,7 @@ graph, and `-W` evaluates the whole graph. Method JSON defaults load before expl
 CLI overrides. `--agg` (also `--aggpreprocess`) selects an aggregated variant where
 available.
 
-### Hyperparameter optimization (HPO)
-
-Search reduction-method settings using **mean validation accuracy only**.
-For example, GDEM ships a search space:
-
-```bash
-python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 --hpo --save_path ./checkpoints
-```
-
-Use `--hpo_space path/to/space.json` for a custom grid. Each key is a method
-setting and each list contains its candidate values. For a method without a
-shipped grid, the first invocation writes a one-point template to widen.
-The command previews the grid and requests confirmation; `--hpo_yes` starts it
-directly. Rerunning the same command resumes from `trials.jsonl`.
-
-The winning settings are saved to `checkpoints/hpo/gdem/cora_r0.5/best.json`:
-
-```bash
-python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 \
-  --config ./checkpoints/hpo/gdem/cora_r0.5/best.json --save_path ./checkpoints
-```
-
-HPO computes validation scores during search; the replay command evaluates the
-selected configuration. `--hpo_eval_runs` controls validation fits per trial
-(default: 3). [Search-space format](graphslim/configs/hpo/README.md).
-
-### Examples
+## Examples
 
 Each example uses the same pipeline and loads defaults for its selected method.
 
@@ -440,7 +416,7 @@ python -m examples.train_gcond -G -1
 Direct execution such as `python examples/train_gcond.py --help` also works from
 any directory. Importing an example does not launch training.
 
-### Package API
+## Package API
 
 ```python
 from graphslim.config import get_args
@@ -536,18 +512,29 @@ options take precedence. Public imports include `CGC`, `ClustGDD`, `GCGP` from
 
 The fixed reproduction artifact records the settings adopted for each historical pair.
 For a new dataset or method, `--hpo`
-grid-searches the reduction settings themselves with validation-only selection:
+grid-searches the reduction settings themselves and selects them by **mean validation accuracy only**.
+For example, GDEM ships a search space:
 
 ```bash
-python -m graphslim.train_all -D yelp -M gdem -R 0.001 -G 0 --hpo --save_path ./checkpoints
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 --hpo --save_path ./checkpoints
 ```
 
 It prints the search space (from `--hpo_space`, else `graphslim/configs/hpo/<method>.json`,
 else a one-point template written under `save_path/hpo/` for you to widen), the number of
 trials and a time estimate, then asks for confirmation (`--hpo_yes` skips it). Every trial
-reduces the graph and scores it by the mean validation accuracy of `--hpo_eval_runs` downstream
+reduces the graph and scores it by the mean validation accuracy of `--hpo_eval_runs` (default 3) downstream
 fits (`--eval_model`, GCN by default); no test score is computed. Finished trials are appended to `trials.jsonl`, so an
 interrupted search resumes, and the winner lands in `best.json` for `--config`.
+
+Replay the winning settings saved in `checkpoints/hpo/gdem/cora_r0.5/best.json`:
+
+```bash
+python -m graphslim.train_all -D cora -M gdem -R 0.5 -G 0 \
+  --config ./checkpoints/hpo/gdem/cora_r0.5/best.json --save_path ./checkpoints
+```
+
+Use `--hpo_space path/to/space.json` for a custom grid: each key is a method setting and
+each list contains its candidate values ([search-space format](graphslim/configs/hpo/README.md)).
 
 ## Reproduce the benchmark
 
