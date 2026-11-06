@@ -56,7 +56,7 @@ The added TSpanner/Yelp pair uses AP matched to the revised GC4NC tables;
 Other Yelp AP results remain outside this roster.
 
 **110/110 declared method–dataset pairs completed all declared settings.**
-**108/110 (98.18%)** meet a mean one-sided relative shortfall below 5%;
+**107/110 (97.27%)** meet a mean one-sided relative shortfall below 5%;
 **110/110 (100.00%)** meet a mean one-sided relative shortfall below 10%.
 The fixed roster spans **17 methods and 7 datasets**, with equal weight per pair.
 Pairs without documented numerical references are excluded.
@@ -71,8 +71,8 @@ Each column is cumulative for the same **110 pairs with documented numerical ref
 
 | Criterion | <1% | <2% | <5% | <10% |
 | --- | ---: | ---: | ---: | ---: |
-| One-sided relative shortfall | 64/110 (58.18%) | 84/110 (76.36%) | 108/110 (98.18%) | 110/110 (100.00%) |
-| Two-sided relative error | 39/110 (35.45%) | 64/110 (58.18%) | 98/110 (89.09%) | 103/110 (93.64%) |
+| One-sided relative shortfall | 65/110 (59.09%) | 85/110 (77.27%) | 107/110 (97.27%) | 110/110 (100.00%) |
+| Two-sided relative error | 39/110 (35.45%) | 64/110 (58.18%) | 96/110 (87.27%) | 103/110 (93.64%) |
 
 <!-- reproduction-coverage:end -->
 
@@ -97,13 +97,14 @@ generated their GC4NC references ([reasons and fresh scores](benchmark/results/r
 The [pair-level snapshot](benchmark/results/reproduction_coverage_20261106.json) records all 110 pairs within the 17 × 7 combinations and their provenance.
 
 Excluding the four reused-observation comparisons leaves 106 numerical comparisons:
-one-sided <5% **104/106 (98.11%)**, <10% **106/106 (100.00%)**;
-two-sided <5% **94/106 (88.68%)**, <10% **99/106 (93.40%)**.
+one-sided <5% **103/106 (97.17%)**, <10% **106/106 (100.00%)**;
+two-sided <5% **92/106 (86.79%)**, <10% **99/106 (93.40%)**.
 
 [Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)
 contains 313 setting-level reference/reproduced scores, per-pair metrics,
 source hashes, author-confirmed reference corrections and both metrics.
 It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.
+Inductive K-Center and Herding settings on Flickr, Reddit and Yelp were rerun after a fix.
 Recompute offline with Python's standard library:
 
 ```bash
@@ -266,8 +267,8 @@ Whole graph: 70.70 ± 0.14.
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 40.69 ± 0.39 | 42.88 ± 0.29 | 42.63 ± 0.23 |
 | Node sparsification | Random | 41.22 ± 1.91 | 43.89 ± 0.45 | 44.04 ± 0.68 |
-| Node sparsification | Herding | 40.05 ± 1.49 | 42.63 ± 0.95 | 44.44 ± 0.45 |
-| Node sparsification | K-Center | 39.88 ± 2.36 | 42.35 ± 1.10 | 43.02 ± 0.69 |
+| Node sparsification | Herding | 39.90 ± 1.14 | 43.42 ± 0.77 | 43.11 ± 0.47 |
+| Node sparsification | K-Center | 39.68 ± 0.81 | 40.82 ± 0.72 | 42.24 ± 0.66 |
 | Edge sparsification | TSpanner³ | 47.18 ± 0.13 | 47.19 ± 0.16 | 47.18 ± 0.14 |
 | Coarsening | Averaging | 37.93 ± 0.31 | 37.76 ± 0.35 | 37.66 ± 0.34 |
 | Coarsening | VNG | 42.73 ± 0.76 | 41.86 ± 0.82 | 42.37 ± 1.03 |
@@ -290,7 +291,8 @@ Whole graph: 46.95 ± 0.19.
 | Family | Method | 0.05% | 0.10% | 0.20% |
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 39.87 ± 0.78 | 51.49 ± 1.15 | 56.83 ± 1.99 |
-| Node sparsification | Herding | 49.88 ± 4.41 | 58.71 ± 4.57 | 69.33 ± 1.92 |
+| Node sparsification | Herding | 48.75 ± 0.66 | 60.66 ± 1.94 | 73.40 ± 0.96 |
+| Node sparsification | K-Center | 41.88 ± 2.02 | 50.14 ± 3.38 | 58.59 ± 3.07 |
 | Edge sparsification | TSpanner³ | 94.01 ± 0.04 | 93.99 ± 0.03 | 94.00 ± 0.05 |
 | Coarsening | Averaging | 88.29 ± 0.06 | 88.43 ± 0.09 | 88.41 ± 0.07 |
 | Condensation | GEOM² | 90.63 ± 0.2 | 91.33 ± 0.1 | 91.03 ± 0.3 |
@@ -311,8 +313,8 @@ Whole graph: 93.99 ± 0.05.
 | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | 50.23 ± 0.53 | 46.08 ± 0.00 | 46.08 ± 0.00 |
 | Node sparsification | Random | 46.10 ± 0.05 | 47.74 ± 1.05 | 49.21 ± 2.60 |
-| Node sparsification | Herding | 46.13 ± 0.07 | 46.43 ± 0.39 | 47.00 ± 0.35 |
-| Node sparsification | K-Center | 46.45 ± 0.26 | 48.30 ± 0.30 | 48.42 ± 0.64 |
+| Node sparsification | Herding | 46.87 ± 0.91 | 47.77 ± 1.08 | 49.87 ± 1.47 |
+| Node sparsification | K-Center | 46.47 ± 0.35 | 47.48 ± 0.25 | 48.90 ± 1.00 |
 | Edge sparsification | TSpanner³ | 47.50 ± 0.26 | 47.50 ± 0.23 | 47.54 ± 0.13 |
 | Coarsening | Averaging | 53.42 ± 0.86 | 53.79 ± 0.35 | 53.83 ± 0.35 |
 | Coarsening | VNG | 46.08 ± 0.00 | 46.08 ± 0.00 | 46.08 ± 0.00 |
@@ -331,7 +333,7 @@ Whole graph: 47.43 ± 0.22.
 ³ The published GC4NC benchmark reports no value for these cells; GraphSlim measurements under the same protocol are shown without a published comparison.
 CentP and GDEM are not compared with published values: defects fixed after 1.3.1 also affected the implementation behind their GC4NC references ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)).
 
-Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed, Reddit); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
+Rows more than 3 points from the paper on average are omitted: VN (Citeseer, Cora, Pubmed); GCSNTK (Citeseer, Pubmed); MSGC (Citeseer, Reddit, Yelp); Random (Cora, Reddit); Herding (Cora); ClustGDD (Cora); K-Center (Pubmed); TSpanner (Pubmed); VNG (Arxiv, Reddit); GCond (Arxiv); SGDD (Reddit). Runs that failed: GCSNTK (Arxiv, Flickr, Reddit, Yelp); SGDD (Arxiv); VN (Flickr, Yelp).
 
 <!-- reproduction-results:end -->
 

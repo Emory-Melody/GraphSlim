@@ -1,6 +1,6 @@
 {
   "source": "benchmark/results/reproduction_coverage_20261106.json",
-  "source_sha256": "6d9cf83de30995733c9ee859629fe327c7aa428593448ba013b25d1dd46fb897",
+  "source_sha256": "b6ac12e1af1d0b4045f8f2984e7bf079e39b949727be7b82340a3badea2572f9",
   "renderer_sha256": "a273bbb1c6470cd68aa2f954e8c4d28a8d75c2d1a08bd149535c6400dc2d6a75",
   "as_of_utc": "2026-11-06T00:00:00+00:00",
   "scope": "110 unique method x dataset pairs across 17 methods and 7 datasets: the 124-pair roster of 2026-11-03 without CentP and GDEM.",
@@ -19,7 +19,7 @@
       "lower_inclusive": 0,
       "upper_exclusive": 1,
       "label": "Measured shortfall <1%",
-      "count": 64,
+      "count": 65,
       "pairs": [
         "averaging/citeseer",
         "averaging/cora",
@@ -58,6 +58,7 @@
         "herding/citeseer",
         "herding/cora",
         "herding/pubmed",
+        "herding/reddit",
         "kcenter/citeseer",
         "kcenter/cora",
         "kcenter/pubmed",
@@ -123,7 +124,7 @@
       "lower_inclusive": 2,
       "upper_exclusive": 5,
       "label": "Measured shortfall 2\u2013<5%",
-      "count": 24,
+      "count": 22,
       "pairs": [
         "cent_d/yelp",
         "cgc/flickr",
@@ -136,9 +137,7 @@
         "doscond/yelp",
         "gcond/yelp",
         "herding/flickr",
-        "herding/reddit",
         "herding/yelp",
-        "kcenter/flickr",
         "msgc/citeseer",
         "msgc/reddit",
         "random/flickr",
@@ -157,10 +156,11 @@
       "lower_inclusive": 5,
       "upper_exclusive": 10,
       "label": "Measured shortfall 5\u2013<10%",
-      "count": 2,
+      "count": 3,
       "pairs": [
         "gcsntk/citeseer",
-        "gcsntk/flickr"
+        "gcsntk/flickr",
+        "kcenter/flickr"
       ],
       "color": "#D4DDFF"
     }
@@ -169,49 +169,49 @@
     {
       "threshold_percent": 1,
       "segment_counts": [
-        64,
+        65,
         0,
         0,
         0
       ],
-      "measured_count": 64,
-      "count": 64,
+      "measured_count": 65,
+      "count": 65,
       "denominator": 110,
-      "percent": 58.18181818181818
+      "percent": 59.09090909090909
     },
     {
       "threshold_percent": 2,
       "segment_counts": [
-        64,
+        65,
         20,
         0,
         0
       ],
-      "measured_count": 84,
-      "count": 84,
+      "measured_count": 85,
+      "count": 85,
       "denominator": 110,
-      "percent": 76.36363636363636
+      "percent": 77.27272727272727
     },
     {
       "threshold_percent": 5,
       "segment_counts": [
-        64,
+        65,
         20,
-        24,
+        22,
         0
       ],
-      "measured_count": 108,
-      "count": 108,
+      "measured_count": 107,
+      "count": 107,
       "denominator": 110,
-      "percent": 98.18181818181819
+      "percent": 97.27272727272727
     },
     {
       "threshold_percent": 10,
       "segment_counts": [
-        64,
+        65,
         20,
-        24,
-        2
+        22,
+        3
       ],
       "measured_count": 110,
       "count": 110,
@@ -222,8 +222,8 @@
   "outside_largest_threshold": [],
   "interpretation": "Each column is cumulative for the same roster of documented numerical comparisons. Measured ranges are disjoint; missing references and completion credits are excluded. Eight added GC4NC pairs reuse the archived observations reported by the revised reference tables; they are not independent replication runs.",
   "assets_sha256": {
-    ".svg": "3e240ae2ec85b3ea5cc761224457679397b64fa68f99539c5f412cec667de9ab",
-    ".png": "82c830574dd84a87d1f65b125174758e111ff17da6fc5771a9348b331d7ed123",
-    ".pdf": "704652010405d33291063bf10af720509cc0cdf9d680e522dcb272dfddd7eddb"
+    ".svg": "3965fff9fd7807d3316773ddc25e1df3763264f1a95e7491f9b77d7e6e531db0",
+    ".png": "4d540781b905893fa7c60ff5bdfb689cecaae6bf2343f3c7dbad1d0e3a62b04e",
+    ".pdf": "131b75f1c8bd58b7077ee2c18e68b42cbab493ee088034196e122c74818e0341"
   }
 }

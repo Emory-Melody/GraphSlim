@@ -23,6 +23,13 @@
         "t_spanner",
         "gdem"
       ]
+    },
+    {
+      "run": "runs/rerun_coreset_ind_20261106",
+      "methods": [
+        "kcenter",
+        "herding"
+      ]
     }
   ],
   "threshold": 3.0,
@@ -6276,22 +6283,22 @@
       "label": "0.10",
       "paper": 42.8,
       "paper_text": "42.80\u00b10.1",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 40.0465,
-      "std": 1.4893,
+      "mean": 39.9041,
+      "std": 1.1397,
       "n": 30,
       "reduced_nodes": [
         41,
         41,
         41
       ],
-      "seconds": 37.7,
+      "seconds": 52.8,
       "result_sha256": [
-        "be39ae258db54b9493cffafac0c8ae8bb89034f3ad82cf37d5ad375175d11094",
-        "5bf448e256830729e55a5ec519a322ba43863b5a14d0b095216697f669bc71eb",
-        "5e808209afe934a188b619a6f4acc94b796866663d60d29d61f648ec65d6bd56"
+        "20fa539db019aae2804d1f6f9dcbeb147fa48f98429df6c412158968e78b933f",
+        "ab3fce227e815b28a5661610129d5be595f205cdb33f0ea163e965a0e1c0d61d",
+        "15bf8c6e179f9b3a95dd072ea8ad68796d0dcaa18d89b77c9f9565e105d34cfa"
       ]
     },
     {
@@ -6301,22 +6308,22 @@
       "label": "0.50",
       "paper": 43.86,
       "paper_text": "43.86\u00b10.5",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 42.6261,
-      "std": 0.9545,
+      "mean": 43.4233,
+      "std": 0.7747,
       "n": 30,
       "reduced_nodes": [
         220,
         220,
         220
       ],
-      "seconds": 35.9,
+      "seconds": 42.9,
       "result_sha256": [
-        "e589f8361758dcb411f28d4b8cbb944fd6d3c297acbabd9b9e1607a620de9c33",
-        "5dcabc925e601bcead73c0659fdddd0dc2b543659e12847f0443fbaadf09e6da",
-        "a89224639bb91adc2056148197a26b4635f524db021440e09b150ed460449f1d"
+        "710df9ac84f1578c1d5e10245c24e586d23a11aa3c0acb256931fdd43440635b",
+        "f0166574f55a23571b2dfa013129285bbdc2b20b8d84f1ce1fdaa79180a7701c",
+        "8efc808d092b0aed4d56016ebb864e9053db6d15605d47798aaf5a96007b12b4"
       ]
     },
     {
@@ -6326,22 +6333,22 @@
       "label": "1.00",
       "paper": 45.12,
       "paper_text": "45.12\u00b10.4",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 44.4417,
-      "std": 0.45,
+      "mean": 43.107,
+      "std": 0.4668,
       "n": 30,
       "reduced_nodes": [
         444,
         444,
         444
       ],
-      "seconds": 41.5,
+      "seconds": 51.5,
       "result_sha256": [
-        "9a703fd07b80a7b71f7ee68216890fc8836b828d9506801e9d568c83e885a902",
-        "efcde7874e4a8c72e523d2c0679cf2c0e19da60a6fcac1cc9e5e0dd4ec67112b",
-        "69bae37b2b7118dbe00115f6315e87a04ec38401a7446ded2eb0d41eca4e4862"
+        "0d5121de15ea81dcbb8ff05a67c929cc884cb04f339bab05a37286caad8ed56a",
+        "3b4ef5a895e71394cb45053c677ff2db8ada36c71d8f38fcd74e74b19b5782d1",
+        "d9bbc191ba30f42aafa869c2b9a14d49d1a341be367dac7ac78956bf9541678f"
       ]
     },
     {
@@ -6351,22 +6358,22 @@
       "label": "0.10",
       "paper": 43.01,
       "paper_text": "43.01\u00b10.5",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 39.8775,
-      "std": 2.3566,
+      "mean": 39.6787,
+      "std": 0.8076,
       "n": 30,
       "reduced_nodes": [
         41,
         41,
         41
       ],
-      "seconds": 35.4,
+      "seconds": 56.7,
       "result_sha256": [
-        "acfffb1111cff27338939cca27c7f283f0b5322848c2667666bd31249c11ec49",
-        "1aeaec13663df39b1c511fa3847dd4cabaee50b9a44423e1baa15d3746474a28",
-        "adcf308e63acc4add8bb189be126be4cb4851d9501f97db33fddbbdadf31fc2d"
+        "6aa3c0875d9e4f6fbf7aa290c0e02d7823c8f08cd34cb2d9c507a2fd8fd83be2",
+        "9a79dad50a8541049ca57a2cfdd5b24b5222f748aab3310e930bdd8214836cba",
+        "e6b020388927485aded38970791bc94f60efb96148f129ca057caf52bed64374"
       ]
     },
     {
@@ -6376,22 +6383,22 @@
       "label": "0.50",
       "paper": 43.46,
       "paper_text": "43.46\u00b10.8",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 42.3509,
-      "std": 1.1033,
+      "mean": 40.8222,
+      "std": 0.7195,
       "n": 30,
       "reduced_nodes": [
         220,
         220,
         220
       ],
-      "seconds": 42.4,
+      "seconds": 50.2,
       "result_sha256": [
-        "926871fbb36821987fe81e238da2af5d7f7fe21925025ce121ee4b432ebfb45d",
-        "c6ba5be564388dac1d65ae2855fedacaeaf74a8e25f6b402b9f07b5a4decc6d2",
-        "d144997609b26b6d9af7cb5692801b9ab570929f0a663516661b2183f51bdb10"
+        "665aef74dc28f8b34bbe6e6ef942f3a9370a88fb5a5939f835547f53fb2ee4c4",
+        "f708ad4cc7f76922725aa6f561b4ee7b5bf6f98502e5a685e6d56af1b4f63da0",
+        "17020feda33e3c45a943b67f27414804d46b70b84399d3b960fe074e7e24b7ef"
       ]
     },
     {
@@ -6401,22 +6408,22 @@
       "label": "1.00",
       "paper": 43.53,
       "paper_text": "43.53\u00b10.6",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 43.025,
-      "std": 0.6945,
+      "mean": 42.2413,
+      "std": 0.6554,
       "n": 30,
       "reduced_nodes": [
         444,
         444,
         444
       ],
-      "seconds": 37.6,
+      "seconds": 53.8,
       "result_sha256": [
-        "8b60a200ad5a33e5dfabb9bb36e67c4822fd633f7c173d7649655226db4d19e6",
-        "97da7a99f10fa4353f049e9391fafd62c7aecb60878f420d223ad22cc409d933",
-        "7c8e49f1f684d7afd2934a3bb1b6d7796de00383facf554f2fff4c2a4809283a"
+        "ef2919c83ff48f2ef7b0038407fec7aae33a54c7cf6158948a2b0723d92abb4b",
+        "84cd9734c1735be84f28c7a2238ab1356c6542925090a1b5a65acf3c9e1694fa",
+        "435945ab1db95b812b86326b5a474c65e40400fb6b11b116c4f1425bb015cb33"
       ]
     },
     {
@@ -7611,22 +7618,22 @@
       "label": "0.05",
       "paper": 46.88,
       "paper_text": "46.88\u00b10.4",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 49.8771,
-      "std": 4.4086,
+      "mean": 48.7531,
+      "std": 0.6614,
       "n": 30,
       "reduced_nodes": [
         69,
         69,
         69
       ],
-      "seconds": 140.9,
+      "seconds": 333.6,
       "result_sha256": [
-        "6327983672f948d4ba519f494750c542fb48b648a36fb240008dc9a7a59e44b8",
-        "71f3d2c9934b70efebba614fbae68d740f00114708c036b21c9e14eed41f5f48",
-        "52ac27960029782bbd7e0489cde8ccd360315c3575bc331d295c6f8d267a771c"
+        "361b3c24cb614e6c2def1e0b16393e7555b2b1d83f3f81b3578ab8b0ee0add1f",
+        "d5f5d42b6507559a3791e38f6100ab3d7649de9db956ebbcc67acd3db9c6619d",
+        "6392b55993b00f9598a914329717066c39e584b80dcb39acd62d39463bd0f3bf"
       ]
     },
     {
@@ -7636,22 +7643,22 @@
       "label": "0.10",
       "paper": 59.34,
       "paper_text": "59.34\u00b10.7",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 58.7096,
-      "std": 4.5747,
+      "mean": 60.6607,
+      "std": 1.94,
       "n": 30,
       "reduced_nodes": [
         138,
         138,
         138
       ],
-      "seconds": 148.9,
+      "seconds": 360.7,
       "result_sha256": [
-        "ed204f5df74339a43d121dd77ce0f479df88267f3c86c27662417e50dc7ccb5d",
-        "d4a31f47bb483d4f3a37282c39248d6baeaffc3b204590074a1707f79377263d",
-        "3085b8d54ca76f9d9069c826528bbb05b9fdb80b93742d15f153b901396557ff"
+        "93271015e12b317655a143300a744031996c15cb5e9f38697701300ce865be32",
+        "9b13bca4bb2c13780fec5574cb9891618c9a78c6c5d12055a3ec2bd14d3fe4b7",
+        "ace04df159eb7f887a1ef686b25bddf6b52df4349d4ff0e4c4b8766f1168031f"
       ]
     },
     {
@@ -7661,22 +7668,22 @@
       "label": "0.20",
       "paper": 73.46,
       "paper_text": "73.46\u00b10.5",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 69.3269,
-      "std": 1.9222,
+      "mean": 73.3964,
+      "std": 0.9628,
       "n": 30,
       "reduced_nodes": [
         288,
         288,
         288
       ],
-      "seconds": 169.3,
+      "seconds": 363.1,
       "result_sha256": [
-        "08060c02266a8419a8b5318df96fc55a6c41f03c8750c0069e11f3de51663b0a",
-        "4b8813f77518c016365b829e907846505b7491913ec7e63bb0761ea91ccd95d8",
-        "0f3d9cff7fbe2fb6a74f9d2f92e7aa0789bfa6b1c898afbb170562e22ed0a55a"
+        "116a391f8b9cc5c562a9dc88d2ec0f038723fe8a4c224ddf6b8ff97ccc328113",
+        "00a94dcccbe83a2e4c4c37f47f6606e6f1949cf62a7cde48569c3059f6ccc28b",
+        "604c2082837a360e76a1de901d028f566b665716b79473291ee48c9146565f6e"
       ]
     },
     {
@@ -7686,22 +7693,22 @@
       "label": "0.05",
       "paper": 40.24,
       "paper_text": "40.24\u00b10.8",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 43.4416,
-      "std": 1.5868,
+      "mean": 41.8768,
+      "std": 2.015,
       "n": 30,
       "reduced_nodes": [
         69,
         69,
         69
       ],
-      "seconds": 180.7,
+      "seconds": 293.0,
       "result_sha256": [
-        "112c3c963908c630170d865ccba47fa1a037eb84694e9e51198a4b19f4ebb31c",
-        "c3d62125c21a782b3ccc41342a501766ff59be474c5dabdf6a38b3a4168ec4c7",
-        "7541a6b014d624ee0e8302c9720ac2a8830b2be4ad8a5034bc5a8ab71060560b"
+        "eaa083bb5ba146d1f118ef1aa224fc67b8b796e5b72bdde3b0bf8ff3fba1bd10",
+        "029f05632fef2db1fc5a70cdb305fdd054c4f5a65056b247b1440fa1b47a6993",
+        "4301dd425a9a61e594b794934cc4751973a7d9852dace63df138a32bfe66385d"
       ]
     },
     {
@@ -7711,22 +7718,22 @@
       "label": "0.10",
       "paper": 48.28,
       "paper_text": "48.28\u00b10.7",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 59.3224,
-      "std": 2.0536,
+      "mean": 50.1384,
+      "std": 3.3791,
       "n": 30,
       "reduced_nodes": [
         138,
         138,
         138
       ],
-      "seconds": 173.9,
+      "seconds": 286.6,
       "result_sha256": [
-        "be6a04a86c001b427a5e46eaea6fed0316bda6a0ba0d6eb2a51e5e1d47f1d374",
-        "a325a5ae38f8d60a7ff7b1620987a5c95733f8699b781368a61ac003f7b3a893",
-        "615244d63bd1fa2890240b29e9685320d03ad0c9b3f46dbc99f15f8a180e139b"
+        "8a147cad22a0b3e399879f0aba154bb10904c24ffee4b5dbcf3c3599cfebbd93",
+        "5cd186508d285f03718a6f93fabb7a27a163dea229b83604712cb5ecb55ba6ae",
+        "b7801402a9df2129f22c915a34558d54adf5901207026fcc72456587651f1897"
       ]
     },
     {
@@ -7736,22 +7743,22 @@
       "label": "0.20",
       "paper": 56.81,
       "paper_text": "56.81\u00b11.7",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 67.5456,
-      "std": 2.0373,
+      "mean": 58.5913,
+      "std": 3.0708,
       "n": 30,
       "reduced_nodes": [
         288,
         288,
         288
       ],
-      "seconds": 161.4,
+      "seconds": 177.8,
       "result_sha256": [
-        "334c7af1eb030f43402f59332f2ce8ce93756c2ca24f1b4dbbace6ed4a7c6d31",
-        "10d03ac1ab776a3ed4b938d219afeab46e20f2cdd2f10cbcc0a60293ad8badc6",
-        "112d77bbf7b423d63631ea54b5ef61845478f66933474bb5da27897a237fa9d3"
+        "b00c7faab8cbed682d196e3d88c09f06d9829700ca2e6b5ec1955ffc4dbccdcb",
+        "b19f98c37d3647a1a0d29f81d83ae379fbcd3c62dd315e4927733a20fa6fb450",
+        "a5b08ea0470713422161ff5480b2d83dfc507937dc4876333f78981b9fd37ce7"
       ]
     },
     {
@@ -8721,22 +8728,22 @@
       "label": "0.05",
       "paper": 46.08,
       "paper_text": "46.08\u00b10.0",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 46.1263,
-      "std": 0.0655,
+      "mean": 46.8733,
+      "std": 0.9076,
       "n": 30,
       "reduced_nodes": [
         17,
         17,
         17
       ],
-      "seconds": 68.6,
+      "seconds": 82.3,
       "result_sha256": [
-        "032455fa3623d0a37c41c18c862e344f742c48427a122acc683a458dfda1b53a",
-        "ffb2a01789f9d21ca769cc24bb45bd2be1afcdd3ffcce64afdb11e1256eb80a9",
-        "0124bc7a6112781d03c6b617fe65507c72fbda855c0edffb3eb7c4d60704b52d"
+        "a2e3a221df941b5841319755dc2125551e0d44b70264e1fe9e0ae7d988a2d6c8",
+        "aa9131a0b557c0345f48c6581da28e9bd2dca1146a5eb90f720a931838003236",
+        "f6be5a18caba45a2a56663baae6c755149e964ae861dd7b8ebd9dfe5a76f7d6f"
       ]
     },
     {
@@ -8746,22 +8753,22 @@
       "label": "0.10",
       "paper": 52.23,
       "paper_text": "52.23\u00b10.3",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 46.4289,
-      "std": 0.3897,
+      "mean": 47.7666,
+      "std": 1.0774,
       "n": 30,
       "reduced_nodes": [
         36,
         36,
         36
       ],
-      "seconds": 72.7,
+      "seconds": 75.7,
       "result_sha256": [
-        "5938363f8f4fe1865485dcaf2b110eb2fba910d52573bdd18fc6472c7f62577d",
-        "67b3d615acf1260574ac4ce2f831beaa104c8e7a9d9806ca984e2c1314047b7c",
-        "78a6364588b1437dbce537ba9aaf0d87665cf019f9afd47670c9032543ccf1d7"
+        "d166be7876e1abe79760c6f1598c7c2cc40574a5516596ca61a6c69c6fedc2fb",
+        "67056700eacefda9c8190287898401d0769f4298c4fcb62f85039d2fd2881481",
+        "fac7ff030c0f2289835dc064a4952e34a5a81bccc82e619b6d0b96d6d6f43de0"
       ]
     },
     {
@@ -8771,22 +8778,22 @@
       "label": "0.20",
       "paper": 47.49,
       "paper_text": "47.49\u00b10.1",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 46.9975,
-      "std": 0.3456,
+      "mean": 49.8659,
+      "std": 1.471,
       "n": 30,
       "reduced_nodes": [
         72,
         72,
         72
       ],
-      "seconds": 68.0,
+      "seconds": 62.9,
       "result_sha256": [
-        "1602e5c757798de2bc25027d858d4bf5b333ce0d2955ba34da06bc7456c59add",
-        "c5cc0472a0aa23e2acc88f5adb8ceeff0b4f7fd7aba2bae79f9f35614c3384ad",
-        "337158f6395a930403ee38b76b23f4aff5b6a1192bbe14ec02ed726fa411795c"
+        "6fb1c69db63887dee9306f37a02b9350094a89352d969ec884fefe6aa8d966b4",
+        "d6e3da92b5708de7e767e846b1ea2715027a9459a752b4bd27e3d582afc19850",
+        "e7b92580e9c53cbb7879f2e72732268efa615046806521267fa251b554b8c2da"
       ]
     },
     {
@@ -8796,22 +8803,22 @@
       "label": "0.05",
       "paper": 46.07,
       "paper_text": "46.07\u00b10.0",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 46.4483,
-      "std": 0.2552,
+      "mean": 46.4681,
+      "std": 0.3454,
       "n": 30,
       "reduced_nodes": [
         17,
         17,
         17
       ],
-      "seconds": 72.9,
+      "seconds": 80.1,
       "result_sha256": [
-        "5824fb1cc3c582e1292986e9ad068294496e9cabfada9d7b7f8e56e9b0a58637",
-        "562bdc543c4dd761c04454db02607e5d93293b5b669bad439af2c41f9026741b",
-        "bfb90604ab7a9ee10a52c83d6fdfd2b0063204b52aab312cfc7e93d4f498a259"
+        "1a07e8963ac1f705dca3c7e4e0141ffc70bf2a341c3a8d478b228dcc13a4a5c4",
+        "c3882baaf24ee4d0151f5067d6ecaed9bcf7a8ebdbd4d97c2052aec28b98bb3d",
+        "ade59dd1e9bba60a355e68360487e224fbecd29b18672d27056eea58490022c0"
       ]
     },
     {
@@ -8821,22 +8828,22 @@
       "label": "0.10",
       "paper": 46.22,
       "paper_text": "46.22\u00b10.0",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 48.2976,
-      "std": 0.2999,
+      "mean": 47.4807,
+      "std": 0.2453,
       "n": 30,
       "reduced_nodes": [
         36,
         36,
         36
       ],
-      "seconds": 68.3,
+      "seconds": 69.4,
       "result_sha256": [
-        "1a38a1f278a944d4a57dd67c63260b3ac2b010c9bcc371ec8fb2848bcd6243d6",
-        "57e1d39d19154b8b6a64382c9476712800b8e0b9d0ee4da9e083123f8256708c",
-        "14b2dbd7303e140dadcaae83ca7b47b83cc86c0f3092bec57b5344d9069ae1aa"
+        "49bbd741e48fc75d0733b9fdb00a2e8c7b341ad92508257941343caba1a24097",
+        "994f5016658467fc3108d73ea733322e3c270017004ae1979921830028cd74db",
+        "4d2bc98e6a1683dc53ce307c5259024ba3f28289226c7dafe142cac0f311d1df"
       ]
     },
     {
@@ -8846,22 +8853,22 @@
       "label": "0.20",
       "paper": 46.85,
       "paper_text": "46.85\u00b10.2",
-      "run": "runs/table9_20261028",
-      "source_sha256": "67ccb2865f7d56febde164e4d7e21992354d124d8c9fdefb26f7624ac6579f4f",
+      "run": "runs/rerun_coreset_ind_20261106",
+      "source_sha256": "43f4b37dd3db0ecd4449559920565a4c90995f7baafaea3367cee0c20425a1d2",
       "status": "complete",
-      "mean": 48.4163,
-      "std": 0.6385,
+      "mean": 48.9017,
+      "std": 0.9965,
       "n": 30,
       "reduced_nodes": [
         72,
         72,
         72
       ],
-      "seconds": 68.8,
+      "seconds": 85.8,
       "result_sha256": [
-        "25ccfe0a5f1520697e7d163eda194039762198bc09ec7775d23da76ed33e599d",
-        "e94a75e58b6da3f8392669b584e9bb120d4adc15063dd0566aca04bf26ddd814",
-        "3ac2f776cce8888d5499e636d6de6b2d8328d10be62e76daee7e50e3a2c776c3"
+        "347f9bc9e8509a3164b1f9507e4487925fec66892f1ec1bcae1c8a7895cb8762",
+        "55d901306fab6ddeb3b86e49f0a8902c9d07723486a863ce4b3e641c47325049",
+        "7a4b8989871335617b5a2daf36486685d03fb233b9177ac3453f93de7f24a950"
       ]
     },
     {

@@ -5,6 +5,7 @@
     "cent_p",
     "gdem"
   ],
+  "replaced_settings": 15,
   "setting_count": 313,
   "pair_count": 110,
   "method_count": 17,
@@ -15,15 +16,15 @@
     "paper_110": {
       "mean_shortfall_percent": {
         "1": {
-          "count": 64,
+          "count": 65,
           "denominator": 110
         },
         "2": {
-          "count": 84,
+          "count": 85,
           "denominator": 110
         },
         "5": {
-          "count": 108,
+          "count": 107,
           "denominator": 110
         },
         "10": {
@@ -41,7 +42,7 @@
           "denominator": 110
         },
         "5": {
-          "count": 98,
+          "count": 96,
           "denominator": 110
         },
         "10": {
@@ -71,15 +72,15 @@
     "without_shared_observations_106": {
       "mean_shortfall_percent": {
         "1": {
-          "count": 60,
+          "count": 61,
           "denominator": 106
         },
         "2": {
-          "count": 80,
+          "count": 81,
           "denominator": 106
         },
         "5": {
-          "count": 104,
+          "count": 103,
           "denominator": 106
         },
         "10": {
@@ -97,7 +98,7 @@
           "denominator": 106
         },
         "5": {
-          "count": 94,
+          "count": 92,
           "denominator": 106
         },
         "10": {
@@ -128,15 +129,15 @@
   "uncorrected_table9_sensitivity": {
     "mean_shortfall_percent": {
       "1": {
-        "count": 63,
+        "count": 64,
         "denominator": 110
       },
       "2": {
-        "count": 83,
+        "count": 84,
         "denominator": 110
       },
       "5": {
-        "count": 107,
+        "count": 106,
         "denominator": 110
       },
       "10": {
@@ -154,7 +155,7 @@
         "denominator": 110
       },
       "5": {
-        "count": 96,
+        "count": 94,
         "denominator": 110
       },
       "10": {

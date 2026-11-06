@@ -165,13 +165,14 @@ def coverage_context(text, language, data):
         )
         reconciliation = (
             "Excluding the four reused-observation comparisons leaves 106 numerical comparisons:\n"
-            "one-sided <5% **104/106 (98.11%)**, <10% **106/106 (100.00%)**;\n"
-            "two-sided <5% **94/106 (88.68%)**, <10% **99/106 (93.40%)**.\n"
+            "one-sided <5% **103/106 (97.17%)**, <10% **106/106 (100.00%)**;\n"
+            "two-sided <5% **92/106 (86.79%)**, <10% **99/106 (93.40%)**.\n"
             "\n"
             "[Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)\n"
             "contains 313 setting-level reference/reproduced scores, per-pair metrics,\n"
             "source hashes, author-confirmed reference corrections and both metrics.\n"
             "It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.\n"
+            "Inductive K-Center and Herding settings on Flickr, Reddit and Yelp were rerun after a fix.\n"
             "Recompute offline with Python's standard library:\n"
             "\n"
             "```bash\n"
@@ -195,12 +196,13 @@ def coverage_context(text, language, data):
         )
         reconciliation = (
             "剔除 4 个复用观测的比较后，剩余 106 个有数值参照的组合：\n"
-            "单边短缺 <5% 为 **104/106（98.11%）**，<10% 为 **106/106（100.00%）**；\n"
-            "双边误差 <5% 为 **94/106（88.68%）**，<10% 为 **99/106（93.40%）**。\n"
+            "单边短缺 <5% 为 **103/106（97.17%）**，<10% 为 **106/106（100.00%）**；\n"
+            "双边误差 <5% 为 **92/106（86.79%）**，<10% 为 **99/106（93.40%）**。\n"
             "\n"
             "[固定结果产物](benchmark/results/reproducibility_20261106/README.md)\n"
             "保存 313 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。\n"
             "它内含未改动的 1.3.1 产物，并在去掉 CentP 和 GDEM 后重算全部统计。\n"
+            "Flickr、Reddit、Yelp 上归纳式 K-Center 与 Herding 的设置已在修复后重跑。\n"
             "仅用 Python 标准库即可离线重算：\n"
             "\n"
             "```bash\n"

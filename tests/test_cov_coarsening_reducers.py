@@ -38,6 +38,25 @@ def single_thread():
     torch.set_num_threads(previous)
 
 
+@pytest.fixture(autouse=True)
+def seeded_arpack_start(monkeypatch):
+    """Fix ARPACK's start vector so results do not depend on earlier eigsh calls.
+
+    Without ``v0``, ARPACK draws its start vector from an internal seed that advances
+    with every call in the process, so spectral coarsening varies with test order.
+    """
+    import scipy.sparse.linalg as linalg
+
+    original = linalg.eigsh
+
+    def eigsh(matrix, *args, **kwargs):
+        if kwargs.get("v0") is None:
+            kwargs["v0"] = np.random.default_rng(0).standard_normal(matrix.shape[0])
+        return original(matrix, *args, **kwargs)
+
+    monkeypatch.setattr(linalg, "eigsh", eigsh)
+
+
 def coarsen(method, graph, rate=0.5, strategy="greedy"):
     args = SimpleNamespace(device="cpu", reduction_rate=rate, coarsen_strategy=strategy)
     reducer = create_reducer(method, "trans", None, args)

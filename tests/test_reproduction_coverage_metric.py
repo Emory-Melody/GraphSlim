@@ -14,8 +14,8 @@ def test_shortfall_thresholds_preserve_the_frozen_roster():
     assert data["method_count"] == 17
     assert data["numeric_reference_pairs"] == 110
     assert [c["threshold_percent"] for c in data["columns"]] == [1, 2, 5, 10]
-    assert [c["count"] for c in data["columns"]] == [64, 84, 108, 110]
-    assert [c["measured_count"] for c in data["columns"]] == [64, 84, 108, 110]
+    assert [c["count"] for c in data["columns"]] == [65, 85, 107, 110]
+    assert [c["measured_count"] for c in data["columns"]] == [65, 85, 107, 110]
 
 
 def test_missing_references_never_enter_reproduction_counts():
@@ -32,7 +32,7 @@ def test_missing_references_never_enter_reproduction_counts():
 def test_paper_bilateral_errors_use_the_same_numerical_reference_roster():
     data = reviewed_data("mean_relative_gap_percent")
     assert data["total_pairs"] == 110
-    assert [c["count"] for c in data["columns"]] == [39, 64, 98, 103]
+    assert [c["count"] for c in data["columns"]] == [39, 64, 96, 103]
     assert len(data["outside_largest_threshold"]) == 7
     assert all(c["count"] == c["measured_count"] for c in data["columns"])
 
@@ -43,7 +43,24 @@ def test_roster_drops_only_centp_and_gdem_from_the_124_pair_parent():
     parent = json.loads((SOURCE.parents[2] / revision["parent_snapshot"]).read_text())
     excluded = {"cent_p", "gdem"}
     assert len(parent["pairs"]) == 124 and set(revision["reasons"]) == excluded
-    assert source["pairs"] == [p for p in parent["pairs"] if p["method"] not in excluded]
+    rerun = set(revision["reruns_after_fix"]["pairs"])
+    kept = [p for p in parent["pairs"] if p["method"] not in excluded]
+    assert [(p["method"], p["dataset"]) for p in source["pairs"]] == [
+        (p["method"], p["dataset"]) for p in kept
+    ]
+    assert [p for p in source["pairs"] if f"{p['method']}/{p['dataset']}" not in rerun] == [
+        p for p in kept if f"{p['method']}/{p['dataset']}" not in rerun
+    ]
+    assert rerun == {
+        f"{method}/{dataset}"
+        for method, dataset in [
+            ("herding", "flickr"),
+            ("herding", "reddit"),
+            ("herding", "yelp"),
+            ("kcenter", "flickr"),
+            ("kcenter", "yelp"),
+        ]
+    }
     removed = {(p["method"], p["dataset"]) for p in parent["pairs"] if p["method"] in excluded}
     assert {(p["method"], p["dataset"]) for p in revision["removed_pairs"]} == removed
     assert len(removed) == 14
@@ -55,7 +72,8 @@ def test_new_gc4nc_pairs_preserve_the_legacy_roster_and_shared_source_boundary()
     parent = json.loads((SOURCE.parents[2] / revision["parent_snapshot"]).read_text())
     legacy = json.loads((SOURCE.parents[2] / parent["cohort_expansion"]["parent"]).read_text())
     kept = [p for p in legacy["pairs"] if p["method"] not in ("cent_p", "gdem")]
-    assert source["pairs"][: len(kept)] == kept
+    keys = [(p["method"], p["dataset"]) for p in source["pairs"]]
+    assert keys[: len(kept)] == [(p["method"], p["dataset"]) for p in kept]
     added = source["pairs"][len(kept) :]
     assert {(p["method"], p["dataset"]) for p in added} == {
         ("t_spanner", dataset) for dataset in ["ogbn-arxiv", "flickr", "reddit", "yelp"]
@@ -114,9 +132,10 @@ def test_current_artifact_recomputes_the_110_pair_roster_from_the_unchanged_base
         313,
     )
     views = summary["cohort_results"]
-    assert views["paper_110"]["mean_shortfall_percent"]["5"]["count"] == 108
-    assert views["paper_110"]["mean_relative_gap_percent"]["5"]["count"] == 98
-    assert views["without_shared_observations_106"]["mean_shortfall_percent"]["5"]["count"] == 104
+    assert views["paper_110"]["mean_shortfall_percent"]["5"]["count"] == 107
+    assert views["paper_110"]["mean_relative_gap_percent"]["5"]["count"] == 96
+    assert views["without_shared_observations_106"]["mean_shortfall_percent"]["5"]["count"] == 103
+    assert summary["replaced_settings"] == 15
     snapshot = json.loads(SOURCE.read_text())
     for metric in ("mean_shortfall_percent", "mean_relative_gap_percent"):
         for threshold, expected in snapshot["thresholds"][metric].items():

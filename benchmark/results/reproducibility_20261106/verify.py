@@ -3,9 +3,10 @@
 
 The unchanged 1.3.1 artifact is embedded in ``base_20261105``. Its own verifier first
 checks every file hash and recomputes its 124-pair results. This verifier then drops
-the methods listed in ``exclusions.json`` and recomputes every count from the same
-setting-level scores. ``rerun_results.json`` records fresh scores of the excluded
-methods for transparency; it never enters a count.
+the methods listed in ``exclusions.json``, substitutes the rerun scores listed in
+``replacements.json`` (recomputed here from their stored test scores), and recomputes
+every count. ``rerun_results.json`` records fresh scores of the excluded methods for
+transparency; it never enters a count.
 """
 
 import argparse
@@ -45,10 +46,24 @@ def calculate(base):
         base_pairs = list(csv.DictReader(f))
     assert len(base_pairs) == 124
     kept_keys = [(p["method"], p["dataset"]) for p in base_pairs if p["method"] not in excluded]
+    replacements = load(base / "replacements.json")
+    substitute = {}
+    for record in replacements["records"]:
+        key = (record["method"], record["dataset"], record["setting"])
+        assert record["method"] not in excluded and key not in substitute
+        assert len(record["tests"]) == 30
+        value = 100 * statistics.mean(record["tests"])
+        assert abs(value - record["reproduced_percent"]) < 1e-9, key
+        substitute[key] = value
     grouped = {}
     for row in rows:
         if row["method"] not in excluded:
+            key = (row["method"], row["dataset"], row["setting"])
+            if key in substitute:
+                row = dict(row, reproduced_percent=substitute.pop(key))
             grouped.setdefault((row["method"], row["dataset"]), []).append(row)
+    assert not substitute, "Replacement without a matching base setting"
+    rerun = {(r["method"], r["dataset"]) for r in replacements["records"]}
     assert sorted(grouped) == sorted(kept_keys)
     derived, uncorrected = [], []
     for key in kept_keys:
@@ -75,6 +90,7 @@ def calculate(base):
             shared_observations_with_reference=all(
                 r["shared_observations_with_reference"] for r in settings
             ),
+            rerun_after_fix=key in rerun,
         )
         for i, metric in enumerate(parent.METRICS):
             pair[metric] = statistics.mean(v[i] for v in values)
@@ -93,6 +109,7 @@ def calculate(base):
         artifact_id="graphslim-reproducibility-20261106",
         base_artifact="graphslim-reproducibility-20261105",
         excluded_methods=sorted(excluded),
+        replaced_settings=len(replacements["records"]),
         setting_count=sum(len(v) for v in grouped.values()),
         pair_count=len(derived),
         method_count=len({p["method"] for p in derived}),
@@ -163,7 +180,8 @@ def main():
     print(
         f"Verified {summary['setting_count']} settings, {summary['pair_count']} pairs, "
         f"{summary['method_count']} methods and {summary['dataset_count']} datasets "
-        f"(excluded: {', '.join(summary['excluded_methods'])})."
+        f"(excluded: {', '.join(summary['excluded_methods'])}; "
+        f"{summary['replaced_settings']} settings rerun after fixes)."
     )
     names = {
         "mean_shortfall_percent": "one-sided shortfall",

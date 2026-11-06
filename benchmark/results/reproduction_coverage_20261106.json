@@ -62,19 +62,19 @@
  "thresholds": {
   "mean_shortfall_percent": {
    "1": {
-    "count": 64,
+    "count": 65,
     "denominator": 110,
-    "percent": 58.18181818181818
+    "percent": 59.09090909090909
    },
    "2": {
-    "count": 84,
+    "count": 85,
     "denominator": 110,
-    "percent": 76.36363636363636
+    "percent": 77.27272727272727
    },
    "5": {
-    "count": 108,
+    "count": 107,
     "denominator": 110,
-    "percent": 98.18181818181819
+    "percent": 97.27272727272727
    },
    "10": {
     "count": 110,
@@ -94,9 +94,9 @@
     "percent": 58.18181818181818
    },
    "5": {
-    "count": 98,
+    "count": 96,
     "denominator": 110,
-    "percent": 89.0909090909091
+    "percent": 87.27272727272727
    },
    "10": {
     "count": 103,
@@ -491,7 +491,7 @@
    "reference_source": "GC4NC_Table9",
    "reference_status": "numeric_reference",
    "decision_basis": "measured_gap",
-   "evaluation_profile": "historical_frozen",
+   "evaluation_profile": "runs/rerun_coreset_ind_20261106",
    "declared_rates": [
     "0.001",
     "0.005",
@@ -500,9 +500,9 @@
    "complete_result": true,
    "at_least_one_rate_complete": true,
    "credited_by_policy": false,
-   "mean_shortfall_percent": 3.5833817345579364,
-   "mean_relative_gap_percent": 3.5833817345579364,
-   "mean_absolute_gap_pp": 1.555253887868055
+   "mean_shortfall_percent": 4.074435019726711,
+   "mean_relative_gap_percent": 4.074435019726711,
+   "mean_absolute_gap_pp": 1.7818781278477402
   },
   {
    "method": "herding",
@@ -510,7 +510,7 @@
    "reference_source": "GC4NC_Table9",
    "reference_status": "numeric_reference",
    "decision_basis": "measured_gap",
-   "evaluation_profile": "historical_frozen",
+   "evaluation_profile": "runs/rerun_coreset_ind_20261106",
    "declared_rates": [
     "0.0005",
     "0.001",
@@ -519,9 +519,9 @@
    "complete_result": true,
    "at_least_one_rate_complete": true,
    "credited_by_policy": false,
-   "mean_shortfall_percent": 2.2295471276355894,
-   "mean_relative_gap_percent": 4.360597976852299,
-   "mean_absolute_gap_pp": 2.5868600779910245
+   "mean_shortfall_percent": 0.02885703666756167,
+   "mean_relative_gap_percent": 2.1025794963102262,
+   "mean_absolute_gap_pp": 1.0857991269181444
   },
   {
    "method": "herding",
@@ -529,7 +529,7 @@
    "reference_source": "GC4NC_Table9",
    "reference_status": "numeric_reference",
    "decision_basis": "measured_gap",
-   "evaluation_profile": "historical_frozen",
+   "evaluation_profile": "runs/rerun_coreset_ind_20261106",
    "declared_rates": [
     "0.0005",
     "0.001",
@@ -538,9 +538,9 @@
    "complete_result": true,
    "at_least_one_rate_complete": true,
    "credited_by_policy": false,
-   "mean_shortfall_percent": 4.0479539412711585,
-   "mean_relative_gap_percent": 4.081468196167051,
-   "mean_absolute_gap_pp": 2.1133055249817736
+   "mean_shortfall_percent": 2.8485824177768215,
+   "mean_relative_gap_percent": 5.090094193189357,
+   "mean_absolute_gap_pp": 2.544216825399483
   },
   {
    "method": "kcenter",
@@ -624,7 +624,7 @@
    "reference_source": "GC4NC_Table9",
    "reference_status": "numeric_reference",
    "decision_basis": "measured_gap",
-   "evaluation_profile": "historical_frozen",
+   "evaluation_profile": "runs/rerun_coreset_ind_20261106",
    "declared_rates": [
     "0.001",
     "0.005",
@@ -633,9 +633,9 @@
    "complete_result": true,
    "at_least_one_rate_complete": true,
    "credited_by_policy": false,
-   "mean_shortfall_percent": 3.6650732908737074,
-   "mean_relative_gap_percent": 3.6650732908737074,
-   "mean_absolute_gap_pp": 1.5821867670565741
+   "mean_shortfall_percent": 5.591796484206848,
+   "mean_relative_gap_percent": 5.591796484206848,
+   "mean_absolute_gap_pp": 2.4192672931076538
   },
   {
    "method": "kcenter",
@@ -662,7 +662,7 @@
    "reference_source": "GC4NC_Table9",
    "reference_status": "numeric_reference",
    "decision_basis": "measured_gap",
-   "evaluation_profile": "historical_frozen",
+   "evaluation_profile": "runs/rerun_coreset_ind_20261106",
    "declared_rates": [
     "0.0005",
     "0.001",
@@ -672,8 +672,8 @@
    "at_least_one_rate_complete": true,
    "credited_by_policy": false,
    "mean_shortfall_percent": 0.0,
-   "mean_relative_gap_percent": 2.8864087783190815,
-   "mean_absolute_gap_pp": 1.340708313079477
+   "mean_relative_gap_percent": 2.657030096144718,
+   "mean_absolute_gap_pp": 1.2368438365967076
   },
   {
    "method": "t_spanner",
@@ -2614,6 +2614,19 @@
     "dataset": "yelp"
    }
   ],
-  "fresh_scores": "benchmark/results/reproducibility_20261106/rerun_results.json"
+  "fresh_scores": "benchmark/results/reproducibility_20261106/rerun_results.json",
+  "reruns_after_fix": {
+   "pairs": [
+    "herding/flickr",
+    "herding/reddit",
+    "herding/yelp",
+    "kcenter/flickr",
+    "kcenter/yelp"
+   ],
+   "settings": 15,
+   "run": "runs/rerun_coreset_ind_20261106",
+   "record": "benchmark/results/reproducibility_20261106/replacements.json",
+   "reason": "Inductive K-Center and Herding selected nodes from the wrong embedding rows before 6e3974a; all affected settings were rerun and replace their predecessors, including regressions."
+  }
  }
 }

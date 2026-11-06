@@ -28,6 +28,8 @@ SOURCES = [
     dict(run="runs/table9_lightweight_20261029", methods=["cgc", "clustgdd"]),
     # Cells GC4NC Table 9 leaves empty ("-"): GraphSlim measurements under the same protocol.
     dict(run="runs/table9_extra_cells_20261101", methods=["t_spanner", "gdem"]),
+    # Inductive K-Center and Herding rerun after the embedding-row fix (Flickr, Reddit, Yelp).
+    dict(run="runs/rerun_coreset_ind_20261106", methods=["kcenter", "herding"]),
 ]
 DATASETS = ("citeseer", "cora", "pubmed", "ogbn-arxiv", "flickr", "reddit", "yelp")
 RATES = {
