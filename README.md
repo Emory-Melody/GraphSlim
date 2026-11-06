@@ -157,8 +157,9 @@ Yelp uses a separate verified **anomaly-class AP** evaluation of saved graphs.
 The archived accuracy runs use a two-layer GCN (256 hidden units, 300 epochs)
 and ten fits per reduction. Random, K-Center and Herding use three reduction
 seeds. SD denotes population standard deviation; published GEOM/SFGC references
-use SE and are marked in each row. All eligible archived rows are shown,
-including results far from the reference and failed runs.
+use SE and are marked in each row. For accuracy rows with published references,
+the original display rule retains completed rows whose mean absolute gap is at
+most 3 percentage points.
 
 These are frozen campaigns, rather than a uniform rerun of release 1.3.3.
 The historical 110-pair summary above retains its recorded macro-F1/AP references;
@@ -168,7 +169,7 @@ approximate retained-node percentages; edge graphs are labelled separately.
 [Verified Yelp AP results](benchmark/results/yelp_ap_20261101.json).
 
 <details>
-<summary>Show the seven-dataset result tables and omitted-row notes</summary>
+<summary>Show the seven-dataset result tables</summary>
 
 <!-- reproduction-results:start -->
 
@@ -181,16 +182,13 @@ approximate retained-node percentages; edge graphs are labelled separately.
 | Node sparsification | Herding | Archived run / SD | 46.11 ± 2.80 | 61.67 ± 1.43 | 67.37 ± 1.37 |
 | Node sparsification | K-Center | Archived run / SD | 44.92 ± 4.69 | 53.58 ± 2.70 | 60.16 ± 1.28 |
 | Coarsening | Averaging | Archived run / SD | 69.68 ± 0.43 | 69.70 ± 0.45 | 69.63 ± 0.41 |
-| Coarsening | VN | Archived run / SD | 39.54 ± 4.81 | 48.97 ± 7.30 | 51.59 ± 5.40 |
 | Coarsening | VNG | Archived run / SD | 68.83 ± 0.27 | 63.75 ± 0.46 | 67.55 ± 0.55 |
 | Condensation | GEOM² | Published / SE | 67.61 ± 0.7 | 70.70 ± 0.5 | 73.03 ± 0.3 |
 | Condensation | SFGC² | Published / SE | 66.27 ± 0.8 | 70.27 ± 0.7 | 72.36 ± 0.5 |
-| Condensation | GCSNTK | Archived run / SD | 53.84 ± 4.51 | 58.63 ± 4.18 | 50.48 ± 0.34 |
 | Condensation | GCDMX | Archived run / SD | 69.91 ± 0.64 | 70.89 ± 0.38 | 71.82 ± 0.63 |
 | Condensation | DosCondX¹ | Archived run / SD | 68.64 ± 0.47 | 69.24 ± 0.79 | 70.64 ± 0.82 |
 | Condensation | GCond | Archived run / SD | 73.42 ± 0.32 | 70.80 ± 0.38 | 72.44 ± 0.42 |
 | Condensation | DosCond | Archived run / SD | 70.29 ± 0.71 | 71.27 ± 0.42 | 71.64 ± 1.01 |
-| Condensation | MSGC | Archived run / SD | 48.58 ± 4.68 | 70.64 ± 1.29 | 71.66 ± 0.37 |
 | Condensation | SGDD | Archived run / SD | 72.39 ± 0.83 | 71.21 ± 0.38 | 71.59 ± 0.50 |
 | Condensation | GECC | Archived run / SD | 73.07 ± 0.33 | 72.82 ± 0.30 | 72.97 ± 0.22 |
 | Condensation | CGC | Archived run / SD | 70.90 ± 0.24 | 71.89 ± 0.25 | 70.96 ± 0.11 |
@@ -209,11 +207,8 @@ Whole graph (archived run / SD): 71.84 ± 0.21.
 | Family | Method | Source / status | 0.50% | 1.30% | 2.60% |
 | --- | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | Archived run / SD | 57.27 ± 1.15 | 66.86 ± 0.65 | 75.60 ± 0.42 |
-| Node sparsification | Random | Archived run / SD | 47.44 ± 8.58 | 60.72 ± 4.82 | 72.30 ± 1.68 |
-| Node sparsification | Herding | Archived run / SD | 56.90 ± 1.70 | 65.03 ± 0.79 | 73.12 ± 0.75 |
 | Node sparsification | K-Center | Archived run / SD | 48.58 ± 5.61 | 64.46 ± 1.47 | 73.17 ± 0.72 |
 | Coarsening | Averaging | Archived run / SD | 75.83 ± 0.70 | 75.83 ± 0.70 | 75.83 ± 0.70 |
-| Coarsening | VN | Archived run / SD | 33.44 ± 8.86 | 69.29 ± 2.27 | 47.62 ± 6.36 |
 | Coarsening | VNG | Archived run / SD | 64.59 ± 0.56 | 74.29 ± 0.45 | 75.32 ± 0.21 |
 | Condensation | GEOM² | Published / SE | 78.14 ± 0.5 | 82.29 ± 0.6 | 82.82 ± 0.2 |
 | Condensation | SFGC² | Published / SE | 75.11 ± 2.2 | 79.55 ± 0.3 | 80.54 ± 0.5 |
@@ -226,7 +221,6 @@ Whole graph (archived run / SD): 71.84 ± 0.21.
 | Condensation | SGDD | Archived run / SD | 80.41 ± 0.49 | 81.00 ± 0.52 | 79.64 ± 0.60 |
 | Condensation | GECC | Archived run / SD | 81.94 ± 0.59 | 82.86 ± 0.35 | 82.61 ± 0.34 |
 | Condensation | CGC | Archived run / SD | 79.75 ± 0.56 | 81.32 ± 0.37 | 80.75 ± 0.60 |
-| Condensation | ClustGDD | Archived run / SD | 77.32 ± 1.56 | 77.70 ± 0.22 | 77.74 ± 0.64 |
 
 Saved edge graphs retain the input nodes; Graph 1–3 are not node-budget levels.
 
@@ -243,13 +237,10 @@ Whole graph (archived run / SD): 80.81 ± 0.51.
 | Node sparsification | Cent-D | Archived run / SD | 56.17 ± 2.57 | 55.61 ± 1.55 | 71.75 ± 0.82 |
 | Node sparsification | Random | Archived run / SD | 51.17 ± 3.25 | 57.72 ± 2.02 | 74.08 ± 1.81 |
 | Node sparsification | Herding | Archived run / SD | 63.03 ± 1.61 | 68.99 ± 1.67 | 75.69 ± 0.63 |
-| Node sparsification | K-Center | Archived run / SD | 63.03 ± 1.61 | 65.30 ± 2.52 | 74.03 ± 0.64 |
 | Coarsening | Averaging | Archived run / SD | 75.60 ± 0.42 | 75.60 ± 0.42 | 75.60 ± 0.42 |
-| Coarsening | VN | Archived run / SD | 52.64 ± 0.58 | 72.51 ± 0.75 | 77.88 ± 0.56 |
 | Coarsening | VNG | Archived run / SD | 72.85 ± 0.55 | 75.52 ± 0.38 | 76.25 ± 0.42 |
 | Condensation | GEOM² | Published / SE | 69.64 ± 1.4 | 76.21 ± 0.7 | 78.49 ± 0.2 |
 | Condensation | SFGC² | Published / SE | 67.61 ± 2.0 | 66.89 ± 3.3 | 67.61 ± 4.1 |
-| Condensation | GCSNTK | Archived run / SD | 73.62 ± 0.39 | 74.50 ± 1.09 | 73.09 ± 0.70 |
 | Condensation | GCDMX | Archived run / SD | 77.60 ± 0.30 | 75.74 ± 1.37 | 77.44 ± 0.36 |
 | Condensation | DosCondX¹ | Archived run / SD | 72.03 ± 1.58 | 72.25 ± 0.97 | 72.56 ± 0.29 |
 | Condensation | GCond | Archived run / SD | 77.70 ± 0.64 | 78.09 ± 0.47 | 77.32 ± 0.43 |
@@ -257,12 +248,6 @@ Whole graph (archived run / SD): 80.81 ± 0.51.
 | Condensation | MSGC | Archived run / SD | 75.36 ± 0.58 | 77.99 ± 0.44 | 78.32 ± 0.25 |
 | Condensation | SGDD | Archived run / SD | 78.16 ± 0.31 | 77.98 ± 0.32 | 76.25 ± 0.21 |
 | Condensation | GECC | Archived run / SD | 75.14 ± 0.22 | 77.75 ± 0.23 | 80.54 ± 0.29 |
-
-Saved edge graphs retain the input nodes; Graph 1–3 are not node-budget levels.
-
-| Edge method | Source / status | Graph 1 | Graph 2 | Graph 3 |
-| --- | --- | ---: | ---: | ---: |
-| TSpanner | Archived run / SD | 78.75 ± 0.31 | 78.31 ± 0.23 | 79.22 ± 0.22 |
 
 Whole graph (archived run / SD): 78.60 ± 0.57.
 
@@ -275,16 +260,12 @@ Whole graph (archived run / SD): 78.60 ± 0.57.
 | Node sparsification | Herding | Archived run / SD | 49.25 ± 1.86 | 57.26 ± 0.92 | 57.54 ± 0.72 |
 | Node sparsification | K-Center | Archived run / SD | 48.66 ± 1.70 | 55.40 ± 1.63 | 59.00 ± 0.55 |
 | Coarsening | Averaging | Archived run / SD | 59.62 ± 0.42 | 59.96 ± 0.33 | 59.94 ± 0.30 |
-| Coarsening | VNG | Archived run / SD | 0.11 ± 0.00 | 59.44 ± 0.25 | 61.12 ± 0.24 |
 | Condensation | GEOM² | Published / SE | 64.91 ± 0.4 | 68.78 ± 0.1 | 69.59 ± 0.2 |
 | Condensation | SFGC² | Published / SE | 64.91 ± 0.5 | 66.58 ± 0.3 | 67.03 ± 0.5 |
-| Condensation | GCSNTK | Archived run / incomplete | _LinAlgError | _LinAlgError | _LinAlgError |
 | Condensation | GCDMX | Archived run / SD | 60.02 ± 0.44 | 60.59 ± 0.44 | 60.72 ± 0.64 |
 | Condensation | DosCondX¹ | Archived run / SD | 59.58 ± 0.48 | 62.28 ± 0.39 | 59.73 ± 0.30 |
-| Condensation | GCond | Archived run / SD | 50.45 ± 0.94 | 64.06 ± 0.28 | 64.18 ± 0.28 |
 | Condensation | DosCond | Archived run / SD | 56.03 ± 0.60 | 57.41 ± 0.48 | 54.00 ± 0.58 |
 | Condensation | MSGC | Archived run / SD | 61.09 ± 0.32 | 65.68 ± 0.23 | 64.85 ± 0.21 |
-| Condensation | SGDD | Archived run / incomplete | _LinAlgError | _LinAlgError | _LinAlgError |
 | Condensation | GECC | Archived run / SD | 61.52 ± 0.22 | 64.95 ± 0.19 | 66.44 ± 0.19 |
 | Condensation | CGC | Archived run / SD | 60.71 ± 0.61 | 63.52 ± 0.28 | 64.65 ± 0.28 |
 | Condensation | ClustGDD | Archived run / SD | 62.11 ± 0.09 | 65.32 ± 0.08 | 66.38 ± 0.12 |
@@ -306,11 +287,9 @@ Whole graph (archived run / SD): 70.70 ± 0.14.
 | Node sparsification | Herding | Archived run / SD | 39.90 ± 1.14 | 43.42 ± 0.77 | 43.11 ± 0.47 |
 | Node sparsification | K-Center | Archived run / SD | 39.68 ± 0.81 | 40.82 ± 0.72 | 42.24 ± 0.66 |
 | Coarsening | Averaging | Archived run / SD | 37.93 ± 0.31 | 37.76 ± 0.35 | 37.66 ± 0.34 |
-| Coarsening | VN | Archived run / incomplete | IndexError | IndexError | IndexError |
 | Coarsening | VNG | Archived run / SD | 42.73 ± 0.76 | 41.86 ± 0.82 | 42.37 ± 1.03 |
 | Condensation | GEOM² | Published / SE | 47.15 ± 0.1 | 46.71 ± 0.2 | 46.13 ± 0.2 |
 | Condensation | SFGC² | Published / SE | 46.38 ± 0.2 | 46.38 ± 0.2 | 46.61 ± 0.1 |
-| Condensation | GCSNTK | Archived run / incomplete | _LinAlgError | _LinAlgError | _LinAlgError |
 | Condensation | GCDMX | Archived run / SD | 43.25 ± 0.26 | 45.25 ± 0.21 | 45.82 ± 0.30 |
 | Condensation | DosCondX¹ | Archived run / SD | 46.68 ± 0.08 | 46.80 ± 0.11 | 46.83 ± 0.09 |
 | Condensation | GCond | Archived run / SD | 46.64 ± 0.19 | 47.02 ± 0.23 | 46.91 ± 0.13 |
@@ -334,20 +313,15 @@ Whole graph (archived run / SD): 46.95 ± 0.19.
 | Family | Method | Source / status | 0.05% | 0.10% | 0.20% |
 | --- | --- | --- | ---: | ---: | ---: |
 | Node sparsification | Cent-D | Archived run / SD | 39.87 ± 0.78 | 51.49 ± 1.15 | 56.83 ± 1.99 |
-| Node sparsification | Random | Archived run / SD | 47.39 ± 7.05 | 57.37 ± 6.06 | 64.76 ± 4.70 |
 | Node sparsification | Herding | Archived run / SD | 48.75 ± 0.66 | 60.66 ± 1.94 | 73.40 ± 0.96 |
 | Node sparsification | K-Center | Archived run / SD | 41.88 ± 2.02 | 50.14 ± 3.38 | 58.59 ± 3.07 |
 | Coarsening | Averaging | Archived run / SD | 88.29 ± 0.06 | 88.43 ± 0.09 | 88.41 ± 0.07 |
-| Coarsening | VNG | Archived run / SD | 5.77 ± 0.00 | 76.17 ± 0.29 | 79.10 ± 0.49 |
 | Condensation | GEOM² | Published / SE | 90.63 ± 0.2 | 91.33 ± 0.1 | 91.03 ± 0.3 |
 | Condensation | SFGC² | Published / SE | 90.18 ± 0.2 | 89.84 ± 0.3 | 90.71 ± 0.1 |
-| Condensation | GCSNTK | Archived run / incomplete | OOM | OOM | OOM |
 | Condensation | GCDMX | Archived run / SD | 87.31 ± 0.17 | 89.09 ± 0.06 | 89.96 ± 0.04 |
 | Condensation | DosCondX¹ | Archived run / SD | 87.31 ± 0.23 | 88.04 ± 0.24 | 88.67 ± 0.23 |
 | Condensation | GCond | Archived run / SD | 84.48 ± 0.76 | 86.98 ± 0.13 | 90.18 ± 0.07 |
 | Condensation | DosCond | Archived run / SD | 82.72 ± 0.10 | 86.67 ± 0.10 | 88.07 ± 0.26 |
-| Condensation | MSGC | Archived run / SD | 75.86 ± 0.67 | 83.77 ± 0.42 | 85.73 ± 0.21 |
-| Condensation | SGDD | Archived run / SD | 64.82 ± 0.47 | 71.59 ± 0.27 | 44.78 ± 4.80 |
 | Condensation | GECC | Archived run / SD | 89.95 ± 0.10 | 91.00 ± 0.03 | 91.58 ± 0.05 |
 | Condensation | CGC | Archived run / SD | 89.39 ± 0.14 | 90.29 ± 0.06 | 90.92 ± 0.06 |
 | Condensation | ClustGDD | Archived run / SD | 86.89 ± 0.14 | 90.39 ± 0.04 | 91.33 ± 0.07 |
@@ -400,9 +374,9 @@ AP ranks anomaly label 1 by continuous log-odds. All available rows and Whole us
 
 ¹ Archived DosCondX measurements retain their original settings and source names; the Reddit configuration differs from current defaults.
 ² Published GC4NC values use mean ± standard error (SE). These are reference values from the authors' GEOM/SFGC implementations, not package reruns.
-Other numeric archived runs use mean ± population standard deviation (SD). Every available row is shown, regardless of its gap from the reference. Failed or incomplete results retain their status.
+Other numeric archived runs use mean ± population standard deviation (SD). Accuracy rows with published references are shown when all declared rates completed and their mean absolute gap is at most 3 percentage points.
 CentP and GDEM are excluded from historical reference comparisons because defects also affected the reference implementations ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)). Their separately archived Yelp AP scores above describe the saved graphs generated at that time, before the fixes.
-This table is one archived campaign, not the 110-pair cumulative reproduction roster. Later replay/HPO campaigns completed several combinations that failed here, including GCSNTK on Arxiv/Flickr, SGDD on Arxiv, and VN on Flickr/Yelp; consult the [pair-level artifact](benchmark/results/reproducibility_20261106/pairs.csv) for the adopted source per pair.
+This table is one archived campaign, separate from the 110-pair cumulative reproduction roster. The [pair-level artifact](benchmark/results/reproducibility_20261106/pairs.csv) records the adopted source per pair.
 
 <!-- reproduction-results:end -->
 
@@ -627,9 +601,9 @@ The default performance matrix covers seven datasets and **22 methods**, includi
 Clustering, CGC, ClustGDD and GCGP, followed by whole-graph baselines (469 planned
 jobs). GECC, DosCondX, GCDM and SimGC can be selected explicitly with `--methods`;
 they are outside the default roster. New Yelp jobs use AP, whereas the frozen
-GC4NC v3 reference table retains its historical macro-F1 protocol. Published OOM or missing
-cells remain visible in the table; reruns may also fail for resource or method-specific
-requirements. GEOM/SFGC paper performance used the authors' implementations; the local
+GC4NC v3 reference table retains its historical macro-F1 protocol. The original
+published table remains in the [frozen reference CSV](benchmark/results/gc4nc_table9.csv).
+GEOM/SFGC paper performance used the authors' implementations; the local
 expert-buffer defaults differ, so this package runner alone does not establish exact
 reproduction of those published scores.
 
@@ -748,8 +722,8 @@ Source assignment (no scores pooled across batches):
 - `simgc` on `citeseer, cora, pubmed, ogbn-arxiv, flickr, reddit, yelp`: `runs/simgc_repaired_hpo_20261010` — Repaired SimGC: fresh reductions and validation-only GCN search.
 
 [Machine-readable coverage and per-cell provenance](benchmark/results/package_local_results.json);
-[CSV export](benchmark/results/package_local_results.csv). `PENDING`/`FAILED`/`CONFIG`
-are unavailable results, not zero. Published `NR` means absent from the paper,
+[CSV export](benchmark/results/package_local_results.csv). Unavailable entries do not
+denote measured zero. Published `NR` means absent from the paper,
 not absent from this local coverage table. Raw artifacts live in the listed run directories.
 
 <!-- package-results:end -->

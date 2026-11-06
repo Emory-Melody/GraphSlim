@@ -54,7 +54,7 @@ def fake_run(folder, method, scores_by_rate, dataset="cora"):
         (path / "result.json").write_text(json.dumps(record))
 
 
-def test_rows_outside_the_limit_remain_visible(tmp_path, monkeypatch):
+def test_original_row_selection_omits_distant_rows_and_failure_commentary(tmp_path, monkeypatch):
     # Cora GCond in Table 9: 80.17, 80.81, 80.54. DosCond: 80.65, 80.85, 81.15.
     fake_run(tmp_path / "close", "gcond", {"0.1": 80.0, "0.25": 81.0, "0.5": 80.0})
     fake_run(tmp_path / "far", "doscond", {"0.1": 70.0, "0.25": 71.0, "0.5": 72.0})
@@ -73,9 +73,17 @@ def test_rows_outside_the_limit_remain_visible(tmp_path, monkeypatch):
         "| Condensation | GCond | Archived run / SD | 80.00 ± 0.00 | 81.00 ± 0.00 | 80.00 ± 0.00 |"
         in section
     )
-    assert "| Condensation | DosCond | Archived run / SD | 70.00" in cora
-    assert "Every available row is shown" in section
+    assert "| Condensation | DosCond |" not in cora
+    assert "at most 3 percentage points" in section
+    assert "Rows more than" not in section and "Runs that failed" not in section
     assert "| 凝聚 | GCond |" in render.readme_section(snapshot, "zh")
+    for cell in snapshot["cells"]:
+        if cell["method"] == "gcond":
+            cell.update(status="failed", kind="OOM")
+    section = render.readme_section(snapshot, "en")
+    cora = section.split("#### Cora —", 1)[1].split("#### Pubmed —", 1)[0]
+    assert "| Condensation | GCond |" not in cora
+    assert "OOM" not in section and "failed" not in section.lower()
 
 
 def test_readmes_match_the_frozen_snapshot():

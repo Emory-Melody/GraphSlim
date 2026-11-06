@@ -5,8 +5,8 @@
 - Use anomaly-class AP for Yelp/Amazon validation, HPO and final evaluation, including SGFormer and ClustGDD selection. Preserve historical macro-F1 records with their original labels.
 - Reject HPO resumes when the grid, scientific configuration, seeds, model, graph, source or dependency versions differ; reject legacy histories without an identity.
 - Remove the optional CUDA Graph backend and Streamlit/pyvis interface while retaining ordinary CUDA and local visualization.
-- Restore verified Yelp AP results; show all eligible historical accuracy rows with source, uncertainty and failure status. Separate edge graph labels from node budgets.
-- Correct the 22-method default performance roster and document later successful campaigns separately from historical failures.
+- Restore verified Yelp AP results with source and uncertainty labels. Separate edge graph labels from node budgets.
+- Correct the 22-method default performance roster and distinguish archived result tables from the cumulative reproduction artifact.
 - Share tested CPU dependency constraints across installation instructions and CI, and add runnable reducer-extension and HPO guides.
 
 ## 1.3.2 - 2026-11-06

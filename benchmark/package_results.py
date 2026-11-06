@@ -206,8 +206,8 @@ def render(cells, sources):
     lines += [
         "",
         "[Machine-readable coverage and per-cell provenance](benchmark/results/package_local_results.json);",
-        "[CSV export](benchmark/results/package_local_results.csv). `PENDING`/`FAILED`/`CONFIG`",
-        "are unavailable results, not zero. Published `NR` means absent from the paper,",
+        "[CSV export](benchmark/results/package_local_results.csv). Unavailable entries do not",
+        "denote measured zero. Published `NR` means absent from the paper,",
         "not absent from this local coverage table. Raw artifacts live in the listed run directories.",
         "",
     ]

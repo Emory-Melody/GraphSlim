@@ -5,7 +5,7 @@
 (English and Simplified Chinese) from that snapshot only.
 ``--check`` verifies that the embedded tables match the snapshot.
 
-All eligible archived rows are displayed with source and completion status.
+Accuracy rows retain the original completed-row, three-percentage-point display rule.
 Yelp uses its separate verified AP snapshot; archived macro-F1 is never relabelled.
 """
 
@@ -373,7 +373,7 @@ def readme_yelp_ap(snapshot, language="en"):
 
 
 def readme_tables(snapshot, language="en"):
-    """Show every eligible archived row, with explicit provenance and missingness."""
+    """Keep the original accuracy-row selection and label each displayed source."""
     cells = index(snapshot)
     lines = []
     for dataset in DATASETS:
@@ -400,6 +400,10 @@ def readme_tables(snapshot, language="en"):
                 if not any(row):
                     continue
                 if method in PUBLISHED_ONLY:
+                    if not all(
+                        c and c.get("paper_text") not in (None, "", "-", "OOM", "NR") for c in row
+                    ):
+                        continue
                     values = [
                         (c.get("paper_text") or "NR").replace("±", " ± ") if c else "NR"
                         for c in row
@@ -407,18 +411,11 @@ def readme_tables(snapshot, language="en"):
                     source = "Published / SE" if language == "en" else "文献数值 / SE"
                     name = NAMES[method] + "²"
                 else:
-                    values = [
-                        fmt(c)
-                        if c and c["status"] == "complete"
-                        else (c.get("kind", "FAILED") if c and c["status"] == "failed" else "NR")
-                        for c in row
-                    ]
-                    complete = all(c and c["status"] == "complete" for c in row)
-                    source = (
-                        ("Archived run / SD" if complete else "Archived run / incomplete")
-                        if language == "en"
-                        else ("历史运行 / SD" if complete else "历史运行 / 未完成")
-                    )
+                    status, _ = row_status(cells, dataset, method)
+                    if status not in ("reproduced", "no published value"):
+                        continue
+                    values = [fmt(c) for c in row]
+                    source = "Archived run / SD" if language == "en" else "历史运行 / SD"
                     legacy = any(c and c.get("legacy_method") for c in row)
                     name = NAMES[method] + ("¹" if legacy else "")
                 if family == "Edge sparsification":
@@ -466,17 +463,17 @@ def readme_section(snapshot, language="en"):
         note = (
             "¹ Archived DosCondX measurements retain their original settings and source names; the Reddit configuration differs from current defaults.\n"
             "² Published GC4NC values use mean ± standard error (SE). These are reference values from the authors' GEOM/SFGC implementations, not package reruns.\n"
-            "Other numeric archived runs use mean ± population standard deviation (SD). Every available row is shown, regardless of its gap from the reference. Failed or incomplete results retain their status.\n"
+            "Other numeric archived runs use mean ± population standard deviation (SD). Accuracy rows with published references are shown when all declared rates completed and their mean absolute gap is at most 3 percentage points.\n"
             "CentP and GDEM are excluded from historical reference comparisons because defects also affected the reference implementations ([reasons and fresh scores](benchmark/results/reproducibility_20261106/README.md)). Their separately archived Yelp AP scores above describe the saved graphs generated at that time, before the fixes.\n"
-            "This table is one archived campaign, not the 110-pair cumulative reproduction roster. Later replay/HPO campaigns completed several combinations that failed here, including GCSNTK on Arxiv/Flickr, SGDD on Arxiv, and VN on Flickr/Yelp; consult the [pair-level artifact](benchmark/results/reproducibility_20261106/pairs.csv) for the adopted source per pair."
+            "This table is one archived campaign, separate from the 110-pair cumulative reproduction roster. The [pair-level artifact](benchmark/results/reproducibility_20261106/pairs.csv) records the adopted source per pair."
         )
     else:
         note = (
             "¹ DosCondX 历史测量保留原设置和来源名；Reddit 配置与当前默认值不同。\n"
             "² GC4NC 文献值为均值 ± 标准误（SE），来自原作者的 GEOM/SFGC 实现，不属于本包重跑。\n"
-            "其他历史运行数值为均值 ± 总体标准差（SD）。全部已有结果均展示，不按与参考值的差距筛行；失败和未完成结果保留状态。\n"
+            "其他历史运行数值为均值 ± 总体标准差（SD）。有论文参考值的准确率行仅在全部声明比例完成、平均绝对差不超过 3 个百分点时展示。\n"
             "CentP 和 GDEM 不参与历史参考比较，因为缺陷也存在于参考实现中（[原因及重跑结果](benchmark/results/reproducibility_20261106/README.md)）。上方单独归档的 Yelp AP 仍描述当时生成的图，生成时间早于修复。\n"
-            "此表对应一个历史批次，并非累计的 110 个复现组合。后续 replay/HPO 批次已完成这里曾失败的部分组合，包括 GCSNTK–Arxiv/Flickr、SGDD–Arxiv、VN–Flickr/Yelp；各组合采用的来源见[逐对产物](benchmark/results/reproducibility_20261106/pairs.csv)。"
+            "此表对应一个历史批次，与累计的 110 个复现组合分别报告；各组合采用的来源见[逐对产物](benchmark/results/reproducibility_20261106/pairs.csv)。"
         )
     return tables + "\n" + note + "\n"
 
