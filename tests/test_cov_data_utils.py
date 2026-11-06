@@ -207,13 +207,15 @@ def test_explicit_device_and_duck_typed_trees_without_edge_features():
         utils.disjointed_union([first, second], device=torch.device("meta"))
 
 
-def test_dict_dataloader_drops_length_option_before_batching():
+def test_dict_dataloader_samples_requested_length_and_drops_option_before_batching():
     graph = Data(x=torch.ones(2, 1), edge_index=torch.tensor([[1], [0]]), y=torch.tensor([0]))
     dataset = {0: [{0: {"freq": 1, "data": graph}}], 1: [{1: {"freq": 1, "data": graph}}]}
     value = utils.get_dataloader(dataset, dataset_len=4, batch_size=1)
     assert isinstance(value.dataset, utils.myDataset)
     assert value.batch_size == 1
-    assert all(batch.num_graphs == 1 for batch in value)
+    # Regression: dataset_len used to be discarded after sampling.
+    assert len(value.dataset) == 4
+    assert [batch.num_graphs for batch in value] == [1, 1, 1, 1]
 
 
 def test_frequent_pattern_mining_uses_each_class_threshold(monkeypatch):

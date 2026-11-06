@@ -69,13 +69,17 @@ class GCDMX(GCondBase):
             model.train()
             with torch.no_grad():
                 emb_real, _ = model.forward(features, adj, output_layer_features=True)
+            # SGC-style models return one representation tensor instead of a layer list.
+            emb_real = emb_real if isinstance(emb_real, list) else [emb_real]
 
             loss_avg = 0
             for ol in range(outer_loop):
                 emb_syn, _ = model.forward(feat_syn, adj_syn, output_layer_features=True)
+                emb_syn = emb_syn if isinstance(emb_syn, list) else [emb_syn]
                 loss_emb = 0
                 for i in range(len(emb_syn)):
-                    if i == args.nlayers - 1:
+                    # Match hidden layers; a one-layer model matches its only (output) layer.
+                    if i == max(args.nlayers - 1, 1):
                         break
                     for c in range(data.nclass):
                         coeff = self.num_class_dict[c] / self.nnodes_syn
@@ -120,6 +124,7 @@ class GCDMX(GCondBase):
                     self.optimizer_model.step()
                 with torch.no_grad():
                     emb_real, _ = model.forward(features, adj, output_layer_features=True)
+                emb_real = emb_real if isinstance(emb_real, list) else [emb_real]
             loss_avg /= outer_loop
             bar.set_postfix({"loss": loss_avg})
 

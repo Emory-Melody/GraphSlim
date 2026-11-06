@@ -58,7 +58,8 @@ class MFCoreSet(CoreSet):
                 data.adj_fully = to_tensor(data.adj_train)
                 data.pre_conv = normalize_adj_tensor(data.adj_fully, sparse=True)
                 data.pre_conv = matmul(data.pre_conv, data.pre_conv)
-                feat_agg = matmul(data.pre_conv, data.feat_full).float()
+                # The operator is over the training subgraph, so propagate its features.
+                feat_agg = matmul(data.pre_conv, data.feat_train).float()
                 idx_selected = self.select(feat_agg)
 
                 data.feat_syn = feat_agg[idx_selected]

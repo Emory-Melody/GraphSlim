@@ -365,3 +365,78 @@ def test_sparsify_validates_epsilon_for_raw_laplacian_input():
     laplacian = graphs.Path(16).L
     with pytest.raises(ValueError, match="Epsilon"):
         utils.graph_sparsify(laplacian, 0.1)
+
+
+def test_coarsening_quality_dense_branch_matches_exact_coarse_spectrum():
+    # Regression: kmax > n / 2 unpacked np.linalg.eig as (vectors, values).
+    graph = graphs.Path(16)
+    c = utils.get_coarsening_matrix(graph, [[2 * i, 2 * i + 1] for i in range(8)])
+    metrics = utils.coarsening_quality(graph, c, kmax=6)
+    coarse = np.linalg.eigvalsh((c @ graph.L @ c.T).toarray())[:6]
+    original = np.linalg.eigvalsh(graph.L.toarray())[:6]
+    np.testing.assert_allclose(
+        metrics["error_eigenvalue"][1:], np.abs(original[1:] - coarse[1:]) / original[1:], rtol=1e-6
+    )
+    assert metrics["angle_matrix"].shape == (16, 8)
+    assert np.isfinite(metrics["error_subspace"]).all()
+
+
+def test_coarsening_quality_does_not_mutate_cached_or_given_spectrum():
+    # Regression: l[0] = 1 overwrote G.e (and a caller's lk) in place.
+    graph = graphs.Path(12)
+    graph.compute_fourier_basis()
+    cached = graph.e.copy()
+    c = utils.get_coarsening_matrix(graph, [[0, 1], [4, 5], [8, 9]])
+    utils.coarsening_quality(graph, c, kmax=3)
+    np.testing.assert_array_equal(graph.e, cached)
+    values, vectors = np.linalg.eigh(graph.L.toarray())
+    given = values.copy()
+    utils.coarsening_quality(graph, c, kmax=3, Uk=vectors, lk=given)
+    np.testing.assert_array_equal(given, values)
+
+
+@pytest.mark.parametrize("name", ["min_expected_gradient_loss", "min_expected_loss"])
+def test_expected_loss_proximities_compute_their_lanczos_basis(name):
+    # Regression: names without "lanczos" read an undefined X_lan.
+    graph = graphs.Ring(20, k=2)
+    a, b, w = graph.get_edge_list()
+    values = utils.get_proximity_measure(graph, name, K=4)
+    assert values.shape == (graph.Ne,) and np.isfinite(values).all()
+    assert (values <= 0).all() and (values < 0).any()
+
+
+def test_sparsify_returns_laplacian_for_matrix_input_and_keeps_coordinates():
+    # Regression: scipy.stats.itemfreq no longer exists; the matrix branch
+    # also returned -W instead of the combinatorial Laplacian D - W.
+    graph = graphs.Ring(32, k=2)
+    graph.set_coordinates("ring2D")
+    np.random.seed(5)
+    sparse_graph = utils.graph_sparsify(graph, epsilon=0.5, maxiter=1)
+    np.testing.assert_array_equal(sparse_graph.coords, graph.coords)
+    np.random.seed(5)
+    laplacian = utils.graph_sparsify(graph.L, epsilon=0.5, maxiter=1).toarray()
+    np.testing.assert_allclose(laplacian, sparse_graph.L.toarray(), atol=1e-10)
+    np.testing.assert_allclose(laplacian.sum(1), 0, atol=1e-10)
+    assert (np.diag(laplacian) >= 0).all()
+
+
+def test_multiresolution_sparsify_and_kron_coarsening_with_edge_target():
+    np.random.seed(1)
+    graph = graphs.Ring(64, k=3)
+    graph.set_coordinates("ring2D")
+    pyramid = utils.my_graph_multiresolution(graph, 1, r=0.5, sparsify=True)
+    assert [level.N for level in pyramid] == [64, 32]
+    child = pyramid[1]
+    np.testing.assert_allclose(child.W.toarray(), child.W.T.toarray(), atol=1e-12)
+    assert np.isfinite(child.W.data).all() and (child.W.data >= 0).all()
+    np.random.seed(2)
+    coarse, original = utils.kron_coarsening(graphs.Ring(64, k=3), r=0.5, m=10)
+    assert coarse is not None and coarse.N == 32 and "idx" in coarse.mr
+    assert not coarse.is_directed()
+
+
+def test_kron_coarsening_propagates_non_numerical_errors():
+    # Regression: a bare ``except`` turned every error into (None, None).
+    graph = graphs.Ring(16)
+    with pytest.raises(ValueError, match="Epsilon"):
+        utils.kron_coarsening(graph, r=0.5, m=5)

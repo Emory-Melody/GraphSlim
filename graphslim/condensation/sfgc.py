@@ -85,7 +85,7 @@ class SFGC(GCondBase):
                 )
                 timestamps = []
 
-                timestamps.append([p.detach().cpu() for p in model.parameters()])
+                timestamps.append([p.detach().to("cpu", copy=True) for p in model.parameters()])
 
                 training_index = (
                     torch.as_tensor(data.idx_train, device=device)
@@ -122,7 +122,9 @@ class SFGC(GCondBase):
                     optimizer_model.step()
 
                     if e % 10 == 0 and e > 1:
-                        timestamps.append([p.detach().cpu() for p in model.parameters()])
+                        timestamps.append(
+                            [p.detach().to("cpu", copy=True) for p in model.parameters()]
+                        )
 
                 trajectories.append(timestamps)
 

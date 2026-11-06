@@ -72,7 +72,7 @@ def test_condensation_reduces_saves_and_trains_an_actual_gcn(
     assert 0 <= validation <= 1 and 0 <= test <= 1
 
 
-@pytest.mark.parametrize("method", ["variation_neighborhoods"])
+@pytest.mark.parametrize("method", ["heavy_edge", "variation_neighborhoods"])
 def test_spectral_coarsening_pipeline_preserves_class_pure_components(tmp_path, method):
     graph = graph_fixture()
     # Each connected component has one class; validation/test labels must not

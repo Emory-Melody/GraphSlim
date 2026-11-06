@@ -33,10 +33,11 @@ class GAT(BaseGNN):
         """
         super(GAT, self).__init__(nfeat, nhid, nclass, args, mode)
 
+        # Two attention layers: eight concatenated heads, then one output head.
+        self.heads = 8
+        self.output_heads = 1
         if mode in ["eval", "cross"]:
             self.nlayers = 2
-            self.heads = 8
-            self.output_heads = 1
 
         self.conv1 = GATConv(
             nfeat, nhid, heads=self.heads, dropout=self.dropout, bias=self.with_bias

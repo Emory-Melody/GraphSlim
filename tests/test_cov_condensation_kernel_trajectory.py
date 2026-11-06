@@ -369,3 +369,12 @@ def test_matching_stops_before_checkpoints_when_loss_is_nan(tmp_path, workdir, m
     assert calls == []
     with pytest.raises(FileNotFoundError):
         load_reduced(args)
+
+
+def test_geom_rejects_unsupported_expert_optimizer(tmp_path, workdir):
+    args = trajectory_args(tmp_path, "geom", "trans", optim="RMSprop")
+    graph = graph_fixture()
+    reducer = GEOM("trans", graph, args)
+    with pytest.raises(ValueError, match="'Adam' or 'SGD', got 'RMSprop'"):
+        reducer.buffer_cl(graph)
+    assert not list(Path(reducer.buf_dir).glob("replay_buffer_*.pt"))

@@ -100,7 +100,20 @@ def test_largest_component_and_training_map():
     idx_all, _, raw_all = utils.get_largest_cc(connected, 3, "toy")
     assert sorted(idx_all) == [0, 1, 2] and raw_all is connected
     same, mapping = utils.get_train_lcc(idx_all, np.array([0, 2]), torch.tensor([0, 1, 0]), 3, 2)
-    assert sorted(same) == [0, 2] and mapping.tolist() == [0, 2]
+    assert same == [0, 2] and mapping == [idx_all.index(0), idx_all.index(2)]
+
+
+@pytest.mark.parametrize("as_type", [torch.tensor, np.array, list])
+def test_training_map_never_uses_held_out_nodes(as_type):
+    # LCC listed out of order; training nodes 4 and 5 lie outside it.
+    idx_lcc = [3, 0, 2, 1]
+    labels = torch.tensor([0, 1, 0, 1, 1, 0])
+    train_lcc, idx_map = utils.get_train_lcc(idx_lcc, as_type([2, 4, 0, 5]), labels, 6, 2)
+    # Regression: torch indices used to give an empty overlap, and missing classes were
+    # refilled from non-training nodes (here 1 and 3) using their labels.
+    assert train_lcc == [2, 0]
+    assert [idx_lcc[i] for i in idx_map] == train_lcc
+    assert utils.node_id_list(torch.tensor([[3], [1]])) == [3, 1]
 
 
 def test_spectral_selection_and_embeddings():
@@ -122,6 +135,10 @@ def test_spectral_selection_and_embeddings():
     torch.testing.assert_close(covariance.diagonal(dim1=1, dim2=2).sum(1), torch.ones(2))
     filtered = utils.get_embed_sum(torch.tensor([0.0, 1.0]), basis, features)
     torch.testing.assert_close(filtered[:2], torch.tensor([[0.0, 1.0], [0.0, 0.0]]))
+    # Regression: an empty class (here class 1 of 3) yields a zero row, not NaN.
+    empty = utils.get_embed_mean(torch.ones(2, 2), torch.tensor([0, 2]), num_classes=3)
+    torch.testing.assert_close(empty[1], torch.zeros(2))
+    assert torch.isfinite(empty).all() and empty.shape == (3, 2)
     means = utils.get_embed_mean(
         torch.tensor([[3.0, 4.0], [1.0, 0.0], [0.0, 2.0]]), torch.tensor([0, 1, 1])
     )
@@ -143,6 +160,22 @@ def test_eigendecomposition_cache_is_written_and_reused(tmp_path, monkeypatch):
     np.testing.assert_allclose(loaded_vectors, vectors)
     utils.get_eigh(np.diag([3.0, 1.0]), "unsaved", save=False)
     assert not (tmp_path / "data" / "unsaved" / "eigenvalues.npy").exists()
+    # Regression: the cache root is configurable and matches load_eigen's load_path.
+    root = tmp_path / "elsewhere"
+    utils.get_eigh(laplacian, "toy2", save=True, root=str(root))
+    np.testing.assert_allclose(utils.load_eigen("toy2", str(root))[0], values, atol=1e-12)
+    assert not (tmp_path / "data" / "toy2").exists()
+    # root=None computes without reading or writing any cache.
+    np.save(tmp_path / "data" / "eigenvalues.npy", np.array([9.0, 9.0]))
+    np.save(tmp_path / "data" / "eigenvectors.npy", np.eye(2))
+    fresh, _ = utils.get_eigh(np.diag([3.0, 1.0]), "", save=True, root=None)
+    assert fresh.tolist() == [1.0, 3.0]
+    assert sorted(p.name for p in (tmp_path / "data").iterdir()) == [
+        "eigenvalues.npy",
+        "eigenvectors.npy",
+        "toy",
+        "unsaved",
+    ]
 
 
 def test_large_dataset_spectra_merge_both_ends(tmp_path, monkeypatch):

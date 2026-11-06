@@ -113,6 +113,14 @@ def test_one_hot_labels_match_index_label_gradients(tmp_path):
     )
     assert torch.isfinite(hard) and hard > 0
     torch.testing.assert_close(hard, one_hot)
+    # Regression: soft mode used real labels as synthetic class masks and crashed. KL to a
+    # one-hot target equals the NLL, so soft mode reproduces the hard-label objective.
+    for real, synthetic_targets in ((labels, synthetic), (F.one_hot(labels), F.one_hot(synthetic))):
+        torch.manual_seed(5)
+        soft = reducer.train_class(
+            model, adjacency, features, real, synthetic_targets, args, soft=True
+        )
+        torch.testing.assert_close(soft, hard)
 
 
 def test_batchnorm_statistics_are_frozen_by_check_bn(tmp_path):
@@ -178,6 +186,13 @@ def test_sgdd_learns_graphon_structure_and_saves(tmp_path, setting):
     seed_everything(3)
     reduced = create_reducer("sgdd", setting, graph, args).reduce(graph, verbose=False)
     assert graph.adj_mx.shape == (8, 8)
+    # Regression: graphs smaller than mx_size used to leave adj_mx unset.
+    small = gradient_args(tmp_path / "small", "sgdd", setting)
+    small.mx_size, small.opt_scale, small.epochs, small.checkpoints = 100, 1e-3, 1, [0]
+    small_graph = graph_fixture()
+    create_reducer("sgdd", setting, small_graph, small).reduce(small_graph, verbose=False)
+    assert small.mx_size == 32 and small_graph.adj_mx.shape == (32, 32)
+    assert torch.isfinite(small_graph.adj_syn).all()
     assert reduced.feat_syn.shape == (12, 8) and reduced.adj_syn.shape == (12, 12)
     assert torch.isfinite(reduced.adj_syn).all() and torch.isfinite(reduced.feat_syn).all()
     torch.testing.assert_close(reduced.adj_syn, reduced.adj_syn.T)
@@ -256,10 +271,14 @@ def test_distribution_distances():
 
 
 @pytest.mark.parametrize("method", ["gcdm", "gcdmx"])
-@pytest.mark.parametrize("metric", ["l1", "cos"])
-def test_distribution_matching_lowers_embedding_distance(tmp_path, method, metric):
+@pytest.mark.parametrize(
+    "metric,model,layers",
+    # Regression: one-layer models and SGC (single representation tensor) used to crash.
+    [("l1", "GCN", 2), ("cos", "GCN", 2), ("l1", "GCN", 1), ("l1", "SGC", 2)],
+)
+def test_distribution_matching_lowers_embedding_distance(tmp_path, method, metric, model, layers):
     args = gradient_args(tmp_path, method, "trans")
-    args.condense_model = "GCN"
+    args.condense_model, args.nlayers = model, layers
     args.dis_metric, args.epochs, args.checkpoints = metric, 3, [2]
     args.lr_feat = 0.05
     graph = graph_fixture()

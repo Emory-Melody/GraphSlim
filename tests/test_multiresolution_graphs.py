@@ -46,6 +46,21 @@ def test_pyramid_rejects_unsupported_algorithms(setting):
         utils.my_graph_multiresolution(graphs.Path(12), 1, sparsify=False, **setting)
 
 
+def test_resistance_sparsification_agrees_for_graph_and_laplacian_and_keeps_psd():
+    graph = graphs.Ring(32, k=2)
+    np.random.seed(5)
+    reduced = utils.graph_sparsify(graph, epsilon=0.5, maxiter=2)
+    np.random.seed(5)
+    laplacian = utils.graph_sparsify(graph.L, epsilon=0.5, maxiter=2).toarray()
+    assert reduced.N == graph.N
+    assert reduced.Ne <= graph.Ne
+    np.testing.assert_allclose(laplacian, reduced.L.toarray(), atol=1e-10)
+    np.testing.assert_allclose(laplacian, laplacian.T, atol=1e-12)
+    np.testing.assert_allclose(laplacian.sum(1), 0, atol=1e-12)
+    assert np.linalg.eigvalsh(laplacian).min() >= -1e-10
+    assert np.all(reduced.W.toarray()[graph.W.toarray() == 0] == 0)
+
+
 @pytest.mark.parametrize("epsilon", [0, 0.01, 1, 2])
 def test_sparsification_rejects_invalid_approximation_ranges(epsilon):
     with pytest.raises(ValueError, match="Epsilon"):

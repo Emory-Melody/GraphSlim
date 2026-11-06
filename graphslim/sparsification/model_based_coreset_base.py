@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 # See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
+from pathlib import Path
+
 from graphslim.models import get_model_class
 import numpy as np
 
@@ -8,6 +10,18 @@ from graphslim.evaluation import *
 from graphslim.models import *
 from graphslim.sparsification.coreset_base import CoreSet
 from graphslim.utils import to_tensor
+
+# Precomputed SFGC k-center selections ship with the package.
+FIXED_IDX_DIR = Path(__file__).resolve().parent / "fixed_idx"
+
+
+def fixed_kcenter_indices(args):
+    """Load the packaged SFGC k-center node selection for a dataset and rate.
+
+    :param args: Configuration with ``dataset`` and ``reduction_rate``.
+    :returns: One-dimensional NumPy array of selected node IDs.
+    """
+    return np.load(FIXED_IDX_DIR / f"idx_{args.dataset}_{args.reduction_rate}_kcenter_15.npy")
 
 
 class MBCoreSet(CoreSet):
@@ -44,9 +58,7 @@ class MBCoreSet(CoreSet):
                 # model.fit_with_val(data, train_iters=1200, normadj=True, verbose=verbose,
                 #                    setting=args.setting, reduced=False, final_output=True)
                 # embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
-                idx_selected = np.load(
-                    f"sparsification/fixed_idx/idx_{args.dataset}_{args.reduction_rate}_kcenter_15.npy"
-                )
+                idx_selected = fixed_kcenter_indices(args)
             else:
                 model.fit_with_val(
                     data,
@@ -65,9 +77,7 @@ class MBCoreSet(CoreSet):
 
         if self.setting == "ind":
             if args.method in ["sfgc"]:
-                idx_selected = np.load(
-                    f"sparsification/fixed_idx/idx_{args.dataset}_{args.reduction_rate}_kcenter_15.npy"
-                )
+                idx_selected = fixed_kcenter_indices(args)
             else:
                 model.fit_with_val(
                     data,
@@ -77,7 +87,8 @@ class MBCoreSet(CoreSet):
                     setting=args.setting,
                     reduced=False,
                 )
-                embeds = model.predict(data.feat_full, data.adj_full).detach()
+                # Inductive selection uses local training IDs, so embed the training graph.
+                embeds = model.predict(data.feat_train, data.adj_train).detach()
 
                 idx_selected = self.select(embeds)
             data.feat_syn = data.feat_train[idx_selected]
@@ -88,7 +99,7 @@ class MBCoreSet(CoreSet):
             print("selected nodes:", idx_selected.shape[0])
             print("induced edges:", data.adj_syn.sum())
         data.adj_syn, data.feat_syn, data.labels_syn = to_tensor(
-            data.adj_syn, data.feat_syn, data.labels_syn, device="cpu"
+            data.adj_syn, data.feat_syn, label=data.labels_syn, device="cpu"
         )
         if save:
             save_reduced(data.adj_syn, data.feat_syn, data.labels_syn, args)

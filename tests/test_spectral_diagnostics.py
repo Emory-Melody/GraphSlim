@@ -15,8 +15,8 @@ def test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues(kmax, pr
     coarse, _ = utils.kron_coarsening(graph, r=0.5)
     eigenvalues, eigenvectors = np.linalg.eigh(graph.L.toarray())
     original = eigenvalues.copy()
-    # kron_quality writes lk[0] = 1 in place, so hand it a private copy.
-    kwargs = {"Uk": eigenvectors, "lk": eigenvalues.copy()} if provided_spectrum else {}
+    cached_spectrum = graph.e.copy()
+    kwargs = {"Uk": eigenvectors, "lk": eigenvalues} if provided_spectrum else {}
     quality = utils.kron_quality(graph, coarse, kmax=kmax, **kwargs)
     assert not quality["failed"]
     assert quality["r"] == 0.5 and quality["m"] == coarse.Ne
@@ -28,6 +28,8 @@ def test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues(kmax, pr
         np.abs(original[1:kmax] - expected[1:]) / original[1:kmax],
         atol=1e-5,
     )
+    np.testing.assert_array_equal(eigenvalues, original)
+    np.testing.assert_array_equal(graph.e, cached_spectrum)
 
 
 @pytest.mark.parametrize("seed", range(12))

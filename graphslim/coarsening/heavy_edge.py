@@ -39,11 +39,11 @@ class HeavyEdge(Coarsen):
         super(HeavyEdge, self).__init__(setting, data, args)
         args.method = "heavy_edge"
 
-    def coarsen(self, G, method):
+    def coarsen(self, G, method=None):
         """Coarsen a PyGSP graph using heavy-edge matching.
 
         :param G: Input PyGSP graph.
-        :param method: Compatibility argument; this implementation always uses heavy-edge proximity.
+        :param method: Optional compatibility argument, ignored; this implementation always uses heavy-edge proximity.
         :returns: Tuple ``(coarsening_matrix, coarse_graph, level_matrices, level_graphs)``.
         """
         K = 10

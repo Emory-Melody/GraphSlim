@@ -697,7 +697,8 @@ def perform_balance_evolve_clusteringjk(
                 dists = np.clip(dists, 1e-10, None)
                 power = np.clip(2 / (m - 1), -10, 10)
                 inv_dists = np.clip(np.power(dists, -power), 0, 1e10)
-                sum_inv_dists = np.sum(inv_dists, axis=0, keepdims=True)
+                # Fuzzy c-means memberships of each sample sum to one over the clusters.
+                sum_inv_dists = np.sum(inv_dists, axis=1, keepdims=True)
                 sum_inv_dists[sum_inv_dists == 0] = 1  # Avoid NaN
                 U = inv_dists / sum_inv_dists  # Normalize
                 return U.T  # Transpose to match expected output
@@ -765,7 +766,8 @@ def init_membership_from_centers(centers_array, data, m):
     dists = np.clip(dists, 1e-10, None)
     power = np.clip(2 / (m - 1), -10, 10)
     inv_dists = np.clip(np.power(dists, -power), 0, 1e10)
-    sum_inv_dists = np.sum(inv_dists, axis=0, keepdims=True)
+    # Fuzzy c-means memberships of each sample sum to one over the clusters.
+    sum_inv_dists = np.sum(inv_dists, axis=1, keepdims=True)
     sum_inv_dists[sum_inv_dists == 0] = 1  # Avoid NaN
     U = inv_dists / sum_inv_dists  # Normalize
     return U.T  # Transpose to match expected output

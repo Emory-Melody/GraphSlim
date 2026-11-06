@@ -22,7 +22,7 @@ def as_csr(adj):
         return adj.astype(np.float32).tocsr(copy=True)
     if isinstance(adj, torch.Tensor):
         if adj.layout != torch.strided:
-            adj = adj.to_sparse_coo().coalesce().cpu()
+            adj = adj.detach().to_sparse_coo().coalesce().cpu()
             indices = adj.indices().numpy()
             return sp.csr_matrix((adj.values().numpy(), indices), shape=adj.shape)
         adj = adj.detach().cpu().numpy()

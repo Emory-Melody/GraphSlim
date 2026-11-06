@@ -12,6 +12,7 @@ import scipy.sparse as sp
 import torch
 from click.testing import CliRunner
 from torch_geometric.data import Data
+from torch_sparse import SparseTensor
 
 from graphslim import compat, config, doctor, hpo, run_eval, tracking, train_all, visualization
 from graphslim._lazy import lazy_exports
@@ -145,12 +146,17 @@ def test_run_repeats_reduction_with_offset_seeds_and_logs_each_result(tmp_path, 
 
 
 def test_run_whole_graph_skips_reduction_and_applies_attack(tmp_path, monkeypatch):
+    """Regression: the package attribute ``attack`` may name the submodule."""
+    import importlib
+
     import graphslim.dataset
 
+    attack_module = importlib.import_module("graphslim.dataset.attack")
     tracker, seeds, evaluated = FakeTracker(), [], []
     _install_fakes(monkeypatch, tracker, seeds, evaluated)
     attacked = FakeGraph(name="attacked")
-    monkeypatch.setattr(graphslim.dataset, "attack", lambda graph, args: attacked, raising=False)
+    monkeypatch.setattr(graphslim.dataset, "attack", attack_module, raising=False)
+    monkeypatch.setattr(attack_module, "attack", lambda graph, args: attacked)
     args = _run_args(tmp_path, eval_whole=True, attack="random_adj")
     results = train_all.run(args, load_dataset=lambda *a: FakeGraph(name="clean"))
     assert results == [(5.0, 0.25)]
@@ -650,9 +656,27 @@ def test_reduced_graph_loader_transposes_row_major_coordinates(monkeypatch):
     assert data.edge_index.tolist() == [[0, 1, 2], [1, 2, 0]]
 
 
-def test_hpo_reset_uses_graph_reset_hook_and_summary_counts_sum_without_item():
+def test_hpo_reset_uses_graph_reset_hook():
     graph = FakeGraph()
     hpo.reset_graph(graph)
     assert graph.resets == 1
-    summary = tracking.graph_summary(SimpleNamespace(adj_syn=SimpleNamespace(sum=lambda: 6)))
-    assert summary == {"edges": 6}
+
+
+@pytest.mark.parametrize(
+    "convert",
+    [
+        lambda d: d,
+        lambda d: d.numpy(),
+        lambda d: d.tolist(),
+        lambda d: d.to_sparse(),
+        lambda d: d.to_sparse_csr(),
+        lambda d: sp.csr_matrix(d.numpy()),
+        lambda d: SparseTensor.from_dense(d),
+        lambda d: d.clone().requires_grad_(),
+    ],
+)
+def test_graph_summary_counts_weighted_edges_in_every_layout(convert):
+    """Regression: weighted dense graphs reported total weight; SparseTensor crashed."""
+    dense = torch.tensor([[0.0, 0.1, 0], [0.1, 0, 5], [0, 5, 0]])
+    summary = tracking.graph_summary(SimpleNamespace(adj_syn=convert(dense)))
+    assert summary == {"edges": 4}

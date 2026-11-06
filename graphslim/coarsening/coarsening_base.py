@@ -83,7 +83,10 @@ class Coarsen:
 
         cpu_data = copy.deepcopy(data)
 
-        gps_graph = graphs.Graph(data.adj_full)
+        # The inductive setting coarsens the training subgraph, whose node order
+        # (idx_train) matches the features and labels used in process_coarsened.
+        adjacency = data.adj_full if args.setting == "trans" else data.adj_train
+        gps_graph = graphs.Graph(adjacency)
         candidate, C_list, Gc_list = self.coarsening(gps_graph)
         coarsen_features, coarsen_train_labels, coarsen_train_mask, coarsen_edge = (
             self.process_coarsened(cpu_data, candidate, C_list, Gc_list)
@@ -127,7 +130,7 @@ class Coarsen:
         Gc_list : list
             List of coarsened graphs.
         """
-        if H.A.shape[-1] != H.A.shape[1]:
+        if H.A.shape[0] != H.A.shape[1]:
             H.logger.error("Inconsistent shape to extract components. Square matrix required.")
             return None
 
@@ -203,8 +206,8 @@ class Coarsen:
             features = data.x
             labels = data.y
         else:
-            features = data.x[train_mask]
-            labels = data.y[train_mask]
+            features = data.x[data.idx_train]
+            labels = data.y[data.idx_train]
         coarsen_node = 0
         number = 0
         coarsen_row = None
@@ -261,6 +264,11 @@ class Coarsen:
 
             number += 1
 
+        if coarsen_row is None:
+            raise ValueError(
+                "Spectral coarsening needs at least one connected component with more than "
+                "10 nodes and a training node; components with at most 10 nodes are dropped."
+            )
         coarsen_edge = torch.from_numpy(np.array([coarsen_row, coarsen_col])).long()
         coarsen_train_labels = coarsen_train_labels.long()
 

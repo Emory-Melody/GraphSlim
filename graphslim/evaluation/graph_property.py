@@ -106,6 +106,13 @@ class PropertyEvaluator:
         """
         if reduced:
             self.feat, self.adj, self.label = get_syn_data(data, self.args, model_type=model_type)
+            if (
+                self.args.setting == "trans"
+                and len(self.label) != len(self.feat)
+                and len(self.feat) == len(data.labels_full)
+            ):
+                # Adjacency-only checkpoints (edge sparsifiers) keep every original node.
+                self.label = data.labels_full
         else:
             prefix = "train" if self.args.setting == "ind" else "full"
             self.feat = getattr(data, f"feat_{prefix}")

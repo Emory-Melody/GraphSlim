@@ -41,11 +41,12 @@ def test_weighted_attention_resets_value_projection_and_returns_attention():
 
 def test_configuration_values_come_from_args_or_constructor(tmp_path):
     args = quick_args(tmp_path, "random", "trans")
-    args.train_weight_decay, args.trans_weight_decay, args.trans_dropout = 1, 0.25, 0.1
+    args.trans_weight_decay, args.trans_dropout = 0.25, 0.1
     model = SGFormer(3, 4, 2, args)
+    # Regression: trans_weight_decay is read from args (it was keyed on a typo).
     assert model.trans_weight_decay == 0.25 and model.trans_dropout == 0.1
     assert model.trans_num_layers == args.trans_num_layers == len(model.trans_conv.convs)
-    del args.trans_num_layers, args.trans_dropout, args.train_weight_decay
+    del args.trans_num_layers, args.trans_dropout, args.trans_weight_decay
     model = SGFormer(3, 4, 2, args, trans_num_layers=2, trans_dropout=0.3)
     assert model.trans_num_layers == 2 and len(model.trans_conv.convs) == 2
     assert model.trans_dropout == 0.3 and model.trans_weight_decay == 0.001
@@ -106,3 +107,59 @@ def test_soft_cross_entropy_matches_softmax_target_weighting(tmp_path):
     output, target = torch.log_softmax(torch.randn(3, 2), 1), torch.randn(3, 2)
     expected = -(target.softmax(1) * output).sum(1).mean()
     torch.testing.assert_close(model.loss(output, target), expected)
+
+
+def test_grid_searched_transformer_weight_decay_reaches_the_optimizer(tmp_path, monkeypatch):
+    args = quick_args(tmp_path, "random", "trans")
+    args.trans_weight_decay = 0.0123
+    seen = []
+    adam = torch.optim.Adam
+
+    def record(groups, **kwargs):
+        seen.append([group["weight_decay"] for group in groups])
+        return adam(groups, **kwargs)
+
+    monkeypatch.setattr(torch.optim, "Adam", record)
+    SGFormer(8, 4, 2, args).fit_with_val(tiny_graph(), train_iters=1)
+    assert seen == [[0.0123, 5e-4]]
+
+
+def test_concatenation_without_graph_branch_classifies_transformer_output(tmp_path):
+    args = quick_args(tmp_path, "random", "trans")
+    model = SGFormer(3, 4, 2, args, aggregate="cat", use_graph=False).eval()
+    assert model.fc.in_features == 4
+    x = torch.randn(6, 3)
+    expected = F.log_softmax(model.fc(model.trans_conv(x)), dim=1)
+    torch.testing.assert_close(model(x, torch.eye(6)), expected)
+    assert SGFormer(3, 4, 2, args, aggregate="cat").fc.in_features == 8
+
+
+def test_unimproved_validation_keeps_final_weights(tmp_path):
+    args = quick_args(tmp_path, "random", "trans")
+    args.lr = 0
+    graph = tiny_graph()
+    graph.labels_val = torch.ones_like(graph.labels_val)
+    model = SGFormer(8, 4, 2, args)
+    original = model.load_state_dict
+
+    def forbidden(*a, **k):
+        pytest.fail("No validation improvement means there is no checkpoint to load")
+
+    model.load_state_dict = forbidden
+    with torch.no_grad():
+        model.fc.bias.copy_(torch.tensor([50.0, -50]))
+    model.reset_parameters = lambda: None
+    assert model.fit_with_val(graph, train_iters=2) == 0
+    model.load_state_dict = original
+    assert model.predict(graph.feat_full, graph.adj_full).argmax(1).eq(0).all()
+
+
+def test_verbose_soft_target_fit_reports_accuracy_against_argmax_labels(tmp_path, capsys):
+    args = quick_args(tmp_path, "random", "trans")
+    args.eval_loss = "MSE"
+    graph = tiny_graph()
+    graph.feat_syn, graph.adj_syn = graph.feat_train.clone(), torch.eye(16)
+    graph.labels_syn = F.one_hot(graph.labels_train, 2).float()
+    model = SGFormer(8, 4, 2, args)
+    model.fit_with_val(graph, train_iters=1, reduced=True, verbose=True)
+    assert "Epoch 0, training acc:" in capsys.readouterr().out

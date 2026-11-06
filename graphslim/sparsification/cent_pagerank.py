@@ -68,7 +68,8 @@ class CentP(MFCoreSet):
         # Iterate to compute PageRank
         for i in range(max_iterations):
             old_pagerank = pagerank.copy()
-            pagerank = damping_factor * (transition_matrix @ old_pagerank) + momentum
+            # Each node receives rank from its in-neighbors: P^T r, with P row-stochastic.
+            pagerank = damping_factor * (transition_matrix.T @ old_pagerank) + momentum
             if norm(pagerank - old_pagerank, ord=1) < convergence_threshold:
                 break
 

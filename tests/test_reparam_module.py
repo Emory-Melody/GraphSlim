@@ -140,3 +140,40 @@ def test_untraced_dtype_conversion_and_tuple_trace_input():
     assert eager.dtype == torch.float64
     wrapped.trace((x,))  # positional inputs may be given as a tuple
     torch.testing.assert_close(wrapped(x, flat_param=wrapped.flat_param), eager)
+
+
+def test_default_forward_uses_own_flat_parameter():
+    # Regression: forward() squeezed ``flat_param`` before checking for None.
+    torch.manual_seed(8)
+    model = torch.nn.Sequential(torch.nn.Linear(4, 6), torch.nn.Tanh(), torch.nn.Linear(6, 2))
+    reference = deepcopy(model)
+    wrapped = ReparamModule(model)
+    x = torch.randn(3, 4)
+    out = wrapped(x)
+    torch.testing.assert_close(out, reference(x))
+    out.sum().backward()
+    assert wrapped.flat_param.grad is not None
+    assert wrapped.flat_param.grad.shape == (wrapped.param_numel,)
+
+
+def test_temporary_parameters_and_buffers_restore_after_exception():
+    model = torch.nn.Sequential(torch.nn.Linear(3, 3), torch.nn.BatchNorm1d(3)).eval()
+    wrapped = ReparamModule(model)
+    weight = model[0].weight
+    mean = model[1].running_mean
+    with pytest.raises(RuntimeError, match="abort"):
+        with wrapped.unflattened_param(torch.zeros_like(wrapped.flat_param)):
+            with wrapped.replaced_buffers(
+                [torch.ones_like(b) for _, _, b in wrapped._buffer_infos]
+            ):
+                assert model[0].weight is not weight
+                raise RuntimeError("abort")
+    assert model[0].weight is weight
+    assert model[1].running_mean is mean
+
+
+def test_single_parameter_replacement_remains_a_flat_vector():
+    wrapped = ReparamModule(torch.nn.Linear(1, 1, bias=False))
+    x = torch.tensor([[2.0], [4.0]])
+    torch.testing.assert_close(wrapped(x, flat_param=torch.tensor([3.0])), 3 * x)
+    torch.testing.assert_close(wrapped(x, flat_param=torch.tensor([[3.0]])), 3 * x)

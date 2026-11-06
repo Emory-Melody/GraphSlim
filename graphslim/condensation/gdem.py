@@ -2,6 +2,7 @@
 # See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 from tqdm import trange
 import copy
+import os
 import os.path as osp
 
 import networkx as nx
@@ -56,12 +57,23 @@ class GDEM(GCondBase):
         pge = self.pge
         # calculate eigenvalues and eigenvectors
         dataset_dir = osp.join(args.load_path, args.dataset)
-        if not osp.exists(f"{dataset_dir}/idx_map.npy"):
+        train_nodes = set(node_id_list(data.idx_train))
+        cached = osp.exists(f"{dataset_dir}/idx_map.npy")
+        if cached:
+            idx_lcc = np.load(f"{dataset_dir}/idx_lcc.npy")
+            idx_train_lcc = np.load(f"{dataset_dir}/idx_train_lcc.npy")
+            idx_map = np.load(f"{dataset_dir}/idx_map.npy")
+            # Older caches could contain non-training nodes; rebuild those maps.
+            cached = set(idx_train_lcc.tolist()) <= train_nodes
+            if not cached:
+                print("cached training map contains non-training nodes; rebuilding")
+        if not cached:
+            os.makedirs(dataset_dir, exist_ok=True)
             idx_lcc, adj_norm_lcc, _ = get_largest_cc(data.adj_full, data.num_nodes, args.dataset)
             np.save(f"{dataset_dir}/idx_lcc.npy", idx_lcc)
 
             L_lcc = sp.eye(len(idx_lcc)) - adj_norm_lcc
-            get_eigh(L_lcc, f"{args.dataset}", True)
+            get_eigh(L_lcc, f"{args.dataset}", True, root=args.load_path)
 
             idx_train_lcc, idx_map = get_train_lcc(
                 idx_lcc=idx_lcc,
@@ -73,10 +85,6 @@ class GDEM(GCondBase):
             np.save(f"{dataset_dir}/idx_train_lcc.npy", idx_train_lcc)
             np.save(f"{dataset_dir}/idx_map.npy", idx_map)
             print("preprocess done")
-        else:
-            idx_lcc = np.load(f"{dataset_dir}/idx_lcc.npy")
-            idx_train_lcc = np.load(f"{dataset_dir}/idx_train_lcc.npy")
-            idx_map = np.load(f"{dataset_dir}/idx_map.npy")
 
         eigenvals_lcc, eigenvecs_lcc = load_eigen(args.dataset, args.load_path)
         eigenvals_lcc = torch.FloatTensor(eigenvals_lcc)
@@ -97,9 +105,9 @@ class GDEM(GCondBase):
             eigenvals=eigenvals, eigenvecs=eigenvecs, x=data.feat_full[idx_lcc]
         )
         embed_sum = embed_sum[idx_map, :]
-        embed_mean_real = get_embed_mean(embed_sum=embed_sum, label=data.y[idx_train_lcc]).to(
-            self.device
-        )
+        embed_mean_real = get_embed_mean(
+            embed_sum=embed_sum, label=data.y[idx_train_lcc], num_classes=data.nclass
+        ).to(self.device)
         optimizer_feat = self.optimizer_feat
         optimizer_eigenvec = torch.optim.Adam([self.eigenvecs_syn], lr=args.lr_eigenvec)
         eigenvals_syn = eigenvals.to(self.device)
@@ -275,7 +283,7 @@ class GDEM(GCondBase):
         syn_graph_adj = nx.adjacency_matrix(syn_graph)
         syn_graph_L = gcn_normalize_adj(syn_graph_adj)
         syn_graph_L = np.eye(n_syn) - syn_graph_L
-        _, eigen_vecs = get_eigh(syn_graph_L, "", False)
+        _, eigen_vecs = get_eigh(syn_graph_L, "", False, root=None)
 
         return torch.FloatTensor(eigen_vecs).to(self.device)
 
@@ -352,6 +360,8 @@ class GDEM(GCondBase):
         args = self.args
         data = self.data
         labels_syn = to_tensor(label=data.labels_syn, device=self.device)
+        # The base class allocates features with torch.empty; start from Xavier values.
+        nn.init.xavier_uniform_(self.x_syn.data)
 
         optimizer_feat = torch.optim.Adam([self.x_syn], lr=args.lr_feat, weight_decay=0)
 

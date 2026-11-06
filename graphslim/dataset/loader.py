@@ -354,16 +354,23 @@ class LargeDataLoader(nn.Module):
     def __init__(self, name="Flickr", split="train", batch_size=200, split_method="kmeans"):
         """Load a graph and prepare partitioned, filtered split features.
 
-        :param name: Dataset name. The stored default is ``'Flickr'``; the implemented
-            dataset branches recognize ``'flickr'``, ``'reddit'`` and ``'ogbn-arxiv'``.
+        :param name: Case-insensitive dataset name: ``'flickr'``, ``'reddit'`` or
+            ``'ogbn-arxiv'``; other names raise ``ValueError``. Defaults to ``'Flickr'``.
         :param split: Split mask selected for Flickr or Reddit; the OGB branch selects
             training indices. Defaults to ``'train'``.
-        :param batch_size: Target nodes per partition, used to determine the partition count.
-            Defaults to ``200``.
+        :param batch_size: Positive target nodes per partition, used to determine the
+            partition count (at least one partition). Defaults to ``200``.
         :param split_method: Partitioning rule stored for batch construction.
             Defaults to ``'kmeans'``.
         """
         super(LargeDataLoader, self).__init__()
+        if batch_size <= 0:
+            raise ValueError("batch_size must be positive")
+        name = name.lower()
+        if name not in ("flickr", "reddit", "ogbn-arxiv"):
+            raise ValueError(
+                f"LargeDataLoader supports flickr, reddit and ogbn-arxiv, not {name!r}"
+            )
         path = osp.join("./data")
         if name in ["ogbn-arxiv"]:
             dataset = DataGraphSAINT(root=path, dataset=name)
@@ -385,7 +392,7 @@ class LargeDataLoader(nn.Module):
 
             self.split_idx = torch.tensor(data.idx_train)
             self.n_split = len(self.split_idx)
-            self.k = torch.round(torch.tensor(self.n_split / batch_size)).to(torch.int)
+            self.k = self._partition_count(batch_size)
             self.split_feat = features[self.split_idx]
             self.split_label = labels[self.split_idx]
 
@@ -414,7 +421,7 @@ class LargeDataLoader(nn.Module):
             # features      = self.GCF(self.Adj, features, k=2)
             self.split_idx = torch.where(Dataset[0][mask])[0]
             self.n_split = len(self.split_idx)
-            self.k = torch.round(torch.tensor(self.n_split / batch_size)).to(torch.int)
+            self.k = self._partition_count(batch_size)
 
             # Masked Adjacency Matrix
             optor_index = torch.cat(
@@ -434,6 +441,15 @@ class LargeDataLoader(nn.Module):
             self.split_label = labels[self.split_idx]
             self.split_method = split_method
             self.n_classes = Dataset.num_classes
+
+    def _partition_count(self, batch_size):
+        """Round the split size to a partition count, keeping at least one partition.
+
+        :param batch_size: Target nodes per partition.
+        :returns: Integer tensor with the number of k-means partitions.
+        """
+        k = torch.round(torch.tensor(self.n_split / batch_size)).to(torch.int)
+        return k.clamp(min=1)
 
     def normalize_data(self, data):
         """Standardize feature columns, treating constant columns as unit variance.
@@ -595,8 +611,8 @@ class DataGraphSAINT:
             if missing_files:
                 raise RuntimeError(f"Unable to prepare dataset files: {missing_files}")
 
+        self.adj_full = sp.load_npz(dataset_str + "adj_full.npz")
         if dataset == "ogbn_arxiv":
-            self.adj_full = sp.load_npz(dataset_str + "adj_full.npz")
             self.adj_full = self.adj_full + self.adj_full.T
             self.adj_full[self.adj_full > 1] = 1
 

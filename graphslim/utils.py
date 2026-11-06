@@ -228,7 +228,7 @@ def row_normalize_tensor(mx):
     mx -= mx.min()
     rowsum = mx.sum(1)
     r_inv = rowsum.pow(-1).flatten()
-    # r_inv[torch.isinf(r_inv)] = 0.
+    r_inv[torch.isinf(r_inv)] = 0.0
     r_mat_inv = torch.diag(r_inv)
     mx = r_mat_inv @ mx
     return mx
@@ -1137,7 +1137,7 @@ def updated_log_likelihood_for_edge_changes(node_pairs, adjacency_matrix, d_min)
     """
     # For each node pair find out whether there is an edge or not in the input adjacency matrix.
 
-    edge_entries_before = adjacency_matrix[node_pairs.T]
+    edge_entries_before = adjacency_matrix[tuple(node_pairs.T)]
     degree_sequence = adjacency_matrix.sum(1)
     D_G = degree_sequence[degree_sequence >= d_min.item()]
     sum_log_degrees = torch.log(D_G).sum()

@@ -85,8 +85,11 @@ def load_reduced_graph(
     from torch_geometric.data import Data
 
     adj = torch.load(adj_path, map_location="cpu")
-    if hasattr(adj, "coalesce"):
-        edge_index = adj.coalesce().indices()
+    if isinstance(adj, torch.Tensor):
+        if adj.layout == torch.strided:
+            edge_index = adj.nonzero().t().contiguous()
+        else:
+            edge_index = adj.to_sparse_coo().coalesce().indices()
     elif hasattr(adj, "nonzero"):
         edge_index = torch.as_tensor(adj.nonzero(), dtype=torch.long)
         if edge_index.shape[0] != 2:
@@ -94,6 +97,10 @@ def load_reduced_graph(
     else:
         raise ValueError(f"Unsupported adjacency format in {adj_path}")
     data = Data(edge_index=edge_index)
+    shape = getattr(adj, "shape", None)
+    if shape is not None and len(shape) == 2:
+        # Keep isolated nodes that no edge refers to.
+        data.num_nodes = int(shape[0])
     if feat_path:
         data.x = torch.load(feat_path, map_location="cpu")
     if label_path:

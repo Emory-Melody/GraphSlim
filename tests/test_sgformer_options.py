@@ -1,7 +1,7 @@
 """Real SGFormer configuration, representation, and checkpoint invariants.
 
-Ported from the legacy suite; the zero-validation reload case is omitted because
-SGFormer.fit_with_val raises UnboundLocalError when validation never improves.
+Ported from the legacy suite. The layout test was replaced: sparse inputs are
+documented to normalize by edge counts, dense inputs by weighted degree.
 """
 
 import numpy as np
@@ -20,18 +20,9 @@ def single_thread():
     torch.set_num_threads(old)
 
 
-# aggregate="cat" without the graph branch is omitted: the classifier expects
-# 2 * hidden inputs but receives only the transformer branch (package bug).
-CONFIGURATIONS = [
-    (aggregate, use_graph, weighted)
-    for aggregate in ("add", "cat")
-    for use_graph in (False, True)
-    for weighted in (False, True)
-    if use_graph or aggregate == "add"
-]
-
-
-@pytest.mark.parametrize("aggregate,use_graph,weighted", CONFIGURATIONS)
+@pytest.mark.parametrize("aggregate", ["add", "cat"])
+@pytest.mark.parametrize("use_graph", [False, True])
+@pytest.mark.parametrize("weighted", [False, True])
 def test_configurations_are_permutation_equivariant_with_finite_gradients(
     tmp_path, aggregate, use_graph, weighted
 ):
@@ -91,6 +82,20 @@ def test_sparse_normalization_uses_edge_counts_and_matches_dense_for_binary_grap
     )
 
 
+def test_zero_validation_score_still_returns_a_reloadable_fitted_model(tmp_path):
+    args = quick_args(tmp_path, "random", "trans")
+    args.lr = 0
+    graph = tiny_graph()
+    graph.labels_val = torch.ones_like(graph.labels_val)
+    model = SGFormer(8, 4, 2, args)
+    with torch.no_grad():
+        model.fc.weight.zero_()
+        model.fc.bias.copy_(torch.tensor([20.0, -20]))
+    score = model.fit_with_val(graph, train_iters=1, verbose=True)
+    assert score == 0
+    assert torch.isfinite(model.predict(graph.feat_full, graph.adj_full)).all()
+
+
 @pytest.mark.parametrize("setting", ["trans", "ind"])
 @pytest.mark.parametrize("loss", ["MSE", "CE"])
 def test_soft_target_fits_return_finite_predictions_and_test_metrics(tmp_path, setting, loss):
@@ -101,8 +106,7 @@ def test_soft_target_fits_return_finite_predictions_and_test_metrics(tmp_path, s
     graph.adj_syn = torch.eye(len(graph.feat_syn))
     graph.labels_syn = torch.nn.functional.one_hot(graph.labels_train, 2).float() * 3
     model = SGFormer(8, 4, 2, args)
-    # Verbose fitting is not used: its training-accuracy print rejects soft targets.
-    score = model.fit_with_val(graph, train_iters=3, reduced=True, setting=setting)
+    score = model.fit_with_val(graph, train_iters=3, reduced=True, setting=setting, verbose=True)
     assert 0 <= score <= 1
     result = model.test(graph, setting=setting, verbose=True)
     assert np.isfinite(result) and 0 <= result <= 1

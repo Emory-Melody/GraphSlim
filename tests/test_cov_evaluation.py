@@ -136,6 +136,10 @@ def test_size_in_megabytes_counts_every_storage_type():
     assert getsize_mb([array]) == pytest.approx(64 / megabyte)
     assert getsize_mb([csr]) == pytest.approx(2 * 4 * 8 / megabyte)
     assert getsize_mb([sparse]) == pytest.approx((8 + 8 + 4) * 4 / megabyte)
+    # Regression: unweighted SparseTensors store no value tensor.
+    unweighted = SparseTensor(row=torch.tensor([0, 1]), col=torch.tensor([1, 0]))
+    assert unweighted.storage.value() is None
+    assert getsize_mb([unweighted]) == pytest.approx(2 * 2 * 8 / megabyte)
 
 
 class Reducer:
@@ -167,7 +171,8 @@ def test_f1_scores_for_class_scores_and_sigmoid_probabilities():
     probabilities = np.array([[0.7, 0.2], [0.4, 0.9]])
     micro, macro = calc_f1(np.array([[1, 0], [0, 1]]), probabilities, is_sigmoid=True)
     assert micro == macro == 1.0
-    assert probabilities.tolist() == [[1, 0], [0, 1]]
+    # Regression: thresholding no longer overwrites the caller's probabilities.
+    assert probabilities.tolist() == [[0.7, 0.2], [0.4, 0.9]]
 
 
 def test_graphsaint_evaluation_prints_f1_scores(capsys):
@@ -261,3 +266,48 @@ def test_nas_evaluator_uses_in_memory_choices_and_scores(tmp_path):
     value.results_ori, value.results_syn = [0.1, 0.2, 0.3], [0.3, 0.2, 0.1]
     accuracy, rank = value.cal_pearson()
     assert accuracy == pytest.approx(-1) and rank == pytest.approx(-1)
+
+
+def test_non_graphsaint_evaluation_prints_loss_and_argmax_accuracy(capsys):
+    output = torch.log_softmax(torch.tensor([[2.0, 0.0], [0.0, 2.0], [2.0, 0.0]]), 1)
+    evaluate(output, torch.tensor([0, 1, 1]), SimpleNamespace(dataset="cora"))
+    loss = torch.nn.functional.nll_loss(output, torch.tensor([0, 1, 1])).item()
+    assert f"loss= {loss:.4f} accuracy= 0.6667" in capsys.readouterr().out
+
+
+def test_visualize_compares_raw_and_propagated_saved_reduction(tmp_path):
+    from torch_sparse import matmul
+
+    from graphslim.utils import normalize_adj_tensor, to_tensor
+
+    args = quick_args(tmp_path, "random", "ind")
+    graph = tiny_graph()
+    seed_everything(0)
+    reduced = create_reducer("random", "ind", graph, args).reduce(graph)
+    evaluator = Evaluator(args)
+    calls = []
+    evaluator.tsne_vis = lambda *values: calls.append(values)
+    evaluator.visualize(reduced)
+
+    def propagate(adjacency, features):
+        operator = normalize_adj_tensor(to_tensor(adjacency), sparse=True)
+        return matmul(operator, matmul(operator, features))
+
+    assert len(calls) == 2
+    (feat_train, labels_train, feat_syn, labels_syn), aggregated = calls
+    assert torch.equal(feat_train, graph.feat_train) and torch.equal(feat_syn, reduced.feat_syn)
+    assert torch.equal(labels_syn, reduced.labels_syn)
+    torch.testing.assert_close(aggregated[0], propagate(graph.adj_train, graph.feat_train))
+    torch.testing.assert_close(aggregated[2], propagate(reduced.adj_syn, reduced.feat_syn))
+
+
+def test_property_evaluator_reads_adjacency_only_edge_sparsifier_checkpoint(tmp_path):
+    args = quick_args(tmp_path, "random_edge", "trans")
+    args.with_structure, args.seed = 1, 1
+    graph = tiny_graph()
+    reduced = create_reducer("random_edge", "trans", graph, args).reduce(graph)
+    report = PropertyEvaluator(args).evaluate(reduced, reduced=True)
+    assert report["nodes"] == 32
+    assert report["edges"] == reduced.reduced_edges
+    expected = calculate_homophily(graph.labels_full.numpy(), reduced.adj_syn.to_dense().numpy())
+    assert report["homophily"] == pytest.approx(expected)

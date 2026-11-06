@@ -157,15 +157,17 @@ class ReparamModule(nn.Module):
         """
         saved_views = [getattr(self._get_module_from_name(mn), n) for mn, n in self._param_infos]
         self._unflatten_param(flat_param)
-        yield
-        for (mn, n), p in zip(self._param_infos, saved_views):
-            setattr(self._get_module_from_name(mn), n, p)
-        for mn, n, shared_mn, shared_n in self._shared_param_infos:
-            setattr(
-                self._get_module_from_name(mn),
-                n,
-                getattr(self._get_module_from_name(shared_mn), shared_n),
-            )
+        try:
+            yield
+        finally:
+            for (mn, n), p in zip(self._param_infos, saved_views):
+                setattr(self._get_module_from_name(mn), n, p)
+            for mn, n, shared_mn, shared_n in self._shared_param_infos:
+                setattr(
+                    self._get_module_from_name(mn),
+                    n,
+                    getattr(self._get_module_from_name(shared_mn), shared_n),
+                )
 
     @contextmanager
     def replaced_buffers(self, buffers):
@@ -176,9 +178,11 @@ class ReparamModule(nn.Module):
         """
         for (mn, n, _), new_b in zip(self._buffer_infos, buffers):
             setattr(self._get_module_from_name(mn), n, new_b)
-        yield
-        for mn, n, old_b in self._buffer_infos:
-            setattr(self._get_module_from_name(mn), n, old_b)
+        try:
+            yield
+        finally:
+            for mn, n, old_b in self._buffer_infos:
+                setattr(self._get_module_from_name(mn), n, old_b)
 
     def _forward_with_param_and_buffers(self, flat_param, buffers, *inputs, **kwinputs):
         """Evaluate the wrapped model with explicit parameters and replacement buffers.
@@ -207,15 +211,16 @@ class ReparamModule(nn.Module):
     def forward(self, *inputs, flat_param=None, buffers=None, **kwinputs):
         """Run a functional forward pass with optional replacement parameters and buffers.
 
-        :param flat_param: Flattened model parameters; views preserve gradients through this tensor. Defaults to ``None``.
+        :param flat_param: Flattened model parameters; views preserve gradients through this tensor. Defaults to ``None``, which uses the wrapper's own ``flat_param``.
         :param buffers: Replacement model buffers in the wrapper registration order. Defaults to ``None``.
         :param inputs: Positional inputs forwarded to the wrapped model.
         :param kwinputs: Keyword inputs forwarded to the wrapped model.
         :returns: Output returned by the wrapped module; gradients flow through the chosen parameter tensor.
         """
-        flat_param = torch.squeeze(flat_param)
         if flat_param is None:
             flat_param = self.flat_param
+        # Accept row/column vectors while keeping one-element parameters 1-D.
+        flat_param = flat_param.reshape(-1)
         if buffers is None:
             return self._forward_with_param(flat_param, *inputs, **kwinputs)
         else:

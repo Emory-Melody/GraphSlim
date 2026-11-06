@@ -73,7 +73,8 @@ def getsize_mb(elements):
             row, col, value = e.coo()
             size += row.element_size() * row.nelement()
             size += col.element_size() * col.nelement()
-            size += value.element_size() * value.nelement()
+            if value is not None:  # unweighted SparseTensor stores no values
+                size += value.element_size() * value.nelement()
         elif isinstance(e, sp.csr_matrix):
             e = csr2ei(e)
             size += e.element_size() * e.nelement()
@@ -231,8 +232,8 @@ def calc_f1(y_true, y_pred, is_sigmoid=False):
     if not is_sigmoid:
         y_pred = np.argmax(y_pred, axis=1)
     else:
-        y_pred[y_pred > 0.5] = 1
-        y_pred[y_pred <= 0.5] = 0
+        # Threshold a copy so the caller's probabilities are left unchanged.
+        y_pred = (np.asarray(y_pred) > 0.5).astype(int)
     return f1_score(y_true, y_pred, average="micro"), f1_score(y_true, y_pred, average="macro")
 
 
@@ -269,10 +270,10 @@ def evaluate(output, labels, args):
         )
     else:
         loss_test = F.nll_loss(output, labels)
-        acc_test = accuracy_score(output, labels)
+        acc_test = accuracy_score(labels.cpu().numpy(), output.argmax(1).cpu().numpy())
         print(
             "Test set results:",
             "loss= {:.4f}".format(loss_test.item()),
-            "accuracy= {:.4f}".format(acc_test.item()),
+            "accuracy= {:.4f}".format(acc_test),
         )
     return

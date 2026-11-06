@@ -304,7 +304,7 @@ class GEOM(GCondBase):
             if args.soft_label:
                 self.optimizer_label.step()
                 if args.setting == "ind":
-                    optimizer_tem.zero_grad()
+                    optimizer_tem.step()
             # print('torch.sum(self.feat_syn) = {}'.format(torch.sum(self.feat_syn)))
             if args.optim_lr:
                 optimizer_lr.step()
@@ -395,10 +395,14 @@ class GEOM(GCondBase):
                     momentum=args.mom_teacher,
                     weight_decay=args.wd_teacher,
                 )
+            else:
+                raise ValueError(
+                    f"GEOM expert optimizer must be 'Adam' or 'SGD', got {args.optim!r}"
+                )
 
             timestamps = []
 
-            timestamps.append([p.detach().cpu() for p in model.parameters()])
+            timestamps.append([p.detach().to("cpu", copy=True) for p in model.parameters()])
 
             lam = float(args.lam)
             T = float(args.T)
@@ -422,7 +426,7 @@ class GEOM(GCondBase):
                 optimizer_model.step()
 
                 if e % 10 == 0 and e > 1:
-                    timestamps.append([p.detach().cpu() for p in model.parameters()])
+                    timestamps.append([p.detach().to("cpu", copy=True) for p in model.parameters()])
 
             trajectories.append(timestamps)
 

@@ -58,7 +58,8 @@ class PGE(nn.Module):
         """
         if self.args.dataset == "reddit" and self.args.reduction_rate >= 0.01:
             edge_index = self.edge_index
-            n_part = 5
+            # Keep at least two rows per chunk so training-mode batch norm is defined.
+            n_part = min(5, max(1, edge_index.shape[1] // 2))
             splits = np.array_split(np.arange(edge_index.shape[1]), n_part)
             edge_embed = []
             for idx in splits:

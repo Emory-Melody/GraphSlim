@@ -1,9 +1,9 @@
 """Numerical checks for the GCSNTK kernel, kernel ridge regression, and SGDD spectral maps.
 
-The original version of this file crashed the interpreter: ``sparse_kron`` scales the
-index buffer of an already coalesced sparse input in place, so passing the same
+The legacy version of this file aborted the interpreter: ``sparse_kron`` used to scale
+the index buffer of an already coalesced input in place, so passing the same
 coalesced tensor as both operands produced out-of-range COO indices and a native
-crash in ``to_dense``. These tests use freshly built (uncoalesced) operators.
+crash in ``to_dense``. The regression tests below use coalesced inputs on purpose.
 """
 
 from types import MethodType, SimpleNamespace
@@ -30,6 +30,31 @@ def binary_sparse(dense):
 
 
 @pytest.mark.parametrize("same_input", [False, True])
+@pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+def test_sparse_kronecker_never_mutates_coalesced_inputs(same_input, dtype):
+    first_dense = torch.tensor([[0.0, 1.0, 0.0], [1.0, 0.0, 1.0]], dtype=dtype)
+    second_dense = first_dense if same_input else torch.eye(2, dtype=dtype)
+    first = first_dense.to_sparse()
+    second = first if same_input else second_dense.to_sparse()
+    assert first.is_coalesced() and second.is_coalesced()
+    saved = [(value.indices().clone(), value.values().clone()) for value in [first, second]]
+    kernel = StructureBasedNeuralTangentKernel()
+    for _ in range(3):
+        actual = kernel.sparse_kron(first, second)
+        assert actual.dtype == dtype
+        torch.testing.assert_close(actual.to_dense(), torch.kron(first_dense, second_dense))
+        for value, (indices, weights) in zip([first, second], saved):
+            assert torch.equal(value.indices(), indices)
+            assert torch.equal(value.values(), weights)
+
+
+def test_sparse_kronecker_uses_only_the_sparsity_pattern():
+    weighted = torch.tensor([[0.0, 2.0], [3.0, 0.0]]).to_sparse()
+    actual = StructureBasedNeuralTangentKernel().sparse_kron(weighted, torch.eye(1).to_sparse())
+    torch.testing.assert_close(actual.to_dense(), torch.tensor([[0.0, 1.0], [1.0, 0.0]]))
+
+
+@pytest.mark.parametrize("same_input", [False, True])
 def test_sparse_kronecker_matches_dense_binary_product(same_input):
     first_dense = torch.tensor([[0.0, 1.0, 0.0], [1.0, 0.0, 1.0]])
     second_dense = first_dense if same_input else torch.tensor([[1.0, 0.0], [0.0, 1.0]])
@@ -47,19 +72,38 @@ def test_sparse_kronecker_matches_dense_binary_product(same_input):
 
 
 @pytest.mark.parametrize("scale", ["add", "average"])
-def test_sntk_gram_stays_finite_symmetric_psd_and_repeatable(scale):
+@pytest.mark.parametrize("zero_features", [False, True])
+def test_sntk_gram_stays_finite_symmetric_psd_and_repeatable(scale, zero_features):
     torch.manual_seed(3)
-    features = torch.rand(9, 5, requires_grad=True)
+    features = torch.rand(9, 5)
+    if zero_features:
+        features[:2] = 0  # regression: zero-variance rows used to give 0/0 = NaN
+    features.requires_grad_()
     ring = torch.eye(9) + torch.eye(9).roll(1, 0) + torch.eye(9).roll(-1, 0)
+    adjacency = torch.eye(9).to_sparse() if zero_features else ring.to_sparse()
     kernel = StructureBasedNeuralTangentKernel(K=2, L=2, scale=scale)
-    first = kernel.nodes_gram(features, features, binary_sparse(ring), binary_sparse(ring))
-    second = kernel.nodes_gram(features, features, binary_sparse(ring), binary_sparse(ring))
+    # The same coalesced operator is passed twice, as in K_ss = kernel(G_s, G_s, E_s, E_s).
+    first = kernel.nodes_gram(features, features, adjacency, adjacency)
+    second = kernel.nodes_gram(features, features, adjacency, adjacency)
     assert torch.isfinite(first).all()
     assert torch.equal(first, second)
     torch.testing.assert_close(first, first.T)
     assert torch.linalg.eigvalsh(first.double()).min() > -1e-4 * first.diag().max()
     first.square().mean().backward()
     assert torch.isfinite(features.grad).all()
+    if zero_features:
+        # Zero-variance nodes have (numerically) zero covariance with every node.
+        assert first[:2].abs().max() < 1e-12 * first.abs().max()
+    assert torch.equal(adjacency.to_dense(), torch.eye(9) if zero_features else ring)
+
+
+def test_sntk_positive_variance_path_is_unchanged_by_zero_variance_guard():
+    torch.manual_seed(4)
+    features = torch.rand(6, 3)
+    sigma = features @ features.T
+    updated, diag = StructureBasedNeuralTangentKernel().update_diag(sigma)
+    assert torch.equal(diag, torch.sqrt(torch.diag(sigma)))
+    assert torch.isfinite(updated).all()
 
 
 def test_sntk_identity_structure_reduces_to_relu_ntk_of_features():
@@ -94,6 +138,14 @@ def test_full_rank_krr_has_finite_predictions_and_gradients(ridge):
     prediction.square().mean().backward()
     for value in [prediction, support.grad, targets.grad]:
         assert torch.isfinite(value).all()
+
+
+def test_krr_singular_system_raises_linalg_error():
+    support = torch.zeros(4, 3, requires_grad=True)
+    model = KernelRidgeRegression(lambda a, b, *_: a @ b.T, 0.0)
+    labels = torch.eye(2)[torch.tensor([0, 1, 0])]
+    with pytest.raises(torch.linalg.LinAlgError):
+        model(torch.rand(3, 3), support, labels, torch.rand(4, 2), None, None)
 
 
 def test_krr_matches_original_well_conditioned_objective_and_gradient():

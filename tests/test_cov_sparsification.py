@@ -126,6 +126,40 @@ def test_pagerank_centrality_selects_class_budgets_from_training_nodes(tmp_path,
     assert torch.equal(result.feat_syn, features[selected])
 
 
+def nonprefix_graph():
+    graph = tiny_graph()
+    graph.idx_train = torch.tensor([9, 4, 17, 2, 29, 6, 25, 12])
+    ids = graph.idx_train.numpy()
+    graph.feat_train = graph.feat_full[ids]
+    graph.labels_train = graph.labels_full[ids]
+    graph.adj_train = graph.adj_full[np.ix_(ids, ids)]
+    return graph
+
+
+def test_pagerank_matches_networkx_on_an_irregular_graph(tmp_path):
+    import networkx as nx
+
+    graph = star_graph()
+    args = quick_args(tmp_path, "cent_p", "trans")
+    reducer = CentP("trans", graph, args)
+    adjacency = graph.adj_full.copy()
+    # Regression: scores were uniform (1/n) because P r was used instead of P^T r.
+    scores = reducer.pagerank_algorithm(max_iterations=1000, convergence_threshold=1e-12)
+    reference = nx.pagerank(
+        nx.from_scipy_sparse_array(adjacency), alpha=0.85, tol=1e-12, max_iter=1000
+    )
+    # networkx spreads isolated (dangling) mass uniformly, which only rescales the
+    # fixed point, so the normalized vectors agree.
+    theirs = np.array([reference[i] for i in range(len(scores))])
+    np.testing.assert_allclose(scores / scores.sum(), theirs, rtol=1e-6)
+    assert len(np.unique(np.round(scores, 12))) > 2
+    selected = reducer.select()
+    for label in (0, 1):
+        chosen = [i for i in selected if i % 2 == label]
+        rest = [i for i in range(16) if i % 2 == label and i not in chosen]
+        assert scores[chosen].min() >= scores[rest].max()
+
+
 def propagated(adjacency, features):
     operator = normalize_adj_tensor(to_tensor(adjacency), sparse=True)
     return matmul(matmul(operator, operator), features).float()
@@ -136,9 +170,9 @@ def propagated(adjacency, features):
 def test_aggregated_coresets_select_from_two_hop_features_with_identity_graph(
     tmp_path, capsys, cls, setting
 ):
-    # tiny_graph trains on a prefix of nodes; the inductive aggregation path
-    # propagates feat_full rows, which is only correct for prefix splits.
-    graph = tiny_graph()
+    # Regression: non-prefix training IDs; inductive aggregation must propagate
+    # training-subgraph features rather than the first rows of feat_full.
+    graph = nonprefix_graph()
     args = quick_args(tmp_path, "kcenter", setting)
     args.agg = True
     reducer = cls(setting, graph, args)
@@ -149,9 +183,9 @@ def test_aggregated_coresets_select_from_two_hop_features_with_identity_graph(
     labels = graph.labels_train if setting == "ind" else graph.labels_full
     check_budget(reducer, selected, labels)
     result = reducer.reduce(graph, verbose=True, save=False)
-    assert "selected nodes: 8" in capsys.readouterr().out
+    assert "selected nodes: 4" in capsys.readouterr().out
     torch.testing.assert_close(result.feat_syn, aggregated[selected])
-    assert torch.equal(result.adj_syn, torch.eye(8))
+    assert torch.equal(result.adj_syn, torch.eye(4))
     assert torch.equal(result.labels_syn, labels[selected])
 
 
@@ -207,9 +241,10 @@ def test_fixed_sfgc_indices_are_loaded_instead_of_training(tmp_path, monkeypatch
     graph = tiny_graph()
     args = quick_args(tmp_path, "sfgc", setting)
     args.dataset = "toy"
-    monkeypatch.chdir(tmp_path)
-    folder = tmp_path / "sparsification" / "fixed_idx"
-    folder.mkdir(parents=True)
+    # Regression: indices are read from the package folder, not the working directory.
+    folder = tmp_path / "fixed_idx"
+    folder.mkdir()
+    monkeypatch.setattr(module, "FIXED_IDX_DIR", folder)
     fixed = np.array([3, 0, 5, 2])
     np.save(folder / f"idx_toy_{args.reduction_rate}_kcenter_15.npy", fixed)
 
@@ -223,6 +258,14 @@ def test_fixed_sfgc_indices_are_loaded_instead_of_training(tmp_path, monkeypatch
     assert torch.equal(result.feat_syn, features[fixed])
     labels = graph.labels_train if setting == "ind" else graph.labels_full
     assert torch.equal(result.labels_syn.long(), labels[fixed])
+
+
+def test_packaged_sfgc_indices_load_independently_of_working_directory(tmp_path, monkeypatch):
+    from graphslim.sparsification.model_based_coreset_base import fixed_kcenter_indices
+
+    monkeypatch.chdir(tmp_path)
+    selected = fixed_kcenter_indices(SimpleNamespace(dataset="cora", reduction_rate=0.5))
+    assert selected.ndim == 1 and len(selected) == len(set(selected.tolist())) > 0
 
 
 # ------------------------------------------------------------ edge sparsifiers

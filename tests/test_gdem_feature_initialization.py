@@ -58,3 +58,24 @@ def test_mlp_trainer_restores_best_validation_weights():
     model.eval()
     prediction = model(graph.feat_val).argmax(1)
     assert torch.equal(prediction, graph.labels_val)
+
+
+def test_initialization_starts_from_xavier_values(monkeypatch):
+    """Restored legacy check: with a gradient-free classifier the output is the Xavier start."""
+    agent = object.__new__(GDEM)
+    agent.args = SimpleNamespace(lr_feat=0.005)
+    agent.data = SimpleNamespace(labels_syn=torch.tensor([0, 1]))
+    agent.device = "cpu"
+    # Uninitialized-looking contents must be overwritten, not optimized from.
+    agent.x_syn = nn.Parameter(torch.full((2, 3), float("nan")))
+
+    class ConstantClassifier(nn.Module):
+        def forward(self, features):
+            return F.log_softmax(features[:, :2] * 0, dim=1)
+
+    monkeypatch.setattr(agent, "mlp_trainer", lambda args, data, verbose: ConstantClassifier())
+    torch.manual_seed(12)
+    initial = torch.empty(2, 3)
+    nn.init.xavier_uniform_(initial)
+    torch.manual_seed(12)
+    torch.testing.assert_close(agent.init_feat().detach(), initial)

@@ -454,7 +454,7 @@ class SGFormer(nn.Module):
         self.args = args
         self.device = args.device
         self.lr = args.lr
-        if hasattr(args, "train_weight_decay"):
+        if hasattr(args, "trans_weight_decay"):
             self.trans_weight_decay = args.trans_weight_decay
         else:
             self.trans_weight_decay = trans_weight_decay
@@ -497,7 +497,8 @@ class SGFormer(nn.Module):
         if aggregate == "add":
             self.fc = nn.Linear(hidden_channels, out_channels)
         elif aggregate == "cat":
-            self.fc = nn.Linear(2 * hidden_channels, out_channels)
+            # Without the graph branch only the transformer output is concatenated.
+            self.fc = nn.Linear((2 if use_graph else 1) * hidden_channels, out_channels)
         else:
             raise ValueError(f"Invalid aggregate type:{aggregate}")
 
@@ -619,6 +620,7 @@ class SGFormer(nn.Module):
             print("=== training ===")
 
         best_acc_val = 0
+        weights = None
         if setting == "ind":
             feat_full, adj_full = data.feat_val, data.adj_val
         else:
@@ -664,7 +666,8 @@ class SGFormer(nn.Module):
 
             if verbose and i % 100 == 0:
                 print("Epoch {}, training loss: {}".format(i, loss_train.item()))
-                acc_train = accuracy(output if reindex else output[data.idx_train], labels)
+                hard_labels = labels.argmax(1) if labels.ndim == 2 else labels
+                acc_train = accuracy(output if reindex else output[data.idx_train], hard_labels)
                 print("Epoch {}, training acc: {}".format(i, acc_train))
 
             with torch.no_grad():
@@ -684,7 +687,9 @@ class SGFormer(nn.Module):
 
         if verbose:
             print("=== picking the best model according to the performance on validation ===")
-        self.load_state_dict(weights)
+        # Keep the final weights when validation never improves, as BaseGNN does.
+        if weights is not None:
+            self.load_state_dict(weights)
         return best_acc_val
 
     @torch.no_grad()

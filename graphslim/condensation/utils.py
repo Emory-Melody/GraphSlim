@@ -563,25 +563,28 @@ def get_embed_sum(eigenvals, eigenvecs, x):
     return embed_sum
 
 
-def get_embed_mean(embed_sum, label, class_matrix=None):
+def get_embed_mean(embed_sum, label, class_matrix=None, num_classes=None):
     """Compute normalized class means of node embeddings while keeping empty classes zero.
 
     :param embed_sum: Filtered node embedding matrix.
     :param label: Node labels in the same node ordering as the corresponding features.
     :param class_matrix: Optional class-by-node membership matrix; otherwise built from the labels. Defaults to ``None``.
+    :param num_classes: Number of class rows when building the membership matrix; ``None`` infers it from the largest label. Defaults to ``None``.
     :returns: Class-by-feature tensor of L2-normalized mean embeddings.
     """
     if class_matrix is None:
-        class_matrix = F.one_hot(label).float().T  # cn
+        num_classes = -1 if num_classes is None else num_classes
+        class_matrix = F.one_hot(label, num_classes).float().T  # cn
     embed_sum = class_matrix @ embed_sum  # cd
-    mean_weight = (1 / class_matrix.sum(1)).unsqueeze(-1)  # c1
+    # Empty classes have a zero sum; dividing by one keeps them zero instead of NaN.
+    mean_weight = (1 / class_matrix.sum(1).clamp_min(1)).unsqueeze(-1)  # c1
     embed_mean = mean_weight * embed_sum
     embed_mean = F.normalize(input=embed_mean, p=2, dim=1)
     return embed_mean
 
 
-def get_eigh(laplacian_matrix, data_name, save=True):
-    """Load or compute Laplacian eigenpairs under ``./data/data_name``.
+def get_eigh(laplacian_matrix, data_name, save=True, root="./data"):
+    """Load or compute Laplacian eigenpairs under ``root/data_name``.
 
     Large datasets use low and high partial spectral ranges; other datasets use a
     complete eigendecomposition. Existing cache files are read even when saving is disabled.
@@ -589,19 +592,28 @@ def get_eigh(laplacian_matrix, data_name, save=True):
     :param laplacian_matrix: Dense NumPy or SciPy sparse symmetric Laplacian.
     :param data_name: Dataset name selecting the cache directory and spectral ranges.
     :param save: Whether to write newly computed eigenpairs. Defaults to ``True``.
+    :param root: Cache root, normally ``args.load_path`` so that :func:`load_eigen`
+        reads the same files; ``None`` disables the cache. Defaults to ``"./data"``.
     :returns: NumPy ``(eigenvalues, eigenvectors)`` sorted by ascending eigenvalue.
     """
-    dir = os.path.join("./data", data_name)
-    if not os.path.isdir(dir):
-        os.makedirs(dir)
+    if root is None:
+        save = False
+        dir = None
+    else:
+        dir = os.path.join(root, data_name)
+        if not os.path.isdir(dir):
+            os.makedirs(dir)
 
     val_file_name = "eigenvalues.npy"
     vec_file_name = "eigenvectors.npy"
 
-    eigvals_path = os.path.join(dir, val_file_name)
-    eigvecs_path = os.path.join(dir, vec_file_name)
+    cached = dir is not None
+    if cached:
+        eigvals_path = os.path.join(dir, val_file_name)
+        eigvecs_path = os.path.join(dir, vec_file_name)
+        cached = os.path.exists(eigvals_path) and os.path.exists(eigvecs_path)
 
-    if os.path.exists(eigvals_path) and os.path.exists(eigvecs_path):
+    if cached:
         eigenvalues = np.load(eigvals_path)
         eigenvectors = np.load(eigvecs_path)
     else:
@@ -619,10 +631,10 @@ def get_eigh(laplacian_matrix, data_name, save=True):
     if data_name in ["ogbn-arxiv", "flickr", "reddit", "twitch-gamer"]:
         val_file_name = "eigenvalues_la.npy"
         vec_file_name = "eigenvectors_la.npy"
-        eigvals_path = os.path.join(dir, val_file_name)
-        eigvecs_path = os.path.join(dir, vec_file_name)
+        eigvals_path = os.path.join(dir or "", val_file_name)
+        eigvecs_path = os.path.join(dir or "", vec_file_name)
 
-        if os.path.exists(eigvals_path) and os.path.exists(eigvecs_path):
+        if dir is not None and os.path.exists(eigvals_path) and os.path.exists(eigvecs_path):
             eigenvalues_la = np.load(eigvals_path)
             eigenvectors_la = np.load(eigvecs_path)
         else:
@@ -677,37 +689,32 @@ def load_eigen(dataset, load_path):
     return eigenvalues, eigenvectors
 
 
+def node_id_list(index):
+    """Convert a NumPy, list, or torch node-index collection to Python integers.
+
+    :param index: Node IDs as a tensor, array, or sequence.
+    :returns: List of ``int`` node IDs in the input order.
+    """
+    if isinstance(index, torch.Tensor):
+        index = index.detach().cpu()
+    return np.asarray(index, dtype=np.int64).reshape(-1).tolist()
+
+
 def get_train_lcc(idx_lcc, idx_train, y_full, num_nodes, num_classes):
     """Map only observed training nodes into the largest connected component.
 
-    Validation and test labels are never used to fill missing training classes.
+    Training nodes outside the component are dropped. Validation, test, and
+    unlabeled nodes (and their labels) are never used to fill missing classes.
 
     :param idx_lcc: Original node IDs belonging to the largest connected component.
-    :param idx_train: Original node IDs belonging to the training split.
-    :param y_full: Full-graph labels; retained for compatibility and not used to infer missing training labels.
-    :param num_nodes: Number of nodes in the graph.
-    :param num_classes: Number of output classes.
-    :returns: Tuple ``(original_training_node_ids, component_local_node_ids)``.
+    :param idx_train: Original node IDs belonging to the training split (tensor, array, or list).
+    :param y_full: Full-graph labels; retained for compatibility and not used.
+    :param num_nodes: Number of nodes in the graph; retained for compatibility.
+    :param num_classes: Number of output classes; retained for compatibility.
+    :returns: Tuple ``(original_training_node_ids, component_local_node_ids)``; both lists
+        follow the training split order and refer to the same nodes.
     """
-    idx_train_lcc = list(set(idx_train).intersection(set(idx_lcc)))
-    y_full = y_full.cpu().numpy()
-    if len(idx_lcc) == num_nodes:
-        idx_map = idx_train
-    else:
-        y_train = y_full[idx_train]
-        y_train_lcc = y_full[idx_train_lcc]
-
-        y_lcc_idx = list((set(range(num_nodes)) - set(idx_train)).intersection(set(idx_lcc)))
-        y_lcc_ = y_full[y_lcc_idx]
-        counter_train = Counter(y_train)
-        counter_train_lcc = Counter(y_train_lcc)
-        idx = np.arange(len(y_lcc_))
-        for c in range(num_classes):
-            num_c = counter_train[c] - counter_train_lcc[c]
-            if num_c > 0:
-                idx_c = list(idx[y_lcc_ == c])
-                idx_c = np.array(y_lcc_idx)[idx_c]
-                idx_train_lcc += list(np.random.permutation(idx_c)[:num_c])
-        idx_map = [idx_lcc.index(i) for i in idx_train_lcc]
-
+    position = {node: local for local, node in enumerate(node_id_list(idx_lcc))}
+    idx_train_lcc = [node for node in node_id_list(idx_train) if node in position]
+    idx_map = [position[node] for node in idx_train_lcc]
     return idx_train_lcc, idx_map

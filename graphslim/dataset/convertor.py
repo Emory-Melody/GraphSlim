@@ -166,10 +166,12 @@ def networkit_to_pyg(graph):
     """Convert NetworKit edges and optional scalar weights to a PyG graph.
 
     :param graph: Input graph object.
-    :returns: PyG Data retaining the declared node count, including isolated nodes.
+    :returns: PyG Data retaining the declared node count, including isolated nodes, with one
+        ``edge_index`` column per NetworKit edge (undirected edges are not duplicated).
     """
-    edges = list(graph.edges())
-    edge_index = torch.tensor(edges, dtype=torch.long).t().contiguous()
+    # NetworKit 11 exposes edges through ``iterEdges``; each undirected edge appears once.
+    edges = [(int(u), int(v)) for u, v in graph.iterEdges()]
+    edge_index = torch.tensor(edges, dtype=torch.long).reshape(-1, 2).t().contiguous()
 
     # Check if the graph is weighted
     if graph.isWeighted():
@@ -177,7 +179,7 @@ def networkit_to_pyg(graph):
     else:
         edge_attr = None
 
-    pyg_graph = Data(edge_index=edge_index, edge_attr=edge_attr)
+    pyg_graph = Data(edge_index=edge_index, edge_attr=edge_attr, num_nodes=graph.numberOfNodes())
     return pyg_graph
 
 

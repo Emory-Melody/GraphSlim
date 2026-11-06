@@ -173,8 +173,9 @@ class GCondBase:
         args : Namespace
             Arguments object containing hyperparameters for training and model.
         soft : bool, optional
-            Use KL divergence with log targets instead of negative log
-            likelihood for classwise gradient matching. Defaults to False.
+            Use KL divergence to (one-hot or soft) class-probability targets
+            instead of negative log likelihood for classwise gradient matching.
+            Defaults to False.
 
         Returns
         -------
@@ -198,17 +199,19 @@ class GCondBase:
             else:
                 hard_labels_syn = labels_syn.long()
         else:
-            loss_fn = torch.nn.KLDivLoss(reduction="batchmean", log_target=True)
+            # Model outputs are log-probabilities; targets are class probabilities.
+            loss_fn = torch.nn.KLDivLoss(reduction="batchmean")
             # Convert labels to one-hot encoding if they are class indices
             if labels.dim() == 1:
-                hard_labels = labels
-                soft_labels = F.one_hot(labels, num_classes=data.nclass).float()
+                soft_labels = F.one_hot(labels.long(), num_classes=data.nclass).float()
+            else:
+                soft_labels = labels.float()
             if labels_syn.dim() == 1:
-                hard_labels_syn = labels
-                soft_labels_syn = F.one_hot(labels_syn, num_classes=data.nclass).float()
+                hard_labels_syn = labels_syn.long()
+                soft_labels_syn = F.one_hot(hard_labels_syn, num_classes=data.nclass).float()
             else:
                 hard_labels_syn = torch.argmax(labels_syn, dim=-1)
-                soft_labels_syn = labels_syn
+                soft_labels_syn = labels_syn.float()
 
         # Loop over each class
         for c in range(data.nclass):

@@ -8,9 +8,26 @@ import numpy as np
 import pytest
 import scipy.sparse as sp
 import torch
+from torch_sparse import SparseTensor
 
 from graphslim import tracking, utils
 from graphslim.models.random_attack import RandomAttack
+
+
+def test_incremental_degree_likelihood_matches_recomputing_each_graph():
+    adjacency = torch.zeros(6, 6)
+    for a, b in [(0, 1), (0, 2), (0, 3), (1, 2), (2, 3), (3, 4), (4, 5)]:
+        adjacency[a, b] = adjacency[b, a] = 1
+    pairs = torch.tensor([[0, 1], [0, 5], [1, 4]])
+    minimum = torch.tensor(2.0)
+    actual = utils.updated_log_likelihood_for_edge_changes(pairs, adjacency, minimum)
+    for i, (a, b) in enumerate(pairs):
+        changed = adjacency.clone()
+        changed[a, b] = changed[b, a] = 1 - changed[a, b]
+        expected = utils.degree_sequence_log_likelihood(changed.sum(1), minimum)
+        for values, target in zip(actual, expected):
+            torch.testing.assert_close(values[i], torch.as_tensor(target).float())
+    np.testing.assert_array_equal(adjacency.sum(1), [3, 2, 3, 3, 2, 1])
 
 
 def test_degree_statistics_agree_across_backends_and_ignore_below_threshold_nodes():
@@ -44,21 +61,22 @@ def test_feature_noise_delta_reconstructs_output_and_respects_scope(test_only, r
     assert torch.equal(mask, repeated_mask) and torch.equal(delta, repeated_delta)
 
 
-def test_row_normalization_shifts_by_global_minimum_and_sums_rows_to_one():
-    matrix = torch.tensor([[1.0, 2], [3, 4]])
-    varied = utils.row_normalize_tensor(matrix)
-    torch.testing.assert_close(varied, torch.tensor([[0.0, 1.0], [2 / 5, 3 / 5]]))
+def test_constant_feature_rows_normalize_to_finite_zero_vectors():
+    constant = torch.full((3, 4), 2.0)
+    actual = utils.row_normalize_tensor(constant)
+    torch.testing.assert_close(actual, torch.zeros_like(constant))
+    varied = utils.row_normalize_tensor(torch.tensor([[1.0, 2], [3, 4]]))
     torch.testing.assert_close(varied.sum(1), torch.ones(2))
-    # The global-minimum shift is applied to the caller's tensor in place.
-    torch.testing.assert_close(matrix, torch.tensor([[0.0, 1], [2, 3]]))
 
 
-@pytest.mark.parametrize("kind", ["coo", "csr"])
+@pytest.mark.parametrize("kind", ["dense", "coo", "csr", "torch_sparse"])
 def test_graph_logging_counts_edges_not_total_weight(kind):
     dense = torch.tensor([[0.0, 0.1, 0], [0.1, 0, 5], [0, 5, 0]])
     adjacency = {
+        "dense": lambda: dense,
         "coo": dense.to_sparse,
         "csr": lambda: sp.csr_matrix(dense.numpy()),
+        "torch_sparse": lambda: SparseTensor.from_dense(dense),
     }[kind]()
     summary = tracking.graph_summary(SimpleNamespace(feat_syn=torch.ones(3, 2), adj_syn=adjacency))
     assert summary == {"nodes": 3, "edges": 4, "density": 4 / 6}
@@ -141,3 +159,25 @@ def test_random_feature_attack_preserves_input_and_erases_selected_columns():
     assert original.eq(1).all()
     with pytest.raises(NotImplementedError):
         attack.inject_nodes(sp.eye(4), 1, 1)
+
+
+def test_incremental_degree_likelihood_accepts_numpy_pairs():
+    adjacency = torch.zeros(4, 4)
+    for a, b in [(0, 1), (1, 2), (2, 3)]:
+        adjacency[a, b] = adjacency[b, a] = 1
+    pairs = np.array([[0, 2], [1, 2]])
+    new_ll, alpha, n, _ = utils.updated_log_likelihood_for_edge_changes(
+        pairs, adjacency, torch.tensor(1.0)
+    )
+    assert new_ll.shape == alpha.shape == n.shape == (2,)
+    # Adding edge (0, 2) keeps four nodes at degree >= 1; removing (1, 2) does too.
+    assert n.tolist() == [4.0, 4.0]
+
+
+def test_row_normalization_shifts_by_global_minimum_and_sums_rows_to_one():
+    matrix = torch.tensor([[1.0, 2], [3, 4]])
+    varied = utils.row_normalize_tensor(matrix)
+    torch.testing.assert_close(varied, torch.tensor([[0.0, 1.0], [2 / 5, 3 / 5]]))
+    torch.testing.assert_close(varied.sum(1), torch.ones(2))
+    # The global-minimum shift is applied to the caller's tensor in place.
+    torch.testing.assert_close(matrix, torch.tensor([[0.0, 1], [2, 3]]))

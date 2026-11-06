@@ -14,7 +14,7 @@ from graphslim.coarsening import Average, Cluster, ClusterAgg, utils
 from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.coarsening.labels import label_tensor, synthetic_labels
 from graphslim.coarsening.nope import NOPE, hierarchical_merge, interference_loss
-from graphslim.coarsening.vng import VNG
+from graphslim.coarsening.vng import VNG, layer_embeddings
 from graphslim.dataset import load_reduced
 from graphslim.reduction import create_reducer
 from test_lightweight_methods import quick_args, tiny_graph
@@ -41,10 +41,8 @@ def single_thread():
 def coarsen(method, graph, rate=0.5, strategy="greedy"):
     args = SimpleNamespace(device="cpu", reduction_rate=rate, coarsen_strategy=strategy)
     reducer = create_reducer(method, "trans", None, args)
-    # HeavyEdge.coarsen documents an extra (ignored) ``method`` argument.
-    extra = ("heavy_edge",) if method == "heavy_edge" else ()
     np.random.seed(3)
-    return reducer.coarsen(graph, *extra)
+    return reducer.coarsen(graph)
 
 
 def assert_valid_hierarchy(graph, c, reduced, levels, hierarchy):
@@ -133,6 +131,8 @@ def two_class_components(n_per=16, small=0):
         x=torch.rand(total, 4, generator=generator),
         y=labels,
         adj_full=adjacency,
+        adj_train=adjacency,
+        idx_train=np.arange(total),
         train_mask=torch.ones(total, dtype=torch.bool),
         val_mask=torch.zeros(total, dtype=torch.bool),
     )
@@ -195,6 +195,56 @@ def test_component_extraction_rejects_directed_and_skips_small_components():
     candidate, c_list, gc_list = reducer.coarsening(graphs.Graph(data.adj_full))
     assert [len(g.info["orig_idx"]) for g in candidate] == [6, 6, 4]
     assert c_list == [] and gc_list == []
+
+
+def test_component_extraction_logs_and_returns_none_for_non_square_matrix(caplog):
+    reducer = Coarsen("trans", None, SimpleNamespace(device="cpu"))
+    fake = SimpleNamespace(A=sp.csr_matrix((3, 4)), logger=logging.getLogger("coarsen-test"))
+    with caplog.at_level(logging.ERROR, logger="coarsen-test"):
+        assert reducer.coarsening(fake) is None
+    assert "Square matrix required" in caplog.text
+
+
+@pytest.mark.parametrize("setting", ["trans", "ind"])
+def test_graph_without_large_components_raises_clear_error(tmp_path, setting):
+    # Regression: every component has <= 10 nodes, so nothing is coarsened;
+    # previously trans failed with an object-array TypeError and ind with IndexError.
+    data = two_class_components(n_per=6, small=4)
+    args = coarsen_args(tmp_path, setting, "variation_edges")
+    reducer = create_reducer("variation_edges", setting, data, args)
+    with pytest.raises(ValueError, match="more than 10 nodes"):
+        reducer.reduce(data, verbose=False, save=False)
+
+
+@pytest.mark.parametrize("method", SPECTRAL)
+def test_inductive_spectral_coarsening_uses_training_subgraph(tmp_path, method):
+    # Regression: ind built the graph from adj_full but indexed training-only
+    # features, raising IndexError for any node index >= number of training nodes.
+    from test_legacy_reducer_integration import graph_fixture
+
+    graph = graph_fixture()
+    args = quick_args(tmp_path, method, "ind")
+    np.random.seed(0)
+    reduced = create_reducer(method, "ind", graph, args).reduce(graph, verbose=False)
+    n_train = len(graph.idx_train)
+    n = len(reduced.feat_syn)
+    assert 0 < n < n_train and reduced.adj_syn.shape == (n, n)
+    assert reduced.labels_syn.shape == (n,) and torch.isfinite(reduced.feat_syn).all()
+    adjacency, features, labels = load_reduced(args)
+    torch.testing.assert_close(features, reduced.feat_syn)
+
+
+def test_heavy_edge_runs_through_reducer_pipeline(tmp_path):
+    # Regression: Coarsen.coarsening calls coarsen(H) but HeavyEdge required ``method``.
+    data = two_class_components()
+    args = coarsen_args(tmp_path, "trans", "heavy_edge")
+    reduced = create_reducer("heavy_edge", "trans", data, args).reduce(data, verbose=False)
+    n = len(reduced.feat_syn)
+    # Heavy-edge matching targets half of each class-pure 16-node ring.
+    assert 16 <= n < 32 and reduced.adj_syn.shape == (n, n)
+    assert set(reduced.labels_syn.tolist()) == {0, 1}
+    dense = reduced.adj_syn.to_dense()
+    torch.testing.assert_close(dense, dense.T)
 
 
 def classwise_graph():
@@ -269,6 +319,26 @@ def test_vng_reduce_with_default_sgc_teacher(tmp_path, setting):
     assert torch.isfinite(reduced.adj_syn).all() and torch.isfinite(reduced.feat_syn).all()
     adjacency, features, labels = load_reduced(args)
     torch.testing.assert_close(adjacency, reduced.adj_syn)
+
+
+@pytest.mark.parametrize("setting", ["trans", "ind"])
+def test_vng_reduce_with_multilayer_gcn_teacher(tmp_path, setting):
+    # Regression: predict(..., output_layer_features=True) returns
+    # (per_layer_features, log_probs); VNG iterated over the tuple itself.
+    args = quick_args(tmp_path, "vng", setting)
+    args.condense_model = "GCN"
+    graph = tiny_graph()
+    torch.manual_seed(0)
+    reduced = VNG(setting, graph, args).reduce(graph, verbose=False)
+    assert reduced.feat_syn.shape == (8, 8) and reduced.adj_syn.shape == (8, 8)
+    assert torch.isfinite(reduced.adj_syn).all()
+
+
+def test_layer_embeddings_keeps_single_tensor_model_output():
+    features, log_probs = torch.ones(3, 2), torch.zeros(3, 2)
+    assert [t is features for t in layer_embeddings((features, log_probs))] == [True, False]
+    layers = [torch.ones(3, 4), torch.ones(3, 2)]
+    assert layer_embeddings((layers, log_probs)) == layers
 
 
 def test_vng_virtual_graph_solves_propagation_least_squares(capsys):

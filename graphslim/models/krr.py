@@ -20,8 +20,9 @@ class KernelRidgeRegression(nn.Module):
     def forward(self, G_t, G_s, y_t, y_s, E_t, E_s):
         """Fit kernel ridge coefficients on the synthetic support graph and predict target probabilities.
 
-        The trace-scaled Gram solve uses float64 and retries with small diagonal
-        jitter if necessary. Non-finite kernels raise ``FloatingPointError``.
+        The trace-scaled Gram system is solved with ``torch.linalg.solve`` in the
+        kernel's dtype, without jitter; a singular system (for example ``ridge=0``
+        with a rank-deficient support set) raises ``torch.linalg.LinAlgError``.
 
         :param G_t: Target or synthetic support node features, respectively.
         :param G_s: Target or synthetic support node features, respectively.

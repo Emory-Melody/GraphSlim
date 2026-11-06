@@ -23,7 +23,10 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         self.scale = scale
 
     def sparse_kron(self, A, B):
-        """Compute a sparse Kronecker product without modifying either input index buffer.
+        """Compute the binary sparse Kronecker product of two sparse operators.
+
+        Only the sparsity patterns are used: every stored entry contributes a
+        one of ``A``'s dtype. Neither input is modified.
 
         :param A: Left or right sparse tensor in the Kronecker product, respectively.
         :param B: Left or right sparse tensor in the Kronecker product, respectively.
@@ -34,10 +37,10 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         n_A = A._nnz()
         n_B = B._nnz()
 
-        indices_A = A.coalesce().indices()
+        # ``coalesce()`` returns the input itself when it is already coalesced, so
+        # scale out of place to leave the caller's index buffer untouched.
+        indices_A = A.coalesce().indices() * torch.tensor([[p], [q]], device=A.device)
         indices_B = B.coalesce().indices()
-        indices_A[0, :] = indices_A[0, :] * p
-        indices_A[1, :] = indices_A[1, :] * q
 
         indices = indices_A.repeat(n_B, 1) + indices_B.t().reshape(2 * n_B, 1)
         ind_row = indices.index_select(
@@ -48,7 +51,7 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         ).reshape(-1)
 
         new_ind = torch.cat((ind_row, ind_col)).reshape(2, n_A * n_B)
-        values = torch.ones(n_A * n_B).to(A.device)
+        values = torch.ones(n_A * n_B, dtype=A.dtype, device=A.device)
         new_shape = (m * p, n * q)
 
         return torch.sparse_coo_tensor(new_ind, values, new_shape)
@@ -88,7 +91,9 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         :param S: Covariance or kernel matrix being propagated through the recurrence.
         :returns: Tuple ``(updated_covariance, standard_deviations)``.
         """
-        diag = torch.sqrt(torch.diag(S))
+        # Zero-variance nodes (all-zero aggregated features) would give 0/0; the
+        # clamp is the identity for every positive variance.
+        diag = torch.sqrt(torch.diag(S).clamp_min(torch.finfo(S.dtype).tiny))
         S = S / diag[:, None] / diag[None, :]
         S = torch.clip(S, -0.9999, 0.9999)
         S = (S * (math.pi - torch.arccos(S)) + torch.sqrt(1 - S * S)) / math.pi
@@ -96,7 +101,12 @@ class StructureBasedNeuralTangentKernel(nn.Module):
         return S, diag
 
     def diag(self, g, E):
-        """Collect within-graph variance scales for every graph and dense kernel layer.
+        """Collect within-graph variance scales, one vector per aggregation stage.
+
+        As in the released GC-SNTK code, the variance is refreshed once per
+        aggregation stage and reused by all ``L`` dense layers of that stage, so
+        for ``K > 1`` and ``L > 1`` the kernel differs from the exact
+        layer-by-layer joint recursion.
 
         :param g: Node feature matrix.
         :param E: Sparse adjacency operator for the corresponding graph.

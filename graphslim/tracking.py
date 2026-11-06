@@ -141,12 +141,18 @@ def graph_summary(graph: Any) -> Dict[str, Any]:
         num_edges = int(edge_index.shape[1])
     elif hasattr(graph, "adj_syn"):
         adj = graph.adj_syn
-        if getattr(adj, "is_sparse", False) and hasattr(adj, "_nnz"):
+        # Count stored edges, never total edge weight.
+        if str(getattr(adj, "layout", "")).startswith("torch.sparse") and hasattr(adj, "_nnz"):
             num_edges = int(adj._nnz())
         elif hasattr(adj, "nnz"):
-            num_edges = int(adj.nnz)
-        elif hasattr(adj, "sum"):
-            num_edges = int(adj.sum().item() if hasattr(adj.sum(), "item") else adj.sum())
+            nnz = adj.nnz  # SciPy attribute or torch_sparse method
+            num_edges = int(nnz() if callable(nnz) else nnz)
+        elif hasattr(adj, "count_nonzero"):
+            num_edges = int(adj.count_nonzero())
+        else:
+            import numpy as np
+
+            num_edges = int(np.count_nonzero(adj))
 
     metrics = {}
     if num_nodes is not None:

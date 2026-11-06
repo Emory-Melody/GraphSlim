@@ -16,6 +16,7 @@ from graphslim.evaluation.utils import *
 from graphslim.models import *
 from torch_sparse import SparseTensor
 from graphslim.dataset.convertor import ei2csr
+from graphslim.dataset.utils import load_reduced
 from graphslim.utils import (
     accuracy,
     seed_everything,
@@ -617,48 +618,28 @@ class Evaluator:
         )
         plt.show()
 
-    def visualize(args, data):
+    def visualize(self, data):
         """
-        Visualizes synthetic and original data using t-SNE and saves the plot as a PDF file.
+        Visualizes synthetic and original data using t-SNE and saves the plots as PDF files.
+
+        The reduced graph is read from the configured checkpoint folder. Features
+        are compared directly and after two-hop GCN propagation on each graph.
 
         Parameters
         ----------
-        args : argparse.Namespace
-            Command-line arguments and configuration parameters.
         data : Dataset
             The dataset containing the graph data.
         """
-        save_path = f"{args.save_path}/reduced_graph/{args.method}"
-        feat_syn = torch.load(
-            f"{save_path}/feat_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt",
-            map_location="cpu",
-        )
-        labels_syn = torch.load(
-            f"{save_path}/label_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt",
-            map_location="cpu",
-        )
-        try:
-            adj_syn = torch.load(
-                f"{save_path}/adj_{args.dataset}_{args.reduction_rate}_{args.seed}_-1.pt",
-                map_location=args.device,
-            )
-        except:
-            adj_syn = torch.eye(feat_syn.size(0), device=args.device)
+        adj_syn, feat_syn, labels_syn = load_reduced(self.args, data)
+        feat_syn, labels_syn = feat_syn.cpu().float(), labels_syn.cpu()
 
-        # Obtain embeddings
-        data.adj_train = to_tensor(data.adj_train)
-        data.pre_conv = normalize_adj_tensor(data.adj_train, sparse=True)
-        data.pre_conv = matmul(data.pre_conv, data.pre_conv)
-        feat_train_agg = matmul(data.pre_conv, data.feat_train).float()
+        def propagate(adjacency, features):
+            """Apply the normalized adjacency twice to the features."""
+            operator = normalize_adj_tensor(to_tensor(adjacency), sparse=True)
+            return matmul(operator, matmul(operator, features)).float()
 
-        adj_syn = to_tensor(data.adj_syn)
-        pre_conv_syn = normalize_adj_tensor(adj_syn, sparse=True)
-        pre_conv_syn = matmul(pre_conv_syn, pre_conv_syn)
-        feat_syn_agg = matmul(pre_conv_syn, labels_syn).float()
+        feat_train_agg = propagate(data.adj_train, data.feat_train)
+        feat_syn_agg = propagate(adj_syn.cpu(), feat_syn)
 
-        self.tsne_vis(
-            data.feat_train, data.labels_train, feat_syn, labels_syn
-        )  # Visualizes feature
-        self.tsne_vis(
-            feat_train_agg, data.labels_train, feat_syn_agg, labels_syn
-        )  # Visualizes embedding
+        self.tsne_vis(data.feat_train, data.labels_train, feat_syn, labels_syn)
+        self.tsne_vis(feat_train_agg, data.labels_train, feat_syn_agg, labels_syn)

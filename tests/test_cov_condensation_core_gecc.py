@@ -182,6 +182,9 @@ def test_fuzzy_helpers_normalize_memberships_and_penalize_imbalance(tmp_path, mo
     centers = points[[0, 6]]
     membership = gecc.init_membership_from_centers(centers, data_t, 2.0)
     assert membership.shape == (2, 12) and (membership >= 0).all()
+    # Regression: each sample's memberships sum to one over the clusters.
+    np.testing.assert_allclose(membership.sum(0), np.ones(12))
+    assert (membership[0, :6] > 0.5).all() and (membership[1, 6:] > 0.5).all()
     # A sample located exactly on a center dominates that center's memberships.
     assert membership[0, 0] > 0.99 and membership[1, 6] > 0.99
     args = cluster_args(2.0, rep_fuzz=2)

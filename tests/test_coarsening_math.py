@@ -97,10 +97,7 @@ def test_multilevel_coarseners_produce_valid_partitions(method, strategy):
     graph.set_coordinates("ring2D")
     args = SimpleNamespace(device="cpu", reduction_rate=0.5, coarsen_strategy=strategy)
     np.random.seed(19)
-    reducer = create_reducer(method, "trans", None, args)
-    # HeavyEdge.coarsen documents an extra (ignored) ``method`` argument.
-    extra = ("heavy_edge",) if method == "heavy_edge" else ()
-    c, reduced, levels, hierarchy = reducer.coarsen(graph, *extra)
+    c, reduced, levels, hierarchy = create_reducer(method, "trans", None, args).coarsen(graph)
     assert c.shape == (reduced.N, graph.N)
     assert 0 < reduced.N < graph.N
     np.testing.assert_allclose((c @ c.T).toarray(), np.eye(reduced.N), atol=1e-12)

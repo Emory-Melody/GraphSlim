@@ -138,12 +138,3 @@ graphslim.condensation.simgc module
    :members:
    :undoc-members:
    :show-inheritance:
-
-
-graphslim.condensation.mirage module
-----------------------------------------
-
-.. automodule:: graphslim.condensation.mirage
-   :members:
-   :undoc-members:
-   :show-inheritance:

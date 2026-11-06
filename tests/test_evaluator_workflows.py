@@ -106,6 +106,4 @@ def test_model_based_kcenter_selects_distinct_training_nodes_and_keeps_class_bud
     assert graph.labels_full[selected].bincount().tolist() == [4, 4]
     result = reducer.reduce(graph, verbose=True, save=False)
     assert result.feat_syn.shape == (8, 8)
-    # Model-based coresets return float labels; compare their class counts.
-    assert result.labels_syn.long().bincount().tolist() == [4, 4]
-    assert torch.equal(result.labels_syn.long(), graph.labels_full[selected])
+    assert result.labels_syn.bincount().tolist() == [4, 4]

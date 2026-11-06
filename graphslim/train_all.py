@@ -22,7 +22,11 @@ def run(args, *, load_dataset=None, on_result=None):
     :param on_result: Optional callback ``(run_args, reduced_graph, evaluator, result)`` invoked after each evaluation. Defaults to ``None``.
     :returns: List of evaluation summary pairs, or the selected trial record (possibly None) in HPO mode.
     """
-    from graphslim.dataset import attack, get_dataset
+    from graphslim.dataset import get_dataset
+
+    # Import from the submodule: once graphslim.dataset.attack has been imported,
+    # the package attribute ``attack`` names that module rather than the function.
+    from graphslim.dataset.attack import attack
     from graphslim.evaluation import Evaluator
     from graphslim.utils import seed_everything
 

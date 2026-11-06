@@ -1184,7 +1184,8 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
     else:
         l, U = sp.sparse.linalg.eigsh(G.L, k=kmax, which="SM", tol=1e-3)
 
-    # Avoid divide by zero issues
+    # Avoid divide by zero issues (copy: never overwrite the caller's or G.e's spectrum)
+    l = np.array(l, dtype=float)
     l[0] = 1
     linv = l ** (-0.5)
     linv[0] = 0
@@ -1198,7 +1199,7 @@ def coarsening_quality(G, C, kmax=30, Uk=None, lk=None):
 
     # Compute eigenvalues and eigenvectors of the coarsened Laplacian
     if kmax > n / 2:
-        [Uc, lc] = np.linalg.eig(Lc.toarray())
+        Uc, lc = eig(Lc.toarray())
     else:
         lc, Uc = sp.sparse.linalg.eigsh(Lc, k=kmax, which="SM", tol=1e-3)
 
@@ -1662,7 +1663,7 @@ def get_proximity_measure(G, name, K=10):
     M = edges.shape[1]  # Number of edges
 
     num_vectors = K  # Number of vectors for test vectors generation
-    if "lanczos" in name:
+    if "lanczos" in name or "expected" in name:
         l_lan, X_lan = sp.sparse.linalg.eigsh(G.L, k=K, which="SM", tol=1e-2)
     elif "cheby" in name:
         X_cheby = generate_test_vectors(
@@ -2035,7 +2036,8 @@ def kron_coarsening(G, r=0.5, m=None):
 
     Notes
     -----
-    If the coarsening fails, the function returns (None, None).
+    If the numerical coarsening fails (``LinAlgError`` or an ARPACK error), the
+    function returns (None, None); other errors propagate.
     """
 
     # Ensure the graph has coordinates; if not, generate random coordinates
@@ -2071,8 +2073,8 @@ def kron_coarsening(G, r=0.5, m=None):
 
         return Gc, Gs[0]
 
-    except:
-        # Return None if coarsening fails
+    except (np.linalg.LinAlgError, sp.sparse.linalg.ArpackError):
+        # Return None if the numerical coarsening fails
         return None, None
 
 
@@ -2118,7 +2120,8 @@ def kron_quality(G, Gc, kmax=30, Uk=None, lk=None):
     else:
         l, U = sp.sparse.linalg.eigsh(G.L, k=kmax, which="SM", tol=1e-3)
 
-    # Adjust the smallest eigenvalue to avoid division by zero
+    # Adjust the smallest eigenvalue to avoid division by zero (on a private copy)
+    l = np.array(l, dtype=float)
     l[0] = 1
     linv = l ** (-0.5)
     linv[0] = 0
@@ -2284,7 +2287,7 @@ def my_graph_multiresolution(
             raise NotImplementedError("Unknown graph reduction method.")
 
         if sparsify and Gs[i + 1].N > 2:
-            Gs[i + 1] = reduction.graph_sparsify(
+            Gs[i + 1] = graph_sparsify(
                 Gs[i + 1], min(max(sparsify_eps, 2.0 / np.sqrt(Gs[i + 1].N)), 1.0)
             )
 
@@ -2371,24 +2374,28 @@ def graph_sparsify(M, epsilon, maxiter=10):
 
         # Sample edges based on their probabilities
         results = sp.stats.rv_discrete(values=(np.arange(np.shape(Pe)[0]), Pe)).rvs(size=int(q))
-        spin_counts = sp.stats.itemfreq(results).astype(int)
+        sampled, sample_counts = np.unique(results, return_counts=True)
         per_spin_weights = weights / (q * Pe)
 
         counts = np.zeros(np.shape(weights)[0])
-        counts[spin_counts[:, 0]] = spin_counts[:, 1]
+        counts[sampled] = sample_counts
         new_weights = counts * per_spin_weights
 
         # Construct the new sparser weight matrix
         sparserW = sp.sparse.csc_matrix((new_weights, (start_nodes, end_nodes)), shape=(N, N))
         sparserW = sparserW + sparserW.T
-        sparserL = sp.sparse.diags(sparserW.diagonal(), 0) - sparserW
+        # Combinatorial Laplacian D - W of the sampled graph.
+        sparserL = sp.sparse.diags(np.asarray(sparserW.sum(axis=1)).ravel(), 0) - sparserW
 
     if isinstance(M, graphs.Graph):
         sparserW = sp.sparse.diags(sparserL.diagonal(), 0) - sparserL
         if not M.is_directed():
             sparserW = (sparserW + sparserW.T) / 2.0
 
-        Mnew = graphs.Graph(sparserW)
+        if hasattr(M, "coords"):
+            Mnew = graphs.Graph(sparserW, coords=M.coords)
+        else:
+            Mnew = graphs.Graph(sparserW)
     else:
         Mnew = sp.sparse.lil_matrix(sparserL)
 

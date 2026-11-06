@@ -226,7 +226,8 @@ def export(folder, manifest):
 def execute(options, manifest):
     from benchmark.rerun_nr import write_json, array_hash, serializable, lock_file
     from graphslim.config import get_args
-    from graphslim.dataset import get_dataset, get_syn_data, perturb_graph, attack
+    from graphslim.dataset import get_dataset, get_syn_data, perturb_graph
+    from graphslim.dataset.attack import attack
     from graphslim.evaluation import Evaluator, NasEvaluator, PropertyEvaluator
     from graphslim.reduction import create_reducer
     from graphslim.utils import seed_everything

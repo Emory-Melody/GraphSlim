@@ -5,7 +5,10 @@ import pytest
 import torch
 
 from graphslim.condensation.gdem import GDEM, MLP
-from graphslim.dataset import load_reduced
+from torch_geometric.data import Data
+
+from graphslim.dataset import load_reduced, loader
+from graphslim.dataset.utils import splits
 from graphslim.reduction import create_reducer
 from graphslim.utils import seed_everything
 from test_legacy_reducer_integration import graph_fixture
@@ -21,39 +24,46 @@ def single_thread():
 
 
 def gdem_args(tmp_path, monkeypatch):
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "data" / "cora").mkdir(parents=True)
+    # Run from an empty working directory: nothing may be written relative to it.
+    (tmp_path / "work").mkdir()
+    monkeypatch.chdir(tmp_path / "work")
     args = quick_args(tmp_path / "out", "gdem", "trans")
-    args.load_path = "./data"  # GDEM's eigen cache is written relative to the working directory
+    args.load_path = str(tmp_path / "cache")  # a non-default dataset root
     args.eigen_k, args.e1, args.e2 = 4, 2, 2
     args.epochs, args.eval_epochs, args.run_inter_eval = 12, 2, 1
     args.checkpoints, args._cuda_graph_trace = [11], True
     return args
 
 
-def numpy_split_graph():
-    # GraphSAINT-format loaders provide NumPy split indices; get_train_lcc requires them
-    # (torch index tensors are hashed by identity there, see the coverage report).
-    graph = graph_fixture()
-    graph.idx_train = graph.idx_train.numpy()
+def disconnected_fixture():
+    """A 20-node ring plus a 12-node ring; four training nodes lie outside the LCC."""
+    generator = torch.Generator().manual_seed(7)
+    nodes = torch.arange(32)
+
+    def ring(members):
+        return torch.stack([members.repeat(2), torch.cat([members.roll(1), members.roll(-1)])])
+
+    raw = Data(
+        x=torch.rand(32, 8, generator=generator),
+        y=nodes % 2,
+        edge_index=torch.cat([ring(nodes[:20]), ring(nodes[20:])], dim=1),
+        train_mask=(nodes < 14) | ((nodes >= 20) & (nodes < 24)),
+        val_mask=(nodes >= 14) & (nodes < 17),
+        test_mask=((nodes >= 17) & (nodes < 20)) | (nodes >= 24),
+    )
+    graph = loader.TransAndInd(splits(raw), "cora", norm=False)
+    graph.nclass = 2
     return graph
 
 
-def xavier_feature_init(self):
-    """The documented Xavier start; the package skips it (see coverage report) and
-    optimizes uninitialized ``torch.empty`` memory, which makes runs nondeterministic.
-    ``init_feat`` itself is covered in test_gdem_feature_initialization.py."""
-    torch.nn.init.xavier_uniform_(self.x_syn.data)
-    return self.x_syn
-
-
-def test_gdem_learns_spectral_graph_and_reuses_preprocessing(tmp_path, monkeypatch):
+@pytest.mark.parametrize("fixture", [graph_fixture, disconnected_fixture])
+def test_gdem_learns_spectral_graph_and_reuses_preprocessing(tmp_path, monkeypatch, fixture):
     args = gdem_args(tmp_path, monkeypatch)
-    monkeypatch.setattr(GDEM, "init_feat", xavier_feature_init)
-    graph = numpy_split_graph()
+    graph = fixture()  # torch split indices, as produced by the PyG loaders
     seed_everything(4)
     reducer = create_reducer("gdem", "trans", graph, args)
-    assert reducer.eigenvecs_syn.shape == (12, 4)
+    n = len(reducer.labels_syn)
+    assert n == len(graph.idx_train) // 2 and reducer.eigenvecs_syn.shape == (n, 4)
     initial = reducer.eigenvecs_syn.detach().clone()
     reduced = reducer.reduce(graph, verbose=True)
     assert not torch.equal(initial, reducer.eigenvecs_syn)
@@ -61,21 +71,56 @@ def test_gdem_learns_spectral_graph_and_reuses_preprocessing(tmp_path, monkeypat
     losses = trace["loss_trace"]
     assert len(losses) == 12 and np.isfinite(losses).all()
     assert min(losses[1:]) < losses[0]
-    lcc = np.load(tmp_path / "data" / "cora" / "idx_lcc.npy")
-    assert sorted(lcc) == list(range(32))
-    train_lcc = np.load(tmp_path / "data" / "cora" / "idx_train_lcc.npy")
-    assert sorted(train_lcc) == sorted(graph.idx_train)
-    assert (tmp_path / "data" / "cora" / "eigenvalues.npy").exists()
+    cache = tmp_path / "cache" / "cora"
+    lcc = np.load(cache / "idx_lcc.npy")
+    train_lcc = np.load(cache / "idx_train_lcc.npy")
+    idx_map = np.load(cache / "idx_map.npy")
+    train = graph.idx_train.tolist()
+    # Only training nodes inside the largest component, in split order, with matching map.
+    assert train_lcc.tolist() == [i for i in train if i in set(lcc.tolist())]
+    assert lcc[idx_map].tolist() == train_lcc.tolist()
+    assert len(lcc) == (32 if fixture is graph_fixture else 20)
+    assert (cache / "eigenvalues.npy").exists()  # eigen cache lives under args.load_path
+    assert list((tmp_path / "work").iterdir()) == []
     adjacency, features, labels = load_reduced(args)
-    assert adjacency.shape == (12, 12) and features.shape == (12, 8)
+    assert adjacency.shape == (n, n) and features.shape == (n, 8)
     torch.testing.assert_close(adjacency, adjacency.T)
-    assert labels.bincount().tolist() == [6, 6]
+    assert labels.bincount().tolist() == np.bincount(reducer.labels_syn).tolist()
+    assert abs(labels.bincount()[0] - labels.bincount()[1]) <= 1
     torch.testing.assert_close(reduced.feat_syn, reducer.x_syn.detach())
     # Second run takes the cached largest-component branch.
-    graph = numpy_split_graph()
+    graph = fixture()
     args.epochs, args.checkpoints = 2, [1]
     create_reducer("gdem", "trans", graph, args).reduce(graph, verbose=False)
-    assert graph.feat_syn.shape == (12, 8)
+    assert graph.feat_syn.shape == (n, 8) and torch.isfinite(graph.feat_syn).all()
+
+
+def test_gdem_feature_initialization_is_deterministic(tmp_path, monkeypatch):
+    args = gdem_args(tmp_path, monkeypatch)
+    runs = []
+    for _ in range(2):
+        # Dirty the allocator so uninitialized memory would differ between runs.
+        torch.full((12, 8), float("nan")).sum()
+        seed_everything(4)
+        runs.append(create_reducer("gdem", "trans", graph_fixture(), args).x_syn.detach())
+    assert torch.isfinite(runs[0]).all() and runs[0].abs().max() < 100
+    torch.testing.assert_close(runs[0], runs[1], rtol=0, atol=0)
+
+
+def test_stale_cache_with_non_training_nodes_is_rebuilt(tmp_path, monkeypatch):
+    args = gdem_args(tmp_path, monkeypatch)
+    cache = tmp_path / "cache" / "cora"
+    cache.mkdir(parents=True)
+    # A map written by the old refill logic: node 30 is a test node.
+    np.save(cache / "idx_lcc.npy", np.arange(32))
+    np.save(cache / "idx_train_lcc.npy", np.array([0, 1, 30]))
+    np.save(cache / "idx_map.npy", np.array([0, 1, 30]))
+    graph = graph_fixture()
+    args.epochs, args.checkpoints = 2, [1]
+    seed_everything(4)
+    create_reducer("gdem", "trans", graph, args).reduce(graph, verbose=False)
+    rebuilt = np.load(cache / "idx_train_lcc.npy")
+    assert rebuilt.tolist() == graph.idx_train.tolist()
 
 
 def test_gdem_spectral_helpers_reconstruct_projections(tmp_path, monkeypatch):
@@ -95,8 +140,8 @@ def test_gdem_spectral_helpers_reconstruct_projections(tmp_path, monkeypatch):
     eigenvectors = agent.get_init_syn_eigenvecs(7, 3)
     torch.testing.assert_close(eigenvectors.T @ eigenvectors, torch.eye(7), atol=1e-4, rtol=0)
     saved = torch.rand(4, 2)
-    (tmp_path / "initial_feat" / "cora").mkdir(parents=True)
-    torch.save(saved, tmp_path / "initial_feat" / "cora" / f"x_init_0.5_{args.seed}.pt")
+    (tmp_path / "work" / "initial_feat" / "cora").mkdir(parents=True)
+    torch.save(saved, tmp_path / "work" / "initial_feat" / "cora" / f"x_init_0.5_{args.seed}.pt")
     torch.testing.assert_close(agent.get_init_syn_feat("cora", 0.5), saved)
 
 

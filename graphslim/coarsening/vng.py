@@ -14,6 +14,22 @@ from graphslim.utils import one_hot
 from graphslim.reduction.cluster_ops import fitted_labels, sparse_membership
 
 
+def layer_embeddings(output):
+    """Flatten ``predict(..., output_layer_features=True)`` into a list of node embeddings.
+
+    Message-passing models return ``(per_layer_features, log_probs)`` and use the
+    per-layer features; single-tensor models such as SGC return
+    ``(features, log_probs)`` and keep both tensors, as before.
+
+    :param output: Tuple returned by ``model.predict`` with layer features requested.
+    :returns: List of tensors with one row per node.
+    """
+    features, log_probs = output
+    if isinstance(features, (list, tuple)):
+        return list(features)
+    return [features, log_probs]
+
+
 class VNG:
     """
     A class that implements Virtual Node Graph (VNG) reduction for coarsening graphs.
@@ -76,7 +92,9 @@ class VNG:
                 setting=args.setting,
                 reduced=False,
             )
-            embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)
+            embeds = layer_embeddings(
+                model.predict(data.feat_full, data.adj_full, output_layer_features=True)
+            )
             embeds = [embed[data.train_mask] for embed in embeds]
             labels = one_hot(data.labels_train, data.nclass)
 
@@ -98,8 +116,9 @@ class VNG:
                 reindex=True,
             )
             model.eval()
-            embeds = model.predict(data.feat_train, data.adj_train, output_layer_features=True)
-            embeds = [embed for embed in embeds]
+            embeds = layer_embeddings(
+                model.predict(data.feat_train, data.adj_train, output_layer_features=True)
+            )
             labels = one_hot(data.labels_train, data.nclass)
 
             coarsen_edge, coarsen_features, coarsen_labels = self.vng(

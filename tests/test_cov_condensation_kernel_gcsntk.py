@@ -1,4 +1,4 @@
-"""GCSNTK kernel-ridge condensation and the Mirage logging helper."""
+"""GCSNTK kernel-ridge condensation on small and partitioned graphs."""
 
 import numpy as np
 import pytest
@@ -7,7 +7,6 @@ import torch.nn.functional as F
 
 import graphslim.condensation.gcsntk as gcsntk_module
 from graphslim.condensation.gcsntk import GCSNTK
-from graphslim.condensation.mirage import Mirage
 from graphslim.dataset import load_reduced
 from graphslim.models import KernelRidgeRegression, StructureBasedNeuralTangentKernel
 from graphslim.reduction import create_reducer
@@ -158,10 +157,12 @@ class SyntheticBatches:
         index = self.batches[i]
         adjacency = torch.as_tensor(self.graph.adj_train[index][:, index].toarray())
         adjacency = adjacency + torch.eye(len(index))
+        # LargeDataLoader returns coalesced ``torch.sparse.mm`` products; these used to
+        # have their indices rescaled in place by ``sparse_kron``.
         return (
             self.graph.feat_train[index],
             self.graph.labels_train[index].reshape(-1, 1),
-            binary_sparse(adjacency),
+            adjacency.to_sparse(),
         )
 
 
@@ -191,22 +192,3 @@ def test_gcsntk_large_dataset_branch_trains_over_partitions(
         torch.testing.assert_close(reduced.adj_syn, torch.eye(size))
     adjacency, features, _ = load_reduced(args)
     assert features.shape == (size, 8) and adjacency.shape == (size, size)
-
-
-def test_mirage_appends_timestamped_messages(tmp_path):
-    args = quick_args(tmp_path, "gcond", "trans")
-    graph = tiny_graph()
-    agent = Mirage("trans", graph, args)
-    assert agent.feat_syn.shape == (len(graph.labels_syn), 8)
-    log = tmp_path / "mirage.log"
-    agent.append_to_file("first entry", log)
-    agent.append_to_file({"seed": 7, "hops": [1, 2]}, log)
-    text = log.read_text(encoding="utf-8")
-    blocks = text.split("-" * 20 + "\n")[1:]
-    assert len(blocks) == 2
-    assert blocks[0].splitlines()[1] == "first entry"
-    assert "{'hops': [1, 2], 'seed': 7}" in blocks[1]
-    for block in blocks:
-        # day-month-year hour:minute:second
-        stamp = block.splitlines()[0]
-        assert len(stamp) == 19 and stamp[2] == stamp[5] == "-" and stamp[13] == ":"

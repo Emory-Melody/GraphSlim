@@ -44,8 +44,6 @@ def test_deep_models_with_batch_norm_build_hidden_stack_and_normalize(tmp_path, 
     torch.manual_seed(0)
     model = cls(4, 5, 2, args)
     assert len(model.layers) == 3 and len(model.bns) == 2
-    # GCN and GraphSage batch norm only works with SparseTensor adjacency: their
-    # dense path yields (1, N, C) tensors that BatchNorm1d misreads (package bug).
     x, adjacency = torch.randn(7, 4), SparseTensor.from_dense(normalize_adj_tensor(ring(7)))
     output = model(x, adjacency)
     assert output.shape == (7, 2)
@@ -59,8 +57,10 @@ def test_deep_models_with_batch_norm_build_hidden_stack_and_normalize(tmp_path, 
         model.bns[0](hidden),
         (hidden - model.bns[0].running_mean) / (model.bns[0].running_var + 1e-5).sqrt(),
     )
-    if cls is Cheby:
-        torch.testing.assert_close(model(x, adjacency.to_dense()), model(x, adjacency))
+    # Regression: dense (1, N, C) layer outputs are normalized over node rows.
+    torch.testing.assert_close(model(x, adjacency.to_dense()), model(x, adjacency))
+    model.train()
+    torch.testing.assert_close(model(x, adjacency.to_dense()), model(x, adjacency))
 
 
 @pytest.mark.parametrize("cls", [GCN, Cheby, GraphSage])
@@ -367,3 +367,15 @@ def test_gat_fit_converts_dense_synthetic_adjacency_to_sparse(tmp_path):
     graph.labels_syn = graph.labels_train[:8]
     model = GAT(8, 2, 2, args, mode="cross")
     assert 0 <= model.fit_with_val(graph, train_iters=2, reduced=True) <= 1
+
+
+def test_gat_default_training_mode_builds_two_attention_layers(tmp_path):
+    args = quick_args(tmp_path, "random", "trans")
+    args.nlayers, args.dropout = 3, 0.0
+    model = GAT(4, 3, 2, args).eval()
+    assert (model.heads, model.output_heads, model.nlayers) == (8, 1, 3)
+    assert model.conv1.heads == 8 and model.conv2.in_channels == 24
+    edges = SparseTensor.from_dense(ring())
+    output = model(torch.randn(6, 4), edges)
+    assert output.shape == (6, 2)
+    torch.testing.assert_close(output.exp().sum(1), torch.ones(6))

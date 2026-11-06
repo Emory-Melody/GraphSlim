@@ -164,7 +164,8 @@ def test_real_class_neighbor_samples_keep_seed_nodes_inside_training_view(settin
         assert len(blocks) == depth
 
 
-def test_large_loader_accepts_single_node_batches(monkeypatch):
+@pytest.mark.parametrize("batch_size", [1, 100])
+def test_large_loader_accepts_batch_size_larger_than_training_split(monkeypatch, batch_size):
     import torch_geometric.datasets
 
     class Dataset:
@@ -174,7 +175,44 @@ def test_large_loader_accepts_single_node_batches(monkeypatch):
             return raw_graph()
 
     monkeypatch.setattr(torch_geometric.datasets, "Flickr", lambda **kw: Dataset())
-    batches = loader.LargeDataLoader("flickr", batch_size=1)
+    batches = loader.LargeDataLoader("flickr", batch_size=batch_size)
     batches.split_batch()
     assert 1 <= batches.k <= batches.n_split
     assert len(batches.batch_labels) == 12
+    if batch_size == 100:
+        # Regression: the partition count used to round to zero and break KMeans.
+        assert int(batches.k) == 1 and set(batches.batch_labels.tolist()) == {0}
+
+
+@pytest.mark.parametrize("batch_size", [0, -1])
+def test_large_loader_rejects_nonpositive_batch_sizes_before_io(batch_size):
+    with pytest.raises(ValueError, match="batch_size"):
+        loader.LargeDataLoader(batch_size=batch_size)
+
+
+def test_large_loader_default_name_is_case_insensitive_and_unknown_names_fail(monkeypatch):
+    import torch_geometric.datasets
+
+    class Dataset:
+        num_classes = 2
+
+        def __getitem__(self, index):
+            return raw_graph()
+
+    # Regression: the default name "Flickr" matched no branch (UnboundLocalError).
+    monkeypatch.setattr(torch_geometric.datasets, "Flickr", lambda **kw: Dataset())
+    batches = loader.LargeDataLoader(batch_size=4)
+    assert batches.properties() == (3, 12, 2, 3, 20)
+    with pytest.raises(ValueError, match="supports flickr, reddit and ogbn-arxiv"):
+        loader.LargeDataLoader("cora")
+
+
+def test_cached_non_arxiv_graphsaint_files_load_without_symmetrizing(tmp_path, monkeypatch):
+    # Regression: adj_full was only read for ogbn-arxiv, so other caches crashed.
+    raw = write_saint(tmp_path / "flickr/raw")
+    monkeypatch.setattr(gdown, "download_folder", lambda **kw: pytest.fail("no download"))
+    value = loader.DataGraphSAINT(str(tmp_path), "flickr")
+    stored = sp.load_npz(tmp_path / "flickr/raw/adj_full.npz")
+    assert (value.adj_full != stored).nnz == 0
+    assert value.num_nodes == 20 and value.train_mask.sum() == 12
+    np.testing.assert_array_equal(value.feat_full, raw.x.numpy())

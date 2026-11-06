@@ -261,3 +261,13 @@ def test_scheduled_direct_update_adds_scaled_gradient_and_clamps():
     attack._update_edge_weights(5, 3, torch.tensor([1.0, -10.0]))
     lr = float(5 / 20 / 2 * 4.0 / np.sqrt(2))
     torch.testing.assert_close(attack.perturbed_edge_weight, torch.tensor([0.5 + lr, attack.eps]))
+
+
+def test_pge_chunking_trains_on_tiny_reddit_graphs():
+    # Regression: 2 nodes -> 4 pairs used to split into single-row batch-norm chunks.
+    torch.manual_seed(2)
+    model = PGE(3, 2, args=pge_args("reddit", 0.05)).train()
+    adjacency = model(torch.randn(2, 3))
+    assert adjacency.shape == (2, 2) and adjacency.diagonal().eq(0).all()
+    adjacency.sum().backward()
+    assert torch.isfinite(model.layers[0].weight.grad).all()

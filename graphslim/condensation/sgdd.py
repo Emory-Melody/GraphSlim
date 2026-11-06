@@ -28,6 +28,8 @@ class SGDD(GCondBase):
         :param kwargs: Additional keyword options passed to the underlying implementation.
         """
         super(SGDD, self).__init__(setting, data, args, **kwargs)
+        # The graphon transport matrix is sized by mx_size; small graphs use all nodes.
+        args.mx_size = min(args.mx_size, data.adj_full.shape[0])
 
         self.pge = IGNR(
             node_feature=self.d, nfeat=128, nnodes=self.nnodes_syn, device=self.device, args=args
@@ -47,10 +49,8 @@ class SGDD(GCondBase):
         """
         args = self.args
 
-        if data.adj_full.shape[0] < args.mx_size:
-            args.mx_size = data.adj_full.shape[0]
-        else:
-            data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
+        # __init__ already capped mx_size at the graph size.
+        data.adj_mx = data.adj_full[: args.mx_size, : args.mx_size]
 
         feat_syn, labels_syn = to_tensor(self.feat_syn, label=data.labels_syn, device=self.device)
         if args.setting == "trans":

@@ -196,7 +196,11 @@ def load_reduced(args, data=None):
 
     Raises ``FileNotFoundError`` when no matching component exists. For partial
     checkpoints, missing features or labels can use the supplied original data,
-    and a missing adjacency uses an identity graph.
+    and a missing adjacency uses an identity graph. Missing labels always fall
+    back to ``data.labels_train``: in the transductive setting an adjacency-only
+    checkpoint (edge sparsifiers) therefore yields full-graph features with
+    training labels, and downstream training indexes its outputs by
+    ``data.idx_train`` so that validation and test labels are never trained on.
 
     :param args: Configuration namespace containing the options used by this operation.
     :param data: Graph data containing features, adjacency, labels, and split indices. Defaults to ``None``.
@@ -264,16 +268,9 @@ def load_reduced(args, data=None):
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(file_path)
-        load_locations = []
-        if target_device != "cpu":
-            load_locations.append(target_device)
-        load_locations.append("cpu")
+        load_locations = [target_device, "cpu"] if target_device != "cpu" else ["cpu"]
         last_exc = None
-        tried = set()
         for loc in load_locations:
-            if loc in tried:
-                continue
-            tried.add(loc)
             try:
                 tensor = torch.load(file_path, map_location=loc)
                 if loc != target_device and target_device != "cpu" and hasattr(tensor, "to"):
@@ -287,10 +284,8 @@ def load_reduced(args, data=None):
                 return tensor
             except Exception as e:
                 last_exc = e
-                continue
-        if last_exc is not None:
-            raise last_exc
-        raise RuntimeError(f"Failed to load tensor from {file_path}")
+        # The CPU attempt always runs, so reaching here means every attempt failed.
+        raise last_exc
 
     try:
         feat_path = os.path.join(
@@ -374,9 +369,7 @@ def get_syn_data(data, args, model_type, verbose=False):
     if labels_syn.shape[0] == data.labels_train.shape[0]:
         return feat_syn, adj_syn, labels_syn
 
-    if type(adj_syn) == torch.tensor and is_sparse_tensor(adj_syn):
-        adj_syn = adj_syn.to_dense()
-    elif isinstance(adj_syn, torch.sparse.FloatTensor):
+    if isinstance(adj_syn, torch.sparse.FloatTensor):
         adj_syn = adj_syn.to_dense()
     else:
         adj_syn = adj_syn
@@ -695,12 +688,13 @@ def disjointed_union(tree_list, class_=None, device=None):
         "Number of node features are different."
     )
     assert all(tree.y == tree_list[0].y for tree in tree_list), "Tree must be in same class."
-    if hasattr(tree_list[0], "edge_attr"):
-        assert all(hasattr(tree, "edge_attr") for tree in tree_list), (
+    # PyG ``Data`` reports absent attributes as ``None``, so test the value.
+    if getattr(tree_list[0], "edge_attr", None) is not None:
+        assert all(getattr(tree, "edge_attr", None) is not None for tree in tree_list), (
             "Not all trees have edge features."
         )
         assert all(
-            tree.edge_attr.shape[1] == tree_list[0].edge_attr.shape[1] for tree in tree_list
+            tree.edge_attr.shape[1:] == tree_list[0].edge_attr.shape[1:] for tree in tree_list
         ), "Number of edge features are different."
         hasedgeattr = True
     else:
@@ -712,7 +706,7 @@ def disjointed_union(tree_list, class_=None, device=None):
     )
     if hasedgeattr:
         edge_attr = torch.zeros(
-            (total_edges, tree_list[0].edge_attr.shape[1]),
+            (total_edges, *tree_list[0].edge_attr.shape[1:]),
             device=device,
             dtype=tree_list[0].edge_attr.dtype,
         )
@@ -726,7 +720,7 @@ def disjointed_union(tree_list, class_=None, device=None):
         num_edges = tree.edge_index.shape[1]
         idxs = torch.arange(num_edges) + edge_start
         if hasedgeattr:
-            edge_attr[idxs, :] = tree.edge_attr
+            edge_attr[idxs] = tree.edge_attr
         edge_index_extract = tree.edge_index
         edge_index_extract = edge_index_extract + node_start
         edge_index[:, idxs] = edge_index_extract
@@ -749,7 +743,8 @@ def roots_to_embed(data):
     nn = data.x.shape[0]
     root = torch.zeros((nn,), device=data.x.device)
     root_indices = torch.tensor(
-        list(set(data.edge_index[1].tolist()).difference(set(data.edge_index[0].tolist())))
+        sorted(set(data.edge_index[1].tolist()).difference(set(data.edge_index[0].tolist()))),
+        dtype=torch.long,
     ).to(data.x.device)
     root[root_indices] = 1
     data.roots_to_embed = root
@@ -763,20 +758,26 @@ class myDataset(Dataset):
         """Initialize myDataset and its configuration.
 
         :param dataset_list: Sequence of graph samples stored by the dataset wrapper.
-        :param dataset_len: Exposed sample count; zero uses the stored list length. Defaults to ``0``.
+        :param dataset_len: Number of graphs to draw with replacement in proportion to each
+            entry's ``freq`` (at least the list length); zero keeps the stored list as is.
+            Defaults to ``0``.
         :param kwargs: Additional keyword options passed to the underlying implementation.
         """
         super().__init__()
         this.dataset_list = [list(d.values())[0] for d in dataset_list]
-        this.dataset_len = max(len(this.dataset_list), dataset_len)
         this.rng = np.random.RandomState(seed=kwargs.get("seed", 0))
         freq, data = list(zip(*((d["freq"], d["data"]) for d in this.dataset_list)))
-        probs = np.asarray(freq) / np.sum(freq)
-        this.data = [
-            data[this.rng.choice(np.arange(len(data)), p=probs)] for _ in range(this.dataset_len)
-        ]
-        this.dataset_len = len(this.dataset_list)
-        this.data = data
+        if dataset_len:
+            # Draw max(len, dataset_len) graphs in proportion to pattern frequency.
+            this.dataset_len = max(len(this.dataset_list), dataset_len)
+            probs = np.asarray(freq) / np.sum(freq)
+            this.data = [
+                data[this.rng.choice(np.arange(len(data)), p=probs)]
+                for _ in range(this.dataset_len)
+            ]
+        else:
+            this.dataset_len = len(this.dataset_list)
+            this.data = list(data)
 
     def len(this):
         """Report the configured dataset length.
@@ -886,9 +887,7 @@ def preprocess_dataset_test(dataset, node_label_map, edge_label_map, node_label_
     :param node_label_map_full: Dictionary mapping original node feature tuples to canonical IDs.
     :returns: List of encoded PyG graphs; ``edge_label_map`` is retained for interface compatibility.
     """
-    label_processed_dataset = process_labels(
-        dataset, node_label_map, edge_label_map, node_label_map_full
-    )
+    label_processed_dataset = process_labels(dataset, node_label_map, node_label_map_full)
     return label_processed_dataset
 
 

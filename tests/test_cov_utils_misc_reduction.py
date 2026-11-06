@@ -65,6 +65,16 @@ def test_as_csr_accepts_every_adjacency_representation(convert):
     np.testing.assert_array_equal(matrix.toarray(), DENSE)
 
 
+@pytest.mark.parametrize("layout", ["coo", "csr"])
+def test_as_csr_detaches_sparse_tensors_that_require_grad(layout):
+    """Regression: sparse tensors with autograd history could not be converted."""
+    dense = torch.tensor(DENSE, requires_grad=True)
+    sparse = dense.to_sparse() if layout == "coo" else dense.to_sparse_csr()
+    assert sparse.requires_grad
+    np.testing.assert_array_equal(lightweight.as_csr(sparse).toarray(), DENSE)
+    np.testing.assert_array_equal(lightweight.as_csr(dense).toarray(), DENSE)
+
+
 def test_as_csr_copies_scipy_input():
     source = sp.csr_matrix(DENSE)
     lightweight.as_csr(source).data[:] = 0

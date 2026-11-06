@@ -68,6 +68,15 @@ class BaseGNN(nn.Module):
             for bn in self.bns:
                 bn.reset_parameters()
 
+    def _batch_norm(self, index, x):
+        """Apply a hidden batch norm over node rows, including dense ``(1, N, C)`` layer outputs.
+
+        :param index: Index of the batch normalization layer.
+        :param x: Node representations whose last dimension holds features.
+        :returns: Normalized representations with the input shape.
+        """
+        return self.bns[index](x.reshape(-1, x.shape[-1])).view(x.shape)
+
     def forward(self, x, adj, output_layer_features=False):
         """Compute node predictions from features and one adjacency or a list of layer adjacencies.
 
@@ -80,7 +89,7 @@ class BaseGNN(nn.Module):
             for i, layer in enumerate(self.layers):
                 x = layer(x, adj[i])
                 if i != self.nlayers - 1:
-                    x = self.bns[i](x) if self.with_bn else x
+                    x = self._batch_norm(i, x) if self.with_bn else x
                     if self.with_relu:
                         x = self.activation(x)
                     x = F.dropout(x, self.dropout, training=self.training)
@@ -89,7 +98,7 @@ class BaseGNN(nn.Module):
             for ix, layer in enumerate(self.layers):
                 x = layer(x, adj)
                 if ix != self.nlayers - 1:
-                    x = self.bns[ix](x) if self.with_bn else x
+                    x = self._batch_norm(ix, x) if self.with_bn else x
                     if self.with_relu:
                         x = self.activation(x)
                     x = F.dropout(x, self.dropout, training=self.training)
