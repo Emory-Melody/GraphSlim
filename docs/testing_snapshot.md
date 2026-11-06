@@ -1,29 +1,29 @@
 # Version-specific software testing record
 
-The Git 1.3.1 release has **49 canonical methods** (5 node,
+The Git 1.3.2 release has **49 canonical methods** (5 node,
 18 edge, 10 coarsening, 16 condensation) and **eight downstream GNN architectures**.
-The source fingerprint, environment, raw test log, JUnit results, and full
-coverage data are in [validation/release_1_3_1](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/validation/release_1_3_1/README.md).
+The environment, raw test log, JUnit results, full coverage data and packaging
+checks are in [validation/release_1_3_2](https://github.com/Emory-Melody/GraphSlim/blob/1.3.2/validation/release_1_3_2/README.md).
 These files are committed with the implementation they describe.
 
-## Current reviewed release: 1.3.1
+## Current reviewed release: 1.3.2
 
 On Linux CPU with Python 3.11 and PyTorch 2.6.0+cpu, the repository suite reports
-**479 passed, 31 skipped, zero failures/errors**. Skips include CUDA-only checks
-and unavailable optional pinned reference checkouts. The full-package coverage
-run includes 106 Python modules, with zero excluded statements:
+**1,589 passed, 31 skipped, zero failures/errors**. Skips are CUDA-only checks and
+unavailable optional pinned reference checkouts. The full-package coverage run
+includes 105 Python modules, with zero excluded statements:
 
 | Measure | Covered / total | Percentage |
 | --- | ---: | ---: |
-| Statements | 4,522 / 10,625 | 42.56% |
-| Branches | 1,145 / 3,368 | 34.00% |
-| Combined coverage.py measure | 5,667 / 13,993 | 40.50% |
+| Statements | 10,405 / 10,532 | 98.79% |
+| Branches | 3,222 / 3,354 | 96.06% |
 
-These tests establish the exercised software behavior in this environment;
-they do not replace the numerical benchmark artifact or verify every GPU path.
-No claim of 90% coverage is made for this revision. CI produces separate
-coverage artifacts for each tested Python/PyTorch combination; local results
-and remote CI results must be identified separately.
+Tests use small synthetic graphs on CPU and need no dataset downloads. They check
+method behaviour (selection budgets, kernel symmetry, loss decrease, save and reload,
+reference identities such as PageRank against NetworkX) rather than only calling
+code. The defects they exposed are fixed in this release; see the changelog. The
+remaining uncovered lines are mostly CUDA-only branches and defensive paths that
+cannot be reached.
 
 To reproduce, install the supported CPU dependencies from the README, then run:
 
@@ -32,14 +32,17 @@ python -m pip install -e '.[dev,fuzzy]' 'dgl==1.1.3' 'coverage==7.16.2'
 python -m coverage run -m pytest -q -ra --junitxml=pytest.xml
 python -m coverage combine
 python -m coverage json -o coverage.json
-python -m coverage xml -o coverage.xml
-python benchmark/results/reproducibility_20261105/verify.py --check
+python benchmark/results/reproducibility_20261106/verify.py --check
 ```
 
 The checked-in `.coveragerc` measures all `graphslim` modules, enables branch
-coverage, and combines multiprocessing/subprocess execution. The record contains
-exact dependency versions. Optional reference availability and CUDA availability
-affect skips; keep those conditions explicit when comparing runs.
+coverage, and combines multiprocessing/subprocess execution.
+
+## Release 1.3.1
+
+The 1.3.1 suite reported 479 passed and 31 skipped tests, 42.56% statement coverage
+(4,522/10,625) and 34.00% branch coverage (1,145/3,368) across 106 modules. Its record
+is in [validation/release_1_3_1](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/validation/release_1_3_1/README.md).
 
 ## Earlier development record
 

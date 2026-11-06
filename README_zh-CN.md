@@ -14,7 +14,7 @@
 
 </div>
 
-**Git 版本 1.3.1（2026-11-05）：**[tag `1.3.1`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.1) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.1/docs/testing_snapshot.md)。
+**Git 版本 1.3.2（2026-11-06）：**[tag `1.3.2`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.2) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.2/docs/testing_snapshot.md)和[更新日志](CHANGELOG.md)。
 
 
 GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
@@ -336,7 +336,7 @@ CentP 和 GDEM 不与论文数值对照：1.3.1 之后修复的缺陷同样存�
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.1
+git checkout --detach 1.3.2
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu

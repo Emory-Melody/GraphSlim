@@ -1,0 +1,18 @@
+{
+  "graphslim-1.3.2-py3-none-any.whl": {
+    "sha256": "4f5832ae0064f80381a0e928dbf71bcff8058dcd71045e52206ec5475b8c638d",
+    "files": 282,
+    "package_python_modules": 105,
+    "python_license_headers": 105,
+    "mirage_present": false,
+    "junk_files": []
+  },
+  "graphslim-1.3.2.tar.gz": {
+    "sha256": "228452131c910245051f0be19237bf61f03a3980b65162a3384b0367a2d70cb7",
+    "files": 584,
+    "package_python_modules": 105,
+    "python_license_headers": 105,
+    "mirage_present": false,
+    "junk_files": []
+  }
+}
