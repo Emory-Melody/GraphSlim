@@ -6,5 +6,6 @@
   "graphslim/models/gat.py": "899f9c17a2558c39a6cddbc010ea1023bfcb7d987582d5723fbe14022dbbd6ce",
   "graphslim/models/base.py": "42a57cb2271c0d99b7c9fee0e410ae82da6acda733c9eb3d16c5e7b79762835a",
   "graphslim/config.py": "04da89e530a2283bb3d58f26ceae8fc8dc687cd09708989fcd33be2f2bc7c5b8",
-  "graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e"
+  "graphslim/configs/gcond/cora.json": "824059f06209668a22b7f47509505bb10d19ddcf0a11f95263f9b14feff2f38e",
+  "examples/demo_short.json": "46a60f7b25ffe38469af5f90ce9e36fc0b6f720d900c3e816991e5a381e6476a"
 }
