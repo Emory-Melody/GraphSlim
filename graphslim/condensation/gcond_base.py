@@ -147,6 +147,8 @@ class GCondBase:
                 return feat_syn
         init_args = copy(args)
         init_args.method = args.init
+        # Let the initializer know which condensation method it serves.
+        init_args.init_for = args.method
         agent = create_reducer(args.init, setting=args.setting, data=self.data, args=init_args)
         reduced_data = agent.reduce(self.data, verbose=True, save=True)
         if with_adj:

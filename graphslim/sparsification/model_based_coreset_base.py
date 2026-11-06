@@ -15,13 +15,29 @@ from graphslim.utils import to_tensor
 FIXED_IDX_DIR = Path(__file__).resolve().parent / "fixed_idx"
 
 
+def fixed_kcenter_path(args):
+    """Path of the packaged SFGC k-center selection for a dataset and rate."""
+    return FIXED_IDX_DIR / f"idx_{args.dataset}_{args.reduction_rate}_kcenter_15.npy"
+
+
 def fixed_kcenter_indices(args):
     """Load the packaged SFGC k-center node selection for a dataset and rate.
 
     :param args: Configuration with ``dataset`` and ``reduction_rate``.
     :returns: One-dimensional NumPy array of selected node IDs.
     """
-    return np.load(FIXED_IDX_DIR / f"idx_{args.dataset}_{args.reduction_rate}_kcenter_15.npy")
+    return np.load(fixed_kcenter_path(args))
+
+
+def uses_fixed_sfgc_selection(args):
+    """Whether SFGC's released k-center selection applies to this run.
+
+    SFGC initializes from the authors' fixed k-center nodes. The selection is used
+    when SFGC itself or its k-center initializer runs and a packaged file exists for
+    the dataset and rate; otherwise k-center is trained as usual.
+    """
+    serves_sfgc = "sfgc" in (args.method, getattr(args, "init_for", None))
+    return serves_sfgc and fixed_kcenter_path(args).is_file()
 
 
 class MBCoreSet(CoreSet):
@@ -54,7 +70,7 @@ class MBCoreSet(CoreSet):
             data.feat_full.shape[1], args.hidden, data.nclass, args
         ).to(self.device)
         if self.setting == "trans":
-            if args.method in ["sfgc"]:
+            if uses_fixed_sfgc_selection(args):
                 # model.fit_with_val(data, train_iters=1200, normadj=True, verbose=verbose,
                 #                    setting=args.setting, reduced=False, final_output=True)
                 # embeds = model.predict(data.feat_full, data.adj_full, output_layer_features=True)[0].detach()
@@ -76,7 +92,7 @@ class MBCoreSet(CoreSet):
             data.labels_syn = data.labels_full[idx_selected]
 
         if self.setting == "ind":
-            if args.method in ["sfgc"]:
+            if uses_fixed_sfgc_selection(args):
                 idx_selected = fixed_kcenter_indices(args)
             else:
                 model.fit_with_val(

@@ -333,3 +333,41 @@ def test_edge_sparsifier_without_saving_returns_cpu_adjacency(tmp_path):
     assert result.reduction_metadata["reduced_edges"] == result.reduced_edges
     assert result.reduced_edges <= result.reduction_metadata["original_edges"]
     assert not (tmp_path / "reduced_graph").exists()
+
+
+@pytest.mark.parametrize("setting", ["trans", "ind"])
+def test_kcenter_initializer_for_sfgc_uses_released_selection(tmp_path, monkeypatch, setting):
+    """SFGC reaches k-center through GCondBase.init, which renames the method."""
+    import graphslim.sparsification.model_based_coreset_base as module
+
+    graph = tiny_graph()
+    args = quick_args(tmp_path, "kcenter", setting)
+    args.dataset, args.init_for = "toy", "sfgc"
+    folder = tmp_path / "fixed_idx"
+    folder.mkdir()
+    monkeypatch.setattr(module, "FIXED_IDX_DIR", folder)
+    fixed = np.array([3, 0, 5, 2])
+    np.save(folder / f"idx_toy_{args.reduction_rate}_kcenter_15.npy", fixed)
+
+    def no_training(*args, **kwargs):
+        pytest.fail("SFGC's k-center initializer must use the released selection")
+
+    monkeypatch.setattr(module.get_model_class("GCN"), "fit_with_val", no_training)
+    result = KCenter(setting, graph, args).reduce(graph, save=False)
+    features = graph.feat_train if setting == "ind" else graph.feat_full
+    assert torch.equal(result.feat_syn, features[fixed])
+
+
+def test_fixed_selection_applies_only_to_sfgc_with_a_packaged_file():
+    from graphslim.sparsification.model_based_coreset_base import uses_fixed_sfgc_selection
+
+    def run(**fields):
+        return uses_fixed_sfgc_selection(SimpleNamespace(**fields))
+
+    assert run(method="kcenter", init_for="sfgc", dataset="cora", reduction_rate=0.5)
+    assert run(method="sfgc", dataset="reddit", reduction_rate=0.001)
+    # Plain k-center and other condensation initializers keep training.
+    assert not run(method="kcenter", dataset="cora", reduction_rate=0.5)
+    assert not run(method="kcenter", init_for="geom", dataset="cora", reduction_rate=0.5)
+    # No released selection for PubMed: SFGC falls back to trained k-center.
+    assert not run(method="kcenter", init_for="sfgc", dataset="pubmed", reduction_rate=0.5)

@@ -21,5 +21,8 @@
   "min_start_epoch": 0,
   "syn_steps": 2500,
   "beta": 0.01,
-  "init": "kcenter"
+  "init": "kcenter",
+  "tem": 1,
+  "lr_tem": 0.01,
+  "maxtem": 0.01
 }

@@ -288,3 +288,33 @@ def test_distribution_matching_lowers_embedding_distance(tmp_path, method, metri
     assert reduced.feat_syn.shape == (12, 8) and torch.isfinite(reduced.feat_syn).all()
     assert reduced.labels_syn.bincount().tolist() == [6, 6]
     assert np.isfinite(reduced.feat_syn.numpy()).all()
+
+
+def test_initializer_records_the_condensation_method_it_serves(tmp_path, monkeypatch):
+    import graphslim.condensation.gcond_base as base
+
+    args = gradient_args(tmp_path, "gcond")
+    args.init = "random"
+    graph = graph_fixture()
+    reducer = create_reducer("gcond", "trans", graph, args)
+    seen = {}
+    original = base.create_reducer
+
+    def recording(method, setting, data, args):
+        seen["method"], seen["init_for"] = args.method, args.init_for
+        return original(method, setting=setting, data=data, args=args)
+
+    monkeypatch.setattr(base, "create_reducer", recording)
+    reducer.init()
+    assert seen == {"method": "random", "init_for": "gcond"}
+    assert args.method == "gcond" and not hasattr(args, "init_for")
+
+
+@pytest.mark.parametrize("dataset", ["yelp", "amazon"])
+def test_geom_soft_label_configs_define_temperature(dataset):
+    from graphslim.config import get_args
+
+    args = get_args(["-D", dataset, "-M", "geom"])
+    assert args.setting == "ind" and args.soft_label == 1
+    # Same temperature settings as Flickr, the closest-sized inductive GEOM dataset.
+    assert (args.tem, args.lr_tem, args.maxtem) == (1, 0.01, 0.01)
