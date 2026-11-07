@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: MIT
 # See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
-"""Spectral, clustering, VNG and NOPE coarseners on small synthetic graphs."""
+"""Spectral, clustering and VNG coarseners on small synthetic graphs."""
 
 import logging
-import warnings
 from types import SimpleNamespace
 
 import numpy as np
@@ -15,7 +14,6 @@ from pygsp import graphs
 from graphslim.coarsening import Average, Cluster, ClusterAgg, utils
 from graphslim.coarsening.coarsening_base import Coarsen
 from graphslim.coarsening.labels import label_tensor, synthetic_labels
-from graphslim.coarsening.nope import NOPE, hierarchical_merge, interference_loss
 from graphslim.coarsening.vng import VNG, layer_embeddings
 from graphslim.dataset import load_reduced
 from graphslim.reduction import create_reducer
@@ -393,97 +391,3 @@ def test_vng_virtual_graph_solves_propagation_least_squares(capsys):
     q = membership @ adjacency @ head
     np.testing.assert_allclose(edge.numpy() @ p, q, rtol=1e-3, atol=1e-3)
     np.testing.assert_allclose(coarse_features.numpy(), membership @ features.numpy(), atol=1e-5)
-
-
-def test_interference_losses_match_closed_forms():
-    features = np.array([[1.0, 0.0], [0.0, 1.0], [1.0, 1.0], [2.0, 0.0]])
-    sizes = np.array([1.0, 3.0, 1.0, 1.0])
-    neighbors = {0: {1, 2}, 1: {0, 2, 3}, 2: {0, 1}, 3: {1}}
-    weight = 1 * 3 / (4 + 1e-8)
-    relaxed = interference_loss(0, 1, features, sizes, neighbors, relaxed=True)
-    assert relaxed == pytest.approx(weight * 2 * 2)
-    exact = interference_loss(0, 1, features, sizes, neighbors)
-    sum_u = 0 + 1  # neighbors 1 and 2 of node 0: (0)^2 + (1)^2
-    sum_v = 0 + 1 + 0  # neighbors 0, 2, 3 of node 1: 0, 1, 0
-    difference = 0.0  # common neighbor 2: <(1,1), (1,-1)> = 0
-    assert exact == pytest.approx(weight * (sum_u + sum_v + difference))
-    cached = interference_loss(0, 1, features, sizes, neighbors, sum_sq=np.array([5.0, 7.0]))
-    assert cached == pytest.approx(weight * 12)
-
-
-@pytest.mark.parametrize("relaxed", [False, True])
-def test_hierarchical_merge_respects_components_and_target(relaxed):
-    blocks = [np.ones((4, 4)) - np.eye(4), np.ones((3, 3)) - np.eye(3), np.zeros((1, 1))]
-    adjacency = sp.block_diag(blocks, format="csr")
-    features = np.arange(16, dtype=np.float32).reshape(8, 2)
-    mapping, centers, tree = hierarchical_merge(features, adjacency, 2, relaxed)
-    # Three components cannot be merged below three clusters.
-    assert len(centers) == 3 and sorted(np.bincount(mapping).tolist()) == [1, 3, 4]
-    assert len(set(mapping[:4])) == 1 and len(set(mapping[4:7])) == 1
-    for cluster in range(3):
-        np.testing.assert_allclose(centers[cluster], features[mapping == cluster].mean(0))
-    assert len(tree) == 5
-    identity, _, _ = hierarchical_merge(features, adjacency, 100, relaxed)
-    np.testing.assert_array_equal(np.sort(identity), np.arange(8))
-
-
-def test_hierarchical_merge_prunes_stale_heap_entries():
-    n = 60
-    rows = np.repeat(np.arange(n), n)
-    cols = np.tile(np.arange(n), n)
-    adjacency = sp.csr_matrix((np.ones(n * n), (rows, cols)), shape=(n, n))
-    features = np.random.default_rng(1).normal(size=(n, 2)).astype(np.float32)
-    mapping, centers, _ = hierarchical_merge(features, adjacency, 1, relaxed=True)
-    assert len(centers) == 1 and (mapping == 0).all()
-    np.testing.assert_allclose(centers[0], features.mean(0), rtol=1e-4, atol=1e-5)
-
-
-def nope_args(tmp_path, setting, **overrides):
-    args = quick_args(tmp_path, "cgc", setting)
-    args.method = "nope"
-    for key, value in overrides.items():
-        setattr(args, key, value)
-    return args
-
-
-@pytest.mark.parametrize("setting", ["trans", "ind"])
-@pytest.mark.parametrize("relaxed", [False, True])
-def test_nope_reduces_to_labelled_supernodes(tmp_path, setting, relaxed, capsys):
-    graph = tiny_graph()
-    args = nope_args(tmp_path, setting, nope_relaxed=relaxed)
-    reduced = NOPE(setting, graph, args).reduce(graph, verbose=True, save=True)
-    meta = reduced.reduction_metadata
-    assert meta["variant"] == ("NOPE*" if relaxed else "NOPE")
-    assert meta["requested_nodes"] == 8 and meta["budget_reached"]
-    n = len(reduced.feat_syn)
-    assert n == meta["coarse_nodes"] - meta["unlabeled_supernodes_removed"]
-    assert reduced.adj_syn.shape == (n, n) and set(reduced.adj_syn.unique().tolist()) <= {0, 1}
-    torch.testing.assert_close(reduced.adj_syn, reduced.adj_syn.T)
-    assert (reduced.adj_syn.diagonal() == 0).all()
-    total = graph.num_nodes if setting == "trans" else 16
-    assert reduced.nope_mapping.shape == (total,)
-    assert "NOPE" in capsys.readouterr().out
-    adjacency, features, labels = load_reduced(args)
-    torch.testing.assert_close(features, reduced.feat_syn)
-
-
-def test_nope_graph_budget_warns_when_components_block_target(tmp_path):
-    graph = tiny_graph()
-    adjacency = sp.lil_matrix((32, 32))
-    for i in range(0, 32, 2):
-        adjacency[i, i + 1] = adjacency[i + 1, i] = 1
-    graph.adj_full = adjacency.tocsr()
-    args = nope_args(tmp_path, "trans", nope_budget_base="graph", reduction_rate=0.25)
-    with warnings.catch_warnings(record=True) as caught:
-        warnings.simplefilter("always")
-        reduced = NOPE("trans", graph, args).reduce(graph, verbose=False, save=False)
-    assert any("disconnected components" in str(w.message) for w in caught)
-    assert reduced.reduction_metadata["coarse_nodes"] == 16
-    assert not reduced.reduction_metadata["budget_reached"]
-
-
-def test_nope_rejects_unknown_budget_base(tmp_path):
-    graph = tiny_graph()
-    args = nope_args(tmp_path, "trans", nope_budget_base="nodes")
-    with pytest.raises(ValueError, match="training or graph"):
-        NOPE("trans", graph, args).reduce(graph, verbose=False, save=False)

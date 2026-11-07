@@ -1,0 +1,8 @@
+Command: /home/sgong36/gslim/.venv/bin/python benchmark/results/reproducibility_20261106/verify.py --check
+Verified 313 settings, 110 pairs, 17 methods and 7 datasets (excluded: cent_p, gdem; 15 settings rerun after fixes).
+paper_110 / one-sided shortfall: <1% 65/110 (59.09%), <2% 85/110 (77.27%), <5% 107/110 (97.27%), <10% 110/110 (100.00%)
+paper_110 / two-sided error: <1% 39/110 (35.45%), <2% 64/110 (58.18%), <5% 96/110 (87.27%), <10% 103/110 (93.64%)
+without_shared_observations_106 / one-sided shortfall: <1% 61/106 (57.55%), <2% 81/106 (76.42%), <5% 103/106 (97.17%), <10% 106/106 (100.00%)
+without_shared_observations_106 / two-sided error: <1% 35/106 (33.02%), <2% 60/106 (56.60%), <5% 92/106 (86.79%), <10% 99/106 (93.40%)
+uncorrected_table9_sensitivity / one-sided shortfall: <1% 64/110 (58.18%), <2% 84/110 (76.36%), <5% 106/110 (96.36%), <10% 110/110 (100.00%)
+uncorrected_table9_sensitivity / two-sided error: <1% 39/110 (35.45%), <2% 63/110 (57.27%), <5% 94/110 (85.45%), <10% 103/110 (93.64%)

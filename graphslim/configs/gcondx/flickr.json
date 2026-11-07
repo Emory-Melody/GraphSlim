@@ -1,7 +1,0 @@
-{
-  "lr_feat": 0.01,
-  "lr_adj": 0.01,
-  "dis_metric": "mse",
-  "outer_loop": 10,
-  "condense_model": "GCN"
-}

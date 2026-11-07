@@ -1,0 +1,131 @@
+{
+  "ruff": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "ruff",
+      "check",
+      "graphslim",
+      "examples",
+      "benchmark",
+      "tests"
+    ],
+    "exit_code": 0
+  },
+  "format": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "graphslim",
+      "examples",
+      "benchmark",
+      "tests"
+    ],
+    "exit_code": 0
+  },
+  "table9": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "benchmark.render_results",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "readme_tables": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "benchmark.render_reproduction",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "readme_coverage": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "benchmark.render_readme_highlights",
+      "--coverage-only",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "reproduction_20261105": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "benchmark/results/reproducibility_20261105/verify.py",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "reproduction_20261106": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "benchmark/results/reproducibility_20261106/verify.py",
+      "--check"
+    ],
+    "exit_code": 0
+  },
+  "full_demo_records": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "validation/demo_1_3_4_full_20261106/verify.py"
+    ],
+    "exit_code": 0
+  },
+  "docs_html": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "sphinx",
+      "-E",
+      "-W",
+      "--keep-going",
+      "-b",
+      "html",
+      "-d",
+      "/home/sgong36/gslim/output/retired_methods_20261107/doctrees-html",
+      "docs",
+      "/home/sgong36/gslim/output/retired_methods_20261107/docs-html"
+    ],
+    "exit_code": 0
+  },
+  "docs_epub": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "sphinx",
+      "-E",
+      "-W",
+      "--keep-going",
+      "-b",
+      "epub",
+      "-d",
+      "/home/sgong36/gslim/output/retired_methods_20261107/doctrees-epub",
+      "docs",
+      "/home/sgong36/gslim/output/retired_methods_20261107/docs-epub"
+    ],
+    "exit_code": 0
+  },
+  "docs_latex": {
+    "command": [
+      "/home/sgong36/gslim/.venv/bin/python",
+      "-m",
+      "sphinx",
+      "-E",
+      "-W",
+      "--keep-going",
+      "-b",
+      "latex",
+      "-d",
+      "/home/sgong36/gslim/output/retired_methods_20261107/doctrees-latex",
+      "docs",
+      "/home/sgong36/gslim/output/retired_methods_20261107/docs-latex"
+    ],
+    "exit_code": 0
+  }
+}

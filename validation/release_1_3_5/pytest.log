@@ -1,0 +1,99 @@
+........................s.s.s.......s........s.s.s.s.s.s.s.s.s.s.s.s.s.s [  4%]
+.s.s.s.s................................................................ [  8%]
+........................................................................ [ 13%]
+........................................................................ [ 17%]
+........................................................................ [ 22%]
+........................................................................ [ 26%]
+........................................................................ [ 31%]
+........................................................................ [ 35%]
+........................................................................ [ 40%]
+........................................................................ [ 44%]
+........................................................................ [ 49%]
+........................................................................ [ 53%]
+........................................................................ [ 58%]
+........................................................................ [ 62%]
+........................................................................ [ 66%]
+........................................................................ [ 71%]
+........................................................................ [ 75%]
+........................................................................ [ 80%]
+........................................................................ [ 84%]
+........................................................................ [ 89%]
+........................................................................ [ 93%]
+........................................................................ [ 98%]
+.............................                                            [100%]
+=============================== warnings summary ===============================
+tests/test_cluster_ops.py::test_streamed_hops_equal_reference_and_two_spmm_equal_squared_operator
+  /home/sgong36/gslim/.venv/lib/python3.11/site-packages/torch_sparse/matmul.py:97: UserWarning: Sparse CSR tensor support is in beta state. If you miss a functionality in the sparse tensor support, please submit a feature request to https://github.com/pytorch/pytorch/issues. (Triggered internally at /pytorch/aten/src/ATen/SparseCsrTensorImpl.cpp:53.)
+    C = torch.sparse.mm(A, B)
+
+tests/test_coarsening_math.py: 64 warnings
+tests/test_cov_coarsening_reducers.py: 24 warnings
+tests/test_cov_coarsening_utils.py: 13 warnings
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/coarsening/utils.py:1935: DeprecationWarning: Conversion of an array with ndim > 0 to a scalar is deprecated, and will error in future. Ensure you extract a single element from your array before performing this operation. (Deprecated NumPy 1.25.)
+    matched_weights[mIdx] = weights[eIdx]
+
+tests/test_coarsening_math.py::test_multilevel_coarseners_produce_valid_partitions[heavy_edge-optimal]
+tests/test_coarsening_math.py::test_multilevel_coarseners_produce_valid_partitions[algebraic_jc-optimal]
+tests/test_coarsening_math.py::test_multilevel_coarseners_produce_valid_partitions[affinity_gs-optimal]
+tests/test_coarsening_math.py::test_multilevel_coarseners_produce_valid_partitions[kron-optimal]
+tests/test_cov_coarsening_reducers.py::test_optimal_strategy_matches_valid_partition[algebraic_jc]
+tests/test_cov_coarsening_reducers.py::test_optimal_strategy_matches_valid_partition[affinity_gs]
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/coarsening/utils.py:1937: DeprecationWarning: Conversion of an array with ndim > 0 to a scalar is deprecated, and will error in future. Ensure you extract a single element from your array before performing this operation. (Deprecated NumPy 1.25.)
+    keep = min(int(np.ceil(r * N)), matching.shape[0])
+
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[heavy_edge]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[algebraic_jc]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[affinity_gs]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[kron]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[variation_edges]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[variation_neighborhoods]
+tests/test_cov_coarsening_reducers.py::test_inductive_spectral_coarsening_uses_training_subgraph[variation_cliques]
+tests/test_legacy_reducer_integration.py::test_spectral_coarsening_pipeline_preserves_class_pure_components[heavy_edge]
+tests/test_legacy_reducer_integration.py::test_spectral_coarsening_pipeline_preserves_class_pure_components[variation_neighborhoods]
+  /home/sgong36/gslim/.venv/lib/python3.11/site-packages/scipy/sparse/_construct.py:543: FutureWarning: Input has data type int64, but the output has been cast to float64.  In the future, the output data type will match the input. To avoid this warning, set the `dtype` parameter to `None` to have the output dtype match the input, or set it to the desired output data type.
+  Note: In Python 3.11, this warning can be generated by a call of scipy.sparse.diags(), but the code indicated in the warning message will refer to an internal call of scipy.sparse.diags_array(). If that happens, check your code for the use of diags().
+    A = diags_array(diagonals, offsets=offsets, shape=shape, dtype=dtype)
+
+tests/test_cov_condensation_core_gradient.py: 6 warnings
+tests/test_cov_models_misc.py: 4 warnings
+tests/test_numerical_reducers.py: 2 warnings
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/models/ignr.py:25: DeprecationWarning: Please import `csr_matrix` from the `scipy.sparse` namespace; the `scipy.sparse.csr` namespace is deprecated and will be removed in SciPy 2.0.0.
+    elif isinstance(mx, scipy.sparse.csr.csr_matrix):
+
+tests/test_cov_condensation_kernel_models.py: 24 warnings
+tests/test_kernel_properties.py: 10 warnings
+  /home/sgong36/gslim/.venv/lib/python3.11/site-packages/numpy/matrixlib/defmatrix.py:70: PendingDeprecationWarning: the matrix subclass is not the recommended way to represent matrices or deal with linear algebra (see https://docs.scipy.org/doc/numpy/user/numpy-for-matlab-users.html). Please adjust your code to use regular ndarray.
+    return matrix(data, dtype=dtype, copy=False)
+
+tests/test_cov_utils_core.py::test_normalize_feature_accepts_lil_matrix_and_keeps_zero_rows
+tests/test_numeric_utilities.py::test_batched_and_row_normalization
+tests/test_numeric_utilities.py::test_batched_and_row_normalization
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/utils.py:451: DeprecationWarning: Please import `lil_matrix` from the `scipy.sparse` namespace; the `scipy.sparse.lil` namespace is deprecated and will be removed in SciPy 2.0.0.
+    if type(mx) is not sp.lil.lil_matrix:
+
+tests/test_cov_utils_core.py::test_normalize_feature_accepts_lil_matrix_and_keeps_zero_rows
+tests/test_numeric_utilities.py::test_batched_and_row_normalization
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/utils.py:457: RuntimeWarning: divide by zero encountered in power
+    r_inv = np.power(rowsum, -1).flatten()
+
+tests/test_cov_utils_core.py::test_coo_degree_normalizations_match_dense_closed_forms
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/utils.py:486: UserWarning: torch.sparse.SparseTensor(indices, values, shape, *, device=) is deprecated.  Please use torch.sparse_coo_tensor(indices, values, shape, dtype=, device=). (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:644.)
+    return torch.sparse.FloatTensor(edge_index, values, shape)
+
+tests/test_cov_utils_misc_runtime.py::test_reduced_graph_loader_accepts_array_like_adjacency
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/visualization.py:94: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at /pytorch/torch/csrc/utils/tensor_new.cpp:254.)
+    edge_index = torch.as_tensor(adj.nonzero(), dtype=torch.long)
+
+tests/test_spectral_diagnostics.py::test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues[False-3]
+tests/test_spectral_diagnostics.py::test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues[False-8]
+tests/test_spectral_diagnostics.py::test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues[True-3]
+tests/test_spectral_diagnostics.py::test_kron_quality_preserves_spectrum_and_matches_coarse_eigenvalues[True-8]
+  /home/sgong36/gslim/output/retired_methods_20261107/code/graphslim/coarsening/utils.py:2153: LinAlgWarning: Matrix is singular. The result might be inaccurate or the array might not have a square root.
+    M = U - sp.linalg.sqrtm(Cinv @ Gc.L.dot(C)) @ U @ np.diag(linv)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [3] tests/test_cluster_ops.py:36: CUDA unavailable
+SKIPPED [1] tests/test_cluster_ops.py:63: CUDA unavailable
+SKIPPED [18] tests/test_clustgdd_streaming.py:40: CUDA unavailable
+1591 passed, 22 skipped, 174 warnings in 62.93s (0:01:02)

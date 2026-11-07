@@ -1,0 +1,8 @@
+Command: /home/sgong36/gslim/.venv/bin/python benchmark/results/reproducibility_20261105/verify.py --check
+Verified 355 settings, 124 pairs, 19 methods and 7 datasets.
+historical_with_policy / mean_shortfall_percent: <1% 71/123 (57.72%), <2% 93/123 (75.61%), <5% 121/123 (98.37%), <10% 123/123 (100.00%)
+historical_with_policy / mean_relative_gap_percent: <1% 42/123 (34.15%), <2% 69/123 (56.10%), <5% 111/123 (90.24%), <10% 116/123 (94.31%)
+numerical_only_116 / mean_shortfall_percent: <1% 64/116 (55.17%), <2% 86/116 (74.14%), <5% 114/116 (98.28%), <10% 116/116 (100.00%)
+numerical_only_116 / mean_relative_gap_percent: <1% 35/116 (30.17%), <2% 62/116 (53.45%), <5% 104/116 (89.66%), <10% 109/116 (93.97%)
+paper_124 / mean_shortfall_percent: <1% 72/124 (58.06%), <2% 94/124 (75.81%), <5% 122/124 (98.39%), <10% 124/124 (100.00%)
+paper_124 / mean_relative_gap_percent: <1% 43/124 (34.68%), <2% 70/124 (56.45%), <5% 112/124 (90.32%), <10% 117/124 (94.35%)

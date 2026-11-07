@@ -139,7 +139,7 @@ def initialize(options):
         threads=options.threads,
         selection="validation only",
         reduction="package method defaults; no HPO; eager backend",
-        rate_denominator="labeled training nodes; NOPE reports actual retained nodes",
+        rate_denominator="labeled training nodes",
         parity="author SGNK eager versus native CUDA kernel capture; GP/Adam eager",
         timeout_seconds=options.timeout,
         max_rss_gib=options.max_rss_gib,
@@ -421,7 +421,7 @@ def export(folder, manifest):
         ]
     lines += [
         "",
-        "NOPE is the existing training-budget condensation adapter, not the original-node classifier from its paper. Unreachable targets, unlabeled-supernode filtering and class loss remain disclosed in per-job metadata. Timeout/resource failures are unavailable, never zero. GPU peaks are allocator peaks; per-job RSS is process peak, including data and training. Stages execute in the frozen order after all prior-stage jobs are terminal, including retained failures.",
+        "Timeout/resource failures are unavailable, never zero. GPU peaks are allocator peaks; per-job RSS is process peak, including data and training. Stages execute in the frozen order after all prior-stage jobs are terminal, including retained failures.",
         "",
     ]
     (folder / "results.md").write_text("\n".join(lines))

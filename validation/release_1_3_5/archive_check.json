@@ -1,0 +1,14 @@
+{
+  "graphslim-1.3.5-py3-none-any.whl": {
+    "retired_files": [],
+    "runtime_modules_matching_tested_source": 102,
+    "python_shell_sources_with_license_notice": 126,
+    "metadata_version": "1.3.5"
+  },
+  "graphslim-1.3.5.tar.gz": {
+    "retired_files": [],
+    "runtime_modules_matching_tested_source": 102,
+    "python_shell_sources_with_license_notice": 269,
+    "metadata_version": "1.3.5"
+  }
+}

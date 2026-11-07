@@ -36,7 +36,7 @@ def sparsify(model_type, adj_syn, args, verbose=False):
         adj_syn = adj_syn - adj_syn
         torch.diagonal(adj_syn).fill_(1)
     elif model_type == "GAT":
-        if args.method in ("cgc", "clustgdd", "gcgp", "nope"):
+        if args.method in ("cgc", "clustgdd", "gcgp"):
             # These methods construct their topology explicitly. Compression can
             # produce valid weights below 0.5; preserve all nonzero edges.
             threshold = 0
@@ -57,12 +57,6 @@ def sparsify(model_type, adj_syn, args, verbose=False):
         else:
             threshold = 0
 
-    # if verbose and args.method not in ['gcondx', 'doscondx', 'sfgc', 'geom', 'gcsntk']:
-    # print('Sum:', adj_syn.sum().item())
-    # print(adj_syn)
-    # print('Sparsity:', adj_syn.nonzero().shape[0] / adj_syn.numel())
-    # if args.method in ['sgdd']:
-    #     threshold = 0.5
     if threshold > 0:
         adj_syn[adj_syn < threshold] = 0
         if verbose:

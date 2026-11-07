@@ -1,0 +1,2 @@
+Command: /home/sgong36/gslim/.venv/bin/python -m benchmark.render_results --check
+Frozen Table 9 CSV is valid: 21 dataset/rate rows.

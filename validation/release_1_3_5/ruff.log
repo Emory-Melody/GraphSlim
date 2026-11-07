@@ -1,0 +1,2 @@
+Command: /home/sgong36/gslim/.venv/bin/python -m ruff check graphslim examples benchmark tests
+All checks passed!

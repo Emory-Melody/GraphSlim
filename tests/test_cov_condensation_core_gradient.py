@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 # See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
-"""Gradient/distribution-matching condensers: GCondBase helpers, GCondX, SGDD, SimGC, GCDM."""
+"""Gradient/distribution-matching condensers: GCondBase helpers, SGDD, SimGC, GCDM."""
 
 import logging
 from types import SimpleNamespace
@@ -12,7 +12,6 @@ from torch.nn import functional as F
 
 from graphslim.condensation.gcdm import dist
 from graphslim.condensation.gcond_base import GCondBase
-from graphslim.condensation.gcondx import GCondX
 from graphslim.condensation.simgc import (
     SimGCTeacher,
     propagated_features,
@@ -155,28 +154,7 @@ def test_validation_only_evaluation_reports_and_saves_only_improvements(tmp_path
     assert features.abs().sum() > 0  # a worse graph never overwrites the checkpoint
 
 
-# --------------------------------------------------------------------------- GCondX / SGDD
-
-
-@pytest.mark.parametrize("setting", ["trans", "ind"])
-def test_structure_free_gcond_updates_features_and_trains_gcn(tmp_path, setting):
-    args = gradient_args(tmp_path, "gcond", setting)
-    args.method = "gcondx"
-    graph = graph_fixture()
-    seed_everything(3)
-    reducer = GCondX(setting, graph, args)
-    reduced = reducer.reduce(graph, verbose=False)
-    initial = torch.load(
-        tmp_path / "reduced_graph" / "random" / f"feat_cora_0.5_{args.seed}.pt", weights_only=True
-    )
-    assert not torch.equal(reducer.feat_syn.detach(), torch.as_tensor(initial))
-    torch.testing.assert_close(reduced.adj_syn, torch.eye(12))
-    assert reduced.labels_syn.bincount().tolist() == [6, 6]
-    assert torch.isfinite(reduced.feat_syn).all()
-    validation, test = Evaluator(args).test(
-        reduced, "GCN", reduced=True, mode="cross", verbose=False
-    )
-    assert 0 <= validation <= 1 and 0 <= test <= 1
+# --------------------------------------------------------------------------- SGDD
 
 
 @pytest.mark.parametrize("setting", ["trans", "ind"])

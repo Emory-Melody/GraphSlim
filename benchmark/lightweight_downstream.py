@@ -217,7 +217,7 @@ def export(folder, manifest):
     lines.extend(
         [
             "",
-            "Cells are test accuracy (%) or the dataset metric; uncertainty/raw seeds are in `scores.csv` and `jobs/*/result.json`. No numeric partial cells. `metattack` is the package's PRBCD path, with 2 surrogate/attack steps in smoke mode, not literal MetaAttack. Clean jobs additionally retain fixed-model inference-noise results, two-candidate validation-only NAS, graph properties and oracle-threshold MIA diagnostics. NOPE preserves components and removes unlabeled supernodes; actual node counts can differ from the request.",
+            "Cells are test accuracy (%) or the dataset metric; uncertainty/raw seeds are in `scores.csv` and `jobs/*/result.json`. No numeric partial cells. `metattack` is the package's PRBCD path, with 2 surrogate/attack steps in smoke mode, not literal MetaAttack. Clean jobs additionally retain fixed-model inference-noise results, two-candidate validation-only NAS, graph properties and oracle-threshold MIA diagnostics.",
             "",
         ]
     )

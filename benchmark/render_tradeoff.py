@@ -140,7 +140,6 @@ def collect(run_dir):
         ),
         notes=dict(
             reddit="The package loader uses the PyG Reddit2 graph.",
-            nope="NOPE reached the 3600 s job limit on both datasets and has no cell.",
         ),
         cells=cells,
     )

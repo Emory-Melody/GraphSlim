@@ -1,10 +1,30 @@
 # Version-specific software testing record
 
-GraphSlim 1.3.4 retains 49 canonical methods and eight downstream GNN architectures.
+GraphSlim 1.3.5 retains 49 canonical methods and eight downstream GNN architectures.
 It uses anomaly-class AP for Yelp/Amazon validation, HPO and final evaluation.
 The frozen 110-pair comparison artifact retains its historical metric definitions.
 
-## Current release: 1.3.4
+## Current release: 1.3.5
+
+Release 1.3.5 removes the retired GCondX and NOPE implementations, nine
+configuration files, obsolete tests and active benchmark references.
+The 49-method registry and eight downstream GNN architectures are unchanged.
+A fresh Linux CPU run passes **1,591 tests**, with **22 CUDA checks skipped**,
+zero failures/errors, **98.77% statement coverage** and **95.97% branch coverage**
+across all **102 package modules**, with zero excluded statements.
+Statements: 10,039 / 10,164;
+branches: 3,121 / 3,252.
+The [release record](https://github.com/Emory-Melody/GraphSlim/tree/1.3.5/validation/release_1_3_5)
+contains the source/configuration hashes, complete test log, coverage reports
+and distribution checks. Regression tests reject retired registry entries,
+public exports, importable modules and configuration directories.
+
+Historical result tables and the full CPU/CUDA demo measured on 1.3.4 retain
+their original version, source hashes and numerical records; they are not
+claimed as reruns of 1.3.5. To reproduce the current CPU checks, use the
+[versioned installation](installation.md) and the coverage commands below.
+
+## Release 1.3.4
 
 Release 1.3.4 freezes the final README selection policy and extends per-file
 licensing to auxiliary sources. Production Python code is unchanged from 1.3.3.

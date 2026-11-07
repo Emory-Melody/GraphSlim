@@ -38,10 +38,10 @@ def parent_run(tmp_path):
             rate=None,
         ),
         dict(
-            id="cora__nope__r0.1__s1",
+            id="cora__clustgdd__r0.1__s1",
             stage=1,
             dataset="cora",
-            method="nope",
+            method="clustgdd",
             kind="reduction",
             seed=1,
             rate="0.1",
@@ -93,7 +93,7 @@ def test_resume_copies_only_verified_work_and_keeps_original_terminal(tmp_path):
     assert manifest["continuation"]["jobs"]["whole__cora"]["reused_seeds"] == [0]
     assert not (output / "jobs/whole__cora/terminal.json").exists()
     assert not (output / "jobs/whole__cora").is_symlink()
-    assert (output / "jobs/cora__nope__r0.1__s1").is_symlink()
+    assert (output / "jobs/cora__clustgdd__r0.1__s1").is_symlink()
     assert json.loads((output / "summary.json").read_text())["numeric_cells"] == 0
     assert resume.initialize(parent, output, 14400, 100, [3]) == manifest
     assert before == {

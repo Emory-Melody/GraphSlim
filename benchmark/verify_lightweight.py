@@ -12,7 +12,6 @@ import ast
 import importlib.util
 from pathlib import Path
 import subprocess
-from types import SimpleNamespace
 
 import numpy as np
 import scipy.sparse as sp
@@ -28,7 +27,6 @@ from graphslim.condensation.gcgp import (
     gp_predict,
     concrete_adjacency,
 )
-from graphslim.coarsening.nope import interference_loss
 from graphslim.reduction.lightweight import sparse_tensor
 
 REFERENCES = {
@@ -38,7 +36,6 @@ REFERENCES = {
         "https://github.com/HKBU-LAGAS/ClustGDD",
     ),
     "GCGP": ("d81ed427cd52d5a0d2a74bdf4328d31db1dcc1eb", "https://github.com/WANGLin0126/GCGP"),
-    "NOPE": ("9b9ee38b3966ab550ca9c9e5dd6b393aff8f444a", "https://github.com/dazonglian/NOPE-main"),
 }
 
 
@@ -159,33 +156,6 @@ def verify(reference_root):
         "ClustGDD consistency",
         consistency_loss(outputs),
         clust["consistency_loss"](None, outputs, 0.5),
-    )
-    nope = load_definitions(reference_root / "NOPE/model/merge.py", {"calculate_loss_m1_fast"})
-    relaxed = load_definitions(
-        reference_root / "NOPE/model/merge_relax.py", {"calculate_lm2_loss_fast"}
-    )
-    vectors = x.float().numpy()
-    neighbors = {0: {1, 2}, 1: {0, 2, 3}, 2: {0, 1, 4}, 3: {1, 4}, 4: {2, 3, 5}, 5: {4}}
-    sizes = np.array([1, 2, 1, 3, 1, 2], dtype=np.float32)
-    sums = np.array([np.square(vectors[sorted(neighbors[i])] @ vectors[i]).sum() for i in range(6)])
-    graph = SimpleNamespace(
-        vectors=vectors,
-        sizes=sizes,
-        sum_sq=sums,
-        adj=neighbors,
-        degrees=np.array([len(neighbors[i]) for i in range(6)]),
-    )
-    compare(
-        "NOPE interference",
-        torch.tensor(interference_loss(0, 1, vectors, sizes, neighbors, sum_sq=sums)),
-        torch.tensor(nope["calculate_loss_m1_fast"](0, 1, graph)),
-        1e-5,
-    )
-    compare(
-        "NOPE star interference",
-        torch.tensor(interference_loss(0, 1, vectors, sizes, neighbors, relaxed=True)),
-        torch.tensor(relaxed["calculate_lm2_loss_fast"]([0], [1], graph)[0]),
-        1e-5,
     )
     return {
         "utc": utcnow(),

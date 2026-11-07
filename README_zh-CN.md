@@ -14,7 +14,7 @@
 
 </div>
 
-**Git 版本 1.3.4（2026-11-06）：**[tag `1.3.4`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.4) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/docs/testing_snapshot.md)和[更新日志](CHANGELOG.md)。
+**Git 版本 1.3.5（2026-11-07）：**[tag `1.3.5`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.5) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.5/docs/testing_snapshot.md)和[更新日志](CHANGELOG.md)。
 
 
 GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
@@ -151,7 +151,7 @@ Random、K-Center 和 Herding 使用三个缩减种子。
 SD 为总体标准差；直接引用的 GEOM/SFGC 文献值使用 SE，并在每行标明。
 有论文参考值的准确率行沿用原展示规则：全部声明比例完成，且平均绝对差不超过 3 个百分点。
 
-这些是冻结批次，不是用 1.3.4 统一重跑的实验。上方 110 个组合继续使用归档的
+这些是冻结批次，不是用 1.3.5 统一重跑的实验。上方 110 个组合继续使用归档的
 宏 F1/AP 参考口径；当前软件包在 Yelp 和 Amazon Fraud 上的新运行使用 AP。
 节点预算标签表示近似的节点保留百分比，边稀疏图使用独立标签。
 [冻结的准确率结果](benchmark/results/table9_reproduction.json) ·
@@ -380,7 +380,7 @@ CentP 和 GDEM 不参与历史参考比较，因为缺陷也存在于参考实�
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.4
+git checkout --detach 1.3.5
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu

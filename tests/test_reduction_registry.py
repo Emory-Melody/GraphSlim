@@ -1,5 +1,10 @@
 # SPDX-License-Identifier: MIT
 # See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
+import importlib.util
+from pathlib import Path
+
+import pytest
+
 from graphslim.reduction import get_method_spec, list_methods
 
 
@@ -20,6 +25,21 @@ def test_current_roster_has_49_methods_and_retains_doscondx():
     assert not hasattr(condensation, "GCondX")
     with pytest.raises(ValueError):
         get_method_spec("GCONDX")
+
+
+@pytest.mark.parametrize(
+    "method,family,class_name",
+    [("gcondx", "condensation", "GCondX"), ("nope", "coarsening", "NOPE")],
+)
+def test_retired_methods_have_no_registry_export_module_or_config(method, family, class_name):
+    import importlib
+    import graphslim
+
+    with pytest.raises(ValueError, match="Unknown graph reduction method"):
+        get_method_spec(method)
+    assert not hasattr(importlib.import_module(f"graphslim.{family}"), class_name)
+    assert importlib.util.find_spec(f"graphslim.{family}.{method}") is None
+    assert not (Path(graphslim.__file__).parent / "configs" / method).exists()
 
 
 def test_registry_resolves_public_aliases():

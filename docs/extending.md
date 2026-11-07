@@ -7,7 +7,7 @@ complete example on an in-memory graph, with no dataset download:
 python -m examples.custom_reducer
 ```
 
-The [example source](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/examples/custom_reducer.py)
+The [example source](https://github.com/Emory-Melody/GraphSlim/blob/1.3.5/examples/custom_reducer.py)
 implements `FirstPerClass`, saves and reloads its reduced graph, and evaluates a
 GCN for five epochs. The resulting accuracy is an integration check.
 

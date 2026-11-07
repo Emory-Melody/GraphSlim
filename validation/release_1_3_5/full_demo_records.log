@@ -1,0 +1,4 @@
+Command: /home/sgong36/gslim/.venv/bin/python validation/demo_1_3_4_full_20261106/verify.py
+cpu: 76.68% +/- 1.28%; 10 fits; 3608.6 s
+gpu: 76.72% +/- 2.03%; 10 fits; 3037.7 s
+Verified matching release, inputs, dependencies, configuration and both 10-fit population summaries.

@@ -1,0 +1,2 @@
+Command: /home/sgong36/gslim/.venv/bin/python -m ruff format --check graphslim examples benchmark tests
+241 files already formatted

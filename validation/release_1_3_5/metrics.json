@@ -1,0 +1,23 @@
+{
+  "passed": 1591,
+  "skipped": 22,
+  "modules": 102,
+  "statement_percent": "98.77",
+  "branch_percent": "95.97",
+  "coverage_totals": {
+    "covered_lines": 10039,
+    "num_statements": 10164,
+    "percent_covered": 98.09183064997019,
+    "percent_covered_display": "98.09",
+    "missing_lines": 125,
+    "excluded_lines": 0,
+    "percent_statements_covered": 98.77016922471468,
+    "percent_statements_covered_display": "98.77",
+    "num_branches": 3252,
+    "num_partial_branches": 123,
+    "covered_branches": 3121,
+    "missing_branches": 131,
+    "percent_branches_covered": 95.97170971709717,
+    "percent_branches_covered_display": "95.97"
+  }
+}

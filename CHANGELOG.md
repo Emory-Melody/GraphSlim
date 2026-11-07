@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.5 - 2026-11-07
+
+- Remove the retired GCondX and NOPE implementations and their configuration directories from source and built distributions. The canonical registry remains at 49 methods; DosCondX remains supported.
+- Remove obsolete tests, the NOPE reference verifier and dataset special case, and stale benchmark descriptions. New Table 9 job plans no longer schedule GCondX. Frozen results and their legacy-name rendering remain preserved.
+- Add regression checks that retired methods have no registry entry, public export, importable module or configuration directory. Refresh release testing, packaging, documentation and manuscript version pointers.
+- Preserve the full CPU/CUDA examples measured on 1.3.4 under their original version and source hashes; this cleanup does not relabel those runs as 1.3.5 executions.
+
 ## 1.3.4 - 2026-11-06
 
 - Freeze the final submission source with the restored result-table selection and no README failure commentary.
