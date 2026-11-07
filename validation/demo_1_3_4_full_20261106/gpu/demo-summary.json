@@ -1,0 +1,146 @@
+{
+  "config": {
+    "dataset": "cora",
+    "method": "gcond",
+    "init": "kcenter",
+    "reduction_rate": 0.5,
+    "save_path": "/home/sgong36/gslim/output/demo_1_3_4_full_20261106/runs/gpu",
+    "gpu_id": 0,
+    "load_path": "/home/sgong36/gslim/data",
+    "config": null,
+    "setting": "trans",
+    "split": "fixed",
+    "dataset_split_id": 0,
+    "run_reduction": 3,
+    "run_eval": 10,
+    "run_inter_eval": 3,
+    "eval_interval": 100,
+    "hidden": 256,
+    "condense_model": "SGC",
+    "epochs": 1000,
+    "agg": false,
+    "multi_label": false,
+    "dis_metric": "ours",
+    "lr_adj": 0.0001,
+    "lr_feat": 0.0001,
+    "optim": "Adam",
+    "threshold": 0.05,
+    "dropout": 0.0,
+    "ntrans": 1,
+    "with_bn": false,
+    "eval_whole": false,
+    "with_structure": 1,
+    "lr": 0.01,
+    "weight_decay": 0.0,
+    "pre_norm": true,
+    "outer_loop": 20,
+    "inner_loop": 15,
+    "edge_reduction": false,
+    "seed": 1,
+    "sparsifier_options": null,
+    "nlayers": 2,
+    "verbose": false,
+    "soft_label": 0,
+    "wandb": false,
+    "wandb_project": "graphslim",
+    "wandb_run_name": null,
+    "wandb_required": false,
+    "eval_epochs": 300,
+    "eval_model": "GCN",
+    "gin_eps": 0.0,
+    "gin_train_eps": false,
+    "eval_wd": 0.0,
+    "eval_loss": "CE",
+    "activation": "relu",
+    "alpha": 0.1,
+    "ptb_r": 0.25,
+    "attack": null,
+    "coarsen_strategy": "greedy",
+    "no_buff": false,
+    "batch_adj": 1,
+    "mx_size": 100,
+    "ts": 4,
+    "hpo": false,
+    "hpo_space": null,
+    "hpo_eval_runs": 3,
+    "hpo_yes": false,
+    "feat_alpha": 10,
+    "smoothness_alpha": 0.1,
+    "eigen_k": 60,
+    "ratio": 0.8,
+    "lr_eigenvec": 0.01,
+    "gamma": 0.5,
+    "device": "cuda:0"
+  },
+  "shapes": {
+    "feat_syn": [
+      70,
+      1433
+    ],
+    "adj_syn": [
+      70,
+      70
+    ],
+    "labels_syn": [
+      70
+    ]
+  },
+  "evaluation_model": "GAT",
+  "fits": [
+    {
+      "seed": 1,
+      "validation": 0.788,
+      "test": 0.776
+    },
+    {
+      "seed": 2,
+      "validation": 0.754,
+      "test": 0.746
+    },
+    {
+      "seed": 3,
+      "validation": 0.756,
+      "test": 0.761
+    },
+    {
+      "seed": 4,
+      "validation": 0.77,
+      "test": 0.75
+    },
+    {
+      "seed": 5,
+      "validation": 0.778,
+      "test": 0.801
+    },
+    {
+      "seed": 6,
+      "validation": 0.784,
+      "test": 0.796
+    },
+    {
+      "seed": 7,
+      "validation": 0.758,
+      "test": 0.762
+    },
+    {
+      "seed": 8,
+      "validation": 0.732,
+      "test": 0.737
+    },
+    {
+      "seed": 9,
+      "validation": 0.762,
+      "test": 0.759
+    },
+    {
+      "seed": 10,
+      "validation": 0.776,
+      "test": 0.784
+    }
+  ],
+  "test_mean": 0.7672000000000001,
+  "test_population_std": 0.02030172406471925,
+  "torch_version": "2.8.0+cu128",
+  "cuda_version": "12.8",
+  "hardware": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb"
+}

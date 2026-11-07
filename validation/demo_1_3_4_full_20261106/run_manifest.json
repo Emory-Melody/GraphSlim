@@ -1,0 +1,7 @@
+{
+  "source_tag": "1.3.4",
+  "source_commit": "ecbbd608a4c915359d8c99b38fe875eb614aa8ce",
+  "runner_sha256": "e2e0478181726849628ac3b57e2ff6047163d3a6e81caee3480b356cd076cf41",
+  "configuration_policy": "Unmodified full defaults; only device, load path, save path and process thread limits are set. CPU and GPU use one identical CUDA-capable PyTorch 2.8 environment.",
+  "gpu_device_policy": "Existing free MIG instance on GPU 0; no GPU reconfiguration or interruption of other jobs."
+}

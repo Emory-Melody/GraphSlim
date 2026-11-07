@@ -1,0 +1,19 @@
+{
+  "software_version": "1.3.4",
+  "software_commit": "ecbbd608a4c915359d8c99b38fe875eb614aa8ce",
+  "scope": "Complete default Cora GCond-to-GAT integration examples. One reduction seed and ten downstream fits per device; no claim of all-method GPU coverage or an isolated hardware speed comparison.",
+  "devices": {
+    "cpu": {
+      "mean_percent": 76.68,
+      "population_std_percent": 1.2789057822998546,
+      "elapsed_seconds": 3608.643213331001,
+      "hardware": "x86_64"
+    },
+    "gpu": {
+      "mean_percent": 76.72000000000001,
+      "population_std_percent": 2.030172406471925,
+      "elapsed_seconds": 3037.705355111044,
+      "hardware": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb"
+    }
+  }
+}
