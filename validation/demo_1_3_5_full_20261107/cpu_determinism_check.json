@@ -1,0 +1,60 @@
+{
+  "purpose": "Explain why the full CPU result differs from the 1.3.4 CPU record while the CUDA result is bitwise identical.",
+  "source_tag": "1.3.5",
+  "source_commit": "0acbde0feff27e43b2b9141ec867fbb06fc5cc35",
+  "environment": "Same environment as the full runs (PyTorch 2.8.0+cu128, CUDA hidden, PYTHONHASHSEED=1).",
+  "command": "python examples/demo.py -G -1 --config examples/demo_short.json --load_path <data> --save_path <run>",
+  "thread_setting": "OMP_NUM_THREADS, MKL_NUM_THREADS and OPENBLAS_NUM_THREADS set to the listed thread count; single-thread runs also call torch.set_num_threads(1).",
+  "runs": [
+    {
+      "run": "r1",
+      "threads": 4,
+      "test_mean": 0.40399999999999997,
+      "test_population_std": 0.0220454076850486,
+      "gcond_feat_sha256": "3d9525736a89d6b7f5081e977b7508c57dc17ed6e9048550c6be7520f7f1058d",
+      "gcond_adj_sha256": "ebca101859c2fad122d97290ebca118b83db35f387d1bb52f05a60f937d86a29",
+      "kcenter_feat_sha256": "d1c63f17baba53d31ea0530a6c91dbc716cec6c9592982792e70ba6ba21bde31"
+    },
+    {
+      "run": "r2",
+      "threads": 4,
+      "test_mean": 0.40199999999999997,
+      "test_population_std": 0.024535688292770596,
+      "gcond_feat_sha256": "964e5a8487b2f1119a31b81c576c4268356190b0477679cf0e9602870b4b2f85",
+      "gcond_adj_sha256": "71a35c0c2f946bcf88c252009d222f584975a45617ba2010e933d8219e962b4c",
+      "kcenter_feat_sha256": "d1c63f17baba53d31ea0530a6c91dbc716cec6c9592982792e70ba6ba21bde31"
+    },
+    {
+      "run": "r3",
+      "threads": 4,
+      "test_mean": 0.40266666666666673,
+      "test_population_std": 0.024513035081133647,
+      "gcond_feat_sha256": "89931037789e1c178b5ed253e9ba5bb38aef5dde44f6334fab408309d5db8f11",
+      "gcond_adj_sha256": "dcf418400b6f15626d1214c39cb1f20b3aa69f07134af6e23e5e027b897b6b5a",
+      "kcenter_feat_sha256": "d1c63f17baba53d31ea0530a6c91dbc716cec6c9592982792e70ba6ba21bde31"
+    },
+    {
+      "run": "s1",
+      "threads": 1,
+      "test_mean": 0.39033333333333337,
+      "test_population_std": 0.040202266381663375,
+      "gcond_feat_sha256": "51a62fb09dd66944f8a52b4a100b840f14cd20dd1fa137bb373e31fd152c0d0e",
+      "gcond_adj_sha256": "1af3defcd8d0b43c848c173ec48884a8e3503a22f8e6f86373df887f46a121f2",
+      "kcenter_feat_sha256": "d1c63f17baba53d31ea0530a6c91dbc716cec6c9592982792e70ba6ba21bde31"
+    },
+    {
+      "run": "s2",
+      "threads": 1,
+      "test_mean": 0.39033333333333337,
+      "test_population_std": 0.040202266381663375,
+      "gcond_feat_sha256": "51a62fb09dd66944f8a52b4a100b840f14cd20dd1fa137bb373e31fd152c0d0e",
+      "gcond_adj_sha256": "1af3defcd8d0b43c848c173ec48884a8e3503a22f8e6f86373df887f46a121f2",
+      "kcenter_feat_sha256": "d1c63f17baba53d31ea0530a6c91dbc716cec6c9592982792e70ba6ba21bde31"
+    }
+  ],
+  "findings": {
+    "four_thread_distinct_gcond_graphs": 3,
+    "single_thread_identical": true,
+    "kcenter_identical_in_all_runs": true
+  }
+}

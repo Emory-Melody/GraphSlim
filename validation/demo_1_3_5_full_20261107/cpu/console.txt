@@ -1,0 +1,43 @@
+GraphSlim | Composable API demo
+
+[1/4] Configuration
+------------------------------------------------------------
+  Dataset / reducer      cora / gcond
+  Initializer / model    kcenter / GAT
+  Device / seed          cpu / 1
+  Training-node budget   50%
+  Reduction epochs       1000
+  Outer / inner loops    20 / 15
+  Eval epochs / fits     300 / 10
+
+[2/4] Original graph
+------------------------------------------------------------
+  Nodes / features       2,708 / 1,433
+  Train / val / test     140 / 500 / 1,000
+  Classes                7
+
+[3/4] Reduced graph
+------------------------------------------------------------
+  feat_syn               (70, 1433)
+  adj_syn                (70, 70)
+  labels_syn             (70,)
+
+[4/4] GAT evaluation
+------------------------------------------------------------
+  Fit 1 (seed 1)         test 76.10%
+  Fit 2 (seed 2)         test 76.70%
+  Fit 3 (seed 3)         test 77.80%
+  Fit 4 (seed 4)         test 78.80%
+  Fit 5 (seed 5)         test 80.60%
+  Fit 6 (seed 6)         test 79.00%
+  Fit 7 (seed 7)         test 73.90%
+  Fit 8 (seed 8)         test 77.30%
+  Fit 9 (seed 9)         test 79.60%
+  Fit 10 (seed 10)       test 76.40%
+  Test mean +/- std      77.62% +/- 1.86%
+
+Saved artifacts
+------------------------------------------------------------
+  Checkpoints            /tmp/demo135/runs/cpu/reduced_graph/gcond
+  Detailed log           /tmp/demo135/runs/cpu/demo-details.log
+  Run summary            /tmp/demo135/runs/cpu/demo-summary.json

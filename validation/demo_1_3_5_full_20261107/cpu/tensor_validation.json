@@ -1,0 +1,31 @@
+[
+  {
+    "file": "reduced_graph/gcond/adj_cora_0.5_1.pt",
+    "shape": [
+      70,
+      70
+    ],
+    "dtype": "torch.float32",
+    "finite": true,
+    "sha256": "372dd7e2f3256821126bb8129699c3fbcc071371adc399737223d1af171cf710"
+  },
+  {
+    "file": "reduced_graph/gcond/feat_cora_0.5_1.pt",
+    "shape": [
+      70,
+      1433
+    ],
+    "dtype": "torch.float32",
+    "finite": true,
+    "sha256": "a3c11c724dc6e100f698255d6be6b26e53b0cf310b334e1a77b190bf80418e59"
+  },
+  {
+    "file": "reduced_graph/gcond/label_cora_0.5_1.pt",
+    "shape": [
+      70
+    ],
+    "dtype": "torch.int64",
+    "finite": true,
+    "sha256": "1a5a70ed2138f84bfb1fea218a940e7da5d72406b1a6d05ec71bbe19396ace3e"
+  }
+]

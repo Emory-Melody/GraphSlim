@@ -1,0 +1,10 @@
+{
+  "state": "complete",
+  "exit_code": 0,
+  "elapsed_seconds": 3518.9446065939264,
+  "finished_utc": "2026-11-07T07:30:49.089708+00:00",
+  "test_mean": 0.7762,
+  "test_population_std": 0.0186322301402704,
+  "verified_fits": 10,
+  "source_unchanged": true
+}

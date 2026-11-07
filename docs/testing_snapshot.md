@@ -19,9 +19,11 @@ contains the source/configuration hashes, complete test log, coverage reports
 and distribution checks. Regression tests reject retired registry entries,
 public exports, importable modules and configuration directories.
 
-Historical result tables and the full CPU/CUDA demo measured on 1.3.4 retain
-their original version, source hashes and numerical records; they are not
-claimed as reruns of 1.3.5. To reproduce the current CPU checks, use the
+Historical result tables retain their original version, source hashes and
+numerical records; they are not claimed as reruns of 1.3.5. The full CPU/CUDA
+demo was rerun on the 1.3.5 tag after release; its records are in
+[validation/demo_1_3_5_full_20261107](https://github.com/Emory-Melody/GraphSlim/tree/main/validation/demo_1_3_5_full_20261107),
+and the earlier 1.3.4 records remain in `validation/demo_1_3_4_full_20261106`. To reproduce the current CPU checks, use the
 [versioned installation](installation.md) and the coverage commands below.
 
 ## Release 1.3.4
