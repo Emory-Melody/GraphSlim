@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Gradient/distribution-matching condensers: GCondBase helpers, GCondX, SGDD, SimGC, GCDM."""
 
 import logging

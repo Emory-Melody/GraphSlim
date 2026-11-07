@@ -67,7 +67,7 @@
       "gnn_architectures": 8,
       "extended_evaluations": 2
     },
-    "GraphSlim_1.3.3": {
+    "GraphSlim_1.3.4": {
       "node": 5,
       "edge": 18,
       "coarsening": 10,

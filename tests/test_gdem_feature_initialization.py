@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """GDEM feature initialization: a trained MLP drives synthetic features toward their labels.
 
 Ported from the legacy suite. The legacy ``gdem_init_profile`` options (separate MLP epochs

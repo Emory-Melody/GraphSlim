@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Numerical checks for the GCSNTK kernel, kernel ridge regression, and SGDD spectral maps.
 
 The legacy version of this file aborted the interpreter: ``sparse_kron`` used to scale

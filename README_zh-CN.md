@@ -14,7 +14,7 @@
 
 </div>
 
-**Git 版本 1.3.3（2026-11-06）：**[tag `1.3.3`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.3) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.3/docs/testing_snapshot.md)和[更新日志](CHANGELOG.md)。
+**Git 版本 1.3.4（2026-11-06）：**[tag `1.3.4`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.4) 固定本文对应的 49 种方法、8 种 GNN 源码。请安装此 Git 版本；PyPI 仍为较早的 1.2.1。参见[版本对应的测试记录](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/docs/testing_snapshot.md)和[更新日志](CHANGELOG.md)。
 
 
 GraphSlim 将 **49 种图缩减方法**、**8 种下游 GNN 骨干网络**和
@@ -97,7 +97,8 @@ CentP 和 GDEM 不纳入比较：1.3.1 之后修复的缺陷同样存在于生�
 
 [固定结果产物](benchmark/results/reproducibility_20261106/README.md)
 保存 313 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。
-它内含未改动的 1.3.1 产物，并在去掉 CentP 和 GDEM 后重算全部统计。
+它保留 1.3.1 的数值记录，并在去掉 CentP 和 GDEM 后重算全部统计。
+1.3.4 为独立验证脚本增加许可注释；[原始与更新后的哈希](validation/release_1_3_4/license_changes.json)记录这一变更。
 Flickr、Reddit、Yelp 上归纳式 K-Center 与 Herding 的设置已在修复后重跑。
 仅用 Python 标准库即可离线重算：
 
@@ -150,7 +151,7 @@ Random、K-Center 和 Herding 使用三个缩减种子。
 SD 为总体标准差；直接引用的 GEOM/SFGC 文献值使用 SE，并在每行标明。
 有论文参考值的准确率行沿用原展示规则：全部声明比例完成，且平均绝对差不超过 3 个百分点。
 
-这些是冻结批次，不是用 1.3.3 统一重跑的实验。上方 110 个组合继续使用归档的
+这些是冻结批次，不是用 1.3.4 统一重跑的实验。上方 110 个组合继续使用归档的
 宏 F1/AP 参考口径；当前软件包在 Yelp 和 Amazon Fraud 上的新运行使用 AP。
 节点预算标签表示近似的节点保留百分比，边稀疏图使用独立标签。
 [冻结的准确率结果](benchmark/results/table9_reproduction.json) ·
@@ -379,7 +380,7 @@ CentP 和 GDEM 不参与历史参考比较，因为缺陷也存在于参考实�
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.3
+git checkout --detach 1.3.4
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu

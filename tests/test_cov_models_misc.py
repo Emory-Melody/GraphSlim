@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Graphon generator, parameterized adjacency, random attacks, and PRBCD edge cases."""
 
 from types import SimpleNamespace

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Validate a fresh SimGC citation reduction without computing test metrics.
 
 This is a one-seed package integration check, not a benchmark result. Run in a

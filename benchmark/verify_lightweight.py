@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Compare package mathematics against pinned author source, without training.
 
 Reference clones are inputs, not dependencies of the installed package. Only

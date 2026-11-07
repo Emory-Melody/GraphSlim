@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Measure matched author/GraphSlim clustering reducers on full ogbn-arxiv.
 
 Plan freezes package/author sources and one common standardized graph. Run each

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Frozen, resumable four-stage dataset expansion with explicit resource failures.
 
 Stage 1: original seven datasets. Stage 2: two official heterophilous graphs.

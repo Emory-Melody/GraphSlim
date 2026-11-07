@@ -1,0 +1,165 @@
+Running Sphinx v9.0.4
+loading translations [en]... done
+making output directory... done
+Converting `source_suffix = ['.rst', '.md']` to `source_suffix = {'.rst': 'restructuredtext', '.md': 'restructuredtext'}`.
+myst v5.1.0: MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions=set(), disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https', 'mailto', 'ftp'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=0, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, strikethrough_single_tilde=False, colon_fence_exact_match=False, suppress_warnings=[], highlight_code_blocks=True)
+[autosummary] generating autosummary for: changes_since_gc4nc.md, extending.md, gc4nc_reference_corrections.md, hpo.md, index.rst, installation.md, quickstart.md, source/graphslim.coarsening.rst, source/graphslim.condensation.rst, source/graphslim.dataset.rst, source/graphslim.evaluation.rst, source/graphslim.models.rst, source/graphslim.reduction.rst, source/graphslim.rst, source/graphslim.sparsification.rst, source/modules.rst, testing_snapshot.md
+building [mo]: targets for 0 po files that are out of date
+writing output...
+building [html]: targets for 17 source files that are out of date
+updating environment: [new config] 17 added, 0 changed, 0 removed
+reading sources... [  6%] changes_since_gc4nc
+reading sources... [ 12%] extending
+reading sources... [ 18%] gc4nc_reference_corrections
+reading sources... [ 24%] hpo
+reading sources... [ 29%] index
+reading sources... [ 35%] installation
+reading sources... [ 41%] quickstart
+reading sources... [ 47%] source/graphslim
+reading sources... [ 53%] source/graphslim.coarsening
+reading sources... [ 59%] source/graphslim.condensation
+reading sources... [ 65%] source/graphslim.dataset
+reading sources... [ 71%] source/graphslim.evaluation
+reading sources... [ 76%] source/graphslim.models
+reading sources... [ 82%] source/graphslim.reduction
+reading sources... [ 88%] source/graphslim.sparsification
+reading sources... [ 94%] source/modules
+reading sources... [100%] testing_snapshot
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... /home/sgong36/gslim/output/submission_fixes_20261106/code/docs/source/graphslim.rst: document is referenced in multiple toctrees: ['index', 'source/modules'], selecting: source/modules <- source/graphslim
+done
+preparing documents... done
+copying assets...
+copying downloadable files... [ 50%] ../../benchmark/results/implementation_comparison_20261031.json
+copying downloadable files... [100%] ../../benchmark/results/gecc_arxiv_comparison_20261102.json
+
+copying static files...
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-html/_static/documentation_options.js
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-html/_static/basic.css
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-html/_static/language_data.js
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-html/_static/js/versions.js
+copying static files: done
+copying extra files...
+copying extra files: done
+copying assets: done
+writing output... [  6%] changes_since_gc4nc
+writing output... [ 12%] extending
+writing output... [ 18%] gc4nc_reference_corrections
+writing output... [ 24%] hpo
+writing output... [ 29%] index
+writing output... [ 35%] installation
+writing output... [ 41%] quickstart
+writing output... [ 47%] source/graphslim
+writing output... [ 53%] source/graphslim.coarsening
+writing output... [ 59%] source/graphslim.condensation
+writing output... [ 65%] source/graphslim.dataset
+writing output... [ 71%] source/graphslim.evaluation
+writing output... [ 76%] source/graphslim.models
+writing output... [ 82%] source/graphslim.reduction
+writing output... [ 88%] source/graphslim.sparsification
+writing output... [ 94%] source/modules
+writing output... [100%] testing_snapshot
+
+generating indices... genindex py-modindex done
+highlighting module code... [  1%] graphslim._lazy
+highlighting module code... [  2%] graphslim.coarsening.affinity_gs
+highlighting module code... [  3%] graphslim.coarsening.algebraic_jc
+highlighting module code... [  4%] graphslim.coarsening.averaging
+highlighting module code... [  5%] graphslim.coarsening.clustering
+highlighting module code... [  6%] graphslim.coarsening.clusteringagg
+highlighting module code... [  8%] graphslim.coarsening.coarsening_base
+highlighting module code... [  9%] graphslim.coarsening.heavy_edge
+highlighting module code... [ 10%] graphslim.coarsening.kron
+highlighting module code... [ 11%] graphslim.coarsening.labels
+highlighting module code... [ 12%] graphslim.coarsening.utils
+highlighting module code... [ 13%] graphslim.coarsening.variation_cliques
+highlighting module code... [ 14%] graphslim.coarsening.variation_edges
+highlighting module code... [ 15%] graphslim.coarsening.variation_neighborhoods
+highlighting module code... [ 16%] graphslim.coarsening.vng
+highlighting module code... [ 17%] graphslim.compat
+highlighting module code... [ 18%] graphslim.condensation.cgc
+highlighting module code... [ 19%] graphslim.condensation.clustgdd
+highlighting module code... [ 20%] graphslim.condensation.doscond
+highlighting module code... [ 22%] graphslim.condensation.doscondx
+highlighting module code... [ 23%] graphslim.condensation.gcdm
+highlighting module code... [ 24%] graphslim.condensation.gcdmx
+highlighting module code... [ 25%] graphslim.condensation.gcgp
+highlighting module code... [ 26%] graphslim.condensation.gcond
+highlighting module code... [ 27%] graphslim.condensation.gcond_base
+highlighting module code... [ 28%] graphslim.condensation.gcsntk
+highlighting module code... [ 29%] graphslim.condensation.gdem
+highlighting module code... [ 30%] graphslim.condensation.gecc
+highlighting module code... [ 31%] graphslim.condensation.geom
+highlighting module code... [ 32%] graphslim.condensation.msgc
+highlighting module code... [ 33%] graphslim.condensation.sfgc
+highlighting module code... [ 34%] graphslim.condensation.sgdd
+highlighting module code... [ 35%] graphslim.condensation.simgc
+highlighting module code... [ 37%] graphslim.condensation.utils
+highlighting module code... [ 38%] graphslim.config
+highlighting module code... [ 39%] graphslim.dataset.attack
+highlighting module code... [ 40%] graphslim.dataset.convertor
+highlighting module code... [ 41%] graphslim.dataset.loader
+highlighting module code... [ 42%] graphslim.dataset.noise
+highlighting module code... [ 43%] graphslim.dataset.utils
+highlighting module code... [ 44%] graphslim.doctor
+highlighting module code... [ 45%] graphslim.evaluation.eval_agent
+highlighting module code... [ 46%] graphslim.evaluation.graph_property
+highlighting module code... [ 47%] graphslim.evaluation.nas_eval
+highlighting module code... [ 48%] graphslim.evaluation.utils
+highlighting module code... [ 49%] graphslim.hpo
+highlighting module code... [ 51%] graphslim.models
+highlighting module code... [ 52%] graphslim.models.appnp
+highlighting module code... [ 53%] graphslim.models.base
+highlighting module code... [ 54%] graphslim.models.cheby
+highlighting module code... [ 55%] graphslim.models.gat
+highlighting module code... [ 56%] graphslim.models.gcn
+highlighting module code... [ 57%] graphslim.models.gin
+highlighting module code... [ 58%] graphslim.models.gntk
+highlighting module code... [ 59%] graphslim.models.graphsage
+highlighting module code... [ 60%] graphslim.models.ignr
+highlighting module code... [ 61%] graphslim.models.krr
+highlighting module code... [ 62%] graphslim.models.layers
+highlighting module code... [ 63%] graphslim.models.parametrized_adj
+highlighting module code... [ 65%] graphslim.models.prbcd
+highlighting module code... [ 66%] graphslim.models.random_attack
+highlighting module code... [ 67%] graphslim.models.reparam_module
+highlighting module code... [ 68%] graphslim.models.sgc
+highlighting module code... [ 69%] graphslim.models.sgformer
+highlighting module code... [ 70%] graphslim.models.sntk
+highlighting module code... [ 71%] graphslim.reduction.cluster_ops
+highlighting module code... [ 72%] graphslim.reduction.lightweight
+highlighting module code... [ 73%] graphslim.reduction.registry
+highlighting module code... [ 74%] graphslim.run_eval
+highlighting module code... [ 75%] graphslim.sparsification.cent_degree
+highlighting module code... [ 76%] graphslim.sparsification.cent_pagerank
+highlighting module code... [ 77%] graphslim.sparsification.coreset_base
+highlighting module code... [ 78%] graphslim.sparsification.edge_sparsification_base
+highlighting module code... [ 80%] graphslim.sparsification.g_spar
+highlighting module code... [ 81%] graphslim.sparsification.herding
+highlighting module code... [ 82%] graphslim.sparsification.herding_agg
+highlighting module code... [ 83%] graphslim.sparsification.kcenter
+highlighting module code... [ 84%] graphslim.sparsification.kcenter_agg
+highlighting module code... [ 85%] graphslim.sparsification.kcenter_sample
+highlighting module code... [ 86%] graphslim.sparsification.local_degree
+highlighting module code... [ 87%] graphslim.sparsification.model_based_coreset_base
+highlighting module code... [ 88%] graphslim.sparsification.model_free_coreset_base
+highlighting module code... [ 89%] graphslim.sparsification.networkit_sparsifiers
+highlighting module code... [ 90%] graphslim.sparsification.random
+highlighting module code... [ 91%] graphslim.sparsification.random_edge
+highlighting module code... [ 92%] graphslim.sparsification.rank_degree
+highlighting module code... [ 94%] graphslim.sparsification.scan
+highlighting module code... [ 95%] graphslim.sparsification.spanning_forest
+highlighting module code... [ 96%] graphslim.sparsification.t_spanner
+highlighting module code... [ 97%] graphslim.tracking
+highlighting module code... [ 98%] graphslim.train_all
+highlighting module code... [ 99%] graphslim.utils
+highlighting module code... [100%] graphslim.visualization
+
+writing additional pages... search done
+dumping search index in English (code: en)... done
+dumping object inventory... done
+build succeeded.
+
+The HTML pages are in ../docs-html.

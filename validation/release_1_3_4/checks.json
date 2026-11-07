@@ -1,0 +1,42 @@
+{
+  "version": "1.3.4",
+  "pytest": {
+    "tests": 1623,
+    "passed": 1601,
+    "skipped": 22,
+    "failures": 0,
+    "errors": 0
+  },
+  "statement_coverage": {
+    "covered": 10211,
+    "total": 10336,
+    "percent": 98.79
+  },
+  "branch_coverage": {
+    "covered": 3175,
+    "total": 3306,
+    "percent": 96.04
+  },
+  "excluded_statements": 0,
+  "package_python_modules": 104,
+  "gpu_validation": "not run; 22 CUDA checks skipped",
+  "checks": {
+    "ruff": "passed",
+    "format": "passed",
+    "sphinx_html": "passed",
+    "sphinx_epub": "passed",
+    "sphinx_latex": "passed",
+    "historical_artifacts": "passed",
+    "readme_tables": "passed",
+    "readme_coverage": "passed",
+    "clustering_figures": "passed",
+    "short_cpu_demo": "passed",
+    "cpu_dgl_doctor": "passed",
+    "result_policy_preserved": "passed",
+    "production_python_unchanged": "passed",
+    "wheel_and_sdist": "passed",
+    "twine": "passed",
+    "source_archive_licensing": "271/271 Python and shell sources carry notices",
+    "uv_lock": "passed"
+  }
+}

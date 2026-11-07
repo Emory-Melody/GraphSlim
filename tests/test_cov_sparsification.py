@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Coreset selectors, their reduction bases, and NetworKit sparsifier edge cases."""
 
 from collections import Counter

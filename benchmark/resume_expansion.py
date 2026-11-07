@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Continue evaluation-only timeouts using their original frozen computation.
 
 Creates a separate run, retaining all original terminal records. Only wall/RSS

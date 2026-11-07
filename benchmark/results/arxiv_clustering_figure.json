@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/arxiv_clustering_comparison_20261101.json",
   "source_sha256": "8ea3c86975b824c000077cd1ace9e6734ff3afa46408a91c2fb0080f4f63d2e6",
-  "renderer_sha256": "e05f33646afce2e020d3274d17b7f5062546799b009eeda6ee65b2ffadc837e6",
+  "renderer_sha256": "9435fa8239d30a37a7b234413b88aee9cadd2bedb601733052c590e6a2614ce4",
   "source_archive": {
     "path": "benchmark/results/arxiv_clustering_source_20261101.zip",
     "sha256": "0ae4a2345909de7bf60a49d5846a0399939b92d17906988076e904f91966fc8f",

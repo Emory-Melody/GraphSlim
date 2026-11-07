@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Render the README comparison figure and coverage table from frozen evidence.
 
 Run ``python -m benchmark.render_readme_highlights`` to update both languages,
@@ -171,7 +173,9 @@ def coverage_context(text, language, data):
             "[Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)\n"
             "contains 313 setting-level reference/reproduced scores, per-pair metrics,\n"
             "source hashes, author-confirmed reference corrections and both metrics.\n"
-            "It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.\n"
+            "It preserves the 1.3.1 numerical records and recomputes every count without CentP and GDEM.\n"
+            "Release 1.3.4 adds license comments to the standalone verifiers;\n"
+            "[original and updated hashes](validation/release_1_3_4/license_changes.json) document that change.\n"
             "Inductive K-Center and Herding settings on Flickr, Reddit and Yelp were rerun after a fix.\n"
             "Recompute offline with Python's standard library:\n"
             "\n"
@@ -201,7 +205,8 @@ def coverage_context(text, language, data):
             "\n"
             "[固定结果产物](benchmark/results/reproducibility_20261106/README.md)\n"
             "保存 313 个设置的参照值和复现值、逐组合指标、源文件哈希、作者确认的参考值更正及两种口径。\n"
-            "它内含未改动的 1.3.1 产物，并在去掉 CentP 和 GDEM 后重算全部统计。\n"
+            "它保留 1.3.1 的数值记录，并在去掉 CentP 和 GDEM 后重算全部统计。\n"
+            "1.3.4 为独立验证脚本增加许可注释；[原始与更新后的哈希](validation/release_1_3_4/license_changes.json)记录这一变更。\n"
             "Flickr、Reddit、Yelp 上归纳式 K-Center 与 Herding 的设置已在修复后重跑。\n"
             "仅用 Python 标准库即可离线重算：\n"
             "\n"

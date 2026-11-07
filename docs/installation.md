@@ -8,7 +8,7 @@ The following CPU setup uses the same DGL/NumPy constraints as CI:
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.3
+git checkout --detach 1.3.4
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
@@ -23,7 +23,7 @@ For the latter, use the matching Torch/PyG wheels and `cpu-torch28.txt`.
 The optional `.[viz]` extra enables local graph visualization.
 
 For CUDA, select matching Torch and PyG extension wheels using the
-[README GPU setup](https://github.com/Emory-Melody/GraphSlim/blob/1.3.3/README.md#gpu-setup-and-checks)
+[README GPU setup](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/README.md#gpu-setup-and-checks)
 and keep the chosen Torch version constrained. GPU execution uses native PyTorch operations. Check it with
 `python -m graphslim.doctor --device cuda:0 --dgl`.
 

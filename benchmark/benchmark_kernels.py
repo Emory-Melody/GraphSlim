@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Paired GCGP SGNK microbenchmarks against pinned author mathematics.
 
 Equal shapes/dtype/inputs and forward/gradient checks precede every timing row.

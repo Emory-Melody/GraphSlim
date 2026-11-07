@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Publish complete package NR cells from explicitly scoped immutable run batches.
 
 This is a provenance-aware coverage table, not a controlled cross-batch ranking.

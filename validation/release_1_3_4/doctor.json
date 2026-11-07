@@ -1,0 +1,60 @@
+{
+  "utc": "2026-11-07T00:06:25.011268+00:00",
+  "platform": "Linux-5.14.0-687.33.1.el9_8.x86_64-x86_64-with-glibc2.34",
+  "python": "3.11.15",
+  "device_requested": "cpu",
+  "versions": {
+    "graphslim": "1.2.1",
+    "torch": "2.6.0+cpu",
+    "torch-geometric": "2.8.0.post1",
+    "torch-scatter": "2.1.2+pt26cpu",
+    "torch-sparse": "0.6.18+pt26cpu",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "dgl": "1.1.3"
+  },
+  "checks": {
+    "python_support": {
+      "status": "passed",
+      "detail": "supported Python minor"
+    },
+    "torch_import": {
+      "status": "passed"
+    },
+    "torch_native_sparse": {
+      "status": "passed",
+      "detail": "COO sparse matmul and value/feature backward; isolated node retained"
+    },
+    "torch_native_csr": {
+      "status": "passed",
+      "detail": "CSR matmul and feature backward; edge-value backward not probed"
+    },
+    "torch_solve_backward": {
+      "status": "passed",
+      "detail": "dense linear solve and matrix backward"
+    },
+    "torch_sparse_extension": {
+      "status": "passed",
+      "detail": "torch-sparse matmul and feature backward"
+    },
+    "torch_scatter_extension": {
+      "status": "passed",
+      "detail": "torch-scatter grouped sum and backward"
+    },
+    "pyg_gcn": {
+      "status": "passed",
+      "detail": "PyG GCN forward/backward on requested device"
+    },
+    "dgl_roundtrip_cpu": {
+      "status": "passed",
+      "detail": "actual DGL CPU interchange with weights, splits and isolated nodes; not a DGL GPU/GraphBolt test"
+    }
+  },
+  "scope": "runtime/operator probes, not certification of every method or CUDA/DGL combination",
+  "source_sha256": {
+    "doctor.py": "7fdc00b02574e5d85a1a40e6c9ffa704aae0d968088615f13d9729a064213dc0",
+    "compat.py": "07faa67b92c599d1331524d434de0747a3bb0571d061495b554bc7bbb64a5d95",
+    "dataset/convertor.py": "73cf1ed182af5e57b53c2f97b3a31718da18ea47e013bc24be28b8c96cd2f061"
+  },
+  "torch_cuda_runtime": null
+}

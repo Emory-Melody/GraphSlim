@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 # Configuration file for the Sphinx documentation builder.
 #
 # For the full list of built-in configuration values, see the documentation:
@@ -16,7 +18,7 @@ html_theme = "sphinx_rtd_theme"
 
 source_suffix = [".rst", ".md"]
 project = "GraphSlim"
-version = release = "1.3.3"
+version = release = "1.3.4"
 copyright = "2024, Emory Melody Group"
 author = "Shengbo Gong, Juntong Ni, Wei Jin"
 

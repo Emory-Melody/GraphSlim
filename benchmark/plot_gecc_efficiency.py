@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Render archived GECC operator checks, separately from full-reducer comparisons."""
 
 import argparse

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Real SGFormer configuration, representation, and checkpoint invariants.
 
 Ported from the legacy suite. The layout test was replaced: sparse inputs are

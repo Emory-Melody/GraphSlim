@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Paired numerical, latency and memory checks for clustering operators.
 
 Microbenchmarks are not end-to-end Products speed claims. Compare complete

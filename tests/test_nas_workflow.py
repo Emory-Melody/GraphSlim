@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Actual short architecture searches, persisted choices, and ranking statistics."""
 
 from pathlib import Path

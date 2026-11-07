@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Recalculate the 110-pair release results using only Python's standard library.
 
 The unchanged 1.3.1 artifact is embedded in ``base_20261105``. Its own verifier first

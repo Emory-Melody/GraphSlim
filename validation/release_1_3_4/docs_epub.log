@@ -1,0 +1,75 @@
+Running Sphinx v9.0.4
+loading translations [en]... done
+making output directory... done
+Converting `source_suffix = ['.rst', '.md']` to `source_suffix = {'.rst': 'restructuredtext', '.md': 'restructuredtext'}`.
+myst v5.1.0: MdParserConfig(commonmark_only=False, gfm_only=False, enable_extensions=set(), disable_syntax=[], all_links_external=False, links_external_new_tab=False, url_schemes=('http', 'https', 'mailto', 'ftp'), ref_domains=None, fence_as_directive=set(), number_code_blocks=[], title_to_header=False, heading_anchors=0, heading_slug_func=None, html_meta={}, footnote_sort=True, footnote_transition=True, words_per_minute=200, substitutions={}, linkify_fuzzy_links=True, dmath_allow_labels=True, dmath_allow_space=True, dmath_allow_digits=True, dmath_double_inline=False, update_mathjax=True, mathjax_classes='tex2jax_process|mathjax_process|math|output_area', enable_checkboxes=False, strikethrough_single_tilde=False, colon_fence_exact_match=False, suppress_warnings=[], highlight_code_blocks=True)
+[autosummary] generating autosummary for: changes_since_gc4nc.md, extending.md, gc4nc_reference_corrections.md, hpo.md, index.rst, installation.md, quickstart.md, source/graphslim.coarsening.rst, source/graphslim.condensation.rst, source/graphslim.dataset.rst, source/graphslim.evaluation.rst, source/graphslim.models.rst, source/graphslim.reduction.rst, source/graphslim.rst, source/graphslim.sparsification.rst, source/modules.rst, testing_snapshot.md
+building [mo]: targets for 0 po files that are out of date
+writing output...
+building [epub]: targets for 17 source files that are out of date
+updating environment: [new config] 17 added, 0 changed, 0 removed
+reading sources... [  6%] changes_since_gc4nc
+reading sources... [ 12%] extending
+reading sources... [ 18%] gc4nc_reference_corrections
+reading sources... [ 24%] hpo
+reading sources... [ 29%] index
+reading sources... [ 35%] installation
+reading sources... [ 41%] quickstart
+reading sources... [ 47%] source/graphslim
+reading sources... [ 53%] source/graphslim.coarsening
+reading sources... [ 59%] source/graphslim.condensation
+reading sources... [ 65%] source/graphslim.dataset
+reading sources... [ 71%] source/graphslim.evaluation
+reading sources... [ 76%] source/graphslim.models
+reading sources... [ 82%] source/graphslim.reduction
+reading sources... [ 88%] source/graphslim.sparsification
+reading sources... [ 94%] source/modules
+reading sources... [100%] testing_snapshot
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... /home/sgong36/gslim/output/submission_fixes_20261106/code/docs/source/graphslim.rst: document is referenced in multiple toctrees: ['index', 'source/modules'], selecting: source/modules <- source/graphslim
+done
+preparing documents... done
+copying assets...
+copying static files...
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/_static/documentation_options.js
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/_static/basic.css
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/_static/language_data.js
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/_static/epub.css
+copying static files: done
+copying extra files...
+copying extra files: done
+copying assets: done
+writing output... [  6%] changes_since_gc4nc
+writing output... [ 12%] extending
+writing output... [ 18%] gc4nc_reference_corrections
+writing output... [ 24%] hpo
+writing output... [ 29%] index
+writing output... [ 35%] installation
+writing output... [ 41%] quickstart
+writing output... [ 47%] source/graphslim
+writing output... [ 53%] source/graphslim.coarsening
+writing output... [ 59%] source/graphslim.condensation
+writing output... [ 65%] source/graphslim.dataset
+writing output... [ 71%] source/graphslim.evaluation
+writing output... [ 76%] source/graphslim.models
+writing output... [ 82%] source/graphslim.reduction
+writing output... [ 88%] source/graphslim.sparsification
+writing output... [ 94%] source/modules
+writing output... [100%] testing_snapshot
+
+generating indices... genindex py-modindex done
+writing additional pages... done
+writing mimetype file...
+writing META-INF/container.xml file...
+writing content.opf file...
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/content.opf
+writing nav.xhtml file...
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/nav.xhtml
+writing toc.ncx file...
+Writing evaluated template result to /home/sgong36/gslim/output/submission_fixes_20261106/docs-epub/toc.ncx
+writing GraphSlim.epub file...
+build succeeded.
+
+The ePub file is in ../docs-epub.

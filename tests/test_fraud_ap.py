@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Fraud AP preserves score ranking and drives both validation and test evaluation."""
 
 import numpy as np

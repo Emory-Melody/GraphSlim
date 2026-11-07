@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """GCSNTK kernel-ridge condensation on small and partitioned graphs."""
 
 import numpy as np

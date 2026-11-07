@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Auditable all-architecture / noise integration matrix for lightweight methods.
 
 Smoke runs verify real data paths, not paper accuracy. Full runs retain method

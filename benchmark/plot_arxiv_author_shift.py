@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Plot published author points and frozen GraphSlim ogbn-arxiv measurements.
 
 Run from the repository root: python -m benchmark.plot_arxiv_author_shift

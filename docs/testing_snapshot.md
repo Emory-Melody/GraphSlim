@@ -1,10 +1,24 @@
 # Version-specific software testing record
 
-GraphSlim 1.3.3 retains 49 canonical methods and eight downstream GNN architectures.
+GraphSlim 1.3.4 retains 49 canonical methods and eight downstream GNN architectures.
 It uses anomaly-class AP for Yelp/Amazon validation, HPO and final evaluation.
 The frozen 110-pair comparison artifact retains its historical metric definitions.
 
-## Current release: 1.3.3
+## Current release: 1.3.4
+
+Release 1.3.4 freezes the final README selection policy and extends per-file
+licensing to auxiliary sources. Production Python code is unchanged from 1.3.3.
+A fresh CPU run and archive checks are recorded in
+[validation/release_1_3_4](https://github.com/Emory-Melody/GraphSlim/tree/1.3.4/validation/release_1_3_4).
+The run passes **1,601 tests**, with **22 CUDA checks skipped**, and measures
+**98.79% statement coverage** and **96.04% branch coverage** across 104 modules.
+[License-only provenance](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/validation/release_1_3_4/license_changes.json)
+records the verifier comment changes; measured result records are unchanged.
+
+Use the versioned setup, then run the commands below. The original 1.3.3
+record remains pinned to its own release.
+
+## Release 1.3.3
 
 A fresh CPU test and coverage record is stored in
 [validation/release_1_3_3](https://github.com/Emory-Melody/GraphSlim/tree/1.3.3/validation/release_1_3_3).

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Resume NR experiments on idle, explicitly selected local GPUs.
 
 Published results are immutable. Completed local cells are exported separately;

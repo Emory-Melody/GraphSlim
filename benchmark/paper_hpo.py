@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Paper-sourced GECC/SimGC tuning with validation-only selection and GPU leases.
 
 This is a local extension, not an exact paper replay (Yelp/Pubmed, Reddit2,

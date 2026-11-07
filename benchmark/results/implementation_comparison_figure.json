@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/implementation_comparison_20261031.json",
   "source_sha256": "76c50b6708446a47159dc3ba38454d087ae49f773d122871e98dfc9c6317302f",
-  "renderer_sha256": "a5a5537c5cfac19559cee2d957d85f135d25bcc619884bbd6174cf4c1740f4b7",
+  "renderer_sha256": "a57b540980fc1653c8784f321e03ec9b606cecfd81b5be554caf445b423c255f",
   "scope": "new controlled reduction comparison, not paper-score reproduction or an unmodified author CLI benchmark; no all-method claim",
   "displayed_metrics": [
     "time_seconds",

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Graph format conversion with duck-typed DGL graphs and on-disk edge lists."""
 
 import numpy as np

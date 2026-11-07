@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Add a matched GECC cohort to the frozen full-ogbn-arxiv comparison.
 
 The author reducer is pinned independently. GraphSlim uses the author's uniform

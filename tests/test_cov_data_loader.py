@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Dataset dispatch, official splits, samplers, and GraphSAINT preparation without downloads."""
 
 import sys

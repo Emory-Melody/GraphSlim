@@ -1,5 +1,5 @@
 {
-  "renderer_sha256": "a72e5da4ca2e0d3814c6db2700e7af910e0aa327900b0a2690578134c2964e3a",
+  "renderer_sha256": "29c051c7d7ee87b7db9ecfe1b5dbce3d3c7d5fe4a3e773b541af3f6e8a8f502f",
   "sources": [
     {
       "path": "benchmark/results/arxiv_clustering_comparison_20261101.json",

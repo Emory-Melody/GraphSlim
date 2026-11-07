@@ -14,7 +14,7 @@ A PyTorch library for graph sparsification, coarsening, and condensation.
 
 </div>
 
-**Git release 1.3.3 (2026-11-06):** [tag `1.3.3`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.3) fixes the reviewed source version for the 49-method, eight-backbone feature set. Install this Git release for the manuscript; PyPI still provides the earlier 1.2.1. See the [release testing record](https://github.com/Emory-Melody/GraphSlim/blob/1.3.3/docs/testing_snapshot.md) and the [changelog](CHANGELOG.md).
+**Git release 1.3.4 (2026-11-06):** [tag `1.3.4`](https://github.com/Emory-Melody/GraphSlim/tree/1.3.4) fixes the reviewed source version for the 49-method, eight-backbone feature set. Install this Git release for the manuscript; PyPI still provides the earlier 1.2.1. See the [release testing record](https://github.com/Emory-Melody/GraphSlim/blob/1.3.4/docs/testing_snapshot.md) and the [changelog](CHANGELOG.md).
 
 
 GraphSlim brings **49 graph reduction methods**, **8 downstream GNN backbones**,
@@ -103,7 +103,9 @@ two-sided <5% **92/106 (86.79%)**, <10% **99/106 (93.40%)**.
 [Fixed results artifact](benchmark/results/reproducibility_20261106/README.md)
 contains 313 setting-level reference/reproduced scores, per-pair metrics,
 source hashes, author-confirmed reference corrections and both metrics.
-It embeds the unchanged 1.3.1 artifact and recomputes every count without CentP and GDEM.
+It preserves the 1.3.1 numerical records and recomputes every count without CentP and GDEM.
+Release 1.3.4 adds license comments to the standalone verifiers;
+[original and updated hashes](validation/release_1_3_4/license_changes.json) document that change.
 Inductive K-Center and Herding settings on Flickr, Reddit and Yelp were rerun after a fix.
 Recompute offline with Python's standard library:
 
@@ -161,7 +163,7 @@ use SE and are marked in each row. For accuracy rows with published references,
 the original display rule retains completed rows whose mean absolute gap is at
 most 3 percentage points.
 
-These are frozen campaigns, rather than a uniform rerun of release 1.3.3.
+These are frozen campaigns, rather than a uniform rerun of release 1.3.4.
 The historical 110-pair summary above retains its recorded macro-F1/AP references;
 new package runs use AP for Yelp and Amazon Fraud. Node-budget labels describe
 approximate retained-node percentages; edge graphs are labelled separately.
@@ -392,7 +394,7 @@ install matching PyG extension wheels. For example, a CPU development environmen
 ```bash
 git clone https://github.com/Emory-Melody/GraphSlim.git
 cd GraphSlim
-git checkout --detach 1.3.3
+git checkout --detach 1.3.4
 uv venv --python 3.11
 source .venv/bin/activate
 uv pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cpu
@@ -421,7 +423,7 @@ python -m graphslim.doctor --device cuda:0 --dgl --json --output doctor.json
 ```
 
 The published PyPI distribution is installed with `pip install graphslim`.
-Use [the pinned Git source](https://github.com/Emory-Melody/GraphSlim/tree/1.3.3) for the manuscript's 49-method, eight-backbone feature set; PyPI 1.2.1 predates this revision.
+Use [the pinned Git source](https://github.com/Emory-Melody/GraphSlim/tree/1.3.4) for the manuscript's 49-method, eight-backbone feature set; PyPI 1.2.1 predates this revision.
 
 ## Quick start
 

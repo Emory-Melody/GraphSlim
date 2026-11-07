@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Matched, isolated author/GraphSlim reduction measurements.
 
 The comparison uses frozen source and common in-memory inputs and GCN evaluation.

@@ -10,7 +10,7 @@ reproduced scores are unchanged.
 python benchmark/results/reproducibility_20261106/verify.py --check
 ```
 
-The verifier uses only Python's standard library. It first runs the unchanged 1.3.1
+The verifier uses only Python's standard library. It first runs the 1.3.1
 verifier on `base_20261105/`, which checks that artifact's hashes and recomputes its
 124 pairs. It then removes the methods in `exclusions.json`, substitutes the rerun
 scores in `replacements.json` after recomputing each from its 30 stored test scores,
@@ -70,3 +70,12 @@ previous value and result-file hashes.
 As in the base artifact, these are cumulative records of historical frozen runs,
 provenance replays and validation-selected HPO. The verifier recalculates metrics
 from frozen scores; it does not retrain methods.
+
+## Licensing-only archive revision in 1.3.4
+
+Release 1.3.4 adds SPDX license comments to this verifier and the embedded base
+verifier. Their Python ASTs and all numerical records are unchanged. Only the
+corresponding verifier hashes in the manifests are updated. The original release
+tags preserve the original archives; `validation/release_1_3_4/license_changes.json`
+records the original and licensed source hashes. This README note is also hashed
+in the current manifest. This revision does not regenerate scores or pair counts.

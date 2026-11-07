@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Actual graph checkpoint loading, CLI rendering, isolated nodes, and sampling."""
 
 import matplotlib.pyplot as plt

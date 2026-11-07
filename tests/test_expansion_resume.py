@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """A continuation must preserve inputs, original failures and complete-only scores."""
 
 import hashlib

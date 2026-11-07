@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Input and output contracts for independently implemented reducer extensions."""
 
 from copy import deepcopy

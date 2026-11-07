@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Compose one matched GECC/CGC/ClustGDD ogbn-arxiv comparison block."""
 
 import json

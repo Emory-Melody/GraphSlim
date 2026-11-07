@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Reproduce the GC4NC Table 9 performance matrix with this package.
 
 The protocol follows GC4NC (arXiv:2406.16715v3, Appendix A.3). Each reduced graph

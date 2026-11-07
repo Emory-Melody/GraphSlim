@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """CGC example; select ClustGDD or GCGP with the common -M option."""
 
 from pathlib import Path

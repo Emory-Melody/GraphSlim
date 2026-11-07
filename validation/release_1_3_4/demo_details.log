@@ -1,0 +1,127 @@
+Common
++--------------------+-----------------------------+
+| Parameter          | Value                       |
++--------------------+-----------------------------+
+| checkpoints        | [-1, 9, 19]                 |
+| condense_model     | SGC                         |
+| dataset            | cora                        |
+| device             | cpu                         |
+| dis_metric         | ours                        |
+| dropout            | 0                           |
+| edge_reduction     | False                       |
+| epochs             | 20                          |
+| eval_interval      | 10                          |
+| eval_whole         | False                       |
+| gpu_id             | -1                          |
+| hidden             | 256                         |
+| init               | kcenter                     |
+| inner_loop         | 1                           |
+| load_path          | ./data                      |
+| logger             | graphslim.config.gcond.cora |
+| lr                 | 0.01                        |
+| lr_adj             | 0.0001                      |
+| lr_feat            | 0.0001                      |
+| method             | gcond                       |
+| metric             | accuracy                    |
+| multi_label        | False                       |
+| nlayers            | 2                           |
+| ntrans             | 1                           |
+| optim              | Adam                        |
+| outer_loop         | 2                           |
+| pre_norm           | True                        |
+| reduction_rate     | 0.5                         |
+| run_eval           | 3                           |
+| run_inter_eval     | 3                           |
+| run_reduction      | 3                           |
+| save_path          | ./checkpoints/demo_1_3_4    |
+| seed               | 1                           |
+| setting            | trans                       |
+| soft_label         | 0                           |
+| sparsifier_options | None                        |
+| split              | fixed                       |
+| threshold          | 0.05                        |
+| verbose            | False                       |
+| wandb              | False                       |
+| wandb_project      | graphslim                   |
+| wandb_required     | False                       |
+| wandb_run_name     | None                        |
+| weight_decay       | 0                           |
+| with_bn            | False                       |
+| with_structure     | 1                           |
++--------------------+-----------------------------+
+
+Downstream Evaluation
++---------------+-------+
+| Parameter     | Value |
++---------------+-------+
+| activation    | relu  |
+| alpha         | 0.1   |
+| eval_loss     | CE    |
+| eval_model    | GCN   |
+| eval_wd       | 0     |
+| gin_eps       | 0     |
+| gin_train_eps | False |
++---------------+-------+
+
+GCOND
++------------------+--------------------------+
+| Parameter        | Value                    |
++------------------+--------------------------+
+| config           | examples/demo_short.json |
+| dataset_split_id | 0                        |
+| eval_epochs      | 100                      |
++------------------+--------------------------+
+
+HPO
++---------------+-------+
+| Parameter     | Value |
++---------------+-------+
+| hpo           | False |
+| hpo_eval_runs | 3     |
+| hpo_space     | None  |
+| hpo_yes       | False |
++---------------+-------+
+/home/sgong36/.config/matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /tmp/matplotlib-v1s3hxmv because there was an issue with the default path (/home/sgong36/.config/matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+train nodes num: 140
+val nodes num: 500
+test nodes num: 1000
+total nodes num: 2708
+target reduced size:70
+actual reduced size:70
+adj_syn: (70, 70) feat_syn: torch.Size([70, 1433])
+=== training ===
+Epoch 0, training loss: 1.9464629888534546
+Epoch 0, training acc: 0.14285714285714285
+=== picking the best model according to the performance on validation ===
+selected nodes: 70
+induced edges: 6
+Function Time: 3.30851650191471 s
+Function Time: 3308.51650191471 ms
+Original graph:0.77 Mb  Condensed graph:0.40 Mb
+
+  0%|          | 0/20 [00:00<?, ?it/s]
+  5%|▌         | 1/20 [00:00<00:05,  3.22it/s]
+ 10%|█         | 2/20 [00:00<00:05,  3.18it/s]
+ 15%|█▌        | 3/20 [00:00<00:05,  3.18it/s]
+ 20%|██        | 4/20 [00:01<00:04,  3.22it/s]
+ 25%|██▌       | 5/20 [00:01<00:04,  3.00it/s]
+ 30%|███       | 6/20 [00:02<00:05,  2.79it/s]
+ 35%|███▌      | 7/20 [00:02<00:04,  2.73it/s]
+ 40%|████      | 8/20 [00:02<00:04,  2.61it/s]
+ 45%|████▌     | 9/20 [00:03<00:03,  2.78it/s]
+ 50%|█████     | 10/20 [00:07<00:15,  1.54s/it]
+ 55%|█████▌    | 11/20 [00:07<00:10,  1.15s/it]
+ 60%|██████    | 12/20 [00:07<00:07,  1.13it/s]
+ 65%|██████▌   | 13/20 [00:08<00:04,  1.42it/s]
+ 70%|███████   | 14/20 [00:08<00:03,  1.75it/s]
+ 75%|███████▌  | 15/20 [00:08<00:02,  2.05it/s]
+ 80%|████████  | 16/20 [00:09<00:01,  2.30it/s]
+ 85%|████████▌ | 17/20 [00:09<00:01,  2.55it/s]
+ 90%|█████████ | 18/20 [00:09<00:00,  2.74it/s]
+ 95%|█████████▌| 19/20 [00:09<00:00,  2.87it/s]
+100%|██████████| 20/20 [00:14<00:00,  1.58s/it]
+100%|██████████| 20/20 [00:14<00:00,  1.39it/s]
+Function Time: 17.696673274971545 s
+Function Time: 17696.673274971545 ms
+Original graph:0.77 Mb  Condensed graph:0.40 Mb

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Render the README's measured reduction-time and peak-GPU-memory comparisons.
 
 Uses the complete frozen six-pair roster. Run with ``--check`` to validate the

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Regressions exposed by the real Dataset x Method x Application matrix.
 
 Ported from an older snapshot. Cases that the current package fails because of

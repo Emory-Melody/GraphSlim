@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """GCGP kernels, Gaussian-process prediction and reducer option handling."""
 
 import numpy as np

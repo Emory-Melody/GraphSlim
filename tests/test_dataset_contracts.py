@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Mock dataset retrieval only; execute real split, preprocessing, and graph views."""
 
 from types import SimpleNamespace

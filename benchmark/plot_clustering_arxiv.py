@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Render matched complete-reducer GECC/CGC/ClustGDD checks on ogbn-arxiv."""
 
 import argparse

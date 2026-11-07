@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Independent numerical answers for public metrics and graph utilities."""
 
 from types import SimpleNamespace

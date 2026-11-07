@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Incremental graph statistics, noise contracts, and offline tracking clients."""
 
 import builtins

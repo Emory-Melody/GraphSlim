@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Numerical helpers shared by condensation reducers (gradient matching, spectra, curricula)."""
 
 import math

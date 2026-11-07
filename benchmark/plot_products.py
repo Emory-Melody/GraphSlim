@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Plot the verified Products snapshot with blue/gray, hatched bar charts.
 
 Run: python -m benchmark.plot_products

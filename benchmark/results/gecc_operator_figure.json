@@ -13,7 +13,7 @@
       "source_sha256": "003e13c76b5f9548f3f591e75220ef7c71dd805e5763dd2bc9eb1a12feca1983"
     }
   ],
-  "renderer_sha256": "d887de1681c330a8c1819b7748cfbacc674018ca9e871e1308293b3d4243ced7",
+  "renderer_sha256": "3d7197a87a2f725b054b5f3dc5150df2a8d93e8983c6c82d584d2f18bbe12513",
   "pairs": [
     {
       "device": "cpu",

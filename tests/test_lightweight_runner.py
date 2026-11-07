@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Exercise the artifact writer and separate reduction/evaluation seeds."""
 
 from types import SimpleNamespace

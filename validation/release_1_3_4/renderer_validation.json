@@ -1,0 +1,14 @@
+[
+  {
+    "file": "benchmark/results/arxiv_clustering_figure.json",
+    "previous_renderer_sha256": "e05f33646afce2e020d3274d17b7f5062546799b009eeda6ee65b2ffadc837e6",
+    "validated_renderer_sha256": "9435fa8239d30a37a7b234413b88aee9cadd2bedb601733052c590e6a2614ce4",
+    "scope": "Renderer source revalidated; numerical data and frozen figure asset hashes unchanged."
+  },
+  {
+    "file": "benchmark/results/gecc_operator_figure.json",
+    "previous_renderer_sha256": "d887de1681c330a8c1819b7748cfbacc674018ca9e871e1308293b3d4243ced7",
+    "validated_renderer_sha256": "3d7197a87a2f725b054b5f3dc5150df2a8d93e8983c6c82d584d2f18bbe12513",
+    "scope": "Renderer source revalidated; numerical data and frozen figure asset hashes unchanged."
+  }
+]

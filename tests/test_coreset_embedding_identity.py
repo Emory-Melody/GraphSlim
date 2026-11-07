@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Non-prefix train IDs expose full-graph versus training-row confusion (ported legacy test)."""
 
 import numpy as np

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Plot reduction time against downstream accuracy for ogbn-arxiv and Reddit.
 
 ``--collect RUN_DIR`` freezes complete per-seed records from a dataset-expansion

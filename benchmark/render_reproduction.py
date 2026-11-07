@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Freeze the GC4NC Table 9 reproduction and render its README tables.
 
 ``collect`` reads completed jobs from the run directories in ``SOURCES`` and writes

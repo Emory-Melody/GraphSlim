@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.4 - 2026-11-06
+
+- Freeze the final submission source with the restored result-table selection and no README failure commentary.
+- Add per-file licensing notices to auxiliary Python and shell sources; retain third-party terms and record comment-only verifier hash changes. Numerical result records and formulas are unchanged.
+- Publish separately versioned demo evidence and align the manuscript, documentation and source archive with this tag.
+
 ## 1.3.3 - 2026-11-06
 
 - Use anomaly-class AP for Yelp/Amazon validation, HPO and final evaluation, including SGFormer and ClustGDD selection. Preserve historical macro-F1 records with their original labels.

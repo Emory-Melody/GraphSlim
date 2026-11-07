@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Extend the node selector and run a complete CPU pipeline without downloads.
 
 Run ``python -m examples.custom_reducer`` from the source checkout. The example

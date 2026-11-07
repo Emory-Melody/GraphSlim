@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Exercise actual GraphSAINT files and preprocessing; replace network retrieval only."""
 
 import json

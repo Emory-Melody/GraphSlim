@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Released GDEM GCN initialization semantics.
 
 Ported from the legacy suite. The opt-in input-dropout case is dropped because

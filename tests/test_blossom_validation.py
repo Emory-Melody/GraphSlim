@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Enable the matching solver's dual checks and compare to an external oracle."""
 
 import networkx as nx

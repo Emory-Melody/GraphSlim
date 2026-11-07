@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Independent numerical checks, degenerate inputs, and split invariants."""
 
 from types import SimpleNamespace

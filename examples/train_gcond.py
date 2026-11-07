@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Run the gcond example through the shared GraphSlim pipeline."""
 
 from pathlib import Path

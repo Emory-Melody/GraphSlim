@@ -65,3 +65,9 @@ adaptations additionally retain Apache-2.0 terms, and the PyGSP-derived portions
 of `coarsening/utils.py` additionally retain BSD-3-Clause terms. Combined SPDX
 expressions identify these retained terms; the upstream texts above remain in
 source and wheel distributions. Headers do not replace the original notices.
+
+Release 1.3.4 also adds licensing notices to the auxiliary Python and shell sources
+in `benchmark/`, `examples/`, `tests/` and `docs/`. The four archived standalone
+verifiers receive comments only; `validation/release_1_3_4/license_changes.json`
+records original and licensed source hashes and the corresponding manifest entries.
+Original release tags retain the original archives. Numerical records are unchanged.

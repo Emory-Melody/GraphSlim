@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Graph corruption, noise caches, and adversarial cache handling on a tiny graph."""
 
 import json

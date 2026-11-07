@@ -1,0 +1,2 @@
+error: Could not create temporary file
+  Caused by: Read-only file system (os error 30) at path "/home/sgong36/.local/share/uv/tools/.tmpgA9Nkx"

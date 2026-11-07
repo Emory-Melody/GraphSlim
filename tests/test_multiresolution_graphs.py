@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Schur-complement and Laplacian invariants for multiresolution graphs."""
 
 import numpy as np

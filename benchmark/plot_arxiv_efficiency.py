@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Draw measured ogbn-arxiv reduction time and peak GPU memory in blue/open bars."""
 
 import argparse

@@ -1,7 +1,7 @@
 {
   "source": "benchmark/results/reproduction_coverage_20261106.json",
   "source_sha256": "b6ac12e1af1d0b4045f8f2984e7bf079e39b949727be7b82340a3badea2572f9",
-  "renderer_sha256": "a273bbb1c6470cd68aa2f954e8c4d28a8d75c2d1a08bd149535c6400dc2d6a75",
+  "renderer_sha256": "f15232a50cf6f81448add8c194c88b5b761a768c02910d79d8eb9495ff552b49",
   "as_of_utc": "2026-11-06T00:00:00+00:00",
   "scope": "110 unique method x dataset pairs across 17 methods and 7 datasets: the 124-pair roster of 2026-11-03 without CentP and GDEM.",
   "unit": "Equal weight per unique method x dataset pair; average its matched node-budget settings or saved edge graphs before thresholding.",

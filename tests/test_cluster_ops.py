@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Clustering kernels preserve algorithms, budgets, ties and sparse semantics."""
 
 from types import SimpleNamespace

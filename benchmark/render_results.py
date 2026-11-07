@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Render or validate the frozen published GC4NC Table 9 CSV.
 
 The README presents reproduced results instead; this CSV remains their reference.

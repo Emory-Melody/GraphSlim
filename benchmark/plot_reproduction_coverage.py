@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Plot cumulative reproduction coverage for documented numerical references.
 
 The 110 method--dataset pairs exclude Clustering, CentP, GDEM and other missing references.

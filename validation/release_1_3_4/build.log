@@ -1,0 +1,2622 @@
+* Getting build dependencies for sdist...
+running egg_info
+writing graphslim.egg-info/PKG-INFO
+writing dependency_links to graphslim.egg-info/dependency_links.txt
+writing entry points to graphslim.egg-info/entry_points.txt
+writing requirements to graphslim.egg-info/requires.txt
+writing top-level names to graphslim.egg-info/top_level.txt
+reading manifest file 'graphslim.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'docs/_build'
+warning: no previously-included files matching '.DS_Store' found anywhere in distribution
+warning: no previously-included files matching '._*' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+warning: no previously-included files matching '*.bak' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'graphslim.egg-info/SOURCES.txt'
+* Building sdist...
+running sdist
+running egg_info
+writing graphslim.egg-info/PKG-INFO
+writing dependency_links to graphslim.egg-info/dependency_links.txt
+writing entry points to graphslim.egg-info/entry_points.txt
+writing requirements to graphslim.egg-info/requires.txt
+writing top-level names to graphslim.egg-info/top_level.txt
+reading manifest file 'graphslim.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'docs/_build'
+warning: no previously-included files matching '.DS_Store' found anywhere in distribution
+warning: no previously-included files matching '._*' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+warning: no previously-included files matching '*.bak' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'graphslim.egg-info/SOURCES.txt'
+running check
+creating graphslim-1.3.4
+creating graphslim-1.3.4/benchmark
+creating graphslim-1.3.4/benchmark/results
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/benchmark/results
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_90pct_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_round2_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_followup_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_with_clustering_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/benchmark/results
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_90pct_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_round2_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_followup_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_with_clustering_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_90pct_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_round2_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_followup_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_with_clustering_20261031
+creating graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031
+creating graphslim-1.3.4/benchmark/scripts
+creating graphslim-1.3.4/constraints
+creating graphslim-1.3.4/docs
+creating graphslim-1.3.4/docs/source
+creating graphslim-1.3.4/examples
+creating graphslim-1.3.4/graphslim
+creating graphslim-1.3.4/graphslim.egg-info
+creating graphslim-1.3.4/graphslim/coarsening
+creating graphslim-1.3.4/graphslim/condensation
+creating graphslim-1.3.4/graphslim/configs/cgc
+creating graphslim-1.3.4/graphslim/configs/clustgdd
+creating graphslim-1.3.4/graphslim/configs/doscond
+creating graphslim-1.3.4/graphslim/configs/doscondx
+creating graphslim-1.3.4/graphslim/configs/gcdm
+creating graphslim-1.3.4/graphslim/configs/gcdmx
+creating graphslim-1.3.4/graphslim/configs/gcgp
+creating graphslim-1.3.4/graphslim/configs/gcond
+creating graphslim-1.3.4/graphslim/configs/gcondx
+creating graphslim-1.3.4/graphslim/configs/gcsntk
+creating graphslim-1.3.4/graphslim/configs/gdem
+creating graphslim-1.3.4/graphslim/configs/gecc
+creating graphslim-1.3.4/graphslim/configs/geom
+creating graphslim-1.3.4/graphslim/configs/hpo
+creating graphslim-1.3.4/graphslim/configs/msgc
+creating graphslim-1.3.4/graphslim/configs/nope
+creating graphslim-1.3.4/graphslim/configs/sfgc
+creating graphslim-1.3.4/graphslim/configs/sgdd
+creating graphslim-1.3.4/graphslim/configs/simgc
+creating graphslim-1.3.4/graphslim/dataset
+creating graphslim-1.3.4/graphslim/evaluation
+creating graphslim-1.3.4/graphslim/evaluation/scripts
+creating graphslim-1.3.4/graphslim/layers
+creating graphslim-1.3.4/graphslim/licenses
+creating graphslim-1.3.4/graphslim/models
+creating graphslim-1.3.4/graphslim/reduction
+creating graphslim-1.3.4/graphslim/scripts
+creating graphslim-1.3.4/graphslim/sparsification
+creating graphslim-1.3.4/graphslim/sparsification/fixed_idx
+creating graphslim-1.3.4/tests
+creating graphslim-1.3.4/validation
+creating graphslim-1.3.4/validation/20261105
+creating graphslim-1.3.4/validation/demo_records
+creating graphslim-1.3.4/validation/release_1_3_1
+creating graphslim-1.3.4/validation/release_1_3_2
+creating graphslim-1.3.4/validation/release_1_3_3
+creating graphslim-1.3.4/validation/release_1_3_4
+copying files to graphslim-1.3.4...
+copying CHANGELOG.md -> graphslim-1.3.4
+copying LICENSE -> graphslim-1.3.4
+copying MANIFEST.in -> graphslim-1.3.4
+copying README.md -> graphslim-1.3.4
+copying pyproject.toml -> graphslim-1.3.4
+copying benchmark/README.md -> graphslim-1.3.4/benchmark
+copying benchmark/__init__.py -> graphslim-1.3.4/benchmark
+copying benchmark/benchmark_kernels.py -> graphslim-1.3.4/benchmark
+copying benchmark/compare_arxiv.py -> graphslim-1.3.4/benchmark
+copying benchmark/compare_gecc_arxiv.py -> graphslim-1.3.4/benchmark
+copying benchmark/compare_implementations.py -> graphslim-1.3.4/benchmark
+copying benchmark/dd_plot.py -> graphslim-1.3.4/benchmark
+copying benchmark/expand_datasets.py -> graphslim-1.3.4/benchmark
+copying benchmark/gcgp_parity.py -> graphslim-1.3.4/benchmark
+copying benchmark/graph_property.py -> graphslim-1.3.4/benchmark
+copying benchmark/graph_property_no_structure.py -> graphslim-1.3.4/benchmark
+copying benchmark/lightweight_downstream.py -> graphslim-1.3.4/benchmark
+copying benchmark/package_results.py -> graphslim-1.3.4/benchmark
+copying benchmark/paper_hpo.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_arxiv_author_shift.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_arxiv_efficiency.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_clustering_arxiv.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_gecc_efficiency.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_implementation_comparison.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_products.py -> graphslim-1.3.4/benchmark
+copying benchmark/plot_reproduction_coverage.py -> graphslim-1.3.4/benchmark
+copying benchmark/render_arxiv_efficiency.py -> graphslim-1.3.4/benchmark
+copying benchmark/render_readme_highlights.py -> graphslim-1.3.4/benchmark
+copying benchmark/render_reproduction.py -> graphslim-1.3.4/benchmark
+copying benchmark/render_results.py -> graphslim-1.3.4/benchmark
+copying benchmark/render_tradeoff.py -> graphslim-1.3.4/benchmark
+copying benchmark/reproduce.py -> graphslim-1.3.4/benchmark
+copying benchmark/reproduce_table9.py -> graphslim-1.3.4/benchmark
+copying benchmark/requirements.txt -> graphslim-1.3.4/benchmark
+copying benchmark/rerun_nr.py -> graphslim-1.3.4/benchmark
+copying benchmark/resume_expansion.py -> graphslim-1.3.4/benchmark
+copying benchmark/run_cross_arch.py -> graphslim-1.3.4/benchmark
+copying benchmark/run_eval.py -> graphslim-1.3.4/benchmark
+copying benchmark/run_nas.py -> graphslim-1.3.4/benchmark
+copying benchmark/train_all.py -> graphslim-1.3.4/benchmark
+copying benchmark/verify_cluster_ops.py -> graphslim-1.3.4/benchmark
+copying benchmark/verify_lightweight.py -> graphslim-1.3.4/benchmark
+copying benchmark/verify_simgc.py -> graphslim-1.3.4/benchmark
+copying benchmark/results/arxiv_author_vs_graphslim_20261029.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/arxiv_clustering_comparison_20261101.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/arxiv_clustering_figure.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/clustering_arxiv_figure.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/cuda_graph_integration.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/efficiency_compatibility.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/gc4nc_table9.csv -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/gecc_arxiv_comparison_20261102.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/gecc_operator_cpu_20261029.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/gecc_operator_figure.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/gecc_operator_gpu_20261029.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/implementation_comparison_20261031.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/implementation_comparison_figure.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/lightweight_integration.csv -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/lightweight_integration.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/package_local_results.csv -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/package_local_results.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/package_runs.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/paper_hpo_provenance.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/products_20261028.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/provenance.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproduction_coverage_20261101.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproduction_coverage_20261102.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproduction_coverage_20261106.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproduction_coverage_figure.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/table9_reproduction.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/tradeoff_20261028.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/yelp_ap_20261101.json -> graphslim-1.3.4/benchmark/results
+copying benchmark/results/reproducibility_20261103/README.md -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/cohorts.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/manifest.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/pairs.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/reference_validation.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/settings.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/summary.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/verify.py -> graphslim-1.3.4/benchmark/results/reproducibility_20261103
+copying benchmark/results/reproducibility_20261103/sources/benchmark/results/reproduction_coverage_20261101.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/benchmark/results
+copying benchmark/results/reproducibility_20261103/sources/benchmark/results/reproduction_coverage_20261102.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/benchmark/results
+copying benchmark/results/reproducibility_20261103/sources/benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/benchmark/results
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_90pct_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_90pct_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_round2_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_alignment_round2_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_followup_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_followup_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_20261031/matched_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_with_clustering_20261031/vn_repair_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_rates_with_clustering_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031/metric_contract.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261103/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261105/README.md -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/cohorts.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/manifest.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/pairs.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/reference_validation.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/settings.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/summary.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/verify.py -> graphslim-1.3.4/benchmark/results/reproducibility_20261105
+copying benchmark/results/reproducibility_20261105/sources/benchmark/results/reproduction_coverage_20261101.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261105/sources/benchmark/results/reproduction_coverage_20261102.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261105/sources/benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_90pct_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_90pct_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_round2_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_alignment_round2_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_followup_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_followup_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_20261031/matched_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_with_clustering_20261031/vn_repair_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_rates_with_clustering_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031/metric_contract.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261106/README.md -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/exclusions.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/manifest.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/pairs.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/replacements.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/rerun_results.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/summary.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/verify.py -> graphslim-1.3.4/benchmark/results/reproducibility_20261106
+copying benchmark/results/reproducibility_20261106/base_20261105/README.md -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/cohorts.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/manifest.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/pairs.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/reference_validation.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/settings.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/summary.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/verify.py -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results/reproduction_coverage_20261101.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results/reproduction_coverage_20261102.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results/reproduction_coverage_20261102_gc4nc_extended.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/benchmark/results
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_90pct_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_90pct_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_round2_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_alignment_round2_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_followup_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_followup_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_20261031/matched_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_with_clustering_20261031/vn_repair_rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_rates_with_clustering_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031/metric_contract.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031/rate_cells.csv -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031/reference_corrections.json -> graphslim-1.3.4/benchmark/results/reproducibility_20261106/base_20261105/sources/output/reproduction_round4_20261031
+copying benchmark/scripts/data_initialization.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/graph_property_preservation.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/nas.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/performance.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/robustness.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/scalability.sh -> graphslim-1.3.4/benchmark/scripts
+copying benchmark/scripts/transferability.sh -> graphslim-1.3.4/benchmark/scripts
+copying constraints/cpu-common.txt -> graphslim-1.3.4/constraints
+copying constraints/cpu-torch26.txt -> graphslim-1.3.4/constraints
+copying constraints/cpu-torch28.txt -> graphslim-1.3.4/constraints
+copying docs/changes_since_gc4nc.md -> graphslim-1.3.4/docs
+copying docs/conf.py -> graphslim-1.3.4/docs
+copying docs/extending.md -> graphslim-1.3.4/docs
+copying docs/gc4nc_reference_corrections.md -> graphslim-1.3.4/docs
+copying docs/hpo.md -> graphslim-1.3.4/docs
+copying docs/index.rst -> graphslim-1.3.4/docs
+copying docs/installation.md -> graphslim-1.3.4/docs
+copying docs/quickstart.md -> graphslim-1.3.4/docs
+copying docs/requirements.txt -> graphslim-1.3.4/docs
+copying docs/requirements_torch.txt -> graphslim-1.3.4/docs
+copying docs/testing_snapshot.md -> graphslim-1.3.4/docs
+copying docs/source/graphslim.coarsening.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.condensation.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.dataset.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.evaluation.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.models.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.reduction.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.rst -> graphslim-1.3.4/docs/source
+copying docs/source/graphslim.sparsification.rst -> graphslim-1.3.4/docs/source
+copying docs/source/modules.rst -> graphslim-1.3.4/docs/source
+copying examples/__init__.py -> graphslim-1.3.4/examples
+copying examples/custom_reducer.py -> graphslim-1.3.4/examples
+copying examples/demo.py -> graphslim-1.3.4/examples
+copying examples/demo_short.json -> graphslim-1.3.4/examples
+copying examples/train_coarsen.py -> graphslim-1.3.4/examples
+copying examples/train_gcond.py -> graphslim-1.3.4/examples
+copying examples/train_lightweight.py -> graphslim-1.3.4/examples
+copying examples/train_node_sparsification.py -> graphslim-1.3.4/examples
+copying graphslim/THIRD_PARTY_NOTICES.md -> graphslim-1.3.4/graphslim
+copying graphslim/__init__.py -> graphslim-1.3.4/graphslim
+copying graphslim/_lazy.py -> graphslim-1.3.4/graphslim
+copying graphslim/compat.py -> graphslim-1.3.4/graphslim
+copying graphslim/config.py -> graphslim-1.3.4/graphslim
+copying graphslim/doctor.py -> graphslim-1.3.4/graphslim
+copying graphslim/hpo.py -> graphslim-1.3.4/graphslim
+copying graphslim/run_eval.py -> graphslim-1.3.4/graphslim
+copying graphslim/tracking.py -> graphslim-1.3.4/graphslim
+copying graphslim/train_all.py -> graphslim-1.3.4/graphslim
+copying graphslim/utils.py -> graphslim-1.3.4/graphslim
+copying graphslim/visualization.py -> graphslim-1.3.4/graphslim
+copying graphslim.egg-info/PKG-INFO -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim.egg-info/SOURCES.txt -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim.egg-info/dependency_links.txt -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim.egg-info/entry_points.txt -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim.egg-info/requires.txt -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim.egg-info/top_level.txt -> graphslim-1.3.4/graphslim.egg-info
+copying graphslim/coarsening/__init__.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/affinity_gs.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/algebraic_jc.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/averaging.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/clustering.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/clusteringagg.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/coarsening_base.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/heavy_edge.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/kron.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/labels.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/nope.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/utils.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/variation_cliques.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/variation_edges.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/variation_neighborhoods.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/coarsening/vng.py -> graphslim-1.3.4/graphslim/coarsening
+copying graphslim/condensation/__init__.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/cgc.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/clustgdd.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/doscond.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/doscondx.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcdm.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcdmx.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcgp.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcond.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcond_base.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcondx.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gcsntk.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gdem.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/gecc.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/geom.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/msgc.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/sfgc.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/sgdd.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/simgc.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/condensation/utils.py -> graphslim-1.3.4/graphslim/condensation
+copying graphslim/configs/cgc/citeseer.json -> graphslim-1.3.4/graphslim/configs/cgc
+copying graphslim/configs/cgc/cora.json -> graphslim-1.3.4/graphslim/configs/cgc
+copying graphslim/configs/cgc/default.json -> graphslim-1.3.4/graphslim/configs/cgc
+copying graphslim/configs/clustgdd/citeseer.json -> graphslim-1.3.4/graphslim/configs/clustgdd
+copying graphslim/configs/clustgdd/cora.json -> graphslim-1.3.4/graphslim/configs/clustgdd
+copying graphslim/configs/clustgdd/default.json -> graphslim-1.3.4/graphslim/configs/clustgdd
+copying graphslim/configs/doscond/amazon.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/citeseer.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/cora.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/flickr.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/pubmed.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/reddit.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscond/yelp.json -> graphslim-1.3.4/graphslim/configs/doscond
+copying graphslim/configs/doscondx/amazon.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/citeseer.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/cora.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/flickr.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/pubmed.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/reddit.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/yelp.json -> graphslim-1.3.4/graphslim/configs/doscondx
+copying graphslim/configs/gcdm/amazon.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/citeseer.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/cora.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/flickr.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/pubmed.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/reddit.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/yelp.json -> graphslim-1.3.4/graphslim/configs/gcdm
+copying graphslim/configs/gcdmx/amazon.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/citeseer.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/cora.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/flickr.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/pubmed.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/reddit.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/yelp.json -> graphslim-1.3.4/graphslim/configs/gcdmx
+copying graphslim/configs/gcgp/default.json -> graphslim-1.3.4/graphslim/configs/gcgp
+copying graphslim/configs/gcond/amazon.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/citeseer.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/cora.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/flickr.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/pubmed.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/reddit.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcond/yelp.json -> graphslim-1.3.4/graphslim/configs/gcond
+copying graphslim/configs/gcondx/amazon.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/citeseer.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/cora.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/flickr.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/pubmed.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/reddit.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/yelp.json -> graphslim-1.3.4/graphslim/configs/gcondx
+copying graphslim/configs/gcsntk/amazon.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/citeseer.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/cora.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/default.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/flickr.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/pubmed.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/reddit.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/yelp.json -> graphslim-1.3.4/graphslim/configs/gcsntk
+copying graphslim/configs/gdem/amazon.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/citeseer.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/cora.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/flickr.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/pubmed.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/reddit.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gdem/yelp.json -> graphslim-1.3.4/graphslim/configs/gdem
+copying graphslim/configs/gecc/citeseer.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/cora.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/flickr.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/ogbn-products.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/pubmed.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/gecc/reddit.json -> graphslim-1.3.4/graphslim/configs/gecc
+copying graphslim/configs/geom/amazon.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/citeseer.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/cora.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/flickr.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/pubmed.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/reddit.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/geom/yelp.json -> graphslim-1.3.4/graphslim/configs/geom
+copying graphslim/configs/hpo/gdem.json -> graphslim-1.3.4/graphslim/configs/hpo
+copying graphslim/configs/msgc/amazon.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/citeseer.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/cora.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/flickr.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/pubmed.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/reddit.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/msgc/yelp.json -> graphslim-1.3.4/graphslim/configs/msgc
+copying graphslim/configs/nope/default.json -> graphslim-1.3.4/graphslim/configs/nope
+copying graphslim/configs/sfgc/amazon.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/citeseer.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/cora.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/flickr.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/pubmed.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/reddit.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/yelp.json -> graphslim-1.3.4/graphslim/configs/sfgc
+copying graphslim/configs/sgdd/amazon.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/citeseer.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/cora.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/flickr.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/pubmed.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/reddit.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/yelp.json -> graphslim-1.3.4/graphslim/configs/sgdd
+copying graphslim/configs/simgc/amazon.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/citeseer.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/cora.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/flickr.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/ogbn-arxiv.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/pubmed.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/reddit.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/configs/simgc/yelp.json -> graphslim-1.3.4/graphslim/configs/simgc
+copying graphslim/dataset/__init__.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/dataset/attack.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/dataset/convertor.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/dataset/loader.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/dataset/noise.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/dataset/utils.py -> graphslim-1.3.4/graphslim/dataset
+copying graphslim/evaluation/__init__.py -> graphslim-1.3.4/graphslim/evaluation
+copying graphslim/evaluation/eval_agent.py -> graphslim-1.3.4/graphslim/evaluation
+copying graphslim/evaluation/graph_property.py -> graphslim-1.3.4/graphslim/evaluation
+copying graphslim/evaluation/nas_eval.py -> graphslim-1.3.4/graphslim/evaluation
+copying graphslim/evaluation/utils.py -> graphslim-1.3.4/graphslim/evaluation
+copying graphslim/evaluation/scripts/run_cross.sh -> graphslim-1.3.4/graphslim/evaluation/scripts
+copying graphslim/evaluation/scripts/run_main.sh -> graphslim-1.3.4/graphslim/evaluation/scripts
+copying graphslim/evaluation/scripts/script_cross.sh -> graphslim-1.3.4/graphslim/evaluation/scripts
+copying graphslim/layers/__init__.py -> graphslim-1.3.4/graphslim/layers
+copying graphslim/licenses/DeepRobust-MIT.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/licenses/PRBCD-MIT.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/licenses/PyG-MIT.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/licenses/PyGSP-BSD-3-Clause.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/licenses/graph-coarsening-Apache-2.0.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/licenses/pygcn-MIT.txt -> graphslim-1.3.4/graphslim/licenses
+copying graphslim/models/__init__.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/appnp.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/base.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/cheby.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/gat.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/gcn.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/gin.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/gntk.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/graphsage.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/ignr.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/krr.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/layers.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/parametrized_adj.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/prbcd.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/random_attack.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/reparam_module.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/sgc.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/sgformer.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/models/sntk.py -> graphslim-1.3.4/graphslim/models
+copying graphslim/reduction/__init__.py -> graphslim-1.3.4/graphslim/reduction
+copying graphslim/reduction/cluster_ops.py -> graphslim-1.3.4/graphslim/reduction
+copying graphslim/reduction/lightweight.py -> graphslim-1.3.4/graphslim/reduction
+copying graphslim/reduction/registry.py -> graphslim-1.3.4/graphslim/reduction
+copying graphslim/scripts/all.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/common.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/main.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/nas.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/requirement.txt -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/run_cross.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/run_main.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/script_cross.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/script_robust.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sogb.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_all.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_eval.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_flickr.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_grid.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_pub.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/sub_reddit.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/submit_IPC.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/submit_main.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/submit_nas.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/submit_robust.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/submit_transferbility.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/scripts/transferbility.sh -> graphslim-1.3.4/graphslim/scripts
+copying graphslim/sparsification/__init__.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/cent_degree.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/cent_pagerank.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/coreset_base.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/edge_sparsification_base.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/g_spar.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/herding.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/herding_agg.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/kcenter.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/kcenter_agg.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/kcenter_sample.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/local_degree.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/model_based_coreset_base.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/model_free_coreset_base.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/networkit_sparsifiers.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/random.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/random_edge.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/rank_degree.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/scan.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/spanning_forest.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/t_spanner.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/utils.py -> graphslim-1.3.4/graphslim/sparsification
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy -> graphslim-1.3.4/graphslim/sparsification/fixed_idx
+copying tests/test_arxiv_comparison.py -> graphslim-1.3.4/tests
+copying tests/test_blossom_validation.py -> graphslim-1.3.4/tests
+copying tests/test_cluster_ops.py -> graphslim-1.3.4/tests
+copying tests/test_clustgdd_streaming.py -> graphslim-1.3.4/tests
+copying tests/test_coarsening.py -> graphslim-1.3.4/tests
+copying tests/test_coarsening_math.py -> graphslim-1.3.4/tests
+copying tests/test_compat.py -> graphslim-1.3.4/tests
+copying tests/test_config.py -> graphslim-1.3.4/tests
+copying tests/test_coreset_embedding_identity.py -> graphslim-1.3.4/tests
+copying tests/test_cov_coarsening_reducers.py -> graphslim-1.3.4/tests
+copying tests/test_cov_coarsening_utils.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_core_gcgp.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_core_gdem.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_core_gecc.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_core_gradient.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_core_utils.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_kernel_gcsntk.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_kernel_models.py -> graphslim-1.3.4/tests
+copying tests/test_cov_condensation_kernel_trajectory.py -> graphslim-1.3.4/tests
+copying tests/test_cov_data_convertor.py -> graphslim-1.3.4/tests
+copying tests/test_cov_data_loader.py -> graphslim-1.3.4/tests
+copying tests/test_cov_data_noise.py -> graphslim-1.3.4/tests
+copying tests/test_cov_data_utils.py -> graphslim-1.3.4/tests
+copying tests/test_cov_evaluation.py -> graphslim-1.3.4/tests
+copying tests/test_cov_models_gnn.py -> graphslim-1.3.4/tests
+copying tests/test_cov_models_misc.py -> graphslim-1.3.4/tests
+copying tests/test_cov_models_sgformer.py -> graphslim-1.3.4/tests
+copying tests/test_cov_sparsification.py -> graphslim-1.3.4/tests
+copying tests/test_cov_utils_core.py -> graphslim-1.3.4/tests
+copying tests/test_cov_utils_misc_reduction.py -> graphslim-1.3.4/tests
+copying tests/test_cov_utils_misc_runtime.py -> graphslim-1.3.4/tests
+copying tests/test_dataset_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_dataset_expansion.py -> graphslim-1.3.4/tests
+copying tests/test_doctor.py -> graphslim-1.3.4/tests
+copying tests/test_entrypoints.py -> graphslim-1.3.4/tests
+copying tests/test_evaluator_workflows.py -> graphslim-1.3.4/tests
+copying tests/test_expansion_resume.py -> graphslim-1.3.4/tests
+copying tests/test_fraud_ap.py -> graphslim-1.3.4/tests
+copying tests/test_functional_coverage_regressions.py -> graphslim-1.3.4/tests
+copying tests/test_fuzzy_clustering.py -> graphslim-1.3.4/tests
+copying tests/test_gcn_author_profile.py -> graphslim-1.3.4/tests
+copying tests/test_gcond_full_class_profile.py -> graphslim-1.3.4/tests
+copying tests/test_gdem_feature_initialization.py -> graphslim-1.3.4/tests
+copying tests/test_gin.py -> graphslim-1.3.4/tests
+copying tests/test_graph_generation_and_coresets.py -> graphslim-1.3.4/tests
+copying tests/test_graph_interchange_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_graph_operator_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_graphsaint_io.py -> graphslim-1.3.4/tests
+copying tests/test_hpo.py -> graphslim-1.3.4/tests
+copying tests/test_implementation_comparison.py -> graphslim-1.3.4/tests
+copying tests/test_initialization.py -> graphslim-1.3.4/tests
+copying tests/test_kernel_properties.py -> graphslim-1.3.4/tests
+copying tests/test_layer_interchange.py -> graphslim-1.3.4/tests
+copying tests/test_legacy_reducer_integration.py -> graphslim-1.3.4/tests
+copying tests/test_lightweight_methods.py -> graphslim-1.3.4/tests
+copying tests/test_lightweight_runner.py -> graphslim-1.3.4/tests
+copying tests/test_multiresolution_graphs.py -> graphslim-1.3.4/tests
+copying tests/test_nas_workflow.py -> graphslim-1.3.4/tests
+copying tests/test_networkit_sparsifiers.py -> graphslim-1.3.4/tests
+copying tests/test_nr_reruns.py -> graphslim-1.3.4/tests
+copying tests/test_numeric_utilities.py -> graphslim-1.3.4/tests
+copying tests/test_numerical_reducers.py -> graphslim-1.3.4/tests
+copying tests/test_package_results.py -> graphslim-1.3.4/tests
+copying tests/test_paper_hpo.py -> graphslim-1.3.4/tests
+copying tests/test_pipeline.py -> graphslim-1.3.4/tests
+copying tests/test_prbcd_workflow.py -> graphslim-1.3.4/tests
+copying tests/test_public_numerical_helpers.py -> graphslim-1.3.4/tests
+copying tests/test_reduced_loading_branches.py -> graphslim-1.3.4/tests
+copying tests/test_reducer_extension_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_reduction_registry.py -> graphslim-1.3.4/tests
+copying tests/test_reparam_module.py -> graphslim-1.3.4/tests
+copying tests/test_reporting_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_reproduction.py -> graphslim-1.3.4/tests
+copying tests/test_reproduction_coverage_metric.py -> graphslim-1.3.4/tests
+copying tests/test_saved_graphs.py -> graphslim-1.3.4/tests
+copying tests/test_sgformer_options.py -> graphslim-1.3.4/tests
+copying tests/test_simgc_author.py -> graphslim-1.3.4/tests
+copying tests/test_sntk_layer_recursion.py -> graphslim-1.3.4/tests
+copying tests/test_sparsification_contracts.py -> graphslim-1.3.4/tests
+copying tests/test_spectral_diagnostics.py -> graphslim-1.3.4/tests
+copying tests/test_statistics_and_tracking.py -> graphslim-1.3.4/tests
+copying tests/test_table9_reproduction.py -> graphslim-1.3.4/tests
+copying tests/test_tracking.py -> graphslim-1.3.4/tests
+copying tests/test_tradeoff.py -> graphslim-1.3.4/tests
+copying tests/test_trajectory_reducers.py -> graphslim-1.3.4/tests
+copying tests/test_tree_dataset_utilities.py -> graphslim-1.3.4/tests
+copying tests/test_visualization.py -> graphslim-1.3.4/tests
+copying tests/test_visualization_io.py -> graphslim-1.3.4/tests
+copying validation/comparison_sources.json -> graphslim-1.3.4/validation
+copying validation/20261105/README.md -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/archive_check.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/checks.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/coverage.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/coverage.xml -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/environment.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/historical_coverage_comparison.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/historical_coverage_summary.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/install_doctor.json -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/pytest.xml -> graphslim-1.3.4/validation/20261105
+copying validation/20261105/source_manifest.json -> graphslim-1.3.4/validation/20261105
+copying validation/demo_records/historical_gpu_20261101.json -> graphslim-1.3.4/validation/demo_records
+copying validation/demo_records/provenance.json -> graphslim-1.3.4/validation/demo_records
+copying validation/release_1_3_1/README.md -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/archive_check.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/benchmark_table_check.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/checks.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/coverage.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/coverage.xml -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/docs_build.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/doctor.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/doctor.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/environment.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/license_header_audit.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/pytest.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/pytest.xml -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/source_manifest.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/twine_check.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/wheel_doctor.json -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_1/wheel_install.log -> graphslim-1.3.4/validation/release_1_3_1
+copying validation/release_1_3_2/README.md -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/archive_check.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/artifact_check.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/build.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/checks.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/coverage.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/coverage.xml -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/docs_build.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/environment.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/pytest.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/pytest.xml -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/twine_check.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/wheel_doctor.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/wheel_doctor.log -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_2/wheel_import.json -> graphslim-1.3.4/validation/release_1_3_2
+copying validation/release_1_3_3/README.md -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/archive_check.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/build.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/checks.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/coverage.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/coverage.xml -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/custom_reducer.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/demo_output.txt -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/demo_source_hashes.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/demo_summary.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/docs_epub.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/docs_html.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/docs_latex.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/doctor.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/environment.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/pytest.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/pytest.xml -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/source_hashes.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/twine_check.log -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_3/yelp_ap_verification.json -> graphslim-1.3.4/validation/release_1_3_3
+copying validation/release_1_3_4/README.md -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/archive_check.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/build.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/checks.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/coverage.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/coverage.xml -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/coverage_combine.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/demo_details.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/demo_output.txt -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/demo_provenance.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/demo_summary.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/docs_epub.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/docs_html.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/docs_latex.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/doctor.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/doctor.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/environment.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/format.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/license_changes.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/pytest.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/pytest.xml -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/renderer_validation.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/reporting_tests.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/reproduction.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/ruff.log -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/scope_check.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/source_hashes.json -> graphslim-1.3.4/validation/release_1_3_4
+copying validation/release_1_3_4/twine.log -> graphslim-1.3.4/validation/release_1_3_4
+Writing graphslim-1.3.4/setup.cfg
+Creating tar archive
+removing 'graphslim-1.3.4' (and everything under it)
+* Building wheel from sdist
+* Getting build dependencies for wheel...
+running egg_info
+writing graphslim.egg-info/PKG-INFO
+writing dependency_links to graphslim.egg-info/dependency_links.txt
+writing entry points to graphslim.egg-info/entry_points.txt
+writing requirements to graphslim.egg-info/requires.txt
+writing top-level names to graphslim.egg-info/top_level.txt
+reading manifest file 'graphslim.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'docs/_build'
+warning: no previously-included files matching '.DS_Store' found anywhere in distribution
+warning: no previously-included files matching '._*' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+warning: no previously-included files matching '*.bak' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'graphslim.egg-info/SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+creating build/lib/graphslim
+copying graphslim/tracking.py -> build/lib/graphslim
+copying graphslim/compat.py -> build/lib/graphslim
+copying graphslim/train_all.py -> build/lib/graphslim
+copying graphslim/visualization.py -> build/lib/graphslim
+copying graphslim/utils.py -> build/lib/graphslim
+copying graphslim/__init__.py -> build/lib/graphslim
+copying graphslim/hpo.py -> build/lib/graphslim
+copying graphslim/run_eval.py -> build/lib/graphslim
+copying graphslim/doctor.py -> build/lib/graphslim
+copying graphslim/_lazy.py -> build/lib/graphslim
+copying graphslim/config.py -> build/lib/graphslim
+creating build/lib/graphslim/layers
+copying graphslim/layers/__init__.py -> build/lib/graphslim/layers
+creating build/lib/graphslim/reduction
+copying graphslim/reduction/lightweight.py -> build/lib/graphslim/reduction
+copying graphslim/reduction/__init__.py -> build/lib/graphslim/reduction
+copying graphslim/reduction/registry.py -> build/lib/graphslim/reduction
+copying graphslim/reduction/cluster_ops.py -> build/lib/graphslim/reduction
+creating build/lib/graphslim/condensation
+copying graphslim/condensation/cgc.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/msgc.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gecc.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcondx.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcgp.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/utils.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/doscond.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/__init__.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcdm.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/clustgdd.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/doscondx.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/sgdd.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcond_base.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcond.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/simgc.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcsntk.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gdem.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/sfgc.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/gcdmx.py -> build/lib/graphslim/condensation
+copying graphslim/condensation/geom.py -> build/lib/graphslim/condensation
+creating build/lib/graphslim/evaluation
+copying graphslim/evaluation/utils.py -> build/lib/graphslim/evaluation
+copying graphslim/evaluation/__init__.py -> build/lib/graphslim/evaluation
+copying graphslim/evaluation/eval_agent.py -> build/lib/graphslim/evaluation
+copying graphslim/evaluation/graph_property.py -> build/lib/graphslim/evaluation
+copying graphslim/evaluation/nas_eval.py -> build/lib/graphslim/evaluation
+creating build/lib/graphslim/models
+copying graphslim/models/sgformer.py -> build/lib/graphslim/models
+copying graphslim/models/graphsage.py -> build/lib/graphslim/models
+copying graphslim/models/__init__.py -> build/lib/graphslim/models
+copying graphslim/models/cheby.py -> build/lib/graphslim/models
+copying graphslim/models/sntk.py -> build/lib/graphslim/models
+copying graphslim/models/gin.py -> build/lib/graphslim/models
+copying graphslim/models/krr.py -> build/lib/graphslim/models
+copying graphslim/models/gntk.py -> build/lib/graphslim/models
+copying graphslim/models/parametrized_adj.py -> build/lib/graphslim/models
+copying graphslim/models/base.py -> build/lib/graphslim/models
+copying graphslim/models/random_attack.py -> build/lib/graphslim/models
+copying graphslim/models/gat.py -> build/lib/graphslim/models
+copying graphslim/models/ignr.py -> build/lib/graphslim/models
+copying graphslim/models/appnp.py -> build/lib/graphslim/models
+copying graphslim/models/gcn.py -> build/lib/graphslim/models
+copying graphslim/models/prbcd.py -> build/lib/graphslim/models
+copying graphslim/models/layers.py -> build/lib/graphslim/models
+copying graphslim/models/reparam_module.py -> build/lib/graphslim/models
+copying graphslim/models/sgc.py -> build/lib/graphslim/models
+creating build/lib/graphslim/sparsification
+copying graphslim/sparsification/g_spar.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/cent_pagerank.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/cent_degree.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/random_edge.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/kcenter_sample.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/kcenter.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/herding.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/local_degree.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/utils.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/random.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/edge_sparsification_base.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/rank_degree.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/__init__.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/kcenter_agg.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/coreset_base.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/model_free_coreset_base.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/t_spanner.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/networkit_sparsifiers.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/herding_agg.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/model_based_coreset_base.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/scan.py -> build/lib/graphslim/sparsification
+copying graphslim/sparsification/spanning_forest.py -> build/lib/graphslim/sparsification
+creating build/lib/graphslim/coarsening
+copying graphslim/coarsening/vng.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/affinity_gs.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/labels.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/utils.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/variation_cliques.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/coarsening_base.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/heavy_edge.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/clustering.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/nope.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/__init__.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/variation_neighborhoods.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/kron.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/averaging.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/clusteringagg.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/variation_edges.py -> build/lib/graphslim/coarsening
+copying graphslim/coarsening/algebraic_jc.py -> build/lib/graphslim/coarsening
+creating build/lib/graphslim/dataset
+copying graphslim/dataset/noise.py -> build/lib/graphslim/dataset
+copying graphslim/dataset/loader.py -> build/lib/graphslim/dataset
+copying graphslim/dataset/utils.py -> build/lib/graphslim/dataset
+copying graphslim/dataset/__init__.py -> build/lib/graphslim/dataset
+copying graphslim/dataset/attack.py -> build/lib/graphslim/dataset
+copying graphslim/dataset/convertor.py -> build/lib/graphslim/dataset
+running egg_info
+writing graphslim.egg-info/PKG-INFO
+writing dependency_links to graphslim.egg-info/dependency_links.txt
+writing entry points to graphslim.egg-info/entry_points.txt
+writing requirements to graphslim.egg-info/requires.txt
+writing top-level names to graphslim.egg-info/top_level.txt
+reading manifest file 'graphslim.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+no previously-included directories found matching 'docs/_build'
+warning: no previously-included files matching '.DS_Store' found anywhere in distribution
+warning: no previously-included files matching '._*' found anywhere in distribution
+warning: no previously-included files matching '*.py[cod]' found anywhere in distribution
+warning: no previously-included files matching '*.bak' found anywhere in distribution
+adding license file 'LICENSE'
+writing manifest file 'graphslim.egg-info/SOURCES.txt'
+copying graphslim/THIRD_PARTY_NOTICES.md -> build/lib/graphslim
+creating build/lib/graphslim/configs/cgc
+copying graphslim/configs/cgc/citeseer.json -> build/lib/graphslim/configs/cgc
+copying graphslim/configs/cgc/cora.json -> build/lib/graphslim/configs/cgc
+copying graphslim/configs/cgc/default.json -> build/lib/graphslim/configs/cgc
+creating build/lib/graphslim/configs/clustgdd
+copying graphslim/configs/clustgdd/citeseer.json -> build/lib/graphslim/configs/clustgdd
+copying graphslim/configs/clustgdd/cora.json -> build/lib/graphslim/configs/clustgdd
+copying graphslim/configs/clustgdd/default.json -> build/lib/graphslim/configs/clustgdd
+creating build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/amazon.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/citeseer.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/cora.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/flickr.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/ogbn-arxiv.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/pubmed.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/reddit.json -> build/lib/graphslim/configs/doscond
+copying graphslim/configs/doscond/yelp.json -> build/lib/graphslim/configs/doscond
+creating build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/amazon.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/citeseer.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/cora.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/flickr.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/ogbn-arxiv.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/pubmed.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/reddit.json -> build/lib/graphslim/configs/doscondx
+copying graphslim/configs/doscondx/yelp.json -> build/lib/graphslim/configs/doscondx
+creating build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/amazon.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/citeseer.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/cora.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/flickr.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/ogbn-arxiv.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/pubmed.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/reddit.json -> build/lib/graphslim/configs/gcdm
+copying graphslim/configs/gcdm/yelp.json -> build/lib/graphslim/configs/gcdm
+creating build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/amazon.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/citeseer.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/cora.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/flickr.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/ogbn-arxiv.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/pubmed.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/reddit.json -> build/lib/graphslim/configs/gcdmx
+copying graphslim/configs/gcdmx/yelp.json -> build/lib/graphslim/configs/gcdmx
+creating build/lib/graphslim/configs/gcgp
+copying graphslim/configs/gcgp/default.json -> build/lib/graphslim/configs/gcgp
+creating build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/amazon.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/citeseer.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/cora.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/flickr.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/ogbn-arxiv.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/pubmed.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/reddit.json -> build/lib/graphslim/configs/gcond
+copying graphslim/configs/gcond/yelp.json -> build/lib/graphslim/configs/gcond
+creating build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/amazon.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/citeseer.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/cora.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/flickr.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/ogbn-arxiv.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/pubmed.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/reddit.json -> build/lib/graphslim/configs/gcondx
+copying graphslim/configs/gcondx/yelp.json -> build/lib/graphslim/configs/gcondx
+creating build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/amazon.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/citeseer.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/cora.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/default.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/flickr.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/ogbn-arxiv.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/pubmed.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/reddit.json -> build/lib/graphslim/configs/gcsntk
+copying graphslim/configs/gcsntk/yelp.json -> build/lib/graphslim/configs/gcsntk
+creating build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/amazon.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/citeseer.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/cora.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/flickr.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/ogbn-arxiv.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/pubmed.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/reddit.json -> build/lib/graphslim/configs/gdem
+copying graphslim/configs/gdem/yelp.json -> build/lib/graphslim/configs/gdem
+creating build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/citeseer.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/cora.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/flickr.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/ogbn-arxiv.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/ogbn-products.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/pubmed.json -> build/lib/graphslim/configs/gecc
+copying graphslim/configs/gecc/reddit.json -> build/lib/graphslim/configs/gecc
+creating build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/amazon.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/citeseer.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/cora.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/flickr.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/ogbn-arxiv.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/pubmed.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/reddit.json -> build/lib/graphslim/configs/geom
+copying graphslim/configs/geom/yelp.json -> build/lib/graphslim/configs/geom
+creating build/lib/graphslim/configs/hpo
+copying graphslim/configs/hpo/gdem.json -> build/lib/graphslim/configs/hpo
+creating build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/amazon.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/citeseer.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/cora.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/flickr.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/ogbn-arxiv.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/pubmed.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/reddit.json -> build/lib/graphslim/configs/msgc
+copying graphslim/configs/msgc/yelp.json -> build/lib/graphslim/configs/msgc
+creating build/lib/graphslim/configs/nope
+copying graphslim/configs/nope/default.json -> build/lib/graphslim/configs/nope
+creating build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/amazon.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/citeseer.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/cora.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/flickr.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/ogbn-arxiv.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/pubmed.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/reddit.json -> build/lib/graphslim/configs/sfgc
+copying graphslim/configs/sfgc/yelp.json -> build/lib/graphslim/configs/sfgc
+creating build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/amazon.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/citeseer.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/cora.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/flickr.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/ogbn-arxiv.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/pubmed.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/reddit.json -> build/lib/graphslim/configs/sgdd
+copying graphslim/configs/sgdd/yelp.json -> build/lib/graphslim/configs/sgdd
+creating build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/amazon.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/citeseer.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/cora.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/flickr.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/ogbn-arxiv.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/pubmed.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/reddit.json -> build/lib/graphslim/configs/simgc
+copying graphslim/configs/simgc/yelp.json -> build/lib/graphslim/configs/simgc
+creating build/lib/graphslim/licenses
+copying graphslim/licenses/DeepRobust-MIT.txt -> build/lib/graphslim/licenses
+copying graphslim/licenses/PRBCD-MIT.txt -> build/lib/graphslim/licenses
+copying graphslim/licenses/PyG-MIT.txt -> build/lib/graphslim/licenses
+copying graphslim/licenses/PyGSP-BSD-3-Clause.txt -> build/lib/graphslim/licenses
+copying graphslim/licenses/graph-coarsening-Apache-2.0.txt -> build/lib/graphslim/licenses
+copying graphslim/licenses/pygcn-MIT.txt -> build/lib/graphslim/licenses
+creating build/lib/graphslim/scripts
+copying graphslim/scripts/all.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/common.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/main.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/nas.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/requirement.txt -> build/lib/graphslim/scripts
+copying graphslim/scripts/run_cross.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/run_main.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/script_cross.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/script_robust.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sogb.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_all.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_eval.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_flickr.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_grid.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_pub.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/sub_reddit.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/submit_IPC.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/submit_main.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/submit_nas.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/submit_robust.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/submit_transferbility.sh -> build/lib/graphslim/scripts
+copying graphslim/scripts/transferbility.sh -> build/lib/graphslim/scripts
+creating build/lib/graphslim/evaluation/scripts
+copying graphslim/evaluation/scripts/run_cross.sh -> build/lib/graphslim/evaluation/scripts
+copying graphslim/evaluation/scripts/run_main.sh -> build/lib/graphslim/evaluation/scripts
+copying graphslim/evaluation/scripts/script_cross.sh -> build/lib/graphslim/evaluation/scripts
+creating build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+copying graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy -> build/lib/graphslim/sparsification/fixed_idx
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/layers
+copying build/lib/graphslim/layers/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/layers
+copying build/lib/graphslim/tracking.py -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/compat.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/reduction
+copying build/lib/graphslim/reduction/lightweight.py -> build/bdist.linux-x86_64/wheel/./graphslim/reduction
+copying build/lib/graphslim/reduction/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/reduction
+copying build/lib/graphslim/reduction/registry.py -> build/bdist.linux-x86_64/wheel/./graphslim/reduction
+copying build/lib/graphslim/reduction/cluster_ops.py -> build/bdist.linux-x86_64/wheel/./graphslim/reduction
+copying build/lib/graphslim/train_all.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/condensation
+copying build/lib/graphslim/condensation/cgc.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/msgc.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gecc.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcondx.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcgp.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/doscond.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcdm.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/clustgdd.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/doscondx.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/sgdd.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcond_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcond.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/simgc.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcsntk.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gdem.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/sfgc.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/gcdmx.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/condensation/geom.py -> build/bdist.linux-x86_64/wheel/./graphslim/condensation
+copying build/lib/graphslim/visualization.py -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/evaluation
+copying build/lib/graphslim/evaluation/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation
+creating build/bdist.linux-x86_64/wheel/graphslim/evaluation/scripts
+copying build/lib/graphslim/evaluation/scripts/run_cross.sh -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation/scripts
+copying build/lib/graphslim/evaluation/scripts/run_main.sh -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation/scripts
+copying build/lib/graphslim/evaluation/scripts/script_cross.sh -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation/scripts
+copying build/lib/graphslim/evaluation/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation
+copying build/lib/graphslim/evaluation/eval_agent.py -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation
+copying build/lib/graphslim/evaluation/graph_property.py -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation
+copying build/lib/graphslim/evaluation/nas_eval.py -> build/bdist.linux-x86_64/wheel/./graphslim/evaluation
+creating build/bdist.linux-x86_64/wheel/graphslim/scripts
+copying build/lib/graphslim/scripts/submit_IPC.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_eval.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/run_cross.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_flickr.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/submit_transferbility.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/run_main.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/main.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/common.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sogb.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_pub.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/submit_main.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/script_robust.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/transferbility.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_grid.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_all.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/all.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/sub_reddit.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/script_cross.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/requirement.txt -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/submit_robust.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/nas.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/scripts/submit_nas.sh -> build/bdist.linux-x86_64/wheel/./graphslim/scripts
+copying build/lib/graphslim/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/hpo.py -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/run_eval.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/models
+copying build/lib/graphslim/models/sgformer.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/graphsage.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/cheby.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/sntk.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/gin.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/krr.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/gntk.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/parametrized_adj.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/base.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/random_attack.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/gat.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/ignr.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/appnp.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/gcn.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/prbcd.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/layers.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/reparam_module.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/models/sgc.py -> build/bdist.linux-x86_64/wheel/./graphslim/models
+copying build/lib/graphslim/doctor.py -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/_lazy.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/configs
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/default.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+copying build/lib/graphslim/configs/gcsntk/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcsntk
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+copying build/lib/graphslim/configs/msgc/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/msgc
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+copying build/lib/graphslim/configs/simgc/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/simgc
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/ogbn-products.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+copying build/lib/graphslim/configs/gecc/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gecc
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+copying build/lib/graphslim/configs/geom/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/geom
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcgp
+copying build/lib/graphslim/configs/gcgp/default.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcgp
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+copying build/lib/graphslim/configs/gcond/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcond
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+copying build/lib/graphslim/configs/gdem/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gdem
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+copying build/lib/graphslim/configs/gcdmx/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdmx
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+copying build/lib/graphslim/configs/doscondx/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscondx
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+copying build/lib/graphslim/configs/sgdd/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sgdd
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+copying build/lib/graphslim/configs/gcdm/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcdm
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+copying build/lib/graphslim/configs/doscond/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/doscond
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/clustgdd
+copying build/lib/graphslim/configs/clustgdd/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/clustgdd
+copying build/lib/graphslim/configs/clustgdd/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/clustgdd
+copying build/lib/graphslim/configs/clustgdd/default.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/clustgdd
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/hpo
+copying build/lib/graphslim/configs/hpo/gdem.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/hpo
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+copying build/lib/graphslim/configs/sfgc/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/sfgc
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/nope
+copying build/lib/graphslim/configs/nope/default.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/nope
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/amazon.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/ogbn-arxiv.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/pubmed.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/reddit.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/flickr.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+copying build/lib/graphslim/configs/gcondx/yelp.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/gcondx
+creating build/bdist.linux-x86_64/wheel/graphslim/configs/cgc
+copying build/lib/graphslim/configs/cgc/citeseer.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/cgc
+copying build/lib/graphslim/configs/cgc/cora.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/cgc
+copying build/lib/graphslim/configs/cgc/default.json -> build/bdist.linux-x86_64/wheel/./graphslim/configs/cgc
+creating build/bdist.linux-x86_64/wheel/graphslim/licenses
+copying build/lib/graphslim/licenses/pygcn-MIT.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/licenses/PRBCD-MIT.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/licenses/DeepRobust-MIT.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/licenses/PyG-MIT.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/licenses/PyGSP-BSD-3-Clause.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/licenses/graph-coarsening-Apache-2.0.txt -> build/bdist.linux-x86_64/wheel/./graphslim/licenses
+copying build/lib/graphslim/THIRD_PARTY_NOTICES.md -> build/bdist.linux-x86_64/wheel/./graphslim
+copying build/lib/graphslim/config.py -> build/bdist.linux-x86_64/wheel/./graphslim
+creating build/bdist.linux-x86_64/wheel/graphslim/sparsification
+copying build/lib/graphslim/sparsification/g_spar.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/cent_pagerank.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/cent_degree.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/random_edge.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/kcenter_sample.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/kcenter.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/herding.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/local_degree.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/random.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/edge_sparsification_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/rank_degree.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/kcenter_agg.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/coreset_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/model_free_coreset_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/t_spanner.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/networkit_sparsifiers.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/herding_agg.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/model_based_coreset_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+copying build/lib/graphslim/sparsification/scan.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+creating build/bdist.linux-x86_64/wheel/graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification/fixed_idx
+copying build/lib/graphslim/sparsification/spanning_forest.py -> build/bdist.linux-x86_64/wheel/./graphslim/sparsification
+creating build/bdist.linux-x86_64/wheel/graphslim/coarsening
+copying build/lib/graphslim/coarsening/vng.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/affinity_gs.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/labels.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/variation_cliques.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/coarsening_base.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/heavy_edge.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/clustering.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/nope.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/variation_neighborhoods.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/kron.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/averaging.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/clusteringagg.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/variation_edges.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+copying build/lib/graphslim/coarsening/algebraic_jc.py -> build/bdist.linux-x86_64/wheel/./graphslim/coarsening
+creating build/bdist.linux-x86_64/wheel/graphslim/dataset
+copying build/lib/graphslim/dataset/noise.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+copying build/lib/graphslim/dataset/loader.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+copying build/lib/graphslim/dataset/utils.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+copying build/lib/graphslim/dataset/__init__.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+copying build/lib/graphslim/dataset/attack.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+copying build/lib/graphslim/dataset/convertor.py -> build/bdist.linux-x86_64/wheel/./graphslim/dataset
+running install_egg_info
+Copying graphslim.egg-info to build/bdist.linux-x86_64/wheel/./graphslim-1.3.4-py3.11.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/graphslim-1.3.4.dist-info/WHEEL
+creating '/home/sgong36/gslim/output/submission_fixes_20261106/dist/.tmp-qhz6l1a4/graphslim-1.3.4-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'graphslim/THIRD_PARTY_NOTICES.md'
+adding 'graphslim/__init__.py'
+adding 'graphslim/_lazy.py'
+adding 'graphslim/compat.py'
+adding 'graphslim/config.py'
+adding 'graphslim/doctor.py'
+adding 'graphslim/hpo.py'
+adding 'graphslim/run_eval.py'
+adding 'graphslim/tracking.py'
+adding 'graphslim/train_all.py'
+adding 'graphslim/utils.py'
+adding 'graphslim/visualization.py'
+adding 'graphslim/coarsening/__init__.py'
+adding 'graphslim/coarsening/affinity_gs.py'
+adding 'graphslim/coarsening/algebraic_jc.py'
+adding 'graphslim/coarsening/averaging.py'
+adding 'graphslim/coarsening/clustering.py'
+adding 'graphslim/coarsening/clusteringagg.py'
+adding 'graphslim/coarsening/coarsening_base.py'
+adding 'graphslim/coarsening/heavy_edge.py'
+adding 'graphslim/coarsening/kron.py'
+adding 'graphslim/coarsening/labels.py'
+adding 'graphslim/coarsening/nope.py'
+adding 'graphslim/coarsening/utils.py'
+adding 'graphslim/coarsening/variation_cliques.py'
+adding 'graphslim/coarsening/variation_edges.py'
+adding 'graphslim/coarsening/variation_neighborhoods.py'
+adding 'graphslim/coarsening/vng.py'
+adding 'graphslim/condensation/__init__.py'
+adding 'graphslim/condensation/cgc.py'
+adding 'graphslim/condensation/clustgdd.py'
+adding 'graphslim/condensation/doscond.py'
+adding 'graphslim/condensation/doscondx.py'
+adding 'graphslim/condensation/gcdm.py'
+adding 'graphslim/condensation/gcdmx.py'
+adding 'graphslim/condensation/gcgp.py'
+adding 'graphslim/condensation/gcond.py'
+adding 'graphslim/condensation/gcond_base.py'
+adding 'graphslim/condensation/gcondx.py'
+adding 'graphslim/condensation/gcsntk.py'
+adding 'graphslim/condensation/gdem.py'
+adding 'graphslim/condensation/gecc.py'
+adding 'graphslim/condensation/geom.py'
+adding 'graphslim/condensation/msgc.py'
+adding 'graphslim/condensation/sfgc.py'
+adding 'graphslim/condensation/sgdd.py'
+adding 'graphslim/condensation/simgc.py'
+adding 'graphslim/condensation/utils.py'
+adding 'graphslim/configs/cgc/citeseer.json'
+adding 'graphslim/configs/cgc/cora.json'
+adding 'graphslim/configs/cgc/default.json'
+adding 'graphslim/configs/clustgdd/citeseer.json'
+adding 'graphslim/configs/clustgdd/cora.json'
+adding 'graphslim/configs/clustgdd/default.json'
+adding 'graphslim/configs/doscond/amazon.json'
+adding 'graphslim/configs/doscond/citeseer.json'
+adding 'graphslim/configs/doscond/cora.json'
+adding 'graphslim/configs/doscond/flickr.json'
+adding 'graphslim/configs/doscond/ogbn-arxiv.json'
+adding 'graphslim/configs/doscond/pubmed.json'
+adding 'graphslim/configs/doscond/reddit.json'
+adding 'graphslim/configs/doscond/yelp.json'
+adding 'graphslim/configs/doscondx/amazon.json'
+adding 'graphslim/configs/doscondx/citeseer.json'
+adding 'graphslim/configs/doscondx/cora.json'
+adding 'graphslim/configs/doscondx/flickr.json'
+adding 'graphslim/configs/doscondx/ogbn-arxiv.json'
+adding 'graphslim/configs/doscondx/pubmed.json'
+adding 'graphslim/configs/doscondx/reddit.json'
+adding 'graphslim/configs/doscondx/yelp.json'
+adding 'graphslim/configs/gcdm/amazon.json'
+adding 'graphslim/configs/gcdm/citeseer.json'
+adding 'graphslim/configs/gcdm/cora.json'
+adding 'graphslim/configs/gcdm/flickr.json'
+adding 'graphslim/configs/gcdm/ogbn-arxiv.json'
+adding 'graphslim/configs/gcdm/pubmed.json'
+adding 'graphslim/configs/gcdm/reddit.json'
+adding 'graphslim/configs/gcdm/yelp.json'
+adding 'graphslim/configs/gcdmx/amazon.json'
+adding 'graphslim/configs/gcdmx/citeseer.json'
+adding 'graphslim/configs/gcdmx/cora.json'
+adding 'graphslim/configs/gcdmx/flickr.json'
+adding 'graphslim/configs/gcdmx/ogbn-arxiv.json'
+adding 'graphslim/configs/gcdmx/pubmed.json'
+adding 'graphslim/configs/gcdmx/reddit.json'
+adding 'graphslim/configs/gcdmx/yelp.json'
+adding 'graphslim/configs/gcgp/default.json'
+adding 'graphslim/configs/gcond/amazon.json'
+adding 'graphslim/configs/gcond/citeseer.json'
+adding 'graphslim/configs/gcond/cora.json'
+adding 'graphslim/configs/gcond/flickr.json'
+adding 'graphslim/configs/gcond/ogbn-arxiv.json'
+adding 'graphslim/configs/gcond/pubmed.json'
+adding 'graphslim/configs/gcond/reddit.json'
+adding 'graphslim/configs/gcond/yelp.json'
+adding 'graphslim/configs/gcondx/amazon.json'
+adding 'graphslim/configs/gcondx/citeseer.json'
+adding 'graphslim/configs/gcondx/cora.json'
+adding 'graphslim/configs/gcondx/flickr.json'
+adding 'graphslim/configs/gcondx/ogbn-arxiv.json'
+adding 'graphslim/configs/gcondx/pubmed.json'
+adding 'graphslim/configs/gcondx/reddit.json'
+adding 'graphslim/configs/gcondx/yelp.json'
+adding 'graphslim/configs/gcsntk/amazon.json'
+adding 'graphslim/configs/gcsntk/citeseer.json'
+adding 'graphslim/configs/gcsntk/cora.json'
+adding 'graphslim/configs/gcsntk/default.json'
+adding 'graphslim/configs/gcsntk/flickr.json'
+adding 'graphslim/configs/gcsntk/ogbn-arxiv.json'
+adding 'graphslim/configs/gcsntk/pubmed.json'
+adding 'graphslim/configs/gcsntk/reddit.json'
+adding 'graphslim/configs/gcsntk/yelp.json'
+adding 'graphslim/configs/gdem/amazon.json'
+adding 'graphslim/configs/gdem/citeseer.json'
+adding 'graphslim/configs/gdem/cora.json'
+adding 'graphslim/configs/gdem/flickr.json'
+adding 'graphslim/configs/gdem/ogbn-arxiv.json'
+adding 'graphslim/configs/gdem/pubmed.json'
+adding 'graphslim/configs/gdem/reddit.json'
+adding 'graphslim/configs/gdem/yelp.json'
+adding 'graphslim/configs/gecc/citeseer.json'
+adding 'graphslim/configs/gecc/cora.json'
+adding 'graphslim/configs/gecc/flickr.json'
+adding 'graphslim/configs/gecc/ogbn-arxiv.json'
+adding 'graphslim/configs/gecc/ogbn-products.json'
+adding 'graphslim/configs/gecc/pubmed.json'
+adding 'graphslim/configs/gecc/reddit.json'
+adding 'graphslim/configs/geom/amazon.json'
+adding 'graphslim/configs/geom/citeseer.json'
+adding 'graphslim/configs/geom/cora.json'
+adding 'graphslim/configs/geom/flickr.json'
+adding 'graphslim/configs/geom/ogbn-arxiv.json'
+adding 'graphslim/configs/geom/pubmed.json'
+adding 'graphslim/configs/geom/reddit.json'
+adding 'graphslim/configs/geom/yelp.json'
+adding 'graphslim/configs/hpo/gdem.json'
+adding 'graphslim/configs/msgc/amazon.json'
+adding 'graphslim/configs/msgc/citeseer.json'
+adding 'graphslim/configs/msgc/cora.json'
+adding 'graphslim/configs/msgc/flickr.json'
+adding 'graphslim/configs/msgc/ogbn-arxiv.json'
+adding 'graphslim/configs/msgc/pubmed.json'
+adding 'graphslim/configs/msgc/reddit.json'
+adding 'graphslim/configs/msgc/yelp.json'
+adding 'graphslim/configs/nope/default.json'
+adding 'graphslim/configs/sfgc/amazon.json'
+adding 'graphslim/configs/sfgc/citeseer.json'
+adding 'graphslim/configs/sfgc/cora.json'
+adding 'graphslim/configs/sfgc/flickr.json'
+adding 'graphslim/configs/sfgc/ogbn-arxiv.json'
+adding 'graphslim/configs/sfgc/pubmed.json'
+adding 'graphslim/configs/sfgc/reddit.json'
+adding 'graphslim/configs/sfgc/yelp.json'
+adding 'graphslim/configs/sgdd/amazon.json'
+adding 'graphslim/configs/sgdd/citeseer.json'
+adding 'graphslim/configs/sgdd/cora.json'
+adding 'graphslim/configs/sgdd/flickr.json'
+adding 'graphslim/configs/sgdd/ogbn-arxiv.json'
+adding 'graphslim/configs/sgdd/pubmed.json'
+adding 'graphslim/configs/sgdd/reddit.json'
+adding 'graphslim/configs/sgdd/yelp.json'
+adding 'graphslim/configs/simgc/amazon.json'
+adding 'graphslim/configs/simgc/citeseer.json'
+adding 'graphslim/configs/simgc/cora.json'
+adding 'graphslim/configs/simgc/flickr.json'
+adding 'graphslim/configs/simgc/ogbn-arxiv.json'
+adding 'graphslim/configs/simgc/pubmed.json'
+adding 'graphslim/configs/simgc/reddit.json'
+adding 'graphslim/configs/simgc/yelp.json'
+adding 'graphslim/dataset/__init__.py'
+adding 'graphslim/dataset/attack.py'
+adding 'graphslim/dataset/convertor.py'
+adding 'graphslim/dataset/loader.py'
+adding 'graphslim/dataset/noise.py'
+adding 'graphslim/dataset/utils.py'
+adding 'graphslim/evaluation/__init__.py'
+adding 'graphslim/evaluation/eval_agent.py'
+adding 'graphslim/evaluation/graph_property.py'
+adding 'graphslim/evaluation/nas_eval.py'
+adding 'graphslim/evaluation/utils.py'
+adding 'graphslim/evaluation/scripts/run_cross.sh'
+adding 'graphslim/evaluation/scripts/run_main.sh'
+adding 'graphslim/evaluation/scripts/script_cross.sh'
+adding 'graphslim/layers/__init__.py'
+adding 'graphslim/licenses/DeepRobust-MIT.txt'
+adding 'graphslim/licenses/PRBCD-MIT.txt'
+adding 'graphslim/licenses/PyG-MIT.txt'
+adding 'graphslim/licenses/PyGSP-BSD-3-Clause.txt'
+adding 'graphslim/licenses/graph-coarsening-Apache-2.0.txt'
+adding 'graphslim/licenses/pygcn-MIT.txt'
+adding 'graphslim/models/__init__.py'
+adding 'graphslim/models/appnp.py'
+adding 'graphslim/models/base.py'
+adding 'graphslim/models/cheby.py'
+adding 'graphslim/models/gat.py'
+adding 'graphslim/models/gcn.py'
+adding 'graphslim/models/gin.py'
+adding 'graphslim/models/gntk.py'
+adding 'graphslim/models/graphsage.py'
+adding 'graphslim/models/ignr.py'
+adding 'graphslim/models/krr.py'
+adding 'graphslim/models/layers.py'
+adding 'graphslim/models/parametrized_adj.py'
+adding 'graphslim/models/prbcd.py'
+adding 'graphslim/models/random_attack.py'
+adding 'graphslim/models/reparam_module.py'
+adding 'graphslim/models/sgc.py'
+adding 'graphslim/models/sgformer.py'
+adding 'graphslim/models/sntk.py'
+adding 'graphslim/reduction/__init__.py'
+adding 'graphslim/reduction/cluster_ops.py'
+adding 'graphslim/reduction/lightweight.py'
+adding 'graphslim/reduction/registry.py'
+adding 'graphslim/scripts/all.sh'
+adding 'graphslim/scripts/common.sh'
+adding 'graphslim/scripts/main.sh'
+adding 'graphslim/scripts/nas.sh'
+adding 'graphslim/scripts/requirement.txt'
+adding 'graphslim/scripts/run_cross.sh'
+adding 'graphslim/scripts/run_main.sh'
+adding 'graphslim/scripts/script_cross.sh'
+adding 'graphslim/scripts/script_robust.sh'
+adding 'graphslim/scripts/sogb.sh'
+adding 'graphslim/scripts/sub_all.sh'
+adding 'graphslim/scripts/sub_eval.sh'
+adding 'graphslim/scripts/sub_flickr.sh'
+adding 'graphslim/scripts/sub_grid.sh'
+adding 'graphslim/scripts/sub_pub.sh'
+adding 'graphslim/scripts/sub_reddit.sh'
+adding 'graphslim/scripts/submit_IPC.sh'
+adding 'graphslim/scripts/submit_main.sh'
+adding 'graphslim/scripts/submit_nas.sh'
+adding 'graphslim/scripts/submit_robust.sh'
+adding 'graphslim/scripts/submit_transferbility.sh'
+adding 'graphslim/scripts/transferbility.sh'
+adding 'graphslim/sparsification/__init__.py'
+adding 'graphslim/sparsification/cent_degree.py'
+adding 'graphslim/sparsification/cent_pagerank.py'
+adding 'graphslim/sparsification/coreset_base.py'
+adding 'graphslim/sparsification/edge_sparsification_base.py'
+adding 'graphslim/sparsification/g_spar.py'
+adding 'graphslim/sparsification/herding.py'
+adding 'graphslim/sparsification/herding_agg.py'
+adding 'graphslim/sparsification/kcenter.py'
+adding 'graphslim/sparsification/kcenter_agg.py'
+adding 'graphslim/sparsification/kcenter_sample.py'
+adding 'graphslim/sparsification/local_degree.py'
+adding 'graphslim/sparsification/model_based_coreset_base.py'
+adding 'graphslim/sparsification/model_free_coreset_base.py'
+adding 'graphslim/sparsification/networkit_sparsifiers.py'
+adding 'graphslim/sparsification/random.py'
+adding 'graphslim/sparsification/random_edge.py'
+adding 'graphslim/sparsification/rank_degree.py'
+adding 'graphslim/sparsification/scan.py'
+adding 'graphslim/sparsification/spanning_forest.py'
+adding 'graphslim/sparsification/t_spanner.py'
+adding 'graphslim/sparsification/utils.py'
+adding 'graphslim/sparsification/fixed_idx/idx_citeseer_0.1_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_citeseer_0.25_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_citeseer_0.5_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_citeseer_1.0_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_cora_0.1_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_cora_0.25_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_cora_0.5_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_cora_1.0_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_flickr_0.001_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_flickr_0.005_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_flickr_0.01_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.001_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.005_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_ogbn-arxiv_0.01_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_reddit_0.0005_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_reddit_0.001_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_reddit_0.002_kcenter_15.npy'
+adding 'graphslim/sparsification/fixed_idx/idx_reddit_0.005_kcenter_15.npy'
+adding 'graphslim-1.3.4.dist-info/licenses/LICENSE'
+adding 'graphslim-1.3.4.dist-info/METADATA'
+adding 'graphslim-1.3.4.dist-info/WHEEL'
+adding 'graphslim-1.3.4.dist-info/entry_points.txt'
+adding 'graphslim-1.3.4.dist-info/top_level.txt'
+adding 'graphslim-1.3.4.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+WARNING Package 'graphslim.configs.cgc' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.cgc' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.cgc' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.cgc' to be distributed and are
+        already explicitly excluding 'graphslim.configs.cgc' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.clustgdd' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.clustgdd' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.clustgdd' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.clustgdd' to be distributed and are
+        already explicitly excluding 'graphslim.configs.clustgdd' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.doscond' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.doscond' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.doscond' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.doscond' to be distributed and are
+        already explicitly excluding 'graphslim.configs.doscond' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.doscondx' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.doscondx' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.doscondx' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.doscondx' to be distributed and are
+        already explicitly excluding 'graphslim.configs.doscondx' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcdm' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcdm' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcdm' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcdm' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcdm' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcdmx' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcdmx' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcdmx' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcdmx' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcdmx' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcgp' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcgp' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcgp' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcgp' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcgp' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcond' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcond' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcond' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcond' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcond' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcondx' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcondx' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcondx' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcondx' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcondx' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gcsntk' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gcsntk' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gcsntk' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gcsntk' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gcsntk' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gdem' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gdem' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gdem' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gdem' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gdem' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.gecc' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.gecc' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.gecc' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.gecc' to be distributed and are
+        already explicitly excluding 'graphslim.configs.gecc' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.geom' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.geom' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.geom' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.geom' to be distributed and are
+        already explicitly excluding 'graphslim.configs.geom' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.hpo' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.hpo' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.hpo' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.hpo' to be distributed and are
+        already explicitly excluding 'graphslim.configs.hpo' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.msgc' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.msgc' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.msgc' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.msgc' to be distributed and are
+        already explicitly excluding 'graphslim.configs.msgc' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.nope' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.nope' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.nope' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.nope' to be distributed and are
+        already explicitly excluding 'graphslim.configs.nope' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.sfgc' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.sfgc' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.sfgc' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.sfgc' to be distributed and are
+        already explicitly excluding 'graphslim.configs.sfgc' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.sgdd' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.sgdd' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.sgdd' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.sgdd' to be distributed and are
+        already explicitly excluding 'graphslim.configs.sgdd' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.configs.simgc' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.configs.simgc' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.configs.simgc' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.configs.simgc' to be distributed and are
+        already explicitly excluding 'graphslim.configs.simgc' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.evaluation.scripts' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.evaluation.scripts' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.evaluation.scripts' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.evaluation.scripts' to be distributed and are
+        already explicitly excluding 'graphslim.evaluation.scripts' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.licenses' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.licenses' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.licenses' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.licenses' to be distributed and are
+        already explicitly excluding 'graphslim.licenses' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.scripts' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.scripts' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.scripts' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.scripts' to be distributed and are
+        already explicitly excluding 'graphslim.scripts' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+WARNING Package 'graphslim.sparsification.fixed_idx' is absent from the `packages` configuration.
+!!
+
+        ********************************************************************************
+        ############################
+        # Package would be ignored #
+        ############################
+        Python recognizes 'graphslim.sparsification.fixed_idx' as an importable package[^1],
+        but it is absent from setuptools' `packages` configuration.
+
+        This leads to an ambiguous overall configuration. If you want to distribute this
+        package, please make sure that 'graphslim.sparsification.fixed_idx' is explicitly added
+        to the `packages` configuration field.
+
+        Alternatively, you can also rely on setuptools' discovery methods
+        (for example by using `find_namespace_packages(...)`/`find_namespace:`
+        instead of `find_packages(...)`/`find:`).
+
+        You can read more about "package discovery" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/package_discovery.html
+
+        If you don't want 'graphslim.sparsification.fixed_idx' to be distributed and are
+        already explicitly excluding 'graphslim.sparsification.fixed_idx' via
+        `find_namespace_packages(...)/find_namespace` or `find_packages(...)/find`,
+        you can try to use `exclude_package_data`, or `include-package-data=False` in
+        combination with a more fine grained `package-data` configuration.
+
+        You can read more about "package data files" on setuptools documentation page:
+
+        - https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+
+
+        [^1]: For Python, any directory (with suitable naming) can be imported,
+              even if it does not contain any `.py` files.
+              On the other hand, currently there is no concept of package data
+              directory, all directories are treated like packages.
+        ********************************************************************************
+
+!!
+Successfully built graphslim-1.3.4.tar.gz and graphslim-1.3.4-py3-none-any.whl

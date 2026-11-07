@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Run the paper's GCond-to-GAT demo with a readable console transcript.
 
 Run from the repository root: ``python examples/demo.py``. GraphSlim options

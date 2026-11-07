@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """GEOM and SFGC: expert buffer creation, buffer loading, and trajectory matching."""
 
 from pathlib import Path

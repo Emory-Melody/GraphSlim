@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+# See LICENSE and graphslim/THIRD_PARTY_NOTICES.md for retained upstream terms.
 """Compare the structure-based NTK block kernel to a full joint covariance recursion."""
 
 import math

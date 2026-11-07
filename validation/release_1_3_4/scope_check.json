@@ -1,0 +1,16 @@
+{
+  "runtime_python_modules_byte_identical_to_1_3_3": 104,
+  "table_blocks_byte_identical_to_19ee5ff": true,
+  "changed_result_metadata_only": [
+    "benchmark/results/arxiv_clustering_figure.json",
+    "benchmark/results/clustering_arxiv_figure.json",
+    "benchmark/results/gecc_operator_figure.json",
+    "benchmark/results/implementation_comparison_figure.json",
+    "benchmark/results/reproducibility_20261103/manifest.json",
+    "benchmark/results/reproducibility_20261105/manifest.json",
+    "benchmark/results/reproducibility_20261106/base_20261105/manifest.json",
+    "benchmark/results/reproducibility_20261106/manifest.json",
+    "benchmark/results/reproduction_coverage_figure.json"
+  ],
+  "measured_json_csv_zip_records_unchanged": true
+}
